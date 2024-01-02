@@ -246,6 +246,7 @@ public class Configs implements IConfigHandler {
 
                 AFTER_CLICKER_CLICK_COUNT,
                 BLOCK_REACH_DISTANCE,
+                ENTITY_REACH_DISTANCE,
                 BREAKING_GRID_SIZE,
                 CUSTOM_INVENTORY_GUI_SCALE,
                 FAST_BLOCK_PLACEMENT_COUNT,

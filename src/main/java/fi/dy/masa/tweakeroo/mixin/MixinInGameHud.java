@@ -26,7 +26,7 @@ public abstract class MixinInGameHud
 {
     @Shadow @Final private PlayerListHud playerListHud;
     @Shadow @Final private MinecraftClient client;
-    @Shadow private int scaledWidth;
+    //@Shadow private int scaledWidth;
 
     @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
     private void overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
@@ -49,10 +49,10 @@ public abstract class MixinInGameHud
         }
     }
 
-    @Inject(method = "render",
+    @Inject(method = "renderPlayerList",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
-                     ordinal = 1, shift = At.Shift.AFTER))
+                    target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
+                    ordinal = 1, shift = At.Shift.AFTER))
     private void alwaysRenderPlayerList(DrawContext drawContext, float tickDelta, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue())
@@ -61,7 +61,9 @@ public abstract class MixinInGameHud
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
 
             this.playerListHud.setVisible(true);
-            this.playerListHud.render(drawContext, this.scaledWidth, scoreboard, objective);
+            this.playerListHud.render(drawContext, drawContext.getScaledWindowWidth(), scoreboard, objective);
+
+            ci.cancel();
         }
     }
 

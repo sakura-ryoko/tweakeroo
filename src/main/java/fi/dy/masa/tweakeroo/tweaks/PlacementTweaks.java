@@ -225,7 +225,7 @@ public class PlacementTweaks
         {
             ClientPlayerEntity player = mc.player;
             World world = player.getEntityWorld();
-            final double reach = mc.interactionManager.getReachDistance();
+            final double reach = mc.player.getBlockInteractionRange();
             final int maxCount = Configs.Generic.FAST_BLOCK_PLACEMENT_COUNT.getIntegerValue();
 
             mc.crosshairTarget = player.raycast(reach, mc.getTickDelta(), false);
