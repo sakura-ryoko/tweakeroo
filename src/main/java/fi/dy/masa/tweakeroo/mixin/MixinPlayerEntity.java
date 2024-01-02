@@ -41,16 +41,16 @@ public abstract class MixinPlayerEntity extends LivingEntity {
     }
 
     @Inject(method = "getBlockInteractionRange", at = @At("HEAD"), cancellable = true)
-    private void overrideBlockReachDistance(CallbackInfoReturnable<Double> cir) {
+    private void overrideBlockReachDistance(CallbackInfoReturnable<Float> cir) {
         if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue()) {
-            cir.setReturnValue(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue());
+            cir.setReturnValue((float) Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue());
         }
     }
 
     @Inject(method = "getEntityInteractionRange", at = @At("HEAD"), cancellable = true)
-    private void overrideEntityReachDistance(CallbackInfoReturnable<Double> cir) {
+    private void overrideEntityReachDistance(CallbackInfoReturnable<Float> cir) {
         if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue()) {
-            cir.setReturnValue(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue());
+            cir.setReturnValue((float) Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue());
         }
     }
 }
