@@ -159,25 +159,6 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
-/*
-    @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)
-    private void overrideReachDistance(CallbackInfoReturnable<Float> cir)
-    {
-        if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue())
-        {
-            cir.setReturnValue((float) Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue());
-        }
-    }
-
-    @Inject(method = "hasExtendedReach", at = @At("HEAD"), cancellable = true)
-    private void overrideExtendedReach(CallbackInfoReturnable<Boolean> cir)
-    {
-        if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue())
-        {
-            cir.setReturnValue(false);
-        }
-    }
-*/
     @Inject(method = "hasLimitedAttackSpeed", at = @At("HEAD"), cancellable = true)
     private void overrideLimitedAttackSpeed(CallbackInfoReturnable<Boolean> cir)
     {

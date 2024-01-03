@@ -26,7 +26,6 @@ public abstract class MixinInGameHud
 {
     @Shadow @Final private PlayerListHud playerListHud;
     @Shadow @Final private MinecraftClient client;
-    //@Shadow private int scaledWidth;
 
     @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
     private void overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
