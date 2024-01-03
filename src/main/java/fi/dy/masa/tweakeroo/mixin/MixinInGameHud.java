@@ -38,7 +38,8 @@ public abstract class MixinInGameHud
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
-                target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z", ordinal = 0), cancellable = true)
+                target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z",
+                ordinal = 0), cancellable = true)
     private void overrideCursorRender(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
@@ -61,12 +62,10 @@ public abstract class MixinInGameHud
 
             this.playerListHud.setVisible(true);
             this.playerListHud.render(drawContext, drawContext.getScaledWindowWidth(), scoreboard, objective);
-
-            ci.cancel();
         }
     }
 
-    @Inject(method = "renderScoreboardSidebar", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderScoreboardSidebar*", at = @At("HEAD"), cancellable = true)
     private void disableScoreboardRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SCOREBOARD_RENDERING.getBooleanValue())
