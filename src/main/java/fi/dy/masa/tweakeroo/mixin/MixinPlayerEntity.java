@@ -18,8 +18,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity
 {
-    @Shadow
-    protected abstract boolean clipAtLedge();
+    @Shadow protected abstract boolean clipAtLedge();
 
     protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType_1, World world_1)
     {
@@ -35,7 +34,8 @@ public abstract class MixinPlayerEntity extends LivingEntity
         }
     }
 
-    @Redirect(method = "adjustMovementForSneaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;clipAtLedge()Z", ordinal = 0))
+    @Redirect(method = "adjustMovementForSneaking", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/entity/player/PlayerEntity;clipAtLedge()Z", ordinal = 0))
     private boolean fakeSneaking(PlayerEntity entity)
     {
         if (FeatureToggle.TWEAK_FAKE_SNEAKING.getBooleanValue() && ((Object) this) instanceof ClientPlayerEntity)
