@@ -4,6 +4,7 @@ import java.util.function.Predicate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,7 +35,9 @@ public abstract class MixinGameRenderer
 
     @Shadow protected abstract void bobView(MatrixStack matrices, float tickDelta);
 
+    @Unique
     private float realYaw;
+    @Unique
     private float realPitch;
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
@@ -69,7 +72,8 @@ public abstract class MixinGameRenderer
         }
     }
 
-    @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE",
+    // Method renamed
+    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
     private Entity overrideCameraEntityForRayTrace(MinecraftClient mc)
     {
@@ -87,7 +91,8 @@ public abstract class MixinGameRenderer
         return mc.getCameraEntity();
     }
 
-    @ModifyArg(method = "updateTargetedEntity",
+    // Call moved to findCrosshairTarget()
+    @ModifyArg(method = "findCrosshairTarget",
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(" +
                                  "Lnet/minecraft/entity/Entity;" +
@@ -114,7 +119,7 @@ public abstract class MixinGameRenderer
 
     @Inject(method = "renderWorld", at = @At(
                 value = "INVOKE", shift = Shift.AFTER,
-                target = "Lnet/minecraft/client/render/GameRenderer;updateTargetedEntity(F)V"))
+                target = "Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"))
     private void overrideRenderViewEntityPre(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
