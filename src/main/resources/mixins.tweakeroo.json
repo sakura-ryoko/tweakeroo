@@ -12,7 +12,6 @@
 		"IMixinCommandBlockExecutor",
 		"IMixinShovelItem",
 		"IMixinSimpleOption",
-		"MixinAbstractBlockState",
 		"MixinAbstractClientPlayerEntity",
 		"MixinAbstractInventoryScreen",
 		"MixinAbstractSignEditScreen",
@@ -79,5 +78,6 @@
 	"mixinPriority": 990,
 	"injectors": {
 		"defaultRequire": 0
-	}
+	},
+	"mixins": []
 }

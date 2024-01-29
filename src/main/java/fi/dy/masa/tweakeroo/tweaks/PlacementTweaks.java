@@ -3,7 +3,6 @@ package fi.dy.masa.tweakeroo.tweaks;
 import javax.annotation.Nullable;
 
 import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -1078,9 +1077,6 @@ public class PlacementTweaks
     private static boolean canPlaceBlockIntoPosition(World world, BlockPos pos, ItemPlacementContext useContext)
     {
         BlockState state = world.getBlockState(pos);
-        IMixinAbstractBlockState fixed_state = (IMixinAbstractBlockState) state;
-        // Verify Mixin is working before totally removing state.isLiquid() --> DebugLogger added
-        Tweakeroo.debugLog("PlacementTweaks#canPlaceBlockIntoPosition(): BlockState.isLiquid() fixed: {}/orig: {}", fixed_state.tweakeroo$isLiquid(), state.isLiquid());
         return state.canReplace(useContext) || state.isLiquid() || state.isReplaceable();
     }
 
