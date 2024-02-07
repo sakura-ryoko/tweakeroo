@@ -12,7 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.collection.DefaultedList;
@@ -87,7 +87,9 @@ public class CreativeExtraItems
     {
         try
         {
-            ItemStringReader.ItemResult itemResult = ItemStringReader.item(Registries.ITEM.getReadOnlyWrapper(), new StringReader(str));
+            // This took me like 2 hours to find this for code that is unused
+            ItemStringReader itemStringReader = new ItemStringReader(BuiltinRegistries.createWrapperLookup());
+            ItemStringReader.ItemResult itemResult = itemStringReader.consume(new StringReader(str));
             Item item = itemResult.item().value();
 
             if (item != null)

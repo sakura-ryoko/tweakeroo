@@ -128,6 +128,8 @@ public class MiscTweaks
 
     public static void onGameLoop(MinecraftClient mc)
     {
+        if (mc == null)
+            return;
         PlacementTweaks.onTick(mc);
 
         // Reset the counters after rendering each frame

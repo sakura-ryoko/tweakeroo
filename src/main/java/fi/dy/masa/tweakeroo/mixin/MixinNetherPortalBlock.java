@@ -17,7 +17,7 @@ public abstract class MixinNetherPortalBlock
     private void tweakeroo_disablePortalSound(World instance, double x, double y, double z, SoundEvent sound,
                                               SoundCategory category, float volume, float pitch, boolean useDistance)
     {
-        if (Configs.Disable.DISABLE_NETHER_PORTAL_SOUND.getBooleanValue() == false)
+        if (!Configs.Disable.DISABLE_NETHER_PORTAL_SOUND.getBooleanValue())
         {
             instance.playSound(x, y, z, sound, category, volume, pitch, useDistance);
         }

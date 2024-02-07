@@ -5,7 +5,6 @@ import org.joml.Matrix4f;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
@@ -80,7 +79,7 @@ public class RenderHandler implements IRenderer
         }
         else if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue())
         {
-            boolean render = Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown();
+            boolean render = !Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() || GuiBase.isShiftDown();
 
             if (render)
             {
@@ -90,17 +89,20 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(MatrixStack matrixStack, Matrix4f projMatrix)
+    public void onRenderWorldLast(Matrix4f matrix4f, Matrix4f projMatrix)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc.player != null)
         {
-            this.renderOverlays(matrixStack, mc);
+            //MatrixStack matrixStack = new MatrixStack();
+            //matrixStack.multiplyPositionMatrix(matrix4f);
+
+            this.renderOverlays(matrix4f, mc);
         }
     }
 
-    private void renderOverlays(MatrixStack matrixStack, MinecraftClient mc)
+    private void renderOverlays(Matrix4f matrix4f, MinecraftClient mc)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -127,7 +129,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getSide(),
                     hitResult.getPos(),
                     color,
-                    matrixStack,
+                    matrix4f,
                     mc);
 
             RenderSystem.enableDepthTest();

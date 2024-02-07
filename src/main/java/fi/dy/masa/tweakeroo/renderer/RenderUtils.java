@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 
 import net.minecraft.block.Block;
@@ -11,7 +12,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -95,7 +95,7 @@ public class RenderUtils
                 {
                     ItemStack stack = player.getInventory().getStack(row * 9 + column);
 
-                    if (stack.isEmpty() == false)
+                    if (!stack.isEmpty())
                     {
                         fi.dy.masa.malilib.render.InventoryOverlay.renderStackAt(stack, x, y, 1, mc, drawContext);
                     }
@@ -292,23 +292,49 @@ public class RenderUtils
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
+        // New Matrix4fStack method
         int width = GuiUtils.getScaledWindowWidth();
         int height = GuiUtils.getScaledWindowHeight();
         Camera camera = mc.gameRenderer.getCamera();
-        MatrixStack matrixStack = RenderSystem.getModelViewStack();
-        matrixStack.push();
-        matrixStack.translate(width / 2.0, height / 2.0, zLevel);
+        //MatrixStack matrixStack = RenderSystem.getModelViewStack();
+        //matrixStack.push();
+        //matrixStack.translate(width / 2.0, height / 2.0, zLevel);
+        Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+        matrixStack.pushMatrix();
+        matrixStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();
         Quaternionf rot = new Quaternionf().rotationXYZ(-pitch * (float) (Math.PI / 180.0), yaw * (float) (Math.PI / 180.0), 0.0F);
-        matrixStack.multiply(rot);
+        matrixStack.mul(convertQuaternionToMatrix4f(rot));
         //matrixStack.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(camera.getPitch()));
         //matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw()));
         matrixStack.scale(-1.0F, -1.0F, -1.0F);
         RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair(10);
-        matrixStack.pop();
+        matrixStack.popMatrix();
         RenderSystem.applyModelViewMatrix();
+    }
+
+    // Made public under MaLiLib
+    protected static Matrix4f convertQuaternionToMatrix4f(Quaternionf q)
+    {
+        return new Matrix4f(
+                1.0f - 2.0f * ( q.y() * q.y() + q.z() * q.z() ),
+                2.0f * (q.x() * q.y() + q.z() * q.w()),
+                2.0f * (q.x() * q.z() - q.y() * q.w()),
+                0.0f,
+
+                2.0f * ( q.x() * q.y() - q.z() * q.w() ),
+                1.0f - 2.0f * ( q.x() * q.x() + q.z() * q.z() ),
+                2.0f * (q.z() * q.y() + q.x() * q.w() ),
+                0.0f,
+
+                2.0f * ( q.x() * q.z() + q.y() * q.w() ),
+                2.0f * ( q.y() * q.z() - q.x() * q.w() ),
+                1.0f - 2.0f * ( q.x() * q.x() + q.y() * q.y() ),
+                0.0f,
+
+                0, 0, 0, 1.0f);
     }
 
     public static void notifyRotationChanged()
@@ -475,7 +501,7 @@ public class RenderUtils
                 fi.dy.masa.malilib.render.RenderUtils.drawRect(x, yCenter + snapThreshOffset, width, 2, 0xFF20FF20);
             }
         }
-        else if (isSnapRange == false)
+        else if (!isSnapRange)
         {
             fi.dy.masa.malilib.render.RenderUtils.drawRect(x + 1, yCenter - 1, width - 2, 2, 0xFFC0C0C0);
         }

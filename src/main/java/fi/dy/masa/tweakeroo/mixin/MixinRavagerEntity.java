@@ -16,7 +16,7 @@ public abstract class MixinRavagerEntity
     {
         if (Configs.Fixes.RAVAGER_CLIENT_BLOCK_BREAK_FIX.getBooleanValue())
         {
-            return entity.horizontalCollision && entity.getEntityWorld().isClient == false;
+            return entity.horizontalCollision && !entity.getEntityWorld().isClient;
         }
 
         return entity.horizontalCollision;

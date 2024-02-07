@@ -25,7 +25,7 @@ public abstract class MixinWorld
     @Inject(method = "tickEntity(Ljava/util/function/Consumer;Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private <T extends Entity> void preventEntityTicking(Consumer<T> consumer, T entityIn, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && (entityIn instanceof PlayerEntity) == false)
+        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && !(entityIn instanceof PlayerEntity))
         {
             ci.cancel();
         }

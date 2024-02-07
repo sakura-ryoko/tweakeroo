@@ -33,7 +33,7 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
     }
 
     @Override
-    public int getPickupDelay()
+    public int tweakeroo$getPickupDelay()
     {
         return this.pickupDelay;
     }
@@ -84,16 +84,16 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
 
             if (stackSelf.getItem() instanceof BlockItem && ((BlockItem) stackSelf.getItem()).getBlock() instanceof ShulkerBoxBlock &&
                 stackSelf.getItem() == stackOther.getItem() &&
-                fi.dy.masa.malilib.util.InventoryUtils.shulkerBoxHasItems(stackSelf) == false &&
+                    !fi.dy.masa.malilib.util.InventoryUtils.shulkerBoxHasItems(stackSelf) &&
                 // Only stack up to 64, and don't steal from other stacks that are larger
                 stackSelf.getCount() < 64 && stackSelf.getCount() >= stackOther.getCount() &&
-                ItemStack.canCombine(stackSelf, stackOther))
+                ItemStack.areItemsAndNbtEqual(stackSelf, stackOther))
             {
                 int amount = Math.min(stackOther.getCount(), 64 - stackSelf.getCount());
 
                 stackSelf.increment(amount);
                 self.setStack(stackSelf);
-                this.pickupDelay = Math.max(((IEntityItem) other).getPickupDelay(), this.pickupDelay);
+                this.pickupDelay = Math.max(((IEntityItem) other).tweakeroo$getPickupDelay(), this.pickupDelay);
                 this.itemAge = Math.min(other.getItemAge(), this.itemAge);
 
                 if (amount >= stackOther.getCount())
