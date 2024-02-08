@@ -300,9 +300,9 @@ public class RenderUtils
         //matrixStack.push();
         //matrixStack.translate(width / 2.0, height / 2.0, zLevel);
 
-        Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
-        matrixStack.pushMatrix();
-        matrixStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
+        Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
+        matrix4fStack.pushMatrix();
+        matrix4fStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();
 
@@ -311,14 +311,14 @@ public class RenderUtils
         //matrixStack.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(camera.getPitch()));
         //matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw()));
 
-        matrixStack.rotateXYZ(-(pitch) * ((float) (Math.PI / 180.0)), yaw * ((float) (Math.PI / 180.0)), 0.0F);
-        matrixStack.rotateX(-(pitch));
-        matrixStack.rotateY(yaw);
+        matrix4fStack.rotateXYZ(-(pitch) * ((float) (Math.PI / 180.0)), yaw * ((float) (Math.PI / 180.0)), 0.0F);
+        matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
+        matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
 
-        matrixStack.scale(-1.0F, -1.0F, -1.0F);
+        matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
         RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair(10);
-        matrixStack.popMatrix();
+        matrix4fStack.popMatrix();
         RenderSystem.applyModelViewMatrix();
     }
 

@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 
 import net.minecraft.client.MinecraftClient;
@@ -90,7 +89,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(MatrixStack matrixStack, Matrix4f projMatrix)
+    public void onRenderWorldLast(Matrix4f matrix4f, Matrix4f projMatrix)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -99,11 +98,11 @@ public class RenderHandler implements IRenderer
             //MatrixStack matrixStack = new MatrixStack();
             //matrixStack.multiplyPositionMatrix(matrix4f);
 
-            this.renderOverlays(matrixStack, mc);
+            this.renderOverlays(matrix4f, mc);
         }
     }
 
-    private void renderOverlays(MatrixStack matrixStack, MinecraftClient mc)
+    private void renderOverlays(Matrix4f matrix4f, MinecraftClient mc)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -130,7 +129,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getSide(),
                     hitResult.getPos(),
                     color,
-                    matrixStack,
+                    matrix4f,
                     mc);
 
             RenderSystem.enableDepthTest();
