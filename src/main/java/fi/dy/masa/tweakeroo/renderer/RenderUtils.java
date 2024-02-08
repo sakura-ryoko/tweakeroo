@@ -3,7 +3,6 @@ package fi.dy.masa.tweakeroo.renderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
-import org.joml.Quaternionf;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -296,45 +295,31 @@ public class RenderUtils
         int width = GuiUtils.getScaledWindowWidth();
         int height = GuiUtils.getScaledWindowHeight();
         Camera camera = mc.gameRenderer.getCamera();
+
         //MatrixStack matrixStack = RenderSystem.getModelViewStack();
         //matrixStack.push();
         //matrixStack.translate(width / 2.0, height / 2.0, zLevel);
+
         Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
         matrixStack.pushMatrix();
         matrixStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();
-        Quaternionf rot = new Quaternionf().rotationXYZ(-pitch * (float) (Math.PI / 180.0), yaw * (float) (Math.PI / 180.0), 0.0F);
-        matrixStack.mul(convertQuaternionToMatrix4f(rot));
+
+        //Quaternionf rot = new Quaternionf().rotationXYZ(-pitch * (float) (Math.PI / 180.0), yaw * (float) (Math.PI / 180.0), 0.0F);
+        //matrixStack.multiply(rot);
         //matrixStack.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(camera.getPitch()));
         //matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw()));
+
+        matrixStack.rotateXYZ(-(pitch) * ((float) (Math.PI / 180.0)), yaw * ((float) (Math.PI / 180.0)), 0.0F);
+        matrixStack.rotateX(-(pitch));
+        matrixStack.rotateY(yaw);
+
         matrixStack.scale(-1.0F, -1.0F, -1.0F);
         RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair(10);
         matrixStack.popMatrix();
         RenderSystem.applyModelViewMatrix();
-    }
-
-    // Made public under MaLiLib
-    protected static Matrix4f convertQuaternionToMatrix4f(Quaternionf q)
-    {
-        return new Matrix4f(
-                1.0f - 2.0f * ( q.y() * q.y() + q.z() * q.z() ),
-                2.0f * (q.x() * q.y() + q.z() * q.w()),
-                2.0f * (q.x() * q.z() - q.y() * q.w()),
-                0.0f,
-
-                2.0f * ( q.x() * q.y() - q.z() * q.w() ),
-                1.0f - 2.0f * ( q.x() * q.x() + q.z() * q.z() ),
-                2.0f * (q.z() * q.y() + q.x() * q.w() ),
-                0.0f,
-
-                2.0f * ( q.x() * q.z() + q.y() * q.w() ),
-                2.0f * ( q.y() * q.z() - q.x() * q.w() ),
-                1.0f - 2.0f * ( q.x() * q.x() + q.y() * q.y() ),
-                0.0f,
-
-                0, 0, 0, 1.0f);
     }
 
     public static void notifyRotationChanged()
