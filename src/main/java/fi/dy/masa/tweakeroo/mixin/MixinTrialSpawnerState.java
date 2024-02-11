@@ -15,7 +15,7 @@ public class MixinTrialSpawnerState
     @Inject(method = "emitParticles", at = @At("HEAD"), cancellable = true)
     private void cancelParticleRendering(World world, BlockPos pos, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_TRIAL_SPAWNER_PARTICLE.getBooleanValue())
+        if (Configs.Disable.DISABLE_TRIAL_SPAWNER_PARTICLES.getBooleanValue())
         {
             ci.cancel();
         }

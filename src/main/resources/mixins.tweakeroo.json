@@ -80,6 +80,7 @@
     "defaultRequire": 0
   },
   "mixins": [
-    "MixinTrialSpawnerState"
-    ]
+    "MixinTrialSpawnerState",
+    "MixinVaultBlockEntity"
+  ]
 }
