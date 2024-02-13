@@ -39,7 +39,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     @Shadow @Final private String[] messages;
 
     @Override
-    public SignBlockEntity getTile()
+    public SignBlockEntity tweakeroo$getTile()
     {
         return this.blockEntity;
     }
@@ -78,7 +78,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     }
 
     @Override
-    public void applyText(SignText text)
+    public void tweakeroo$applyText(SignText text)
     {
         this.text = text;
 

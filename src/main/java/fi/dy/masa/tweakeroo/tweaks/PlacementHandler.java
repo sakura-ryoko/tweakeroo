@@ -43,7 +43,7 @@ public class PlacementHandler
             {
                 facing = Direction.byId(decodedFacingIndex);
 
-                if (property.getValues().contains(facing) == false)
+                if (!property.getValues().contains(facing))
                 {
                     facing = context.getEntity().getHorizontalFacing().getOpposite();
                 }
@@ -58,7 +58,7 @@ public class PlacementHandler
                     BlockPos headPos = context.pos.offset(facing);
                     ItemPlacementContext ctx = context.getItemPlacementContext();
 
-                    if (context.getWorld().getBlockState(headPos).canReplace(ctx) == false)
+                    if (!context.getWorld().getBlockState(headPos).canReplace(ctx))
                     {
                         return null;
                     }

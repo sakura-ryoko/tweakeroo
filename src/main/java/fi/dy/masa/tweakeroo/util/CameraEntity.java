@@ -41,7 +41,7 @@ public class CameraEntity extends ClientPlayerEntity
     {
         CameraEntity camera = getCamera();
 
-        if (camera != null && Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.getBooleanValue() == false)
+        if (camera != null && !Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.getBooleanValue())
         {
             GameOptions options = MinecraftClient.getInstance().options;
 
@@ -51,7 +51,7 @@ public class CameraEntity extends ClientPlayerEntity
             {
                 sprinting = true;
             }
-            else if (options.forwardKey.isPressed() == false && options.backKey.isPressed() == false)
+            else if (!options.forwardKey.isPressed() && !options.backKey.isPressed())
             {
                 sprinting = false;
             }

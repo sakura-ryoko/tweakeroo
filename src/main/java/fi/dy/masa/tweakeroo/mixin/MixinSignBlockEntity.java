@@ -41,7 +41,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
         {
             MinecraftClient mc = MinecraftClient.getInstance();
 
-            if ((mc.currentScreen instanceof SignEditScreen) && ((IGuiEditSign) mc.currentScreen).getTile() == (Object) this)
+            if ((mc.currentScreen instanceof SignEditScreen) && ((IGuiEditSign) mc.currentScreen).tweakeroo$getTile() == (Object) this)
             {
                 MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isPlayerFacingFront(mc.player));
             }

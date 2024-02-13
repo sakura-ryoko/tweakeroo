@@ -275,7 +275,7 @@ public class MiscUtils
             te.setText(previousSignText, front);
 
             if (guiLines != null) {
-                ((IGuiEditSign) guiLines).applyText(previousSignText);
+                ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
             }
         }
     }

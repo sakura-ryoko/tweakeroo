@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,12 +21,13 @@ import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 @Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer
 {
+    @Unique
     private static boolean wasLava;
 
     @ModifyConstant(
             method = "applyFog",
             slice = @Slice(
-                            from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/entity/effect/StatusEffect;"),
+                            from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
                             to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
             constant = @Constant(floatValue = 0.25f),
             require = 0)
@@ -44,7 +46,7 @@ public abstract class MixinBackgroundRenderer
     @ModifyConstant(
             method = "applyFog",
             slice = @Slice(
-                    from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/entity/effect/StatusEffect;"),
+                    from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
                     to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
             constant = { @Constant(floatValue = 1.0f), @Constant(floatValue = 3.0f)},
             require = 0)
@@ -112,7 +114,7 @@ public abstract class MixinBackgroundRenderer
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {
-            if (thickFog == false && wasLava == false)
+            if (!thickFog && !wasLava)
             {
                 float distance = Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance());
                 RenderSystem.setShaderFogStart(distance * 1.6F);

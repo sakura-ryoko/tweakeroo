@@ -1,11 +1,6 @@
 package fi.dy.masa.tweakeroo.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -850,7 +845,7 @@ public class InventoryUtils
             if (isHotbarSlot(slotNumber))
             {
                 inventory.selectedSlot = slotNumber - 36;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
             }
             else
             {
@@ -862,7 +857,7 @@ public class InventoryUtils
                     if (hotbarSlot != selectedSlot)
                     {
                         inventory.selectedSlot = hotbarSlot;
-                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                        Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
                     }
 
                     mc.interactionManager.clickSlot(container.syncId, slotNumber, hotbarSlot, SlotActionType.SWAP, mc.player);
@@ -1030,7 +1025,7 @@ public class InventoryUtils
                     mc.interactionManager.clickSlot(container.syncId, slot2.id, 0, SlotActionType.PICKUP, player);
 
                     // If the items didn't all fit, return the rest
-                    if (player.getInventory().getMainHandStack().isEmpty() == false)
+                    if (!player.getInventory().getMainHandStack().isEmpty())
                     {
                         mc.interactionManager.clickSlot(container.syncId, slot1.id, 0, SlotActionType.PICKUP, player);
                     }
@@ -1042,7 +1037,7 @@ public class InventoryUtils
                     }
                 }
 
-                if (slot1.hasStack() == false)
+                if (!slot1.hasStack())
                 {
                     break;
                 }
@@ -1088,8 +1083,8 @@ public class InventoryUtils
             BlockState stateTargeted = world.getBlockState(pos);
             ItemStack stack = stateTargeted.getBlock().getPickStack(world, pos, stateTargeted);
 
-            if (stack.isEmpty() == false &&
-                fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandStack()) == false)
+            if (!stack.isEmpty() &&
+                    !fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandStack()))
             {
                 ScreenHandler container = player.currentScreenHandler;
                 PlayerInventory inventory = player.getInventory();
@@ -1108,6 +1103,7 @@ public class InventoryUtils
                 if (isCreative)
                 {
                     inventory.addPickBlock(stack);
+                    assert mc.interactionManager != null;
                     mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
                 }
                 else
@@ -1136,7 +1132,7 @@ public class InventoryUtils
                 NbtCompound tag = nbt.getCompound("BlockEntityTag");
 
                 if (tag.contains("Items", Constants.NBT.TAG_LIST) &&
-                    tag.getList("Items", Constants.NBT.TAG_COMPOUND).size() == 0)
+                        tag.getList("Items", Constants.NBT.TAG_COMPOUND).isEmpty())
                 {
                     tag.remove("Items");
                     changed = true;
