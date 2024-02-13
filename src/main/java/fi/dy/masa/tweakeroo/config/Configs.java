@@ -37,7 +37,7 @@ public class Configs implements IConfigHandler
     public static class Generic
     {
         public static final ConfigInteger       AFTER_CLICKER_CLICK_COUNT           = new ConfigInteger     ("afterClickerClickCount",  1, 1, 32, "The number of right clicks to do per placed block when\ntweakAfterClicker is enabled");
-        public static final ConfigDouble        BLOCK_REACH_DISTANCE                = new ConfigDouble      ("blockReachDistance", 4.5, 0, 64, "The block reach distance to use if the\noverride tweak is enabled.\nThe maximum the server allows is 64, and can be set via game rules.");
+        public static final ConfigDouble        BLOCK_REACH_DISTANCE                = new ConfigDouble      ("blockReachDistance", 4.5, 0, 64, "The block reach distance to use if the override tweak is enabled.\nThe maximum the game allows is 64.\n§6Do not attempt to use this at a value beyond\n[0.5 - 1.0] higher than the Game Rules defined on a server.");
         public static final ConfigOptionList    BLOCK_TYPE_BREAK_RESTRICTION_WARN   = new ConfigOptionList  ("blockTypeBreakRestrictionWarn", MessageOutputType.MESSAGE, "Selects which type of warning message to show (if any)\nwhen the Block Type Break Restriction feature prevents breaking a block");
         public static final ConfigInteger       BREAKING_GRID_SIZE                  = new ConfigInteger     ("breakingGridSize", 3, 1, 1000, "The grid interval size for the grid breaking mode.\nTo quickly adjust the value, scroll while\nholding down the tweak toggle keybind.");
         public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE, "The Breaking Restriction mode to use (hotkey-selectable)");
@@ -48,7 +48,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10, "The GUI scale value to use for inventory screens, if\n§etweakCustomInventoryScreenScale§r is enabled.");
         public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false, "Enables some debug log messages in the game console,\nfor debugging certain issues or crashes.");
         public static final ConfigOptionList    ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY, "Whether or not to render the real pitch angle\nindicator when the elytra camera mode is active");
-        public static final ConfigDouble        ENTITY_REACH_DISTANCE                = new ConfigDouble     ("entityReachDistance", 3.0, 0, 64, "The entity reach distance to use if the\noverride tweak is enabled.\nThe maximum the server allows is 64, and can be set via game rules.");
+        public static final ConfigDouble        ENTITY_REACH_DISTANCE                = new ConfigDouble     ("entityReachDistance", 3.0, 0, 64, "The entity reach distance to use if the override tweak is enabled.\nThe maximum the game allows is 64.\n§6Do not attempt to use this at a value beyond\n[0.5 - 1.0] higher than the Game Rules defined on a server.");
         public static final ConfigOptionList    ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE, "Selects which type of warning message to show (if any)\nwhen the Entity Type Attack Restriction feature prevents attacking an entity");
         public static final ConfigInteger       FAST_BLOCK_PLACEMENT_COUNT          = new ConfigInteger     ("fastBlockPlacementCount", 2, 1, 16, "The maximum number of blocks to place per game tick\nwith the Fast Block Placement tweak");
         public static final ConfigBoolean       FAST_LEFT_CLICK_ALLOW_TOOLS         = new ConfigBoolean     ("fastLeftClickAllowTools", false, "Allow the Fast Left Click to work in survival\nalso while holding tool items");
@@ -311,8 +311,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_STATUS_EFFECT_HUD       = new ConfigBooleanHotkeyed("disableStatusEffectHud",               false, "", "Disables the status effect HUD rendering (which is usually\nin the top right corner of the screen)");
         public static final ConfigBooleanHotkeyed       DISABLE_TILE_ENTITY_RENDERING   = new ConfigBooleanHotkeyed("disableTileEntityRendering",           false, "", "Prevents all TileEntity renderers from rendering");
         public static final ConfigBooleanHotkeyed       DISABLE_TILE_ENTITY_TICKING     = new ConfigBooleanClient  ("disableTileEntityTicking",             false, "", "Prevent all TileEntities from getting ticked");
-        public static final ConfigBooleanHotkeyed       DISABLE_TRIAL_SPAWNER_PARTICLES = new ConfigBooleanClient  ("disableTrialSpawnerParticles",         false, "", "Removes the particle rendering from trial spawners");
-        public static final ConfigBooleanHotkeyed       DISABLE_TRIAL_VAULT_PARTICLES   = new ConfigBooleanClient  ("disableTrialVaultParticles",           false, "", "Removes the particle rendering from trial vaults");
         public static final ConfigBooleanHotkeyed       DISABLE_VILLAGER_TRADE_LOCKING  = new ConfigBooleanClient  ("disableVillagerTradeLocking",          false, "", "Prevents villager trades from ever locking, by always incrementing\nthe max uses as well when the recipe uses is incremented");
         public static final ConfigBooleanHotkeyed       DISABLE_WALL_UNSPRINT           = new ConfigBooleanHotkeyed("disableWallUnsprint",                  false, "", "Touching a wall doesn't drop you out from sprint mode");
         public static final ConfigBooleanHotkeyed       DISABLE_WORLD_VIEW_BOB          = new ConfigBooleanHotkeyed("disableWorldViewBob",                  false, "", "Disables the view bob wobble effect of the world, but not the hand");
@@ -359,8 +357,6 @@ public class Configs implements IConfigHandler
                 DISABLE_STATUS_EFFECT_HUD,
                 DISABLE_TILE_ENTITY_RENDERING,
                 DISABLE_TILE_ENTITY_TICKING,
-                DISABLE_TRIAL_SPAWNER_PARTICLES,
-                DISABLE_TRIAL_VAULT_PARTICLES,
                 DISABLE_VILLAGER_TRADE_LOCKING,
                 DISABLE_WALL_UNSPRINT,
                 DISABLE_WORLD_VIEW_BOB

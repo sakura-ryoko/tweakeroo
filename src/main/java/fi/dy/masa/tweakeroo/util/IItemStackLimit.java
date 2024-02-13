@@ -4,5 +4,5 @@ import net.minecraft.item.ItemStack;
 
 public interface IItemStackLimit
 {
-    int getMaxStackSize(ItemStack stack);
+    int tweakeroo$getMaxStackSize(ItemStack stack);
 }

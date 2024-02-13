@@ -4,6 +4,7 @@ import java.util.Arrays;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,9 +35,13 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
     @Shadow private CyclingButtonWidget<Boolean> conditionalModeButton;
     @Shadow private CyclingButtonWidget<Boolean> redstoneTriggerButton;
 
+    @Unique
     private TextFieldWidget textFieldName;
+    @Unique
     private CyclingButtonWidget<Boolean> buttonUpdateExec;
+    @Unique
     private boolean updateExecValue;
+    @Unique
     private String lastName = "";
 
     @Inject(method = "init", at = @At("RETURN"))
@@ -111,7 +116,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         {
             String currentName = this.blockEntity.getCommandExecutor().getCustomName().getString();
 
-            if (currentName.equals(this.lastName) == false)
+            if (!currentName.equals(this.lastName))
             {
                 this.textFieldName.setText(currentName);
                 this.lastName = currentName;
@@ -149,6 +154,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         }
     }
 
+    @Unique
     private static Text getDisplayStringForCurrentStatus(boolean updateExecValue)
     {
         String translationKey = "tweakeroo.gui.button.misc.command_block.update_execution";

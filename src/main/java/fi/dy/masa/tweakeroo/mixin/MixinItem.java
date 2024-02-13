@@ -10,7 +10,7 @@ public abstract class MixinItem implements IItemStackLimit
     @Shadow public int getMaxCount() { return 0; }
 
     @Override
-    public int getMaxStackSize(net.minecraft.item.ItemStack stack)
+    public int tweakeroo$getMaxStackSize(net.minecraft.item.ItemStack stack)
     {
         return this.getMaxCount();
     }
