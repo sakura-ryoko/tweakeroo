@@ -106,7 +106,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         }
     }
 
-    // This is needed because otherwise the name updating is delayed by "one GUI opening" >_>
+    // This is needed because otherwise, the name updating is delayed by "one GUI opening" >_>
     @Override
     public void tick()
     {

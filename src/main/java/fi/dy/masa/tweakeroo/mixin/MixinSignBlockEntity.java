@@ -49,7 +49,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
     }
 
     @Override
-    public SignText getText(boolean front)
+    public SignText tweakeroo$getText(boolean front)
     {
         return front ? this.frontText : this.backText;
     }

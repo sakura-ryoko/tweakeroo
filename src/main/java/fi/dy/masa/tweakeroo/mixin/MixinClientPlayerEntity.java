@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -33,8 +34,11 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Shadow public float prevNauseaIntensity;
     @Shadow public float nauseaIntensity;
+    @Unique
     private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
+    @Unique
     private Input realInput;
+    @Unique
     private float realNauseaIntensity;
 
     private MixinClientPlayerEntity(ClientWorld world, GameProfile profile)

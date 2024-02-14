@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -42,11 +43,13 @@ public abstract class MixinClientCommandSource
         }
     }
 
+     @Unique
      private static String formatDouble(double val)
      {
          return String.format(Locale.ROOT, "%.2f", val);
      }
 
+     @Unique
      private static String formatInt(int val)
      {
          return Integer.toString(val);

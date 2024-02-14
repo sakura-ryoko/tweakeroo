@@ -72,7 +72,7 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
     {
         if (FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue() &&
             ((BlockItem) (Object) this).getBlock() instanceof ShulkerBoxBlock &&
-            InventoryUtils.shulkerBoxHasItems(stack) == false)
+                !InventoryUtils.shulkerBoxHasItems(stack))
         {
             return 64;
         }
