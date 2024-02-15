@@ -254,6 +254,7 @@ public class PlacementTweaks
                 hitResult = new BlockHitResult(hitVec, side, posNew, false);
                 ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
 
+                Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, side {} pos {} hitResult {}, posNew {}, posLast {}", side, pos, hitResult, posNew, posLast);
                 if (hand != null &&
                         !posNew.equals(posLast) &&
                     canPlaceBlockIntoPosition(world, posNew, ctx) &&
@@ -276,6 +277,8 @@ public class PlacementTweaks
                     hitVec = hitVecFirst.add(posNew.getX(), posNew.getY(), posNew.getZ());
                     ActionResult result = tryPlaceBlock(mc.interactionManager, player, mc.world,
                             posNew, sideFirst, sideRotatedFirst, playerYawFirst, hitVec, hand, hitPartFirst, false);
+
+                    Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, tryPlaceBlock: hitVec {} result {}", hitVec, result);
 
                     if (result == ActionResult.SUCCESS)
                     {
@@ -301,6 +304,8 @@ public class PlacementTweaks
                 canUseFastRightClick(mc.player))
         {
             final int count = Configs.Generic.FAST_RIGHT_CLICK_COUNT.getIntegerValue();
+
+            Tweakeroo.debugLog("onUsingTick(): fastRightClick, count {} ", count);
 
             for (int i = 0; i < count; ++i)
             {

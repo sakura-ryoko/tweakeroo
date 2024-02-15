@@ -12,7 +12,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinExplosion
 {
     /**
-     * I don't know how long this was broken (1.20.4 also?), but let's try to fix it.
+     * I don't know how long this was broken (1.20.4 also?), but let's fix it.
      */
     @ModifyArg(method = "affectWorld",
     at = @At(value = "INVOKE",
