@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.class_9285;
-import net.minecraft.class_9288;
-import net.minecraft.class_9323;
-import net.minecraft.class_9334;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -448,16 +448,16 @@ public class InventoryUtils
     private static float getBaseAttackDamage(ItemStack stack)
     {
         Item item = stack.getItem();
-        class_9323 data = stack.method_57353();
+        ComponentMap data = stack.getComponents();
 
-        if (data != null && data.method_57832(class_9334.ATTRIBUTE_MODIFIERS))
+        if (data != null && data.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS))
         {
-            class_9285 itemAttribute = data.method_57829(class_9334.ATTRIBUTE_MODIFIERS);
+            AttributeModifiersComponent itemAttribute = data.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
             if (itemAttribute != null)
             {
-                List<class_9285.class_9287> modifiers = itemAttribute.modifiers();
+                List<AttributeModifiersComponent.Entry> modifiers = itemAttribute.modifiers();
 
-                for (class_9285.class_9287 entry : modifiers)
+                for (AttributeModifiersComponent.Entry entry : modifiers)
                 {
                     if (entry.attribute().equals(EntityAttributes.GENERIC_ATTACK_DAMAGE))
                     {
@@ -1145,18 +1145,15 @@ public class InventoryUtils
     public static boolean cleanUpShulkerBoxNBT(ItemStack stack)
     {
         boolean changed = false;
-        //NbtCompound nbt = stack.getNbt();
-        class_9323 data = stack.method_57353();
+        ComponentMap data = stack.getComponents();
 
-        if (data != null && data.method_57832(class_9334.CONTAINER))
+        if (data != null && data.contains(DataComponentTypes.CONTAINER))
         {
-            class_9288 itemContainer = data.method_57829(class_9334.CONTAINER);
+            ContainerComponent itemContainer = data.get(DataComponentTypes.CONTAINER);
 
             if (itemContainer != null)
             {
-                //DefaultedList<ItemStack> items = DefaultedList.of();
                 Iterator<ItemStack> iter = itemContainer.iterator();
-                //long size = itemContainer.method_57489().count();
 
                 while (iter.hasNext())
                 {

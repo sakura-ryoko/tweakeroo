@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.mojang.brigadier.StringReader;
 import net.minecraft.block.InfestedBlock;
-import net.minecraft.class_9323;
 import net.minecraft.command.argument.ItemStringReader;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -72,8 +72,7 @@ public class CreativeExtraItems
 
             if (!stack.isEmpty())
             {
-                //if (stack.hasNbt())
-                if (stack.method_57353().method_57835() > 0)
+                if (!stack.getComponents().isEmpty())
                 {
                     ADDED_ITEMS.put(group, stack);
                 }
@@ -96,11 +95,10 @@ public class CreativeExtraItems
 
             if (item != null)
             {
-                // FIXME class_9323 == DataComponentMap under Mojang Mappings
-                class_9323 components = item.method_57347();
+                ComponentMap components = item.getComponents();
                 ItemStack stack = new ItemStack(item);
-                //stack.setNbt(itemResult.nbt());
-                stack.method_57365(components);
+
+                stack.copyComponentsFrom(components);
                 return stack;
             }
         }
