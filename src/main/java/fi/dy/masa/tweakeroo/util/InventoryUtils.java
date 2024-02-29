@@ -7,12 +7,17 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.class_9285;
+import net.minecraft.class_9288;
+import net.minecraft.class_9323;
+import net.minecraft.class_9334;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
@@ -23,7 +28,6 @@ import net.minecraft.item.Items;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -40,7 +44,6 @@ import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.gui.Message;
-import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -445,17 +448,36 @@ public class InventoryUtils
     private static float getBaseAttackDamage(ItemStack stack)
     {
         Item item = stack.getItem();
+        class_9323 data = stack.method_57353();
 
-        if (item instanceof SwordItem)
+        if (data != null && data.method_57832(class_9334.ATTRIBUTE_MODIFIERS))
         {
-            return ((SwordItem) item).getAttackDamage();
-        }
-        else if (item instanceof MiningToolItem)
-        { 
-            return ((MiningToolItem) item).getAttackDamage();
-        }
+            class_9285 itemAttribute = data.method_57829(class_9334.ATTRIBUTE_MODIFIERS);
+            if (itemAttribute != null)
+            {
+                List<class_9285.class_9287> modifiers = itemAttribute.modifiers();
 
-        return 0F;
+                for (class_9285.class_9287 entry : modifiers)
+                {
+                    if (entry.attribute().equals(EntityAttributes.GENERIC_ATTACK_DAMAGE))
+                    {
+                        if (item instanceof SwordItem)
+                        {
+                            return (float) entry.modifier().getValue();
+                        }
+                        else if (item instanceof MiningToolItem)
+                        {
+                            return (float) entry.modifier().getValue();
+                        }
+                    }
+                }
+                return 0F;
+            }
+            else
+                return 0F;
+        }
+        else
+            return 0F;
     }
 
     protected static boolean matchesWeaponMapping(ItemStack stack, Entity entity)
@@ -1123,10 +1145,34 @@ public class InventoryUtils
     public static boolean cleanUpShulkerBoxNBT(ItemStack stack)
     {
         boolean changed = false;
-        NbtCompound nbt = stack.getNbt();
+        //NbtCompound nbt = stack.getNbt();
+        class_9323 data = stack.method_57353();
 
-        if (nbt != null)
+        if (data != null && data.method_57832(class_9334.CONTAINER))
         {
+            class_9288 itemContainer = data.method_57829(class_9334.CONTAINER);
+
+            if (itemContainer != null)
+            {
+                //DefaultedList<ItemStack> items = DefaultedList.of();
+                Iterator<ItemStack> iter = itemContainer.iterator();
+                //long size = itemContainer.method_57489().count();
+
+                while (iter.hasNext())
+                {
+                    ItemStack item = iter.next();
+                    if (item.isEmpty())
+                    {
+                        iter.remove();
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        return changed;
+    }
+            /*
             if (nbt.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
             {
                 NbtCompound tag = nbt.getCompound("BlockEntityTag");
@@ -1149,8 +1195,5 @@ public class InventoryUtils
                 stack.setNbt(null);
                 changed = true;
             }
-        }
-
-        return changed;
-    }
+             */
 }
