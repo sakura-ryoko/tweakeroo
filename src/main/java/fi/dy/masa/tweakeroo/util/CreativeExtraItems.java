@@ -7,7 +7,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.mojang.brigadier.StringReader;
 import net.minecraft.block.InfestedBlock;
 import net.minecraft.command.argument.ItemStringReader;
-import net.minecraft.component.ComponentMap;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -95,11 +94,10 @@ public class CreativeExtraItems
 
             if (item != null)
             {
-                ComponentMap components = item.getComponents();
-                ItemStack stack = new ItemStack(item);
+                //ComponentMap components = item.getComponents();
+                //stack.copyComponentsToNewStack(components);
 
-                stack.copyComponentsFrom(components);
-                return stack;
+                return new ItemStack(item);
             }
         }
         catch (Exception e)
