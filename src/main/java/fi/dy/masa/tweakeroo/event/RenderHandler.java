@@ -1,6 +1,8 @@
 package fi.dy.masa.tweakeroo.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.item.BundleItem;
+import net.minecraft.item.Item;
 import org.joml.Matrix4f;
 
 import net.minecraft.client.MinecraftClient;
@@ -70,12 +72,21 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderTooltipLast(DrawContext drawContext, ItemStack stack, int x, int y)
     {
-        if (stack.getItem() instanceof FilledMapItem)
+        Item item = stack.getItem();
+        if (item instanceof FilledMapItem)
         {
             if (FeatureToggle.TWEAK_MAP_PREVIEW.getBooleanValue() &&
                     (!Configs.Generic.MAP_PREVIEW_REQUIRE_SHIFT.getBooleanValue() || GuiBase.isShiftDown()))
             {
                 fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
+            }
+        }
+        else if (item instanceof BundleItem)
+        {
+            if (FeatureToggle.TWEAK_BUNDLE_PREVIEW.getBooleanValue() &&
+                    (!Configs.Generic.BUNDLE_PREVIEW_REQUIRE_SHIFT.getBooleanValue() || GuiBase.isShiftDown()))
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(stack, x, y, Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getColor(), drawContext);
             }
         }
         else if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue())

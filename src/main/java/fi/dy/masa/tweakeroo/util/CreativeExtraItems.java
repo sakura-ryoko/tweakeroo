@@ -4,15 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
-import com.mojang.brigadier.StringReader;
+import fi.dy.masa.malilib.util.InventoryUtils;
 import net.minecraft.block.InfestedBlock;
-import net.minecraft.command.argument.ItemStringReader;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.collection.DefaultedList;
@@ -67,7 +65,7 @@ public class CreativeExtraItems
 
         for (String str : items)
         {
-            ItemStack stack = parseItemFromString(str);
+            ItemStack stack = InventoryUtils.getItemStackFromString(str);
 
             if (!stack.isEmpty())
             {
@@ -82,6 +80,8 @@ public class CreativeExtraItems
             }
         }
     }
+
+    /*  Removed in favor of new InventoryUtils.getItemStackFromString via MaLiLib
 
     public static ItemStack parseItemFromString(String str)
     {
@@ -107,6 +107,7 @@ public class CreativeExtraItems
 
         return ItemStack.EMPTY;
     }
+     */
 
     public static void removeInfestedBlocks(DefaultedList<ItemStack> stacks)
     {
