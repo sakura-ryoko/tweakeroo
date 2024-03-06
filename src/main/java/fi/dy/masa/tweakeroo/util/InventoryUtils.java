@@ -463,11 +463,11 @@ public class InventoryUtils
                     {
                         if (item instanceof SwordItem)
                         {
-                            return (float) entry.modifier().getValue();
+                            return (float) entry.modifier().value();
                         }
                         else if (item instanceof MiningToolItem)
                         {
-                            return (float) entry.modifier().getValue();
+                            return (float) entry.modifier().value();
                         }
                     }
                 }
