@@ -823,18 +823,18 @@ public class InventoryUtils
                 if (isHotbarSlot(slotNumber))
                 {
                     inventory.selectedSlot = slotNumber - 36;
-                    Tweakeroo.debugLog("swapItemToHand(): slotNumber: {}, inv.selectedSlot: {} --> Yeet packet", slotNumber, inventory.selectedSlot);
+                    //Tweakeroo.debugLog("swapItemToHand(): slotNumber: {}, inv.selectedSlot: {} --> Yeet packet", slotNumber, inventory.selectedSlot);
                     mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
                 }
                 else
                 {
-                    Tweakeroo.debugLog("swapItemToHand(): clickSlot 1, slotNumber: {}, currentHotbarSlot {}", slotNumber, currentHotbarSlot);
+                    //Tweakeroo.debugLog("swapItemToHand(): clickSlot 1, slotNumber: {}, currentHotbarSlot {}", slotNumber, currentHotbarSlot);
                     mc.interactionManager.clickSlot(container.syncId, slotNumber, currentHotbarSlot, SlotActionType.SWAP, mc.player);
                 }
             }
             else if (hand == Hand.OFF_HAND)
             {
-                Tweakeroo.debugLog("swapItemToHand(): clickSlot 2, slotNumber: {} (button 40)", slotNumber);
+                //Tweakeroo.debugLog("swapItemToHand(): clickSlot 2, slotNumber: {} (button 40)", slotNumber);
                 mc.interactionManager.clickSlot(container.syncId, slotNumber, 40, SlotActionType.SWAP, mc.player);
             }
         }
@@ -853,7 +853,7 @@ public class InventoryUtils
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         ScreenHandler container = player.currentScreenHandler;
-        Tweakeroo.debugLog("swapSlots(): slotNum: {}, otherSlot {}, SlotNum {} (button 0)", slotNum, otherSlot, slotNum);
+        //Tweakeroo.debugLog("swapSlots(): slotNum: {}, otherSlot {}, SlotNum {} (button 0)", slotNum, otherSlot, slotNum);
         mc.interactionManager.clickSlot(container.syncId, slotNum, 0, SlotActionType.SWAP, player);
         mc.interactionManager.clickSlot(container.syncId, otherSlot, 0, SlotActionType.SWAP, player);
         mc.interactionManager.clickSlot(container.syncId, slotNum, 0, SlotActionType.SWAP, player);
@@ -871,7 +871,7 @@ public class InventoryUtils
             if (isHotbarSlot(slotNumber))
             {
                 inventory.selectedSlot = slotNumber - 36;
-                Tweakeroo.debugLog("swapToolToHand() slotnumber: {}, inv.selected slot: {} --> Yeet packet", slotNumber, inventory.selectedSlot);
+                //Tweakeroo.debugLog("swapToolToHand() slotnumber: {}, inv.selected slot: {} --> Yeet packet", slotNumber, inventory.selectedSlot);
                 Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
             }
             else
@@ -884,11 +884,11 @@ public class InventoryUtils
                     if (hotbarSlot != selectedSlot)
                     {
                         inventory.selectedSlot = hotbarSlot;
-                        Tweakeroo.debugLog("swapToolToHand() hotbarSlot: {} (vs selectedSlot {}), inv.selected slot: {} --> Yeet packet", hotbarSlot, selectedSlot, inventory.selectedSlot);
+                        //Tweakeroo.debugLog("swapToolToHand() hotbarSlot: {} (vs selectedSlot {}), inv.selected slot: {} --> Yeet packet", hotbarSlot, selectedSlot, inventory.selectedSlot);
                         Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
                     }
 
-                    Tweakeroo.debugLog("swapToolToHand(): clickSlot --> slotNumber {}, hotbarSlot {}", slotNumber, hotbarSlot);
+                    //Tweakeroo.debugLog("swapToolToHand(): clickSlot --> slotNumber {}, hotbarSlot {}", slotNumber, hotbarSlot);
                     mc.interactionManager.clickSlot(container.syncId, slotNumber, hotbarSlot, SlotActionType.SWAP, mc.player);
                 }
             }

@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo;
 
+import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
@@ -32,7 +33,10 @@ public class InitHandler implements IInitializationHandler
         RenderEventHandler.getInstance().registerWorldLastRenderer(renderer);
 
         TickHandler.getInstance().registerClientTickHandler(new ClientTickHandler());
-        WorldLoadHandler.getInstance().registerWorldLoadPreHandler(new WorldLoadListener());
+
+        IWorldLoadListener worldListener = new WorldLoadListener();
+        WorldLoadHandler.getInstance().registerWorldLoadPreHandler(worldListener);
+        WorldLoadHandler.getInstance().registerWorldLoadPostHandler(worldListener);
 
         Callbacks.init(MinecraftClient.getInstance());
     }

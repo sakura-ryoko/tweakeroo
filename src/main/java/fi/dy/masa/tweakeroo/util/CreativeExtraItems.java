@@ -14,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.collection.DefaultedList;
-import fi.dy.masa.tweakeroo.Tweakeroo;
 
 public class CreativeExtraItems
 {
@@ -61,7 +60,7 @@ public class CreativeExtraItems
             return;
         }
 
-        Tweakeroo.logger.info("Adding extra items to creative inventory group '{}'", group.getDisplayName().getString());
+        //Tweakeroo.logger.info("Adding extra items to creative inventory group '{}'", group.getDisplayName().getString());
 
         for (String str : items)
         {
@@ -81,7 +80,7 @@ public class CreativeExtraItems
         }
     }
 
-    /*  Removed in favor of new InventoryUtils.getItemStackFromString via MaLiLib
+    /*  Removed in favor of a new InventoryUtils.getItemStackFromString via MaLiLib
 
     public static ItemStack parseItemFromString(String str)
     {

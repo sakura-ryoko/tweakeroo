@@ -2,7 +2,6 @@ package fi.dy.masa.tweakeroo.tweaks;
 
 import javax.annotation.Nullable;
 
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -133,7 +132,7 @@ public class PlacementTweaks
         {
             if (!isEmulatedClick)
             {
-                Tweakeroo.debugLog("onProcessRightClickPre storing stack: {}", stackOriginal);
+                //Tweakeroo.debugLog("onProcessRightClickPre storing stack: {}", stackOriginal);
                 cacheStackInHand(hand);
             }
 
@@ -148,7 +147,7 @@ public class PlacementTweaks
 
     public static void onProcessRightClickPost(PlayerEntity player, Hand hand)
     {
-        Tweakeroo.debugLog("onProcessRightClickPost -> tryRestockHand with: {}, current: {}", stackBeforeUse[hand.ordinal()], player.getStackInHand(hand));
+        //Tweakeroo.debugLog("onProcessRightClickPost -> tryRestockHand with: {}, current: {}", stackBeforeUse[hand.ordinal()], player.getStackInHand(hand));
         tryRestockHand(player, hand, stackBeforeUse[hand.ordinal()]);
     }
 
@@ -254,7 +253,7 @@ public class PlacementTweaks
                 hitResult = new BlockHitResult(hitVec, side, posNew, false);
                 ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
 
-                Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, side {} pos {} hitResult {}, posNew {}, posLast {}", side, pos, hitResult, posNew, posLast);
+                //Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, side {} pos {} hitResult {}, posNew {}, posLast {}", side, pos, hitResult, posNew, posLast);
                 if (hand != null &&
                         !posNew.equals(posLast) &&
                     canPlaceBlockIntoPosition(world, posNew, ctx) &&
@@ -278,7 +277,7 @@ public class PlacementTweaks
                     ActionResult result = tryPlaceBlock(mc.interactionManager, player, mc.world,
                             posNew, sideFirst, sideRotatedFirst, playerYawFirst, hitVec, hand, hitPartFirst, false);
 
-                    Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, tryPlaceBlock: hitVec {} result {}", hitVec, result);
+                    //Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, tryPlaceBlock: hitVec {} result {}", hitVec, result);
 
                     if (result == ActionResult.SUCCESS)
                     {
@@ -305,7 +304,7 @@ public class PlacementTweaks
         {
             final int count = Configs.Generic.FAST_RIGHT_CLICK_COUNT.getIntegerValue();
 
-            Tweakeroo.debugLog("onUsingTick(): fastRightClick, count {} ", count);
+            //Tweakeroo.debugLog("onUsingTick(): fastRightClick, count {} ", count);
 
             for (int i = 0; i < count; ++i)
             {
@@ -370,7 +369,7 @@ public class PlacementTweaks
             return ActionResult.PASS;
         }
 
-        Tweakeroo.debugLog("onProcessRightClickBlock() pos: {}, side: {}, part: {}, hitVec: {}", posIn, sideIn, hitPart, hitVec);
+        //Tweakeroo.debugLog("onProcessRightClickBlock() pos: {}, side: {}, part: {}, hitVec: {}", posIn, sideIn, hitPart, hitVec);
         ActionResult result = tryPlaceBlock(controller, player, world, posIn, sideIn, sideRotated, yaw, hitVec, hand, hitPart, true);
 
         // Store the initial click data for the fast placement mode
@@ -396,7 +395,7 @@ public class PlacementTweaks
             sideRotatedFirst = sideRotated;
             playerYawFirst = yaw;
             stackBeforeUse[hand.ordinal()] = stackPre;
-            Tweakeroo.debugLog("plop store @ {}", posFirst);
+            //Tweakeroo.debugLog("plop store @ {}", posFirst);
         }
 
         return result;
@@ -510,7 +509,7 @@ public class PlacementTweaks
                 {
                     facing = facing.getOpposite();
                 }
-                Tweakeroo.debugLog("PlacementTweaks#accurate - IN - facing: {}", facing);
+                //Tweakeroo.debugLog("PlacementTweaks#accurate - IN - facing: {}", facing);
             }
             else if (!flexible || !rotation)
             {
@@ -535,7 +534,7 @@ public class PlacementTweaks
                     }
 
                     Direction facingTmp = BlockUtils.getFirstPropertyFacingValue(state);
-                    Tweakeroo.debugLog("PlacementTweaks#accurate - sideIn: {}, state: {}, hit: {}, posIn: {}, posNew: {}", sideIn, state, hitVec, posIn, posNew);
+                    //Tweakeroo.debugLog("PlacementTweaks#accurate - sideIn: {}, state: {}, hit: {}, posIn: {}, posNew: {}", sideIn, state, hitVec, posIn, posNew);
 
                     if (facingTmp != null)
                     {
@@ -550,7 +549,7 @@ public class PlacementTweaks
 
             if (accurateReverse)
             {
-                Tweakeroo.debugLog("PlacementTweaks#accurate - REVERSE - facingOrig: {}, facingNew: {}", facing, facing.getOpposite());
+                //Tweakeroo.debugLog("PlacementTweaks#accurate - REVERSE - facingOrig: {}, facingNew: {}", facing, facing.getOpposite());
                 if (accurateIn || !flexible || !rotation)
                 {
                     facing = facing.getOpposite();
@@ -577,13 +576,13 @@ public class PlacementTweaks
                     x += afterClickerClickCount * 16;
                 }
 
-                Tweakeroo.debugLog("PlacementTweaks#accurate - pre hitVec: {}", hitVec);
-                Tweakeroo.debugLog("PlacementTweaks#processRightClickBlockWrapper facing: {}, x: {}, posNew: {}, side: {}", facing, x, posNew, side);
+                //Tweakeroo.debugLog("PlacementTweaks#accurate - pre hitVec: {}", hitVec);
+                //Tweakeroo.debugLog("PlacementTweaks#processRightClickBlockWrapper facing: {}, x: {}, posNew: {}, side: {}", facing, x, posNew, side);
                 hitVec = new Vec3d(x, hitVec.y, hitVec.z);
-                Tweakeroo.debugLog("PlacementTweaks#accurate - post hitVec: {}", hitVec);
+                //Tweakeroo.debugLog("PlacementTweaks#accurate - post hitVec: {}", hitVec);
             }
 
-            Tweakeroo.debugLog("PlacementTweaks#accurate - facing: {}, side: {}, posNew: {}, hit: {}", facing, side, posNew, hitVec);
+            //Tweakeroo.debugLog("PlacementTweaks#accurate - facing: {}, side: {}, posNew: {}, hit: {}", facing, side, posNew, hitVec);
             return processRightClickBlockWrapper(controller, player, world, posNew, side, hitVec, hand);
         }
 
@@ -595,7 +594,7 @@ public class PlacementTweaks
             if (canPlaceBlockIntoPosition(world, posNew, ctx))
             {
                 // Re-enable Debug logging for now
-                Tweakeroo.debugLog("PlacementTweaks#tryPlaceBlock() pos: {}, side: {}, part: {}, hitVec: {}", posNew, side, hitPart, hitVec);
+                //Tweakeroo.debugLog("PlacementTweaks#tryPlaceBlock() pos: {}, side: {}, part: {}, hitVec: {}", posNew, side, hitPart, hitVec);
                 return handleFlexibleBlockPlacement(controller, player, world, posNew, side, playerYaw, hitVec, hand, hitPart);
             }
             else
@@ -789,7 +788,7 @@ public class PlacementTweaks
                 x += afterClickerClickCount * 16;
             }
 
-            Tweakeroo.debugLog("processRightClickBlockWrapper req facing: {}, x: {}, pos: {}, sideIn: {}", facing, x, posIn, sideIn);
+            //Tweakeroo.debugLog("processRightClickBlockWrapper req facing: {}, x: {}, pos: {}, sideIn: {}", facing, x, posIn, sideIn);
             hitVecIn = new Vec3d(x, hitVecIn.y, hitVecIn.z);
         }
 
@@ -833,7 +832,7 @@ public class PlacementTweaks
 
         // This restock needs to happen even with the pick-before-place tweak active,
         // otherwise the fast placement mode's checks (getHandWithItem()) will fail...
-        Tweakeroo.debugLog("processRightClickBlockWrapper -> tryRestockHand with: {}, current: {}", stackOriginal, player.getStackInHand(hand));
+        //Tweakeroo.debugLog("processRightClickBlockWrapper -> tryRestockHand with: {}, current: {}", stackOriginal, player.getStackInHand(hand));
         tryRestockHand(player, hand, stackOriginal);
 
         if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue() &&
@@ -905,7 +904,7 @@ public class PlacementTweaks
         player.setYaw(yaw);
         player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround()));
 
-        Tweakeroo.debugLog("handleFlexibleBlockPlacement() pos: {}, side: {}, facing orig: yaw: {} / pitch: {} facing new: {}", pos, side, yaw, pitch, facing);
+        //Tweakeroo.debugLog("handleFlexibleBlockPlacement() pos: {}, side: {}, facing orig: yaw: {} / pitch: {} facing new: {}", pos, side, yaw, pitch, facing);
         ActionResult result = processRightClickBlockWrapper(controller, player, world, pos, side, hitVec, hand);
 
         player.setYaw(yawOrig);
