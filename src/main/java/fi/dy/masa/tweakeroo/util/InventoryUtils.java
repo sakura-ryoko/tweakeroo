@@ -305,6 +305,7 @@ public class InventoryUtils
 
         for (int hotbarSlot = 0; hotbarSlot < 9; hotbarSlot++)
         {
+            //Tweakeroo.debugLog("swapHotbarWithInventoryRow(): slot {}, hotbarSlot {} --> malilib.InventoryUtils.swapSlots()", slot, hotbarSlot);
             fi.dy.masa.malilib.util.InventoryUtils.swapSlots(container, slot, hotbarSlot);
             slot++;
         }
@@ -326,6 +327,7 @@ public class InventoryUtils
 
         if (slotWithItem != -1)
         {
+            //Tweakeroo.debugLog("restockNewStackToHand(): hand {}, slotWithItem {}", hand.name(), slotWithItem);
             swapItemToHand(player, hand, slotWithItem);
         }
     }
@@ -365,6 +367,7 @@ public class InventoryUtils
                     // stack in hand, then left click, otherwise right click to split the stack
                     int button = stackSlot.getCount() + stackHand.getCount() <= stackHand.getMaxCount() ? 0 : 1;
 
+                    //Tweakeroo.debugLog("preRestockHand(): syncId {}, slot id {}, button {} // pickup --> currentSlot {}", container.syncId, slot.id, button, currentSlot);
                     mc.interactionManager.clickSlot(container.syncId, slot.id, button, SlotActionType.PICKUP, player);
                     mc.interactionManager.clickSlot(container.syncId, currentSlot, 0, SlotActionType.PICKUP, player);
 
@@ -716,6 +719,7 @@ public class InventoryUtils
 
             if (slotRepairableItem != -1)
             {
+                //Tweakeroo.debugLog("repairModeHandleSlot(): type {} // slotRepairableItem {}", type.asString(), slotRepairableItem);
                 swapItemToEquipmentSlot(player, type, slotRepairableItem);
                 InfoUtils.printActionbarMessage("tweakeroo.message.repair_mode.swapped_repairable_item_to_slot", type.getName());
             }
@@ -764,6 +768,7 @@ public class InventoryUtils
         if (targetSlot >= 0)
         {
             //targetSlots.sort();
+            //Tweakeroo.debugLog("swapElytraWithChestPlate(): chest, target slot {}", targetSlot);
             swapItemToEquipmentSlot(player, EquipmentSlot.CHEST, targetSlot);
         }
     }
@@ -853,9 +858,11 @@ public class InventoryUtils
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         ScreenHandler container = player.currentScreenHandler;
-        //Tweakeroo.debugLog("swapSlots(): slotNum: {}, otherSlot {}, SlotNum {} (button 0)", slotNum, otherSlot, slotNum);
+        //Tweakeroo.debugLog("swapSlots(): click slot 1, slotNum: {}, otherSlot {}, SlotNum {} (button 0)", slotNum, otherSlot, slotNum);
         mc.interactionManager.clickSlot(container.syncId, slotNum, 0, SlotActionType.SWAP, player);
+        //Tweakeroo.debugLog("swapSlots(): click slot 2, slotNum: {}, otherSlot {}, SlotNum {} (button 0)", slotNum, otherSlot, slotNum);
         mc.interactionManager.clickSlot(container.syncId, otherSlot, 0, SlotActionType.SWAP, player);
+        //Tweakeroo.debugLog("swapSlots(): click slot 3, slotNum: {}, otherSlot {}, SlotNum {} (button 0)", slotNum, otherSlot, slotNum);
         mc.interactionManager.clickSlot(container.syncId, slotNum, 0, SlotActionType.SWAP, player);
     }
 
@@ -1050,14 +1057,14 @@ public class InventoryUtils
                 if (stack.getCount() < stack.getMaxCount())
                 {
                     // Pick up the item from slot1 and try to put it in slot2
-                    Tweakeroo.debugLog("tryCombineStacksInInventory(): clickSlot 1 --> slot1.id {}, slot2.id {}, (button 0)",slot1.id, slot2.id);
+                    //Tweakeroo.debugLog("tryCombineStacksInInventory(): clickSlot 1 --> slot1.id {}, slot2.id {}, (button 0)",slot1.id, slot2.id);
                     mc.interactionManager.clickSlot(container.syncId, slot1.id, 0, SlotActionType.PICKUP, player);
                     mc.interactionManager.clickSlot(container.syncId, slot2.id, 0, SlotActionType.PICKUP, player);
 
                     // If the items didn't all fit, return the rest
                     if (!player.getInventory().getMainHandStack().isEmpty())
                     {
-                        Tweakeroo.debugLog("tryCombineStacksInInventory(): clickSlot 2 --> slot1.id {} (button 0)",slot1.id, slot2.id);
+                        //Tweakeroo.debugLog("tryCombineStacksInInventory(): clickSlot 2 --> slot1.id {} (button 0)",slot1.id, slot2.id);
                         mc.interactionManager.clickSlot(container.syncId, slot1.id, 0, SlotActionType.PICKUP, player);
                     }
 
@@ -1134,7 +1141,7 @@ public class InventoryUtils
                 if (isCreative)
                 {
                     inventory.addPickBlock(stack);
-                    Tweakeroo.debugLog("switchToPickedBlock(): clickCreativeStack --> inv.selectedSlot {}", inventory.selectedSlot);
+                    //Tweakeroo.debugLog("switchToPickedBlock(): clickCreativeStack --> inv.selectedSlot {}", inventory.selectedSlot);
                     assert mc.interactionManager != null;
                     mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
                 }
