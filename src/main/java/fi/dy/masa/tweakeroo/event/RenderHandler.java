@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.BundleItem;
 import net.minecraft.item.Item;
 import org.joml.Matrix4f;
@@ -89,13 +90,16 @@ public class RenderHandler implements IRenderer
                 fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(stack, x, y, Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getColor(), drawContext);
             }
         }
-        else if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue())
+        else if (stack.getComponents().contains(DataComponentTypes.CONTAINER) && item.toString().contains("shulker"))
         {
-            boolean render = !Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() || GuiBase.isShiftDown();
-
-            if (render)
+            if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue())
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
+                boolean render = !Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() || GuiBase.isShiftDown();
+
+                if (render)
+                {
+                    fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
+                }
             }
         }
     }
