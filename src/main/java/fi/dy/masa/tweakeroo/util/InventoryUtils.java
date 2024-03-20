@@ -315,7 +315,7 @@ public class InventoryUtils
     {
         int slotWithItem;
 
-        if (stackReference.getItem().isDamageable())
+        if (stackReference.isDamageable())
         {
             int minDurability = getMinDurability(stackReference);
             slotWithItem = findSlotWithSuitableReplacementToolWithDurabilityLeft(player.playerScreenHandler, stackReference, minDurability);
