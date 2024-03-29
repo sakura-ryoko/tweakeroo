@@ -35,5 +35,10 @@
 	"depends": {
 		"minecraft": ">=1.20.4",
 		"malilib": ">=0.19.0-snap"
+	},
+	"custom": {
+		"modmenu": {
+			"parent": "malilib"
+		}
 	}
 }
