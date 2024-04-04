@@ -193,6 +193,7 @@ public class PlacementTweaks
             {
                 InventoryUtils.trySwapCurrentToolIfNearlyBroken(EnumHand.MAIN_HAND);
                 isEmulatedClick = true;
+                mc.entityRenderer.getMouseOver(mc.getRenderPartialTicks()); // Update the ray trace
                 ((IMinecraftAccessor) mc).leftClickMouseAccessor();
                 isEmulatedClick = false;
             }
