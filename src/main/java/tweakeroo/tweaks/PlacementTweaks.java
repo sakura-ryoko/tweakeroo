@@ -65,6 +65,7 @@ public class PlacementTweaks
     private static boolean isEmulatedClick;
     private static boolean firstWasRotation;
     private static boolean firstWasOffset;
+    private static boolean leftClickedInWorld;
     private static int placementCount;
     private static ItemStack stackClickedOn = ItemStack.EMPTY;
     @Nullable private static IBlockState stateClickedOn = null;
@@ -109,7 +110,7 @@ public class PlacementTweaks
             }
         }
 
-        if (attackHeld == false)
+        if (attackHeld == false || GuiUtils.isScreenOpen())
         {
             clearClickedBlockInfoAttack();
         }
@@ -153,18 +154,22 @@ public class PlacementTweaks
 
     public static void onLeftClickMousePre()
     {
-        Minecraft mc = GameWrap.getClient();
         HitResult trace = GameWrap.getHitResult();
 
         // Only set the position if it was null, otherwise the fast left click tweak
         // would just reset it every time.
-        if (trace.type == HitResult.Type.BLOCK && posFirstBreaking == null)
+        if (trace != null && GuiUtils.noScreenOpen())
         {
-            posFirstBreaking = trace.blockPos;
-            sideFirstBreaking = trace.side;
+            leftClickedInWorld = true;
+
+            if (posFirstBreaking == null && trace.type == HitResult.Type.BLOCK)
+            {
+                posFirstBreaking = trace.blockPos;
+                sideFirstBreaking = trace.side;
+            }
         }
 
-        onProcessRightClickPre(mc.player, EnumHand.MAIN_HAND);
+        onProcessRightClickPre(GameWrap.getClientPlayer(), EnumHand.MAIN_HAND);
     }
 
     public static void onLeftClickMousePost()
@@ -185,7 +190,7 @@ public class PlacementTweaks
 
     private static void onAttackTick(Minecraft mc)
     {
-        if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())
+        if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue() && leftClickedInWorld)
         {
             final int count = Configs.Generic.FAST_LEFT_CLICK_COUNT.getIntegerValue();
 
@@ -194,6 +199,17 @@ public class PlacementTweaks
                 InventoryUtils.trySwapCurrentToolIfNearlyBroken(EnumHand.MAIN_HAND);
                 isEmulatedClick = true;
                 mc.entityRenderer.getMouseOver(mc.getRenderPartialTicks()); // Update the ray trace
+
+                HitResult trace = GameWrap.getHitResult();
+
+                // Reset the cooldown, but only while targeting blocks.
+                // If it would always be reset, then you get annoying side effects
+                // like breaking the block when exiting a screen for some block in creative mode.
+                if (trace != null && trace.type == HitResult.Type.BLOCK)
+                {
+                    ((IMinecraftAccessor) mc).resetLeftClickCooldown();
+                }
+
                 ((IMinecraftAccessor) mc).leftClickMouseAccessor();
                 isEmulatedClick = false;
             }
@@ -927,6 +943,7 @@ public class PlacementTweaks
 
     private static void clearClickedBlockInfoAttack()
     {
+        leftClickedInWorld = false;
         posFirstBreaking = null;
         sideFirstBreaking = null;
     }

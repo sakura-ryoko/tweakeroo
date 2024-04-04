@@ -31,8 +31,8 @@ import tweakeroo.util.MiscUtils;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft implements IMinecraftAccessor
 {
-    @Shadow
-    private int rightClickDelayTimer;
+    @Shadow private int leftClickCounter;
+    @Shadow private int rightClickDelayTimer;
 
     @Shadow
     private void clickMouse() {}
@@ -44,6 +44,12 @@ public abstract class MixinMinecraft implements IMinecraftAccessor
     public void setRightClickDelayTimer(int value)
     {
         this.rightClickDelayTimer = value;
+    }
+
+    @Override
+    public void resetLeftClickCooldown()
+    {
+        this.leftClickCounter = 0;
     }
 
     @Override
