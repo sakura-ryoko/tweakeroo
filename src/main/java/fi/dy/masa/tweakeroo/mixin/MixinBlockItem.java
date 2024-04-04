@@ -32,7 +32,7 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
     @Shadow public abstract Block getBlock();
 
     @Inject(method = "getPlacementState", at = @At("HEAD"), cancellable = true)
-    private void modifyPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir)
+    private void tweakeroo$modifyPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir)
     {
         if (Configs.Generic.CLIENT_PLACEMENT_ROTATION.getBooleanValue())
         {
@@ -70,11 +70,16 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
     @Override
     public int tweakeroo$getMaxStackSize(ItemStack stack)
     {
-        if (FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue() &&
-            ((BlockItem) (Object) this).getBlock() instanceof ShulkerBoxBlock &&
-                !InventoryUtils.shulkerBoxHasItems(stack))
+        if (FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue())
         {
-            return 64;
+            Block block = this.getBlock();
+            if (block instanceof ShulkerBoxBlock)
+            {
+                if (InventoryUtils.shulkerBoxHasItems(stack) == false)
+                {
+                    return Configs.Generic.SHULKER_MAX_STACK_SIZE.getIntegerValue();
+                }
+            }
         }
 
         // FIXME How to call the stack-sensitive version on the super class?

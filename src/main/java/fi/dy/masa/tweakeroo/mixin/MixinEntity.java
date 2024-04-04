@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,7 +33,7 @@ public abstract class MixinEntity
     @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
-    private void overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_RENDER_INVISIBLE_ENTITIES.getBooleanValue())
         {
@@ -41,10 +42,13 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "updateVelocity", at = @At("HEAD"), cancellable = true)
-    private void moreAccurateMoveRelative(float float_1, net.minecraft.util.math.Vec3d motion, CallbackInfo ci)
+    private void tweakeroo$moreAccurateMoveRelative(float float_1, net.minecraft.util.math.Vec3d motion, CallbackInfo ci)
     {
+        Tweakeroo.debugLog("tweakeroo$moreAccurateMoveRelative(): pre");
+        // TODO I'm not sure why IntelliJ is greying this out if the code is correct? --> TEST
         if ((Object) this instanceof ClientPlayerEntity)
         {
+            Tweakeroo.debugLog("tweakeroo$moreAccurateMoveRelative(): post");
             if (FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue())
             {
                 double speed = motion.lengthSquared();
@@ -65,10 +69,14 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
-    private void overrideYaw(double yawChange, double pitchChange, CallbackInfo ci)
+    private void tweakeroo$overrideYaw(double yawChange, double pitchChange, CallbackInfo ci)
     {
+        Tweakeroo.debugLog("tweakeroo$overrideYaw(): pre");
+        // TODO I'm not sure why IntelliJ is greying this out if the code is correct? --> TEST
         if ((Object) this instanceof ClientPlayerEntity)
         {
+            Tweakeroo.debugLog("tweakeroo$overrideYaw(): post");
+
             if (CameraUtils.shouldPreventPlayerMovement())
             {
                 CameraUtils.updateCameraRotations((float) yawChange, (float) pitchChange);
@@ -96,7 +104,7 @@ public abstract class MixinEntity
                 // Not locked, or not snapping the pitch (ie. not in Pitch or Both modes)
                 boolean updatePitch = snapAimLock == false || mode == SnapAimMode.YAW;
 
-                this.updateCustomPlayerRotations(yawChange, pitchChange, updateYaw, updatePitch, pitchLimit);
+                this.tweakeroo$updateCustomPlayerRotations(yawChange, pitchChange, updateYaw, updatePitch, pitchLimit);
 
                 this.yaw = MiscUtils.getSnappedYaw(this.forcedYaw);
                 this.pitch = MiscUtils.getSnappedPitch(this.forcedPitch);
@@ -117,7 +125,7 @@ public abstract class MixinEntity
             {
                 int pitchLimit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
 
-                this.updateCustomPlayerRotations(yawChange, pitchChange, true, true, pitchLimit);
+                this.tweakeroo$updateCustomPlayerRotations(yawChange, pitchChange, true, true, pitchLimit);
 
                 CameraUtils.setCameraYaw((float) this.forcedYaw);
                 CameraUtils.setCameraPitch((float) this.forcedPitch);
@@ -139,7 +147,7 @@ public abstract class MixinEntity
     }
 
     @Unique
-    private void updateCustomPlayerRotations(double yawChange, double pitchChange, boolean updateYaw, boolean updatePitch, float pitchLimit)
+    private void tweakeroo$updateCustomPlayerRotations(double yawChange, double pitchChange, boolean updateYaw, boolean updatePitch, float pitchLimit)
     {
         if (updateYaw)
         {

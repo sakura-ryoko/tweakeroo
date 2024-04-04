@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -37,7 +39,7 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
                                    to = @At(value = "FIELD",
                                             target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;size:Lnet/minecraft/util/math/Vec3i;")),
                     constant = { @Constant(intValue = -48), @Constant(intValue = 48) }, require = 0)
-    private int overrideMaxSize(int original)
+    private int tweakeroo$overrideMaxSize(int original)
     {
         if (FeatureToggle.TWEAK_STRUCTURE_BLOCK_LIMIT.getBooleanValue())
         {
@@ -49,13 +51,16 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
     }
 
     @Inject(method = "streamCornerPos", at = @At("HEAD"), cancellable = true)
-    private void overrideCornerBlockScan(BlockPos start, BlockPos end, CallbackInfoReturnable<Stream<BlockPos>> cir)
+    private void tweakeroo$overrideCornerBlockScan(BlockPos start, BlockPos end, CallbackInfoReturnable<Stream<BlockPos>> cir)
     {
+        Tweakeroo.debugLog("tweakeroo$overrideCornerBlockScan(): pre");
+        // TODO I do not know why IntelliJ is greying this out. --> TEST
         if (FeatureToggle.TWEAK_STRUCTURE_BLOCK_LIMIT.getBooleanValue())
         {
             BlockPos pos = this.getPos();
             World world = this.getWorld();
             String name = ((StructureBlockBlockEntity) (Object) this).getTemplateName();
+            Tweakeroo.debugLog("tweakeroo$overrideCornerBlockScan(): post");
             int maxSize = Configs.Generic.STRUCTURE_BLOCK_MAX_SIZE.getIntegerValue();
             int maxOffset = 48;
 

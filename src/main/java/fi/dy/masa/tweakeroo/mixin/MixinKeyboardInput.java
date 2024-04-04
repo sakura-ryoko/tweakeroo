@@ -22,7 +22,7 @@ public abstract class MixinKeyboardInput extends Input
             ordinal = 0,
             shift = Shift.AFTER,
             opcode = Opcodes.PUTFIELD))
-    private void customMovement(boolean val1, float f, CallbackInfo ci)
+    private void tweakeroo$customMovement(boolean val1, float f, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_MOVEMENT_KEYS.getBooleanValue())
         {

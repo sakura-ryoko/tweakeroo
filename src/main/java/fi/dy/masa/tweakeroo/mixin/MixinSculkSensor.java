@@ -12,7 +12,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinSculkSensor
 {
     @Inject(method = "getCooldownTime", at = @At(value = "HEAD"), require = 0, cancellable = true)
-    private void modifyPulseLength(CallbackInfoReturnable<Integer> cir)
+    private void tweakeroo$modifyPulseLength(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_SCULK_PULSE_LENGTH.getBooleanValue())
         {

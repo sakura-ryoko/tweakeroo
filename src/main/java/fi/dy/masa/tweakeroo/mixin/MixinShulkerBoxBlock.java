@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
 import java.util.List;
-
 import net.minecraft.client.item.TooltipType;
 import net.minecraft.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +16,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinShulkerBoxBlock
 {
     @Inject(method = "appendTooltip", at = @At("HEAD"), cancellable = true)
-    private void removeVanillaTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options, CallbackInfo ci)
+    private void tweakeroo$removeVanillaTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SHULKER_BOX_TOOLTIP.getBooleanValue())
         {

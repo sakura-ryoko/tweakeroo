@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.config.Configs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,7 +41,7 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
     }
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;DDDLnet/minecraft/item/ItemStack;)V", at = @At("RETURN"))
-    private void removeEmptyShulkerBoxTags(World worldIn, double x, double y, double z, ItemStack stack, CallbackInfo ci)
+    private void tweakeroo$removeEmptyShulkerBoxTags(World worldIn, double x, double y, double z, ItemStack stack, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_SHULKERBOX_STACK_GROUND.getBooleanValue())
         {
@@ -54,7 +56,7 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
     }
 
     @Inject(method = "canMerge()Z", at = @At("HEAD"), cancellable = true)
-    private void allowStackingEmptyShulkerBoxes(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$allowStackingEmptyShulkerBoxes(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_SHULKERBOX_STACK_GROUND.getBooleanValue())
         {
@@ -66,7 +68,7 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
                                     && this.pickupDelay != 32767
                                     && this.itemAge != -32768
                                     && this.itemAge < 6000
-                                    && stack.getCount() < 64;
+                                    && stack.getCount() < Configs.Generic.SHULKER_MAX_STACK_SIZE.getIntegerValue();
 
                 cir.setReturnValue(canMerge);
             }
@@ -74,22 +76,25 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
     }
 
     @Inject(method = "tryMerge(Lnet/minecraft/entity/ItemEntity;)V", at = @At("HEAD"), cancellable = true)
-    private void stackEmptyShulkerBoxes(ItemEntity other, CallbackInfo ci)
+    private void tweakeroo$stackEmptyShulkerBoxes(ItemEntity other, CallbackInfo ci)
     {
+        Tweakeroo.debugLog("tweakeroo$stackEmptyShulkerBoxes(): pre");
+        // TODO I don't know why IntelliJ greys this out. --> TEST
         if (FeatureToggle.TWEAK_SHULKERBOX_STACK_GROUND.getBooleanValue())
         {
             ItemEntity self = (ItemEntity) (Object) this;
+            Tweakeroo.debugLog("tweakeroo$stackEmptyShulkerBoxes(): post");
             ItemStack stackSelf = self.getStack();
             ItemStack stackOther = other.getStack();
 
             if (stackSelf.getItem() instanceof BlockItem && ((BlockItem) stackSelf.getItem()).getBlock() instanceof ShulkerBoxBlock &&
                 stackSelf.getItem() == stackOther.getItem() &&
-                    !fi.dy.masa.malilib.util.InventoryUtils.shulkerBoxHasItems(stackSelf) &&
+                    fi.dy.masa.malilib.util.InventoryUtils.shulkerBoxHasItems(stackSelf) == false &&
                 // Only stack up to 64, and don't steal from other stacks that are larger
-                stackSelf.getCount() < 64 && stackSelf.getCount() >= stackOther.getCount() &&
+                stackSelf.getCount() < Configs.Generic.SHULKER_MAX_STACK_SIZE.getIntegerValue() && stackSelf.getCount() >= stackOther.getCount() &&
                 ItemStack.areItemsAndComponentsEqual(stackSelf, stackOther))
             {
-                int amount = Math.min(stackOther.getCount(), 64 - stackSelf.getCount());
+                int amount = Math.min(stackOther.getCount(), Configs.Generic.SHULKER_MAX_STACK_SIZE.getIntegerValue() - stackSelf.getCount());
 
                 stackSelf.increment(amount);
                 self.setStack(stackSelf);

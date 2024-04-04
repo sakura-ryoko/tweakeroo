@@ -17,7 +17,7 @@ public abstract class MixinDimensionEffects_Nether extends DimensionEffects
     }
 
     @Inject(method = "useThickFog", at = @At("HEAD"), cancellable = true)
-    private void disableNetherFog(int x, int z, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$disableNetherFog(int x, int z, CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Disable.DISABLE_NETHER_FOG.getBooleanValue())
         {

@@ -23,7 +23,7 @@ public abstract class MixinAbstractInventoryScreen<T extends ScreenHandler> exte
     }
 
     @Inject(method = "drawStatusEffects", at = @At("HEAD"), cancellable = true)
-    private void disableStatusEffectRendering(DrawContext drawContext, int mouseX, int mouseY, CallbackInfo ci)
+    private void tweakeroo$disableStatusEffectRendering(DrawContext drawContext, int mouseX, int mouseY, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_INVENTORY_EFFECTS.getBooleanValue())
         {

@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinWorld
 {
     @Inject(method = "tickBlockEntities", at = @At("HEAD"), cancellable = true)
-    private void disableBlockEntityTicking(CallbackInfo ci)
+    private void tweakeroo$disableBlockEntityTicking(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_TILE_ENTITY_TICKING.getBooleanValue())
         {
@@ -23,9 +23,9 @@ public abstract class MixinWorld
     }
 
     @Inject(method = "tickEntity(Ljava/util/function/Consumer;Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
-    private <T extends Entity> void preventEntityTicking(Consumer<T> consumer, T entityIn, CallbackInfo ci)
+    private <T extends Entity> void tweakeroo$preventEntityTicking(Consumer<T> consumer, T entityIn, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && !(entityIn instanceof PlayerEntity))
+        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && (entityIn instanceof PlayerEntity) == false)
         {
             ci.cancel();
         }

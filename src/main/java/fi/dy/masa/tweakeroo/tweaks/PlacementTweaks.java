@@ -101,20 +101,20 @@ public class PlacementTweaks
             stackBeforeUse[1] = ItemStack.EMPTY;
         }
 
-        if (!use)
+        if (use == false)
         {
             clearClickedBlockInfoUse();
 
             // Clear the cached stack when releasing both keys, so that the restock doesn't happen when
             // using another item or an empty hand.
-            if (!attack)
+            if (attack == false)
             {
                 stackBeforeUse[0] = ItemStack.EMPTY;
                 stackBeforeUse[1] = ItemStack.EMPTY;
             }
         }
 
-        if (!attack)
+        if (attack == false)
         {
             clearClickedBlockInfoAttack();
         }
@@ -127,18 +127,18 @@ public class PlacementTweaks
         ItemStack stackOriginal = player.getStackInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-                !stackOriginal.isEmpty() &&
+                stackOriginal.isEmpty() == false &&
             canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
-            if (!isEmulatedClick)
+            if (isEmulatedClick == false)
             {
                 //Tweakeroo.debugLog("onProcessRightClickPre storing stack: {}", stackOriginal);
                 cacheStackInHand(hand);
             }
 
             // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
-            boolean allowHotbar = !FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() &&
-                    !FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue();
+            boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
+                                  FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false;
             InventoryUtils.preRestockHand(player, hand, allowHotbar);
         }
 
@@ -164,7 +164,6 @@ public class PlacementTweaks
             sideFirstBreaking = ((BlockHitResult) trace).getSide();
         }
 
-        assert mc.player != null;
         onProcessRightClickPre(mc.player, Hand.MAIN_HAND);
     }
 
@@ -176,11 +175,10 @@ public class PlacementTweaks
     public static void cacheStackInHand(Hand hand)
     {
         PlayerEntity player = MinecraftClient.getInstance().player;
-        assert player != null;
         ItemStack stackOriginal = player.getStackInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-                !stackOriginal.isEmpty() &&
+            stackOriginal.isEmpty() == false &&
             canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             stackBeforeUse[hand.ordinal()] = stackOriginal.copy();
@@ -192,9 +190,8 @@ public class PlacementTweaks
     {
         if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())
         {
-            assert mc.player != null;
             if (mc.player.getAbilities().creativeMode ||
-                (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || !(mc.player.getMainHandStack().getItem() instanceof MiningToolItem)))
+                (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (mc.player.getMainHandStack().getItem() instanceof MiningToolItem) == false))
             {
                 final int count = Configs.Generic.FAST_LEFT_CLICK_COUNT.getIntegerValue();
 
@@ -255,7 +252,7 @@ public class PlacementTweaks
 
                 //Tweakeroo.debugLog("onUsingTick(): fastBlockPlacement, side {} pos {} hitResult {}, posNew {}, posLast {}", side, pos, hitResult, posNew, posLast);
                 if (hand != null &&
-                        !posNew.equals(posLast) &&
+                    posNew.equals(posLast) == false &&
                     canPlaceBlockIntoPosition(world, posNew, ctx) &&
                     isPositionAllowedByPlacementRestriction(posNew, side) &&
                     canPlaceBlockAgainst(world, pos, player, hand)
@@ -364,7 +361,7 @@ public class PlacementTweaks
             stateClickedOn = state;
         }
 
-        if (!canPlaceBlockAgainst(world, posIn, player, hand))
+        if (canPlaceBlockAgainst(world, posIn, player, hand) == false)
         {
             return ActionResult.PASS;
         }
@@ -463,7 +460,7 @@ public class PlacementTweaks
 
         boolean simpleOffset = false;
 
-        if (!handleFlexible &&
+        if (handleFlexible == false &&
             FeatureToggle.TWEAK_FAKE_SNEAK_PLACEMENT.getBooleanValue() &&
             stack.getItem() instanceof BlockItem)
         {
@@ -485,7 +482,7 @@ public class PlacementTweaks
 
             if (posNew == null)
             {
-                if (!flexible || !isFirstClick)
+                if (flexible == false || isFirstClick == false)
                 {
                     posNew = posIn;
                 }
@@ -505,13 +502,13 @@ public class PlacementTweaks
 
                 // Pistons, Droppers, Dispensers should face into the block, but Observers should point their back/output
                 // side into the block when the Accurate Placement In hotkey is used
-                if (!(stack.getItem() instanceof BlockItem) || ((BlockItem) stack.getItem()).getBlock() != Blocks.OBSERVER)
+                if ((stack.getItem() instanceof BlockItem) == false || ((BlockItem) stack.getItem()).getBlock() != Blocks.OBSERVER)
                 {
                     facing = facing.getOpposite();
                 }
                 //Tweakeroo.debugLog("PlacementTweaks#accurate - IN - facing: {}", facing);
             }
-            else if (!flexible || !rotation)
+            else if (flexible == false || rotation == false)
             {
                 if (stack.getItem() instanceof BlockItem)
                 {
@@ -603,7 +600,7 @@ public class PlacementTweaks
             }
         }
 
-        if (!isFirstClick && Configs.Generic.FAST_PLACEMENT_REMEMBER_ALWAYS.getBooleanValue())
+        if (isFirstClick == false && Configs.Generic.FAST_PLACEMENT_REMEMBER_ALWAYS.getBooleanValue())
         {
             return handleFlexibleBlockPlacement(controller, player, world, posIn, sideIn, playerYaw, hitVec, hand, null);
         }
@@ -617,11 +614,11 @@ public class PlacementTweaks
         {
             BlockState state = world.getBlockState(pos);
 
-            if (!stackClickedOn.isEmpty())
+            if (stackClickedOn.isEmpty() == false)
             {
                 ItemStack stack = state.getBlock().getPickStack(world, pos, state);
 
-                if (!fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClickedOn, stack))
+                if (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClickedOn, stack) == false)
                 {
                     return false;
                 }
@@ -641,7 +638,7 @@ public class PlacementTweaks
             ItemStack stackClicked = state.getBlock().getPickStack(world, pos, state);
             ItemStack stackHand = player.getStackInHand(hand);
 
-            if (!fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClicked, stackHand))
+            if (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClicked, stackHand) == false)
             {
                 return false;
             }
@@ -669,7 +666,7 @@ public class PlacementTweaks
 
     private static boolean canUseFastRightClick(PlayerEntity player)
     {
-        if (!canUseItemWithRestriction(FAST_RIGHT_CLICK_ITEM_RESTRICTION, player))
+        if (canUseItemWithRestriction(FAST_RIGHT_CLICK_ITEM_RESTRICTION, player) == false)
         {
             return false;
         }
@@ -693,12 +690,12 @@ public class PlacementTweaks
         {
             ItemStack stackCurrent = player.getStackInHand(hand);
 
-            if (!stackOriginal.isEmpty() && player.getInventory().selectedSlot == hotbarSlot &&
-                (stackCurrent.isEmpty() || !ItemStack.areItemsEqual(stackCurrent, stackOriginal)))
+            if (stackOriginal.isEmpty() == false && player.getInventory().selectedSlot == hotbarSlot &&
+                (stackCurrent.isEmpty() || ItemStack.areItemsEqual(stackCurrent, stackOriginal) == false))
             {
                 // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
-                boolean allowHotbar = !FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() &&
-                        !FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue();
+                boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
+                                      FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false;
                 InventoryUtils.restockNewStackToHand(player, hand, stackOriginal, allowHotbar);
             }
         }

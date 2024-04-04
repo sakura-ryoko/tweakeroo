@@ -199,7 +199,7 @@ public class MiscTweaks
 
             Collection<StatusEffectInstance> effects = player.getStatusEffects();
 
-            if (!effects.isEmpty())
+            if (effects.isEmpty() == false)
             {
                 int minDuration = -1;
                 int count = 0;
@@ -228,7 +228,7 @@ public class MiscTweaks
 
     public static boolean isEntityAllowedByAttackingRestriction(EntityType<?> type)
     {
-        if (!MiscTweaks.ENTITY_TYPE_ATTACK_RESTRICTION.isAllowed(type))
+        if (MiscTweaks.ENTITY_TYPE_ATTACK_RESTRICTION.isAllowed(type) == false)
         {
             MessageOutputType messageOutputType = (MessageOutputType) Configs.Generic.ENTITY_TYPE_ATTACK_RESTRICTION_WARN.getOptionListValue();
 

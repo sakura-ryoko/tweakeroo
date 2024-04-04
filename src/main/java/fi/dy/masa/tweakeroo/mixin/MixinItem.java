@@ -17,7 +17,7 @@ public abstract class MixinItem implements IItemStackLimit
 
     /* // TODO 1.19.3+
     @Inject(method = "getGroup", at = @At("HEAD"), cancellable = true)
-    private void overrideItemGroup(CallbackInfoReturnable<net.minecraft.item.ItemGroup> cir)
+    private void tweakeroo$overrideItemGroup(CallbackInfoReturnable<net.minecraft.item.ItemGroup> cir)
     {
         if (FeatureToggle.TWEAK_CREATIVE_EXTRA_ITEMS.getBooleanValue())
         {

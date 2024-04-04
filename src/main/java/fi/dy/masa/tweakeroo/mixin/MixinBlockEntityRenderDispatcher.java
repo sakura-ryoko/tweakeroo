@@ -14,7 +14,7 @@ public abstract class MixinBlockEntityRenderDispatcher
                                 "Lnet/minecraft/block/entity/BlockEntity;F" +
                                 "Lnet/minecraft/client/util/math/MatrixStack;" +
                                 "Lnet/minecraft/client/render/VertexConsumerProvider;)V", at = @At("HEAD"), cancellable = true)
-    private void preventTileEntityRendering(
+    private void tweakeroo$preventTileEntityRendering(
             net.minecraft.block.entity.BlockEntity tileentityIn,
             float partialTicks,
             net.minecraft.client.util.math.MatrixStack matrixStack,
@@ -30,7 +30,7 @@ public abstract class MixinBlockEntityRenderDispatcher
                                     "Lnet/minecraft/block/entity/BlockEntity;" +
                                     "Lnet/minecraft/client/util/math/MatrixStack;" +
                                     "Lnet/minecraft/client/render/VertexConsumerProvider;II)Z", at = @At("HEAD"), cancellable = true)
-    private void preventTileEntityRendering(
+    private void tweakeroo$preventTileEntityRendering(
             net.minecraft.block.entity.BlockEntity tileEntityIn,
             net.minecraft.client.util.math.MatrixStack matrixStack,
             net.minecraft.client.render.VertexConsumerProvider vertexConsumerProvider,

@@ -12,7 +12,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinChunkBuilder_BuiltChunk
 {
     @Inject(method = "isChunkNonEmpty", at = @At("HEAD"), cancellable = true)
-    private void allowEdgeChunksToRender(BlockPos pos, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$allowEdgeChunksToRender(BlockPos pos, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_RENDER_EDGE_CHUNKS.getBooleanValue())
         {

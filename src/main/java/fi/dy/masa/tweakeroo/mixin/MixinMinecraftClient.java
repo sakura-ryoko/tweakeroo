@@ -60,7 +60,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     }
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void onGameLoop(boolean renderWorld, CallbackInfo ci)
+    private void tweakeroo$onGameLoop(boolean renderWorld, CallbackInfo ci)
     {
         if (this.player != null && this.world != null)
         {
@@ -78,7 +78,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
                          "Lnet/minecraft/util/math/BlockPos;" +
                          "Lnet/minecraft/util/math/Direction;)Z")
             })
-    private void onLeftClickMousePre(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$onLeftClickMousePre(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePre();
     }
@@ -86,7 +86,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     @Inject(method = "doAttack", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
-    private void onLeftClickMousePost(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$onLeftClickMousePost(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePost();
     }
@@ -98,7 +98,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
                          "Lnet/minecraft/util/Hand;" +
                          "Lnet/minecraft/util/hit/BlockHitResult;" +
                          ")Lnet/minecraft/util/ActionResult;"))
-    private ActionResult onProcessRightClickBlock(
+    private ActionResult tweakeroo$onProcessRightClickBlock(
             ClientPlayerInteractionManager controller,
             ClientPlayerEntity player,
             Hand hand,
@@ -108,7 +108,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     }
 
     @Inject(method = "handleInputEvents", at = @At("HEAD"))
-    private void onProcessKeybindsPre(CallbackInfo ci)
+    private void tweakeroo$onProcessKeybindsPre(CallbackInfo ci)
     {
         if (this.currentScreen == null)
         {

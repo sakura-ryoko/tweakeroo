@@ -14,10 +14,10 @@ public abstract class MixinNetherPortalBlock
 {
     @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/World;playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZ)V"))
-    private void tweakeroo_disablePortalSound(World instance, double x, double y, double z, SoundEvent sound,
+    private void tweakeroo$disablePortalSound(World instance, double x, double y, double z, SoundEvent sound,
                                               SoundCategory category, float volume, float pitch, boolean useDistance)
     {
-        if (!Configs.Disable.DISABLE_NETHER_PORTAL_SOUND.getBooleanValue())
+        if (Configs.Disable.DISABLE_NETHER_PORTAL_SOUND.getBooleanValue() == false)
         {
             instance.playSound(x, y, z, sound, category, volume, pitch, useDistance);
         }

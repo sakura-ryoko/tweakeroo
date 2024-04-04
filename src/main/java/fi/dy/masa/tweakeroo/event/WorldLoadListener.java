@@ -8,7 +8,6 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
-
     @Override
     public void onWorldLoadPre(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {

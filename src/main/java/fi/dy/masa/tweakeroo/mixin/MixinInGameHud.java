@@ -28,7 +28,7 @@ public abstract class MixinInGameHud
     @Shadow @Final private MinecraftClient client;
 
     @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
-    private void overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
+    private void tweakeroo$overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
     {
         // Fix the hotbar rendering in the Free Camera mode by using the actual player
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null)
@@ -40,7 +40,7 @@ public abstract class MixinInGameHud
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z",
                 ordinal = 0), cancellable = true)
-    private void overrideCursorRender(CallbackInfo ci)
+    private void tweakeroo$overrideCursorRender(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
         {
@@ -53,7 +53,7 @@ public abstract class MixinInGameHud
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
                     ordinal = 1, shift = At.Shift.AFTER))
-    private void alwaysRenderPlayerList(DrawContext drawContext, float tickDelta, CallbackInfo ci)
+    private void tweakeroo$alwaysRenderPlayerList(DrawContext drawContext, float tickDelta, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue())
         {
@@ -66,7 +66,7 @@ public abstract class MixinInGameHud
     }
 
     @Inject(method = "renderScoreboardSidebar*", at = @At("HEAD"), cancellable = true)
-    private void disableScoreboardRendering(CallbackInfo ci)
+    private void tweakeroo$disableScoreboardRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SCOREBOARD_RENDERING.getBooleanValue())
         {
@@ -75,7 +75,7 @@ public abstract class MixinInGameHud
     }
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
-    private void disableStatusEffectHudRendering(CallbackInfo ci)
+    private void tweakeroo$disableStatusEffectHudRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_STATUS_EFFECT_HUD.getBooleanValue())
         {

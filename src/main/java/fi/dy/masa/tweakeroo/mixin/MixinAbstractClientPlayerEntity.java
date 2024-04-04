@@ -12,7 +12,7 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
 public abstract class MixinAbstractClientPlayerEntity
 {
     @Inject(method = "isSpectator", at = @At("HEAD"), cancellable = true)
-    private void overrideIsSpectator(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$overrideIsSpectator(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && CameraUtils.getFreeCameraSpectator())
         {

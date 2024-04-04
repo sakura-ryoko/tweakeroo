@@ -15,7 +15,7 @@ public abstract class MixinBeaconBlockEntityRenderer
 {
     @Inject(method = "render(Lnet/minecraft/block/entity/BeaconBlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V",
             at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_disableBeamRendering(BeaconBlockEntity beaconBlockEntity,
+    private void tweakeroo$disableBeamRendering(BeaconBlockEntity beaconBlockEntity,
                                                 float f,
                                                 MatrixStack matrixStack,
                                                 VertexConsumerProvider vertexConsumerProvider,

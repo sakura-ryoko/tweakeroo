@@ -36,7 +36,7 @@ public abstract class MixinClientPlayerInteractionManager
             value = "INVOKE",
             target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;syncSelectedSlot()V"),
             cancellable = true)
-    private void onProcessRightClickFirst(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo$onProcessRightClickFirst(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.onProcessRightClickPre(player, hand))
@@ -54,7 +54,7 @@ public abstract class MixinClientPlayerInteractionManager
                                                "Lnet/minecraft/util/Hand;" +
                                                ")Lnet/minecraft/util/TypedActionResult;")),
             at = @At("RETURN"))
-    private void onProcessRightClickPost(Hand hand, PlayerEntity playerEntity,
+    private void tweakeroo$onProcessRightClickPost(Hand hand, PlayerEntity playerEntity,
                                          MutableObject<?> mutableObject, int sequence,
                                          CallbackInfoReturnable<Packet<?>> cir)
     {
@@ -68,7 +68,7 @@ public abstract class MixinClientPlayerInteractionManager
                      ")Lnet/minecraft/util/ActionResult;",
             at = @At("HEAD"),
             cancellable = true)
-    private void onRightClickMouseOnEntityPre1(PlayerEntity player, Entity target, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo$onRightClickMouseOnEntityPre1(PlayerEntity player, Entity target, Hand hand, CallbackInfoReturnable<ActionResult> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.onProcessRightClickPre(player, hand))
@@ -85,7 +85,7 @@ public abstract class MixinClientPlayerInteractionManager
                      ")Lnet/minecraft/util/ActionResult;",
             at = @At("HEAD"),
             cancellable = true)
-    private void onRightClickMouseOnEntityPre2(PlayerEntity player, Entity target, EntityHitResult trace, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo$onRightClickMouseOnEntityPre2(PlayerEntity player, Entity target, EntityHitResult trace, Hand hand, CallbackInfoReturnable<ActionResult> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.onProcessRightClickPre(player, hand))
@@ -95,7 +95,7 @@ public abstract class MixinClientPlayerInteractionManager
     }
 
     @Inject(method = "attackEntity", at = @At("HEAD"), cancellable = true)
-    private void preventEntityAttacksInFreeCameraMode(PlayerEntity player, Entity target, CallbackInfo ci)
+    private void tweakeroo$preventEntityAttacksInFreeCameraMode(PlayerEntity player, Entity target, CallbackInfo ci)
     {
         if (CameraUtils.shouldPreventPlayerInputs())
         {
@@ -118,7 +118,7 @@ public abstract class MixinClientPlayerInteractionManager
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getBlockState(" +
                                                 "Lnet/minecraft/util/math/BlockPos;" +
                                                 ")Lnet/minecraft/block/BlockState;", ordinal = 0))
-    private void onClickBlockPre(BlockPos pos, Direction face, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$onClickBlockPre(BlockPos pos, Direction face, CallbackInfoReturnable<Boolean> cir)
     {
         if (this.client.player != null && this.client.world != null)
         {
@@ -132,7 +132,7 @@ public abstract class MixinClientPlayerInteractionManager
     }
 
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
-    private void handleBreakingRestriction1(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$handleBreakingRestriction1(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
@@ -146,7 +146,7 @@ public abstract class MixinClientPlayerInteractionManager
     }
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
-    private void handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
@@ -160,7 +160,7 @@ public abstract class MixinClientPlayerInteractionManager
     }
 
     @Inject(method = "hasLimitedAttackSpeed", at = @At("HEAD"), cancellable = true)
-    private void overrideLimitedAttackSpeed(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$overrideLimitedAttackSpeed(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())
         {

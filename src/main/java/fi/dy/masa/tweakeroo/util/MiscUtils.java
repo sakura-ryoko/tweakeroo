@@ -205,23 +205,23 @@ public class MiscUtils
     public static boolean isStrippableLog(World world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
-        return IMixinAxeItem.tweakeroo_getStrippedBlocks().containsKey(state.getBlock());
+        return IMixinAxeItem.tweakeroo$getStrippedBlocks().containsKey(state.getBlock());
     }
 
     public static boolean isShovelPathConvertableBlock(World world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
-        return IMixinShovelItem.tweakeroo_getPathStates().containsKey(state.getBlock());
+        return IMixinShovelItem.tweakeroo$getPathStates().containsKey(state.getBlock());
     }
 
     public static boolean getUpdateExec(CommandBlockBlockEntity te)
     {
-        return ((IMixinCommandBlockExecutor) te.getCommandExecutor()).getUpdateLastExecution();
+        return ((IMixinCommandBlockExecutor) te.getCommandExecutor()).tweakeroo$getUpdateLastExecution();
     }
 
     public static void setUpdateExec(CommandBlockBlockEntity te, boolean value)
     {
-        ((IMixinCommandBlockExecutor) te.getCommandExecutor()).setUpdateLastExecution(value);
+        ((IMixinCommandBlockExecutor) te.getCommandExecutor()).tweakeroo$setUpdateLastExecution(value);
     }
 
     public static void printDeathCoordinates(MinecraftClient mc)
@@ -473,7 +473,7 @@ public class MiscUtils
             return true;
         }
 
-        Map<String, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo_getMapStates();
+        Map<String, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo$getMapStates();
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName == null)

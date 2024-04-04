@@ -11,7 +11,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinMouse
 {
     @ModifyVariable(method = "onMouseScroll", ordinal = 1, at = @At("HEAD"), argsOnly = true)
-    private double applyHorizontalScroll(double vertical, long argWindow, double argHorizontal, double argVertical)
+    private double tweakeroo$applyHorizontalScroll(double vertical, long argWindow, double argHorizontal, double argVertical)
     {
         if (Configs.Fixes.MAC_HORIZONTAL_SCROLL.getBooleanValue() && MinecraftClient.IS_SYSTEM_MAC && vertical == 0)
         {

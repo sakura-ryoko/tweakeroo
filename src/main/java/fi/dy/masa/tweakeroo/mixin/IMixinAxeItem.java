@@ -10,5 +10,5 @@ import net.minecraft.item.AxeItem;
 public interface IMixinAxeItem
 {
     @Accessor("STRIPPED_BLOCKS")
-    static Map<Block, Block> tweakeroo_getStrippedBlocks() { return null; }
+    static Map<Block, Block> tweakeroo$getStrippedBlocks() { return null; }
 }

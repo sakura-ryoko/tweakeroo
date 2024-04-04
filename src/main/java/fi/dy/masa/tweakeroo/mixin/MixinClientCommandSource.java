@@ -19,7 +19,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinClientCommandSource
 {
     @Inject(method = "getBlockPositionSuggestions", at = @At("HEAD"), cancellable = true)
-    private void onGetBlockPositionSuggestions(CallbackInfoReturnable<Collection<CommandSource.RelativePosition>> cir)
+    private void tweakeroo$onGetBlockPositionSuggestions(CallbackInfoReturnable<Collection<CommandSource.RelativePosition>> cir)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -27,30 +27,30 @@ public abstract class MixinClientCommandSource
             mc.player != null && (mc.crosshairTarget == null || mc.crosshairTarget.getType() == HitResult.Type.MISS))
         {
             BlockPos pos = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
-            cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(formatInt(pos.getX()), formatInt(pos.getY()), formatInt(pos.getZ()))));
+            cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(tweakeroo$formatInt(pos.getX()), tweakeroo$formatInt(pos.getY()), tweakeroo$formatInt(pos.getZ()))));
         }
     }
 
     @Inject(method = "getPositionSuggestions", at = @At("HEAD"), cancellable = true)
-    private void onGetPositionSuggestions(CallbackInfoReturnable<Collection<CommandSource.RelativePosition>> cir)
+    private void tweakeroo$onGetPositionSuggestions(CallbackInfoReturnable<Collection<CommandSource.RelativePosition>> cir)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (FeatureToggle.TWEAK_TAB_COMPLETE_COORDINATE.getBooleanValue() &&
             mc.player != null && (mc.crosshairTarget == null || mc.crosshairTarget.getType() == HitResult.Type.MISS))
         {
-            cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(formatDouble(mc.player.getX()), formatDouble(mc.player.getY()), formatDouble(mc.player.getZ()))));
+            cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(tweakeroo$formatDouble(mc.player.getX()), tweakeroo$formatDouble(mc.player.getY()), tweakeroo$formatDouble(mc.player.getZ()))));
         }
     }
 
      @Unique
-     private static String formatDouble(double val)
+     private static String tweakeroo$formatDouble(double val)
      {
          return String.format(Locale.ROOT, "%.2f", val);
      }
 
      @Unique
-     private static String formatInt(int val)
+     private static String tweakeroo$formatInt(int val)
      {
          return Integer.toString(val);
      }

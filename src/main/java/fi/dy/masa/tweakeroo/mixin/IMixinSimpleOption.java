@@ -8,5 +8,5 @@ import net.minecraft.client.option.SimpleOption;
 public interface IMixinSimpleOption<T>
 {
     @Accessor("value")
-    void tweakeroo_setValueWithoutCheck(T value);
+    void tweakeroo$setValueWithoutCheck(T value);
 }

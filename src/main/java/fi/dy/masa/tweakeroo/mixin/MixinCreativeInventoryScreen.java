@@ -22,7 +22,7 @@ public abstract class MixinCreativeInventoryScreen extends AbstractInventoryScre
     // This needs to happen before the `this.handler.scrollItems(0.0F);` call.
     @Inject(method = "search", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screen/ingame/CreativeInventoryScreen$CreativeScreenHandler;scrollItems(F)V"))
-    private void tweakeroo_removeInfestedStoneFromCreativeSearchInventory(CallbackInfo ci)
+    private void tweakeroo$removeInfestedStoneFromCreativeSearchInventory(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CREATIVE_INFESTED_BLOCKS.getBooleanValue())
         {

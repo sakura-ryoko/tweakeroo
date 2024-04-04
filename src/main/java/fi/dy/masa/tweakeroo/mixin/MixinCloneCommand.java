@@ -18,7 +18,7 @@ public abstract class MixinCloneCommand
     @Redirect(method = "execute", require = 0,
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/GameRules;getInt(Lnet/minecraft/world/GameRules$Key;)I"))
-    private static int tweakeroo_overrideBlockLimit(GameRules instance, Key<IntRule> rule)
+    private static int tweakeroo$overrideBlockLimit(GameRules instance, Key<IntRule> rule)
     {
         if (FeatureToggle.TWEAK_FILL_CLONE_LIMIT.getBooleanValue())
         {

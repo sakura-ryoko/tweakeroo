@@ -5,7 +5,7 @@ public abstract class MixinPresetsScreen
 {
     /*
     @Inject(method = "init", at = @At("HEAD"))
-    private void addCustomEntries(CallbackInfo ci)
+    private void tweakeroo$addCustomEntries(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CUSTOM_FLAT_PRESETS.getBooleanValue())
         {
@@ -23,7 +23,7 @@ public abstract class MixinPresetsScreen
             {
                 String str = presetStrings.get(i);
 
-                if (this.registerPresetFromString(str) && PRESETS.size() > vanillaEntries)
+                if (this.tweakeroo$registerPresetFromString(str) && PRESETS.size() > vanillaEntries)
                 {
                     Object o = PRESETS.remove(PRESETS.size() - 1);
                     PRESETS.add(0, o);
@@ -32,7 +32,8 @@ public abstract class MixinPresetsScreen
         }
     }
 
-    private boolean registerPresetFromString(String str)
+    @Unique
+    private boolean tweakeroo$registerPresetFromString(String str)
     {
         Matcher matcher = MiscUtils.PATTERN_WORLD_PRESET.matcher(str);
 

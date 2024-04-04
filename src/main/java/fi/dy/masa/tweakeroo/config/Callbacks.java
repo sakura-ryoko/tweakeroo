@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.config;
 
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
@@ -181,9 +182,11 @@ public class Callbacks
 
         private void applyValue(double gamma)
         {
+            Tweakeroo.debugLog("Callbacks#applyValue(): pre");
             @SuppressWarnings("unchecked")
             IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getGamma();
-            opt.tweakeroo_setValueWithoutCheck(gamma);
+            Tweakeroo.debugLog("Callbacks#applyValue(): post");
+            opt.tweakeroo$setValueWithoutCheck(gamma);
         }
     }
 
@@ -196,7 +199,7 @@ public class Callbacks
             // If the feature is enabled on game launch, apply the overridden value here
             if (feature.getBooleanValue())
             {
-                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getSlipperiness());
+                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).tweakeroo$setFriction(Blocks.STONE.getSlipperiness());
             }
         }
 
@@ -205,11 +208,11 @@ public class Callbacks
         {
             if (config.getBooleanValue())
             {
-                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getSlipperiness());
+                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).tweakeroo$setFriction(Blocks.STONE.getSlipperiness());
             }
             else
             {
-                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction((float) Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.getDoubleValue());
+                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).tweakeroo$setFriction((float) Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.getDoubleValue());
             }
         }
     }

@@ -9,5 +9,5 @@ import net.minecraft.world.chunk.light.ChunkLightProvider;
 public interface IMixinChunkLightProvider
 {
     @Accessor("chunkProvider")
-    ChunkProvider tweakeroo_getChunkProvider();
+    ChunkProvider tweakeroo$getChunkProvider();
 }

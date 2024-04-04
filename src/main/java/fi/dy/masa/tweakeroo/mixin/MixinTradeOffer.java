@@ -16,7 +16,7 @@ public abstract class MixinTradeOffer
     @Shadow @Mutable @Final private int maxUses;
 
     @Inject(method = "use", at = @At("RETURN"))
-    private void preventTradeLocking(CallbackInfo ci)
+    private void tweakeroo$preventTradeLocking(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_VILLAGER_TRADE_LOCKING.getBooleanValue())
         {

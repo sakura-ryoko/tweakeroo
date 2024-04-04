@@ -879,7 +879,7 @@ public class InventoryUtils
             {
                 inventory.selectedSlot = slotNumber - 36;
                 //Tweakeroo.debugLog("swapToolToHand() slotnumber: {}, inv.selected slot: {} --> Yeet packet", slotNumber, inventory.selectedSlot);
-                Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
             }
             else
             {
@@ -892,7 +892,7 @@ public class InventoryUtils
                     {
                         inventory.selectedSlot = hotbarSlot;
                         //Tweakeroo.debugLog("swapToolToHand() hotbarSlot: {} (vs selectedSlot {}), inv.selected slot: {} --> Yeet packet", hotbarSlot, selectedSlot, inventory.selectedSlot);
-                        Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
                     }
 
                     //Tweakeroo.debugLog("swapToolToHand(): clickSlot --> slotNumber {}, hotbarSlot {}", slotNumber, hotbarSlot);
@@ -1062,7 +1062,7 @@ public class InventoryUtils
                     mc.interactionManager.clickSlot(container.syncId, slot2.id, 0, SlotActionType.PICKUP, player);
 
                     // If the items didn't all fit, return the rest
-                    if (!player.getInventory().getMainHandStack().isEmpty())
+                    if (player.getInventory().getMainHandStack().isEmpty() == false)
                     {
                         //Tweakeroo.debugLog("tryCombineStacksInInventory(): clickSlot 2 --> slot1.id {} (button 0)",slot1.id, slot2.id);
                         mc.interactionManager.clickSlot(container.syncId, slot1.id, 0, SlotActionType.PICKUP, player);
@@ -1075,7 +1075,7 @@ public class InventoryUtils
                     }
                 }
 
-                if (!slot1.hasStack())
+                if (slot1.hasStack() == false)
                 {
                     break;
                 }
@@ -1121,8 +1121,8 @@ public class InventoryUtils
             BlockState stateTargeted = world.getBlockState(pos);
             ItemStack stack = stateTargeted.getBlock().getPickStack(world, pos, stateTargeted);
 
-            if (!stack.isEmpty() &&
-                    !fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandStack()))
+            if (stack.isEmpty() == false &&
+                fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandStack()) == false)
             {
                 ScreenHandler container = player.currentScreenHandler;
                 PlayerInventory inventory = player.getInventory();
@@ -1142,7 +1142,6 @@ public class InventoryUtils
                 {
                     inventory.addPickBlock(stack);
                     //Tweakeroo.debugLog("switchToPickedBlock(): clickCreativeStack --> inv.selectedSlot {}", inventory.selectedSlot);
-                    assert mc.interactionManager != null;
                     mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
                 }
                 else
@@ -1186,28 +1185,4 @@ public class InventoryUtils
 
         return changed;
     }
-            /*
-            if (nbt.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
-            {
-                NbtCompound tag = nbt.getCompound("BlockEntityTag");
-
-                if (tag.contains("Items", Constants.NBT.TAG_LIST) &&
-                        tag.getList("Items", Constants.NBT.TAG_COMPOUND).isEmpty())
-                {
-                    tag.remove("Items");
-                    changed = true;
-                }
-
-                if (tag.isEmpty())
-                {
-                    nbt.remove("BlockEntityTag");
-                }
-            }
-
-            if (nbt.isEmpty())
-            {
-                stack.setNbt(null);
-                changed = true;
-            }
-             */
 }

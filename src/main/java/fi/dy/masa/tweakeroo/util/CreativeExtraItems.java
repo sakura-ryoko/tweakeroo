@@ -66,9 +66,9 @@ public class CreativeExtraItems
         {
             ItemStack stack = InventoryUtils.getItemStackFromString(str);
 
-            if (!stack.isEmpty())
+            if (stack.isEmpty() == false)
             {
-                if (!stack.getComponents().isEmpty())
+                if (stack.getComponents().isEmpty() == false)
                 {
                     ADDED_ITEMS.put(group, stack);
                 }
@@ -79,34 +79,6 @@ public class CreativeExtraItems
             }
         }
     }
-
-    /*  Removed in favor of a new InventoryUtils.getItemStackFromString via MaLiLib
-
-    public static ItemStack parseItemFromString(String str)
-    {
-        try
-        {
-            // This took me like 2 hours to find this for code that is unused
-            ItemStringReader itemStringReader = new ItemStringReader(BuiltinRegistries.createWrapperLookup());
-            ItemStringReader.ItemResult itemResult = itemStringReader.consume(new StringReader(str));
-            Item item = itemResult.item().value();
-
-            if (item != null)
-            {
-                //ComponentMap components = item.getComponents();
-                //stack.copyComponentsToNewStack(components);
-
-                return new ItemStack(item);
-            }
-        }
-        catch (Exception e)
-        {
-            Tweakeroo.logger.warn("Invalid item '{}'", str);
-        }
-
-        return ItemStack.EMPTY;
-    }
-     */
 
     public static void removeInfestedBlocks(DefaultedList<ItemStack> stacks)
     {

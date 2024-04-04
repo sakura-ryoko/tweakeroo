@@ -25,7 +25,7 @@ public abstract class MixinSlimeBlock extends TranslucentBlock
     }
 
     @Inject(method = "onSteppedOn", at = @At("HEAD"), cancellable = true)
-    private void onEntityWalkOnSlime(World worldIn, BlockPos pos, BlockState state, Entity entityIn, CallbackInfo ci)
+    private void tweakeroo$onEntityWalkOnSlime(World worldIn, BlockPos pos, BlockState state, Entity entityIn, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.getBooleanValue() && entityIn instanceof PlayerEntity)
         {

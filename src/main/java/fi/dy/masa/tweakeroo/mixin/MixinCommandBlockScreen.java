@@ -45,7 +45,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
     private String lastName = "";
 
     @Inject(method = "init", at = @At("RETURN"))
-    private void addExtraFields(CallbackInfo ci)
+    private void tweakeroo$addExtraFields(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_COMMAND_BLOCK_EXTRA_FIELDS.getBooleanValue())
         {
@@ -116,7 +116,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         {
             String currentName = this.blockEntity.getCommandExecutor().getCustomName().getString();
 
-            if (!currentName.equals(this.lastName))
+            if (currentName.equals(this.lastName) == false)
             {
                 this.textFieldName.setText(currentName);
                 this.lastName = currentName;
@@ -130,7 +130,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
             if (this.updateExecValue != updateExec)
             {
                 this.updateExecValue = updateExec;
-                Text str = getDisplayStringForCurrentStatus(this.updateExecValue);
+                Text str = tweakeroo$getDisplayStringForCurrentStatus(this.updateExecValue);
                 this.buttonUpdateExec.setMessage(str);
                 this.buttonUpdateExec.setWidth(this.textRenderer.getWidth(str) + 10);
             }
@@ -155,7 +155,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
     }
 
     @Unique
-    private static Text getDisplayStringForCurrentStatus(boolean updateExecValue)
+    private static Text tweakeroo$getDisplayStringForCurrentStatus(boolean updateExecValue)
     {
         String translationKey = "tweakeroo.gui.button.misc.command_block.update_execution";
         boolean isCurrentlyOn = ! updateExecValue;

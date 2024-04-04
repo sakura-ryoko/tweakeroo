@@ -20,15 +20,8 @@ public abstract class MixinChatHud
 {
     @ModifyVariable(method = "Lnet/minecraft/client/gui/hud/ChatHud;addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
                     at = @At("HEAD"), argsOnly = true)
-    private Text tweakeroo_addMessageTimestamp(Text componentIn, Text parameterMessage, MessageSignatureData data, MessageIndicator indicator)
+    private Text tweakeroo$addMessageTimestamp(Text componentIn, Text parameterMessage, MessageSignatureData data, MessageIndicator indicator)
     {
-        // If we're refreshing, we have probably already modified the message, therefore we don't want to do anything.
-/*
-        if (refreshing)
-        {
-            return componentIn;
-        }
- */
         if (FeatureToggle.TWEAK_CHAT_TIMESTAMP.getBooleanValue())
         {
             MutableText newComponent = Text.literal(MiscUtils.getChatTimestamp() + " ");
@@ -41,7 +34,7 @@ public abstract class MixinChatHud
 
     @Redirect(method = "render", at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
-    private void overrideChatBackgroundColor(DrawContext drawableHelper, int left, int top, int right, int bottom, int color)
+    private void tweakeroo$overrideChatBackgroundColor(DrawContext drawableHelper, int left, int top, int right, int bottom, int color)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())
         {

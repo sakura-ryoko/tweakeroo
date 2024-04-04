@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +27,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
     }
 
     @Inject(method = "method_30263", at = @At("HEAD"), cancellable = true)
-    private void restore_1_15_2_sneaking(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$restore_1_15_2_sneaking(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_SNEAK_1_15_2.getBooleanValue())
         {
@@ -35,32 +36,61 @@ public abstract class MixinPlayerEntity extends LivingEntity
     }
 
     @Redirect(method = "adjustMovementForSneaking", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/player/PlayerEntity;clipAtLedge()Z", ordinal = 0))
-    private boolean fakeSneaking(PlayerEntity entity)
+              target = "Lnet/minecraft/entity/player/PlayerEntity;clipAtLedge()Z", ordinal = 0))
+    private boolean tweakeroo$fakeSneaking(PlayerEntity entity)
     {
-        if (FeatureToggle.TWEAK_FAKE_SNEAKING.getBooleanValue() && ((Object) this) instanceof ClientPlayerEntity)
+        if (FeatureToggle.TWEAK_FAKE_SNEAKING.getBooleanValue())
         {
-            return true;
+            if ((Object) this instanceof ClientPlayerEntity)
+            {
+                return true;
+            }
         }
 
         return this.clipAtLedge();
     }
 
     @Inject(method = "getBlockInteractionRange", at = @At("HEAD"), cancellable = true)
-    private void overrideBlockReachDistance(CallbackInfoReturnable<Double> cir)
+    private void tweakeroo$overrideBlockReachDistance(CallbackInfoReturnable<Double> cir)
     {
+        MinecraftServer server = this.getServer();
         if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue())
         {
-            cir.setReturnValue(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue());
+            if (server != null)
+            {
+                // For Single Player, use the configured value.
+                cir.setReturnValue(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue());
+            }
+            else
+            {
+                double rangeRealMax = cir.getReturnValue() + 1.0;
+
+                // Calculate a "safe" range for servers.  It only allows for an extra 1.0 of Interaction range.
+                cir.setReturnValue(Math.min(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
+                // TODO this should be synchronized via ServUX
+            }
         }
     }
 
     @Inject(method = "getEntityInteractionRange", at = @At("HEAD"), cancellable = true)
-    private void overrideEntityReachDistance(CallbackInfoReturnable<Double> cir)
+    private void tweakeroo$overrideEntityReachDistance(CallbackInfoReturnable<Double> cir)
     {
+        MinecraftServer server = this.getServer();
         if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue())
         {
-            cir.setReturnValue(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue());
+            if (server != null)
+            {
+                // For Single Player, use the configured value.
+                cir.setReturnValue(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue());
+            }
+            else
+            {
+                double rangeRealMax = cir.getReturnValue() + 1.0;
+
+                // Calculate a "safe" range for servers.  It only allows for an extra 1.0 of Interaction range.
+                cir.setReturnValue(Math.min(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
+                // TODO this should be synchronized via ServUX
+            }
         }
     }
 }

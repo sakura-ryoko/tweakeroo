@@ -20,7 +20,7 @@ public abstract class MixinObserverBlock extends FacingBlock
     }
 
     @Inject(method = "scheduleTick", at = @At("HEAD"), cancellable = true)
-    private void preventTrigger(WorldAccess worldIn, BlockPos pos, CallbackInfo ci)
+    private void tweakeroo$preventTrigger(WorldAccess worldIn, BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_OBSERVER.getBooleanValue())
         {

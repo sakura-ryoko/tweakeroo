@@ -19,7 +19,7 @@ public abstract class MixinClientPlayNetworkHandler
             value = "INVOKE",
             target = "Lnet/minecraft/screen/ScreenHandler;setStackInSlot(IILnet/minecraft/item/ItemStack;)V"),
             cancellable = true)
-    private void onHandleSetSlot(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo$onHandleSetSlot(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
     {
         if (PlacementTweaks.shouldSkipSlotSync(packet.getSlot(), packet.getStack()))
         {
@@ -29,7 +29,7 @@ public abstract class MixinClientPlayNetworkHandler
 
     @Inject(method = "onDeathMessage", at = @At(value = "INVOKE", // onCombatEvent
             target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
-    private void onPlayerDeath(DeathMessageS2CPacket packetIn, CallbackInfo ci)
+    private void tweakeroo$onPlayerDeath(DeathMessageS2CPacket packetIn, CallbackInfo ci)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 

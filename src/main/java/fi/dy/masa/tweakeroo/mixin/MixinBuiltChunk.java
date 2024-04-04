@@ -11,7 +11,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinBuiltChunk
 {
     @Inject(method = "scheduleRebuild(Z)V", at = @At("HEAD"), cancellable = true)
-    private void disableChunkReRenders(boolean important, CallbackInfo ci)
+    private void tweakeroo$disableChunkReRenders(boolean important, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {

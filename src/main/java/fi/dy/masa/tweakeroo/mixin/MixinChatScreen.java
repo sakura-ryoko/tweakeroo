@@ -24,7 +24,7 @@ public abstract class MixinChatScreen
     @Mutable @Shadow private String originalChatText;
 
     @Inject(method = "removed", at = @At("HEAD"))
-    private void storeChatText(CallbackInfo ci)
+    private void tweakeroo$storeChatText(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue())
         {
@@ -33,7 +33,7 @@ public abstract class MixinChatScreen
     }
 
     @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
-    private void restoreText(String defaultText, CallbackInfo ci)
+    private void tweakeroo$restoreText(String defaultText, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue() && !MiscUtils.getLastChatText().isEmpty())
         {
@@ -48,13 +48,13 @@ public abstract class MixinChatScreen
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V",
                     shift = Shift.AFTER))
-    private void onSendMessage(int keyCode, int scancode, int modifiers, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo$onSendMessage(int keyCode, int scancode, int modifiers, CallbackInfoReturnable<Boolean> cir)
     {
         MiscUtils.setLastChatText("");
     }
 
     @ModifyConstant(method = "render", constant = @Constant(intValue = Integer.MIN_VALUE))
-    private int overrideChatBackgroundColor(int original)
+    private int tweakeroo$overrideChatBackgroundColor(int original)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())
         {

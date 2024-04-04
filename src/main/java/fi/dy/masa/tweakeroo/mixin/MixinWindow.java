@@ -20,7 +20,7 @@ public abstract class MixinWindow
     @Shadow public abstract int getHeight();
 
     @Inject(method = "getScaleFactor", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_customGuiScaleGetScale(CallbackInfoReturnable<Double> cir)
+    private void tweakeroo$customGuiScaleGetScale(CallbackInfoReturnable<Double> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
             MinecraftClient.getInstance().currentScreen instanceof HandledScreen<?>)
@@ -35,7 +35,7 @@ public abstract class MixinWindow
     }
 
     @Inject(method = "getScaledWidth", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_customGuiScaleGetWidth(CallbackInfoReturnable<Integer> cir)
+    private void tweakeroo$customGuiScaleGetWidth(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
             MinecraftClient.getInstance().currentScreen instanceof HandledScreen<?>)
@@ -50,7 +50,7 @@ public abstract class MixinWindow
     }
 
     @Inject(method = "getScaledHeight", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_customGuiScaleGetHeight(CallbackInfoReturnable<Integer> cir)
+    private void tweakeroo$customGuiScaleGetHeight(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
             MinecraftClient.getInstance().currentScreen instanceof HandledScreen<?>)

@@ -11,5 +11,5 @@ import net.minecraft.item.ShovelItem;
 public interface IMixinShovelItem
 {
     @Accessor("PATH_STATES")
-    static Map<Block, BlockState> tweakeroo_getPathStates() { return null; }
+    static Map<Block, BlockState> tweakeroo$getPathStates() { return null; }
 }

@@ -111,9 +111,6 @@ public class RenderHandler implements IRenderer
 
         if (mc.player != null)
         {
-            //MatrixStack matrixStack = new MatrixStack();
-            //matrixStack.multiplyPositionMatrix(matrix4f);
-
             this.renderOverlays(matrix4f, mc);
         }
     }

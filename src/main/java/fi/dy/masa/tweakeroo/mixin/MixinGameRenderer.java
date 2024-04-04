@@ -41,7 +41,7 @@ public abstract class MixinGameRenderer
     private float realPitch;
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
-    private void onRenderWorld(CallbackInfo ci)
+    private void tweakeroo$onRenderWorld(CallbackInfo ci)
     {
         if (Callbacks.skipWorldRendering)
         {
@@ -51,16 +51,16 @@ public abstract class MixinGameRenderer
 
     @Redirect(method = "renderWorld", require = 0, at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V"))
-    private void disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
+    private void tweakeroo$disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
     {
-        if (!Configs.Disable.DISABLE_WORLD_VIEW_BOB.getBooleanValue())
+        if (Configs.Disable.DISABLE_WORLD_VIEW_BOB.getBooleanValue() == false)
         {
             this.bobView(matrices, tickDelta);
         }
     }
 
     @Inject(method = "getFov", at = @At("HEAD"), cancellable = true)
-    private void applyZoom(Camera camera, float partialTicks, boolean useFOVSetting, CallbackInfoReturnable<Double> cir)
+    private void tweakeroo$applyZoom(Camera camera, float partialTicks, boolean useFOVSetting, CallbackInfoReturnable<Double> cir)
     {
         if (MiscUtils.isZoomActive())
         {
@@ -72,10 +72,9 @@ public abstract class MixinGameRenderer
         }
     }
 
-    // Method renamed
     @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
-    private Entity overrideCameraEntityForRayTrace(MinecraftClient mc)
+    private Entity tweakeroo$overrideCameraEntityForRayTrace(MinecraftClient mc)
     {
         // Return the real player for the hit target ray tracing if the
         // player inputs option is enabled in Free Camera mode.
@@ -91,7 +90,6 @@ public abstract class MixinGameRenderer
         return mc.getCameraEntity();
     }
 
-    // Call moved to findCrosshairTarget()
     @ModifyArg(method = "findCrosshairTarget",
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(" +
@@ -101,17 +99,17 @@ public abstract class MixinGameRenderer
                                  "Lnet/minecraft/util/math/Box;" +
                                  "Ljava/util/function/Predicate;D)" +
                                  "Lnet/minecraft/util/hit/EntityHitResult;"))
-    private Predicate<Entity> overrideTargetedEntityCheck(Predicate<Entity> predicate)
+    private Predicate<Entity> tweakeroo$overrideTargetedEntityCheck(Predicate<Entity> predicate)
     {
         if (Configs.Disable.DISABLE_DEAD_MOB_TARGETING.getBooleanValue())
         {
-            predicate = predicate.and((entityIn) -> !(entityIn instanceof LivingEntity) || ((LivingEntity) entityIn).getHealth() > 0f);
+            predicate = predicate.and((entityIn) -> (entityIn instanceof LivingEntity) == false || ((LivingEntity) entityIn).getHealth() > 0f);
         }
 
         if ((FeatureToggle.TWEAK_HANGABLE_ENTITY_BYPASS.getBooleanValue() && this.client.player != null
              && this.client.player.isSneaking() == Configs.Generic.HANGABLE_ENTITY_BYPASS_INVERSE.getBooleanValue()))
         {
-            predicate = predicate.and((entityIn) -> !(entityIn instanceof AbstractDecorationEntity));
+            predicate = predicate.and((entityIn) -> (entityIn instanceof AbstractDecorationEntity) == false);
         }
 
         return predicate;
@@ -120,7 +118,7 @@ public abstract class MixinGameRenderer
     @Inject(method = "renderWorld", at = @At(
                 value = "INVOKE", shift = Shift.AFTER,
                 target = "Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"))
-    private void overrideRenderViewEntityPre(CallbackInfo ci)
+    private void tweakeroo$overrideRenderViewEntityPre(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -136,7 +134,7 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "renderWorld", at = @At("RETURN"))
-    private void overrideRenderViewEntityPost(CallbackInfo ci)
+    private void tweakeroo$overrideRenderViewEntityPost(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -150,7 +148,7 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void removeHandRendering(CallbackInfo ci)
+    private void tweakeroo$removeHandRendering(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {

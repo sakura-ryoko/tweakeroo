@@ -19,11 +19,11 @@ public abstract class MixinLightingProvider
     @Shadow @Final @Nullable private ChunkLightProvider<?, ?> blockLightProvider;
 
     @Inject(method = "checkBlock", at = @At("HEAD"), cancellable = true)
-    private void disableLightUpdates(BlockPos pos, CallbackInfo ci)
+    private void tweakeroo$disableLightUpdates(BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CLIENT_LIGHT_UPDATES.getBooleanValue() &&
             this.blockLightProvider != null &&
-            ((IMixinChunkLightProvider) this.blockLightProvider).tweakeroo_getChunkProvider().getWorld() == MinecraftClient.getInstance().world)
+            ((IMixinChunkLightProvider) this.blockLightProvider).tweakeroo$getChunkProvider().getWorld() == MinecraftClient.getInstance().world)
         {
             ci.cancel();
         }

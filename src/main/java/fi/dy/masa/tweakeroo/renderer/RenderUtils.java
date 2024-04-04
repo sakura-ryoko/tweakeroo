@@ -94,7 +94,7 @@ public class RenderUtils
                 {
                     ItemStack stack = player.getInventory().getStack(row * 9 + column);
 
-                    if (!stack.isEmpty())
+                    if (stack.isEmpty() == false)
                     {
                         fi.dy.masa.malilib.render.InventoryOverlay.renderStackAt(stack, x, y, 1, mc, drawContext);
                     }
@@ -119,7 +119,6 @@ public class RenderUtils
         {
             // We need to get the player from the server world (if available, ie. in single player),
             // so that the player itself won't be included in the ray trace
-            assert mc.player != null;
             Entity serverPlayer = world.getPlayerByUuid(mc.player.getUuid());
 
             if (serverPlayer != null)
@@ -170,7 +169,7 @@ public class RenderUtils
             }
             else if (entity instanceof AbstractHorseEntity)
             {
-                inv = ((IMixinAbstractHorseEntity) entity).tweakeroo_getHorseInventory();
+                inv = ((IMixinAbstractHorseEntity) entity).tweakeroo$getHorseInventory();
             }
         }
 
@@ -238,13 +237,11 @@ public class RenderUtils
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
         fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, x, y, 9, 27, mc);
-        assert mc.player != null;
         fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, mc.player.getInventory(), x + slotOffsetX, y + slotOffsetY, 9, 9, 27, mc, drawContext);
     }
 
     public static void renderHotbarScrollOverlay(MinecraftClient mc, DrawContext drawContext)
     {
-        assert mc.player != null;
         Inventory inv = mc.player.getInventory();
         final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
         final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
@@ -304,8 +301,6 @@ public class RenderUtils
         matrix4fStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();
-
-        //Quaternionf rot = new Quaternionf().rotationXYZ(-pitch * (float) (Math.PI / 180.0), yaw * (float) (Math.PI / 180.0), 0.0F);
 
         matrix4fStack.rotateXYZ(-(pitch) * ((float) (Math.PI / 180.0)), yaw * ((float) (Math.PI / 180.0)), 0.0F);
         // Fix rotation values using matrix4fRotateFix()
@@ -427,7 +422,6 @@ public class RenderUtils
         int height = 50;
         int x = xCenter - width / 2;
         int y = yCenter - height - 10;
-        assert mc.player != null;
         double currentPitch = mc.player.getPitch();
         double centerPitch = 0;
         double indicatorRange = 180;
@@ -484,7 +478,7 @@ public class RenderUtils
                 fi.dy.masa.malilib.render.RenderUtils.drawRect(x, yCenter + snapThreshOffset, width, 2, 0xFF20FF20);
             }
         }
-        else if (!isSnapRange)
+        else if (isSnapRange == false)
         {
             fi.dy.masa.malilib.render.RenderUtils.drawRect(x + 1, yCenter - 1, width - 2, 2, 0xFFC0C0C0);
         }

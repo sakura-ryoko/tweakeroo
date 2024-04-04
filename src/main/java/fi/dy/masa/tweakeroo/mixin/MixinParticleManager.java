@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinParticleManager
 {
     @Inject(method = "addBlockBreakParticles", at = @At("HEAD"), cancellable = true)
-    private void onAddBlockDestroyEffects(BlockPos pos, BlockState state, CallbackInfo ci)
+    private void tweakeroo$onAddBlockDestroyEffects(BlockPos pos, BlockState state, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_BLOCK_BREAK_PARTICLES.getBooleanValue())
         {
@@ -23,7 +23,7 @@ public abstract class MixinParticleManager
     }
 
     @Inject(method = "addParticle(Lnet/minecraft/client/particle/Particle;)V", at = @At("HEAD"), cancellable = true)
-    private void disableAllParticles(Particle effect, CallbackInfo ci)
+    private void tweakeroo$disableAllParticles(Particle effect, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_PARTICLES.getBooleanValue())
         {

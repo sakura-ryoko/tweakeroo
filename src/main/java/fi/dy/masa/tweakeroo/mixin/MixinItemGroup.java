@@ -7,7 +7,7 @@ public abstract class MixinItemGroup
 {
     /* // TODO 1.19.3+
     @Inject(method = "appendStacks", at = @At("RETURN"))
-    private void appendCustomItems(net.minecraft.util.collection.DefaultedList<net.minecraft.item.ItemStack> stacks, CallbackInfo ci)
+    private void tweakeroo$appendCustomItems(net.minecraft.util.collection.DefaultedList<net.minecraft.item.ItemStack> stacks, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CREATIVE_EXTRA_ITEMS.getBooleanValue())
         {

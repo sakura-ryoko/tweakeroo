@@ -31,7 +31,7 @@ public abstract class MixinBackgroundRenderer
                             to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
             constant = @Constant(floatValue = 0.25f),
             require = 0)
-    private static float reduceLavaFogStart(float original)
+    private static float tweakeroo$reduceLavaFogStart(float original)
     {
         wasLava = true;
 
@@ -48,9 +48,9 @@ public abstract class MixinBackgroundRenderer
             slice = @Slice(
                     from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
                     to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
-            constant = { @Constant(floatValue = 1.0f), @Constant(floatValue = 3.0f)},
+            constant = { @Constant(floatValue = 1.0f), @Constant(floatValue = 5.0f)},
             require = 0)
-    private static float reduceLavaFogEnd(float original)
+    private static float tweakeroo$reduceLavaFogEnd(float original)
     {
         wasLava = true;
 
@@ -97,7 +97,7 @@ public abstract class MixinBackgroundRenderer
     @Redirect(method = "render",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getHorizonShadingRatio()F"))
-    private static float tweakeroo_disableSkyDarkness(ClientWorld.Properties props)
+    private static float tweakeroo$disableSkyDarkness(ClientWorld.Properties props)
     {
         return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : props.getHorizonShadingRatio();
     }
@@ -107,7 +107,7 @@ public abstract class MixinBackgroundRenderer
             at = @At(value = "INVOKE", remap = false,
                      target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogEnd(F)V",
                      shift = At.Shift.AFTER))
-    private static void disableRenderDistanceFog(
+    private static void tweakeroo$disableRenderDistanceFog(
             Camera camera,
             BackgroundRenderer.FogType fogType,
             float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
