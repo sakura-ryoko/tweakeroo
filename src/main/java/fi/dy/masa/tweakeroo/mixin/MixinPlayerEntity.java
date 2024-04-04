@@ -67,7 +67,6 @@ public abstract class MixinPlayerEntity extends LivingEntity
 
                 // Calculate a "safe" range for servers.  It only allows for an extra 1.0 of Interaction range.
                 cir.setReturnValue(Math.min(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
-                // TODO this should be synchronized via ServUX
             }
         }
     }
@@ -89,7 +88,6 @@ public abstract class MixinPlayerEntity extends LivingEntity
 
                 // Calculate a "safe" range for servers.  It only allows for an extra 1.0 of Interaction range.
                 cir.setReturnValue(Math.min(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
-                // TODO this should be synchronized via ServUX
             }
         }
     }

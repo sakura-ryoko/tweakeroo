@@ -53,14 +53,12 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
     @Inject(method = "streamCornerPos", at = @At("HEAD"), cancellable = true)
     private void tweakeroo$overrideCornerBlockScan(BlockPos start, BlockPos end, CallbackInfoReturnable<Stream<BlockPos>> cir)
     {
-        Tweakeroo.debugLog("tweakeroo$overrideCornerBlockScan(): pre");
-        // TODO I do not know why IntelliJ is greying this out. --> TEST
+        // I do not know why IntelliJ is greying this out, it appears to function as expected.
         if (FeatureToggle.TWEAK_STRUCTURE_BLOCK_LIMIT.getBooleanValue())
         {
             BlockPos pos = this.getPos();
             World world = this.getWorld();
             String name = ((StructureBlockBlockEntity) (Object) this).getTemplateName();
-            Tweakeroo.debugLog("tweakeroo$overrideCornerBlockScan(): post");
             int maxSize = Configs.Generic.STRUCTURE_BLOCK_MAX_SIZE.getIntegerValue();
             int maxOffset = 48;
 

@@ -39,18 +39,15 @@ public abstract class MixinLivingEntity extends Entity
             cancellable = true)
     private void tweakeroo$removeOwnPotionEffects(CallbackInfo ci)
     {
+        MinecraftClient mc = MinecraftClient.getInstance();
+
         if (Configs.Disable.DISABLE_FP_EFFECT_PARTICLES.getBooleanValue())
         {
-            Tweakeroo.debugLog("tweakeroo$removeOwnPotionEffects(): pre");
-
-            // TODO I don't know why IntelliJ is greying this out. --> TEST
-            if (((Object) this) instanceof ClientPlayerEntity)
+            // I don't know why IntelliJ is greying this out when it works fine.
+            if ((((Object) this) == (LivingEntity) mc.player) &&
+                (mc.options.getPerspective() == Perspective.FIRST_PERSON))
             {
-                Tweakeroo.debugLog("tweakeroo$removeOwnPotionEffects(): post");
-                if (MinecraftClient.getInstance().options.getPerspective() == Perspective.FIRST_PERSON)
-                {
-                    ci.cancel();
-                }
+                ci.cancel();
             }
         }
     }
@@ -59,14 +56,13 @@ public abstract class MixinLivingEntity extends Entity
             target = "Lnet/minecraft/entity/LivingEntity;tickFallFlying()V"))
     private void tweakeroo$applyCustomDeceleration(CallbackInfo ci)
     {
+        MinecraftClient mc = MinecraftClient.getInstance();
+
         if (FeatureToggle.TWEAK_CUSTOM_FLY_DECELERATION.getBooleanValue())
         {
-            Tweakeroo.debugLog("tweakeroo$applyCustomDeceleration(): pre");
-
-            // TODO I don't know why IntelliJ is greying this out. --> TEST
-            if (((Object) this) instanceof ClientPlayerEntity)
+            // I don't know why IntelliJ is greying this out when it works fine.
+            if (((Object) this) == (LivingEntity) mc.player)
             {
-                Tweakeroo.debugLog("tweakeroo$applyCustomDeceleration(): post");
                 MiscUtils.handlePlayerDeceleration();
             }
         }

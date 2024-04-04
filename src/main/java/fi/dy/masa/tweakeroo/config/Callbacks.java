@@ -182,10 +182,9 @@ public class Callbacks
 
         private void applyValue(double gamma)
         {
-            Tweakeroo.debugLog("Callbacks#applyValue(): pre");
             @SuppressWarnings("unchecked")
             IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getGamma();
-            Tweakeroo.debugLog("Callbacks#applyValue(): post");
+            // Not sure why IntelliJ greys this out while it works?
             opt.tweakeroo$setValueWithoutCheck(gamma);
         }
     }

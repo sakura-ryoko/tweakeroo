@@ -78,12 +78,10 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
     @Inject(method = "tryMerge(Lnet/minecraft/entity/ItemEntity;)V", at = @At("HEAD"), cancellable = true)
     private void tweakeroo$stackEmptyShulkerBoxes(ItemEntity other, CallbackInfo ci)
     {
-        Tweakeroo.debugLog("tweakeroo$stackEmptyShulkerBoxes(): pre");
-        // TODO I don't know why IntelliJ greys this out. --> TEST
+        // I don't know why IntelliJ greys this out while it is working well
         if (FeatureToggle.TWEAK_SHULKERBOX_STACK_GROUND.getBooleanValue())
         {
             ItemEntity self = (ItemEntity) (Object) this;
-            Tweakeroo.debugLog("tweakeroo$stackEmptyShulkerBoxes(): post");
             ItemStack stackSelf = self.getStack();
             ItemStack stackOther = other.getStack();
 

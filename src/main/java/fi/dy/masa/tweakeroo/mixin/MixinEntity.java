@@ -44,39 +44,31 @@ public abstract class MixinEntity
     @Inject(method = "updateVelocity", at = @At("HEAD"), cancellable = true)
     private void tweakeroo$moreAccurateMoveRelative(float float_1, net.minecraft.util.math.Vec3d motion, CallbackInfo ci)
     {
-        Tweakeroo.debugLog("tweakeroo$moreAccurateMoveRelative(): pre");
-        // TODO I'm not sure why IntelliJ is greying this out if the code is correct? --> TEST
-        if ((Object) this instanceof ClientPlayerEntity)
+        // I'm not sure why IntelliJ is greying this out if the code is correct.
+        if ((FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue()) && ((Object) this instanceof ClientPlayerEntity))
         {
-            Tweakeroo.debugLog("tweakeroo$moreAccurateMoveRelative(): post");
-            if (FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue())
+            double speed = motion.lengthSquared();
+
+            if (speed >= 1.0E-7D)
             {
-                double speed = motion.lengthSquared();
+               motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
+               double xFactor = Math.sin(this.yaw * Math.PI / 180D);
+               double zFactor = Math.cos(this.yaw * Math.PI / 180D);
+               net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
 
-                if (speed >= 1.0E-7D)
-                {
-                   motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
-                   double xFactor = Math.sin(this.yaw * Math.PI / 180D);
-                   double zFactor = Math.cos(this.yaw * Math.PI / 180D);
-                   net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
-
-                   this.setVelocity(this.getVelocity().add(change));
-                }
-
-                ci.cancel();
+               this.setVelocity(this.getVelocity().add(change));
             }
+
+            ci.cancel();
         }
     }
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
     private void tweakeroo$overrideYaw(double yawChange, double pitchChange, CallbackInfo ci)
     {
-        Tweakeroo.debugLog("tweakeroo$overrideYaw(): pre");
-        // TODO I'm not sure why IntelliJ is greying this out if the code is correct? --> TEST
+        // I'm not sure why IntelliJ is greying this out if the code is correct?
         if ((Object) this instanceof ClientPlayerEntity)
         {
-            Tweakeroo.debugLog("tweakeroo$overrideYaw(): post");
-
             if (CameraUtils.shouldPreventPlayerMovement())
             {
                 CameraUtils.updateCameraRotations((float) yawChange, (float) pitchChange);
