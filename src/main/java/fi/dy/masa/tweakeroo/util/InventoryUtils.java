@@ -1169,7 +1169,7 @@ public class InventoryUtils
 
             if (itemContainer != null)
             {
-                Iterator<ItemStack> iter = itemContainer.iterator();
+                Iterator<ItemStack> iter = itemContainer.stream().iterator();
 
                 while (iter.hasNext())
                 {
