@@ -1,7 +1,7 @@
 package fi.dy.masa.tweakeroo;
 
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.MinecraftVersion;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class Reference
 {
