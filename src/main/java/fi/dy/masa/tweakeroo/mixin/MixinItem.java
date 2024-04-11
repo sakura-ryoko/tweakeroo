@@ -1,18 +1,20 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import net.minecraft.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import fi.dy.masa.tweakeroo.util.IItemStackLimit;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(net.minecraft.item.Item.class)
 public abstract class MixinItem implements IItemStackLimit
 {
-    @Shadow public int getMaxCount() { return 0; }
+    @Shadow public abstract Item asItem();
 
     @Override
     public int tweakeroo$getMaxStackSize(net.minecraft.item.ItemStack stack)
     {
-        return this.getMaxCount();
+        return this.asItem().getMaxCount();
     }
 
     /* // TODO 1.19.3+
