@@ -4,7 +4,6 @@ import net.minecraft.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import fi.dy.masa.tweakeroo.util.IItemStackLimit;
-import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(net.minecraft.item.Item.class)
 public abstract class MixinItem implements IItemStackLimit
