@@ -42,8 +42,6 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BLOCK_TYPE_BREAK_RESTRICTION_WARN   = new ConfigOptionList  ("blockTypeBreakRestrictionWarn", MessageOutputType.MESSAGE, "Selects which type of warning message to show (if any)\nwhen the Block Type Break Restriction feature prevents breaking a block");
         public static final ConfigInteger       BREAKING_GRID_SIZE                  = new ConfigInteger     ("breakingGridSize", 3, 1, 1000, "The grid interval size for the grid breaking mode.\nTo quickly adjust the value, scroll while\nholding down the tweak toggle keybind.");
         public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE, "The Breaking Restriction mode to use (hotkey-selectable)");
-        public static final ConfigColor         BUNDLE_DISPLAY_BACKGROUND_COLOR     = new ConfigColor       ("bundleDisplayBgColor", "#41854F4C", "Enables tinting/coloring the Bundle display");
-        public static final ConfigBoolean       BUNDLE_PREVIEW_REQUIRE_SHIFT        = new ConfigBoolean     ("bundlePreviewRequireShift", true, "Whether holding shift is required for the Bundle Preview");
         public static final ConfigColor         CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000", "The background color for the chat messages,\nif 'tweakChatBackgroundColor' is enabled");
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]", "The time format for chat messages, if tweakChatTimestamp is enabled\nUses the Java SimpleDateFormat format specifiers.");
         public static final ConfigBoolean       CARPET_ACCURATE_PLACEMENT_PROTOCOL  = new ConfigBoolean     ("carpetAccuratePlacementProtocol", true, "If enabled, then the Flexible Block Placement and the\nAccurate Block Placement use the protocol implemented in Carpet mod.\n§6Note: This is required for any block rotations to work, other than\n§6blocks that only care about the block side you click on (Hoppers, Logs etc.)");
@@ -160,8 +158,6 @@ public class Configs implements IConfigHandler
                 BLOCK_REACH_DISTANCE,
                 ANGEL_BLOCK_PLACEMENT_DISTANCE,
                 BREAKING_GRID_SIZE,
-                BUNDLE_DISPLAY_BACKGROUND_COLOR,
-                BUNDLE_PREVIEW_REQUIRE_SHIFT,
                 CUSTOM_INVENTORY_GUI_SCALE,
                 ENTITY_REACH_DISTANCE,
                 FAST_BLOCK_PLACEMENT_COUNT,
