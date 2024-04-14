@@ -60,7 +60,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     }
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void tweakeroo$onGameLoop(boolean renderWorld, CallbackInfo ci)
+    private void onGameLoop(boolean renderWorld, CallbackInfo ci)
     {
         if (this.player != null && this.world != null)
         {

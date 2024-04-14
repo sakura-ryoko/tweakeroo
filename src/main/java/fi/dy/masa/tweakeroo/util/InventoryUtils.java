@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
@@ -33,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
+
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -1142,7 +1144,6 @@ public class InventoryUtils
     {
         ContainerComponent itemContainer = stack.getComponents().get(DataComponentTypes.CONTAINER);
         boolean changed = false;
-        int count = 0;
 
         if (itemContainer != null)
         {
@@ -1156,11 +1157,8 @@ public class InventoryUtils
                     iter.remove();
                     changed = true;
                 }
-                count++;
             }
         }
-
-        Tweakeroo.debugLog("cleanUpShulkerBoxNBT(): count {} // changed: {}", count, changed);
 
         return changed;
     }
