@@ -183,7 +183,6 @@ public class Callbacks
         {
             @SuppressWarnings("unchecked")
             IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getGamma();
-            // Not sure why IntelliJ greys this out while it works?
             opt.tweakeroo_setValueWithoutCheck(gamma);
         }
     }

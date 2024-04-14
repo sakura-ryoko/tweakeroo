@@ -64,7 +64,8 @@ public abstract class MixinInGameHud
         }
     }
 
-    @Inject(method = "renderScoreboardSidebar*", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
+            at = @At("HEAD"), cancellable = true)
     private void disableScoreboardRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SCOREBOARD_RENDERING.getBooleanValue())

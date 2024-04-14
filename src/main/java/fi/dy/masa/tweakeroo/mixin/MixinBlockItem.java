@@ -70,16 +70,11 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
     @Override
     public int getMaxStackSize(ItemStack stack)
     {
-        if (FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue())
+        if (FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue() &&
+            ((BlockItem) (Object) this).getBlock() instanceof ShulkerBoxBlock &&
+            InventoryUtils.shulkerBoxHasItems(stack) == false)
         {
-            Block block = this.getBlock();
-            if (block instanceof ShulkerBoxBlock)
-            {
-                if (InventoryUtils.shulkerBoxHasItems(stack) == false)
-                {
-                    return 64;
-                }
-            }
+            return 64;
         }
 
         // FIXME How to call the stack-sensitive version on the super class?

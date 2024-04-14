@@ -28,9 +28,7 @@ public abstract class MixinLivingEntity extends Entity
             target = "Lnet/minecraft/world/World;isClient:Z"))
     private boolean fixElytraLanding(World world)
     {
-        return world.isClient &&
-                (Configs.Fixes.ELYTRA_FIX.getBooleanValue() == false ||
-                ((Object) this instanceof ClientPlayerEntity) == false);
+        return world.isClient && (Configs.Fixes.ELYTRA_FIX.getBooleanValue() == false || ((Object) this instanceof ClientPlayerEntity) == false);
     }
 
     @Inject(method = "tickStatusEffects", at = @At(value = "INVOKE", ordinal = 0,
@@ -40,14 +38,11 @@ public abstract class MixinLivingEntity extends Entity
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (Configs.Disable.DISABLE_FP_EFFECT_PARTICLES.getBooleanValue())
+
+        if (Configs.Disable.DISABLE_FP_EFFECT_PARTICLES.getBooleanValue() &&
+            ((Object) this) == mc.player && mc.options.getPerspective() == Perspective.FIRST_PERSON)
         {
-            // I don't know why IntelliJ is greying this out when it works fine.
-            if ((((Object) this) == (LivingEntity) mc.player) &&
-                (mc.options.getPerspective() == Perspective.FIRST_PERSON))
-            {
-                ci.cancel();
-            }
+            ci.cancel();
         }
     }
 
@@ -56,7 +51,7 @@ public abstract class MixinLivingEntity extends Entity
     private void tweakeroo_applyCustomDeceleration(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CUSTOM_FLY_DECELERATION.getBooleanValue() &&
-                ((Entity) this) == MinecraftClient.getInstance().player)
+            ((Entity) this) == MinecraftClient.getInstance().player)
         {
             MiscUtils.handlePlayerDeceleration();
         }

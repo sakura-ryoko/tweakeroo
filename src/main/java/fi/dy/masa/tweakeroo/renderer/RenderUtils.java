@@ -274,12 +274,10 @@ public class RenderUtils
             // With the Vanilla changes, the old values were very Overpowered.
             //  (was: *1.6f, and *(resp * 1.6f)) -- getting values as high as 38.4f,
             //   when we really only need around 15.0f at the most for full visibility.
-            // 5.0f w/ Fire Res (Max: 13.5f)
-            // 1.0f no Fire Res (Max:  7.2f)
 
             if (originalFog > 3.0f)
             {
-                fog += 2.3f;        // Fire Res bonus +2.3f
+                fog += 3.3f;        // Fire Res bonus
             }
             if (aqua > 0)
             {

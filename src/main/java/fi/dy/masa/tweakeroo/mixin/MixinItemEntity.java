@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -13,6 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.IEntityItem;
 import fi.dy.masa.tweakeroo.util.InventoryUtils;
@@ -74,7 +76,6 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
     @Inject(method = "tryMerge(Lnet/minecraft/entity/ItemEntity;)V", at = @At("HEAD"), cancellable = true)
     private void stackEmptyShulkerBoxes(ItemEntity other, CallbackInfo ci)
     {
-        // I don't know why IntelliJ greys this out while it is working well
         if (FeatureToggle.TWEAK_SHULKERBOX_STACK_GROUND.getBooleanValue())
         {
             ItemEntity self = (ItemEntity) (Object) this;
@@ -84,7 +85,7 @@ public abstract class MixinItemEntity extends Entity implements IEntityItem
             if (stackSelf.getItem() instanceof BlockItem && ((BlockItem) stackSelf.getItem()).getBlock() instanceof ShulkerBoxBlock &&
                 stackSelf.getItem() == stackOther.getItem() &&
                 fi.dy.masa.malilib.util.InventoryUtils.shulkerBoxHasItems(stackSelf) == false &&
-                // Only stack up to SHULKER_MAX_STACK_SIZE, and don't steal from other stacks that are larger
+                // Only stack up to 64, and don't steal from other stacks that are larger
                 stackSelf.getCount() < 64 && stackSelf.getCount() >= stackOther.getCount() &&
                 ItemStack.areItemsAndComponentsEqual(stackSelf, stackOther))
             {

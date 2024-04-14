@@ -1,9 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import net.minecraft.particle.ParticleEffect;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.world.explosion.Explosion;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -12,8 +12,8 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinExplosion
 {
     @ModifyArg(method = "affectWorld",
-    at = @At(value = "INVOKE",
-    target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
+               at = @At(value = "INVOKE",
+               target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
     private ParticleEffect addParticleModify(ParticleEffect parameters)
     {
         if (FeatureToggle.TWEAK_EXPLOSION_REDUCED_PARTICLES.getBooleanValue())
@@ -23,5 +23,4 @@ public abstract class MixinExplosion
 
         return ParticleTypes.EXPLOSION_EMITTER;
     }
-
 }

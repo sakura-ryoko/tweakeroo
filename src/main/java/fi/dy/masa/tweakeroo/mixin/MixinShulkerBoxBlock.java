@@ -16,7 +16,11 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinShulkerBoxBlock
 {
     @Inject(method = "appendTooltip", at = @At("HEAD"), cancellable = true)
-    private void removeVanillaTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options, CallbackInfo ci)
+    private void removeVanillaTooltip(ItemStack stack,
+                                      Item.TooltipContext context,
+                                      List<Text> tooltip,
+                                      TooltipType options,
+                                      CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SHULKER_BOX_TOOLTIP.getBooleanValue())
         {

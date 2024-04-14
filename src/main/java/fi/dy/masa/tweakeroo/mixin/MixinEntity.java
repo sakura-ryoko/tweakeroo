@@ -48,12 +48,12 @@ public abstract class MixinEntity
 
                 if (speed >= 1.0E-7D)
                 {
-                    motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
-                    double xFactor = Math.sin(this.yaw * Math.PI / 180D);
-                    double zFactor = Math.cos(this.yaw * Math.PI / 180D);
-                    net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
+                   motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
+                   double xFactor = Math.sin(this.yaw * Math.PI / 180D);
+                   double zFactor = Math.cos(this.yaw * Math.PI / 180D);
+                   net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
 
-                    this.setVelocity(this.getVelocity().add(change));
+                   this.setVelocity(this.getVelocity().add(change));
                 }
 
                 ci.cancel();
