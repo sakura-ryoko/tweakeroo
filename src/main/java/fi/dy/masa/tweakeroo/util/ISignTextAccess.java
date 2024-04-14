@@ -4,5 +4,5 @@ import net.minecraft.block.entity.SignText;
 
 public interface ISignTextAccess
 {
-    SignText tweakeroo$getText(boolean front);
+    SignText getText(boolean front);
 }

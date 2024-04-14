@@ -4,7 +4,6 @@ import java.util.function.Predicate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,13 +34,11 @@ public abstract class MixinGameRenderer
 
     @Shadow protected abstract void bobView(MatrixStack matrices, float tickDelta);
 
-    @Unique
     private float realYaw;
-    @Unique
     private float realPitch;
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$onRenderWorld(CallbackInfo ci)
+    private void onRenderWorld(CallbackInfo ci)
     {
         if (Callbacks.skipWorldRendering)
         {
@@ -51,7 +48,7 @@ public abstract class MixinGameRenderer
 
     @Redirect(method = "renderWorld", require = 0, at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V"))
-    private void tweakeroo$disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
+    private void disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
     {
         if (Configs.Disable.DISABLE_WORLD_VIEW_BOB.getBooleanValue() == false)
         {
@@ -60,7 +57,7 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "getFov", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$applyZoom(Camera camera, float partialTicks, boolean useFOVSetting, CallbackInfoReturnable<Double> cir)
+    private void applyZoom(Camera camera, float partialTicks, boolean useFOVSetting, CallbackInfoReturnable<Double> cir)
     {
         if (MiscUtils.isZoomActive())
         {
@@ -74,7 +71,7 @@ public abstract class MixinGameRenderer
 
     @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
-    private Entity tweakeroo$overrideCameraEntityForRayTrace(MinecraftClient mc)
+    private Entity overrideCameraEntityForRayTrace(MinecraftClient mc)
     {
         // Return the real player for the hit target ray tracing if the
         // player inputs option is enabled in Free Camera mode.
@@ -99,7 +96,7 @@ public abstract class MixinGameRenderer
                                  "Lnet/minecraft/util/math/Box;" +
                                  "Ljava/util/function/Predicate;D)" +
                                  "Lnet/minecraft/util/hit/EntityHitResult;"))
-    private Predicate<Entity> tweakeroo$overrideTargetedEntityCheck(Predicate<Entity> predicate)
+    private Predicate<Entity> overrideTargetedEntityCheck(Predicate<Entity> predicate)
     {
         if (Configs.Disable.DISABLE_DEAD_MOB_TARGETING.getBooleanValue())
         {
@@ -118,7 +115,7 @@ public abstract class MixinGameRenderer
     @Inject(method = "renderWorld", at = @At(
                 value = "INVOKE", shift = Shift.AFTER,
                 target = "Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"))
-    private void tweakeroo$overrideRenderViewEntityPre(CallbackInfo ci)
+    private void overrideRenderViewEntityPre(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -134,7 +131,7 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "renderWorld", at = @At("RETURN"))
-    private void tweakeroo$overrideRenderViewEntityPost(CallbackInfo ci)
+    private void overrideRenderViewEntityPost(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -148,7 +145,7 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$removeHandRendering(CallbackInfo ci)
+    private void removeHandRendering(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {

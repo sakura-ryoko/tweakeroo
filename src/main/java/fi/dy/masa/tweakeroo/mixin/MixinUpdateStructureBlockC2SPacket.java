@@ -19,7 +19,7 @@ public abstract class MixinUpdateStructureBlockC2SPacket
                            to   = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
                                       target = "Lnet/minecraft/network/packet/c2s/play/UpdateStructureBlockC2SPacket;mirror:Lnet/minecraft/util/BlockMirror;")),
             constant = { @Constant(intValue = -48), @Constant(intValue = 48) }, require = 0)
-    private int tweakeroo$overrideStructureBlockSizeLimit(int original)
+    private int tweakeroo_overrideStructureBlockSizeLimit(int original)
     {
         if (FeatureToggle.TWEAK_STRUCTURE_BLOCK_LIMIT.getBooleanValue())
         {

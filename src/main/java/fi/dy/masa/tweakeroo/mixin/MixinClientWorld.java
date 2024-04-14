@@ -35,7 +35,7 @@ public abstract class MixinClientWorld extends World
     }
 
     @Inject(method = "tickEntity", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$disableClientEntityTicking(Entity entity, CallbackInfo ci)
+    private void disableClientEntityTicking(Entity entity, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CLIENT_ENTITY_UPDATES.getBooleanValue() &&
             (entity instanceof PlayerEntity) == false)
@@ -66,7 +66,7 @@ public abstract class MixinClientWorld extends World
     */
 
     @Inject(method = "scheduleBlockRerenderIfNeeded", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$disableChunkReRenders(BlockPos pos, BlockState old, BlockState updated, CallbackInfo ci)
+    private void disableChunkReRenders(BlockPos pos, BlockState old, BlockState updated, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {
@@ -75,7 +75,7 @@ public abstract class MixinClientWorld extends World
     }
 
     @Inject(method = "scheduleBlockRenders", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$disableChunkReRenders(int x, int y, int z, CallbackInfo ci)
+    private void disableChunkReRenders(int x, int y, int z, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {
@@ -84,7 +84,7 @@ public abstract class MixinClientWorld extends World
     }
 
     @Inject(method = "updateListeners", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$disableChunkReRenders(BlockPos pos, BlockState oldState, BlockState newState, int flags, CallbackInfo ci)
+    private void disableChunkReRenders(BlockPos pos, BlockState oldState, BlockState newState, int flags, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {

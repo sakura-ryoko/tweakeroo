@@ -169,7 +169,7 @@ public class RenderUtils
             }
             else if (entity instanceof AbstractHorseEntity)
             {
-                inv = ((IMixinAbstractHorseEntity) entity).tweakeroo$getHorseInventory();
+                inv = ((IMixinAbstractHorseEntity) entity).tweakeroo_getHorseInventory();
             }
         }
 
@@ -271,17 +271,15 @@ public class RenderUtils
             final int aqua = EnchantmentHelper.getEquipmentLevel(Enchantments.AQUA_AFFINITY, living);
             float fog = originalFog;
 
-            // With the new Vanilla changes, the old values were Overpowered.
-            //  (was: 1.6f, and resp * 1.6f) -- getting values as high as 38.4f,
+            // With the Vanilla changes, the old values were very Overpowered.
+            //  (was: *1.6f, and *(resp * 1.6f)) -- getting values as high as 38.4f,
             //   when we really only need around 15.0f at the most for full visibility.
-
-            // Max +6.2f (Additive) --> these values feel about right
-            // 5.0f for Fire Res (Max: 12.7f)
-            // 1.0f no  Fire Res (Max:  7.2f)
+            // 5.0f w/ Fire Res (Max: 13.5f)
+            // 1.0f no Fire Res (Max:  7.2f)
 
             if (originalFog > 3.0f)
             {
-                fog += 1.5f;        // Fire Res bonus +1.5f
+                fog += 2.3f;        // Fire Res bonus +2.3f
             }
             if (aqua > 0)
             {
@@ -307,7 +305,6 @@ public class RenderUtils
         int height = GuiUtils.getScaledWindowHeight();
         Camera camera = mc.gameRenderer.getCamera();
 
-        // WorldRenderer changed to Matrix4fStack
         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
         matrix4fStack.pushMatrix();
         matrix4fStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
@@ -315,7 +312,6 @@ public class RenderUtils
         float yaw = camera.getYaw();
 
         matrix4fStack.rotateXYZ(-(pitch) * ((float) (Math.PI / 180.0)), yaw * ((float) (Math.PI / 180.0)), 0.0F);
-        // Fix rotation values using matrix4fRotateFix()
         matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
         matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
 

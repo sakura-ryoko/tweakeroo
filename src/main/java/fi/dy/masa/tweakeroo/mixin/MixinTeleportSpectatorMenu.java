@@ -23,7 +23,7 @@ public abstract class MixinTeleportSpectatorMenu
     @Shadow @Final @Mutable private List<SpectatorMenuCommand> elements;
 
     @Inject(method = "<init>(Ljava/util/Collection;)V", at = @At("RETURN"))
-    private void tweakeroo$allowSpectatorTeleport(Collection<PlayerListEntry> profiles, CallbackInfo ci)
+    private void allowSpectatorTeleport(Collection<PlayerListEntry> profiles, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_SPECTATOR_TELEPORT.getBooleanValue())
         {

@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinPlayerAbilities
 {
     @Inject(method = "getFlySpeed", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$overrideFlySpeed(CallbackInfoReturnable<Float> cir)
+    private void overrideFlySpeed(CallbackInfoReturnable<Float> cir)
     {
         PlayerEntity player = MinecraftClient.getInstance().player;
 

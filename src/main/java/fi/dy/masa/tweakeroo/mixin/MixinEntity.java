@@ -1,9 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,16 +22,14 @@ public abstract class MixinEntity
     @Shadow public float prevYaw;
     @Shadow public float prevPitch;
 
-    @Unique
     private double forcedPitch;
-    @Unique
     private double forcedYaw;
 
     @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
     @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
+    private void overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_RENDER_INVISIBLE_ENTITIES.getBooleanValue())
         {
@@ -42,31 +38,32 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "updateVelocity", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$moreAccurateMoveRelative(float float_1, net.minecraft.util.math.Vec3d motion, CallbackInfo ci)
+    private void moreAccurateMoveRelative(float float_1, net.minecraft.util.math.Vec3d motion, CallbackInfo ci)
     {
-        // I'm not sure why IntelliJ is greying this out if the code is correct.
-        if ((FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue()) && ((Object) this instanceof ClientPlayerEntity))
+        if ((Object) this instanceof ClientPlayerEntity)
         {
-            double speed = motion.lengthSquared();
-
-            if (speed >= 1.0E-7D)
+            if (FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue())
             {
-               motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
-               double xFactor = Math.sin(this.yaw * Math.PI / 180D);
-               double zFactor = Math.cos(this.yaw * Math.PI / 180D);
-               net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
+                double speed = motion.lengthSquared();
 
-               this.setVelocity(this.getVelocity().add(change));
+                if (speed >= 1.0E-7D)
+                {
+                    motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
+                    double xFactor = Math.sin(this.yaw * Math.PI / 180D);
+                    double zFactor = Math.cos(this.yaw * Math.PI / 180D);
+                    net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
+
+                    this.setVelocity(this.getVelocity().add(change));
+                }
+
+                ci.cancel();
             }
-
-            ci.cancel();
         }
     }
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$overrideYaw(double yawChange, double pitchChange, CallbackInfo ci)
+    private void overrideYaw(double yawChange, double pitchChange, CallbackInfo ci)
     {
-        // I'm not sure why IntelliJ is greying this out if the code is correct?
         if ((Object) this instanceof ClientPlayerEntity)
         {
             if (CameraUtils.shouldPreventPlayerMovement())
@@ -96,7 +93,7 @@ public abstract class MixinEntity
                 // Not locked, or not snapping the pitch (ie. not in Pitch or Both modes)
                 boolean updatePitch = snapAimLock == false || mode == SnapAimMode.YAW;
 
-                this.tweakeroo$updateCustomPlayerRotations(yawChange, pitchChange, updateYaw, updatePitch, pitchLimit);
+                this.updateCustomPlayerRotations(yawChange, pitchChange, updateYaw, updatePitch, pitchLimit);
 
                 this.yaw = MiscUtils.getSnappedYaw(this.forcedYaw);
                 this.pitch = MiscUtils.getSnappedPitch(this.forcedPitch);
@@ -117,7 +114,7 @@ public abstract class MixinEntity
             {
                 int pitchLimit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
 
-                this.tweakeroo$updateCustomPlayerRotations(yawChange, pitchChange, true, true, pitchLimit);
+                this.updateCustomPlayerRotations(yawChange, pitchChange, true, true, pitchLimit);
 
                 CameraUtils.setCameraYaw((float) this.forcedYaw);
                 CameraUtils.setCameraPitch((float) this.forcedPitch);
@@ -138,8 +135,7 @@ public abstract class MixinEntity
         }
     }
 
-    @Unique
-    private void tweakeroo$updateCustomPlayerRotations(double yawChange, double pitchChange, boolean updateYaw, boolean updatePitch, float pitchLimit)
+    private void updateCustomPlayerRotations(double yawChange, double pitchChange, boolean updateYaw, boolean updatePitch, float pitchLimit)
     {
         if (updateYaw)
         {

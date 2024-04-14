@@ -20,7 +20,7 @@ public abstract class MixinChatHud
 {
     @ModifyVariable(method = "Lnet/minecraft/client/gui/hud/ChatHud;addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
                     at = @At("HEAD"), argsOnly = true)
-    private Text tweakeroo$addMessageTimestamp(Text componentIn, Text parameterMessage, MessageSignatureData data, MessageIndicator indicator)
+    private Text tweakeroo_addMessageTimestamp(Text componentIn, Text parameterMessage, MessageSignatureData data, MessageIndicator indicator)
     {
         if (FeatureToggle.TWEAK_CHAT_TIMESTAMP.getBooleanValue())
         {
@@ -34,7 +34,7 @@ public abstract class MixinChatHud
 
     @Redirect(method = "render", at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
-    private void tweakeroo$overrideChatBackgroundColor(DrawContext drawableHelper, int left, int top, int right, int bottom, int color)
+    private void overrideChatBackgroundColor(DrawContext drawableHelper, int left, int top, int right, int bottom, int color)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())
         {

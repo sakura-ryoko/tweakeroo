@@ -81,7 +81,7 @@ public class RenderHandler implements IRenderer
                 fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
             }
         }
-        else if (stack.getComponents().contains(DataComponentTypes.CONTAINER) && item.toString().contains("shulker"))
+        else if (stack.getComponents().contains(DataComponentTypes.CONTAINER))
         {
             if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue())
             {

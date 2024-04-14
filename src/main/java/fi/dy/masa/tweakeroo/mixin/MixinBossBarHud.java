@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinBossBarHud
 {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$disableBossBarRendering(DrawContext drawContext, CallbackInfo ci)
+    private void tweakeroo_disableBossBarRendering(DrawContext drawContext, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_BOSS_BAR.getBooleanValue())
         {

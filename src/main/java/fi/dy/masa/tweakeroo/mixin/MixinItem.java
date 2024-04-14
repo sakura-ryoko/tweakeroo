@@ -11,14 +11,14 @@ public abstract class MixinItem implements IItemStackLimit
     @Shadow public abstract Item asItem();
 
     @Override
-    public int tweakeroo$getMaxStackSize(net.minecraft.item.ItemStack stack)
+    public int getMaxStackSize(net.minecraft.item.ItemStack stack)
     {
         return this.asItem().getMaxCount();
     }
 
     /* // TODO 1.19.3+
     @Inject(method = "getGroup", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$overrideItemGroup(CallbackInfoReturnable<net.minecraft.item.ItemGroup> cir)
+    private void overrideItemGroup(CallbackInfoReturnable<net.minecraft.item.ItemGroup> cir)
     {
         if (FeatureToggle.TWEAK_CREATIVE_EXTRA_ITEMS.getBooleanValue())
         {

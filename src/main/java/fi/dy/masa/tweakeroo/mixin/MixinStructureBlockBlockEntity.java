@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -39,7 +37,7 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
                                    to = @At(value = "FIELD",
                                             target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;size:Lnet/minecraft/util/math/Vec3i;")),
                     constant = { @Constant(intValue = -48), @Constant(intValue = 48) }, require = 0)
-    private int tweakeroo$overrideMaxSize(int original)
+    private int overrideMaxSize(int original)
     {
         if (FeatureToggle.TWEAK_STRUCTURE_BLOCK_LIMIT.getBooleanValue())
         {
@@ -51,9 +49,8 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
     }
 
     @Inject(method = "streamCornerPos", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$overrideCornerBlockScan(BlockPos start, BlockPos end, CallbackInfoReturnable<Stream<BlockPos>> cir)
+    private void overrideCornerBlockScan(BlockPos start, BlockPos end, CallbackInfoReturnable<Stream<BlockPos>> cir)
     {
-        // I do not know why IntelliJ is greying this out, it appears to function as expected.
         if (FeatureToggle.TWEAK_STRUCTURE_BLOCK_LIMIT.getBooleanValue())
         {
             BlockPos pos = this.getPos();

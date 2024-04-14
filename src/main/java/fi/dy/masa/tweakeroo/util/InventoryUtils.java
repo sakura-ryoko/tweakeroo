@@ -1,14 +1,12 @@
 package fi.dy.masa.tweakeroo.util;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ContainerComponent;
@@ -20,14 +18,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolItem;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -42,7 +33,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
-
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -451,33 +441,23 @@ public class InventoryUtils
     private static float getBaseAttackDamage(ItemStack stack)
     {
         Item item = stack.getItem();
-        ComponentMap data = stack.getComponents();
+        if ((item instanceof SwordItem) == false && (item instanceof MiningToolItem) == false)
+            return 0F;
 
-        if (data != null && data.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS))
+        AttributeModifiersComponent itemAttribute = stack.getComponents().get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+
+        if (itemAttribute != null && itemAttribute.equals(AttributeModifiersComponent.DEFAULT) == false)
         {
-            AttributeModifiersComponent itemAttribute = data.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-            if (itemAttribute != null)
-            {
-                List<AttributeModifiersComponent.Entry> modifiers = itemAttribute.modifiers();
+            List<AttributeModifiersComponent.Entry> modifiers = itemAttribute.modifiers();
 
-                for (AttributeModifiersComponent.Entry entry : modifiers)
+            for (AttributeModifiersComponent.Entry entry : modifiers)
+            {
+                if (entry.attribute().equals(EntityAttributes.GENERIC_ATTACK_DAMAGE))
                 {
-                    if (entry.attribute().equals(EntityAttributes.GENERIC_ATTACK_DAMAGE))
-                    {
-                        if (item instanceof SwordItem)
-                        {
-                            return (float) entry.modifier().value();
-                        }
-                        else if (item instanceof MiningToolItem)
-                        {
-                            return (float) entry.modifier().value();
-                        }
-                    }
+                    return (float) entry.modifier().value();
                 }
-                return 0F;
             }
-            else
-                return 0F;
+            return 0F;
         }
         else
             return 0F;
@@ -1160,28 +1140,27 @@ public class InventoryUtils
 
     public static boolean cleanUpShulkerBoxNBT(ItemStack stack)
     {
+        ContainerComponent itemContainer = stack.getComponents().get(DataComponentTypes.CONTAINER);
         boolean changed = false;
-        ComponentMap data = stack.getComponents();
+        int count = 0;
 
-        if (data != null && data.contains(DataComponentTypes.CONTAINER))
+        if (itemContainer != null)
         {
-            ContainerComponent itemContainer = data.get(DataComponentTypes.CONTAINER);
+            Iterator<ItemStack> iter = itemContainer.streamNonEmpty().iterator();
 
-            if (itemContainer != null)
+            while (iter.hasNext())
             {
-                Iterator<ItemStack> iter = itemContainer.stream().iterator();
-
-                while (iter.hasNext())
+                ItemStack item = iter.next();
+                if (item.isEmpty())
                 {
-                    ItemStack item = iter.next();
-                    if (item.isEmpty())
-                    {
-                        iter.remove();
-                        changed = true;
-                    }
+                    iter.remove();
+                    changed = true;
                 }
+                count++;
             }
         }
+
+        Tweakeroo.debugLog("cleanUpShulkerBoxNBT(): count {} // changed: {}", count, changed);
 
         return changed;
     }

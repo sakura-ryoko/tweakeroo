@@ -8,8 +8,8 @@ import net.minecraft.world.CommandBlockExecutor;
 public interface IMixinCommandBlockExecutor
 {
     @Accessor("updateLastExecution")
-    boolean tweakeroo$getUpdateLastExecution();
+    boolean getUpdateLastExecution();
 
     @Accessor("updateLastExecution")
-    void tweakeroo$setUpdateLastExecution(boolean value);
+    void setUpdateLastExecution(boolean value);
 }

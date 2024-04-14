@@ -1,15 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
@@ -21,7 +15,6 @@ import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 @Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer
 {
-    @Unique
     private static boolean wasLava;
 
     @ModifyConstant(
@@ -31,7 +24,7 @@ public abstract class MixinBackgroundRenderer
                             to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
             constant = @Constant(floatValue = 0.25f),
             require = 0)
-    private static float tweakeroo$reduceLavaFogStart(float original)
+    private static float reduceLavaFogStart(float original)
     {
         wasLava = true;
 
@@ -50,7 +43,7 @@ public abstract class MixinBackgroundRenderer
                     to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
             constant = { @Constant(floatValue = 1.0f), @Constant(floatValue = 5.0f)},
             require = 0)
-    private static float tweakeroo$reduceLavaFogEnd(float original)
+    private static float reduceLavaFogEnd(float original)
     {
         wasLava = true;
 
@@ -65,7 +58,7 @@ public abstract class MixinBackgroundRenderer
     @Redirect(method = "render",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getHorizonShadingRatio()F"))
-    private static float tweakeroo$disableSkyDarkness(ClientWorld.Properties props)
+    private static float tweakeroo_disableSkyDarkness(ClientWorld.Properties props)
     {
         return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : props.getHorizonShadingRatio();
     }
@@ -75,14 +68,14 @@ public abstract class MixinBackgroundRenderer
             at = @At(value = "INVOKE", remap = false,
                      target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogEnd(F)V",
                      shift = At.Shift.AFTER))
-    private static void tweakeroo$disableRenderDistanceFog(
+    private static void disableRenderDistanceFog(
             Camera camera,
             BackgroundRenderer.FogType fogType,
             float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {
-            if (!thickFog && !wasLava)
+            if (thickFog == false && wasLava == false)
             {
                 float distance = Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance());
                 RenderSystem.setShaderFogStart(distance * 1.6F);

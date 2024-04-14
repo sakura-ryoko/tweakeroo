@@ -205,23 +205,23 @@ public class MiscUtils
     public static boolean isStrippableLog(World world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
-        return IMixinAxeItem.tweakeroo$getStrippedBlocks().containsKey(state.getBlock());
+        return IMixinAxeItem.tweakeroo_getStrippedBlocks().containsKey(state.getBlock());
     }
 
     public static boolean isShovelPathConvertableBlock(World world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
-        return IMixinShovelItem.tweakeroo$getPathStates().containsKey(state.getBlock());
+        return IMixinShovelItem.tweakeroo_getPathStates().containsKey(state.getBlock());
     }
 
     public static boolean getUpdateExec(CommandBlockBlockEntity te)
     {
-        return ((IMixinCommandBlockExecutor) te.getCommandExecutor()).tweakeroo$getUpdateLastExecution();
+        return ((IMixinCommandBlockExecutor) te.getCommandExecutor()).getUpdateLastExecution();
     }
 
     public static void setUpdateExec(CommandBlockBlockEntity te, boolean value)
     {
-        ((IMixinCommandBlockExecutor) te.getCommandExecutor()).tweakeroo$setUpdateLastExecution(value);
+        ((IMixinCommandBlockExecutor) te.getCommandExecutor()).setUpdateLastExecution(value);
     }
 
     public static void printDeathCoordinates(MinecraftClient mc)
@@ -265,7 +265,7 @@ public class MiscUtils
 
     public static void copyTextFromSign(SignBlockEntity te, boolean front)
     {
-        previousSignText = ((ISignTextAccess) te).tweakeroo$getText(front);
+        previousSignText = ((ISignTextAccess) te).getText(front);
     }
 
     public static void applyPreviousTextToSign(SignBlockEntity te, @Nullable AbstractSignEditScreen guiLines, boolean front)
@@ -275,7 +275,7 @@ public class MiscUtils
             te.setText(previousSignText, front);
 
             if (guiLines != null) {
-                ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
+                ((IGuiEditSign) guiLines).applyText(previousSignText);
             }
         }
     }
@@ -473,7 +473,7 @@ public class MiscUtils
             return true;
         }
 
-        Map<String, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo$getMapStates();
+        Map<String, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo_getMapStates();
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName == null)

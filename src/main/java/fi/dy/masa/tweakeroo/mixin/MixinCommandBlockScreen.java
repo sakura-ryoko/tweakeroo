@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -35,17 +34,13 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
     @Shadow private CyclingButtonWidget<Boolean> conditionalModeButton;
     @Shadow private CyclingButtonWidget<Boolean> redstoneTriggerButton;
 
-    @Unique
     private TextFieldWidget textFieldName;
-    @Unique
     private CyclingButtonWidget<Boolean> buttonUpdateExec;
-    @Unique
     private boolean updateExecValue;
-    @Unique
     private String lastName = "";
 
     @Inject(method = "init", at = @At("RETURN"))
-    private void tweakeroo$addExtraFields(CallbackInfo ci)
+    private void addExtraFields(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_COMMAND_BLOCK_EXTRA_FIELDS.getBooleanValue())
         {
@@ -130,7 +125,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
             if (this.updateExecValue != updateExec)
             {
                 this.updateExecValue = updateExec;
-                Text str = tweakeroo$getDisplayStringForCurrentStatus(this.updateExecValue);
+                Text str = getDisplayStringForCurrentStatus(this.updateExecValue);
                 this.buttonUpdateExec.setMessage(str);
                 this.buttonUpdateExec.setWidth(this.textRenderer.getWidth(str) + 10);
             }
@@ -154,8 +149,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         }
     }
 
-    @Unique
-    private static Text tweakeroo$getDisplayStringForCurrentStatus(boolean updateExecValue)
+    private static Text getDisplayStringForCurrentStatus(boolean updateExecValue)
     {
         String translationKey = "tweakeroo.gui.button.misc.command_block.update_execution";
         boolean isCurrentlyOn = ! updateExecValue;

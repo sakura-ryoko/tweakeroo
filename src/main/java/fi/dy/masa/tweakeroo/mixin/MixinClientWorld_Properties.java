@@ -12,7 +12,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public class MixinClientWorld_Properties
 {
     @Inject(method = "getSkyDarknessHeight", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$overrideSkyDarknessHeight(HeightLimitView world, CallbackInfoReturnable<Double> cir)
+    private void tweakeroo_overrideSkyDarknessHeight(HeightLimitView world, CallbackInfoReturnable<Double> cir)
     {
         // Disable the dark sky effect in normal situations
         // by moving the y threshold below the bottom of the world

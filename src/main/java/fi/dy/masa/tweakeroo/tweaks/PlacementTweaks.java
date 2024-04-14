@@ -63,7 +63,7 @@ public class PlacementTweaks
     private static Direction sideFirstBreaking = null;
     private static Direction sideRotatedFirst = null;
     private static float playerYawFirst;
-    private static final ItemStack[] stackBeforeUse = new ItemStack[] { ItemStack.EMPTY, ItemStack.EMPTY };
+    private static ItemStack[] stackBeforeUse = new ItemStack[] { ItemStack.EMPTY, ItemStack.EMPTY };
     private static boolean isFirstClick;
     private static boolean isEmulatedClick;
     private static boolean firstWasRotation;
@@ -127,7 +127,7 @@ public class PlacementTweaks
         ItemStack stackOriginal = player.getStackInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-                stackOriginal.isEmpty() == false &&
+            stackOriginal.isEmpty() == false &&
             canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             if (isEmulatedClick == false)
@@ -590,7 +590,6 @@ public class PlacementTweaks
 
             if (canPlaceBlockIntoPosition(world, posNew, ctx))
             {
-                // Re-enable Debug logging for now
                 //Tweakeroo.debugLog("PlacementTweaks#tryPlaceBlock() pos: {}, side: {}, part: {}, hitVec: {}", posNew, side, hitPart, hitVec);
                 return handleFlexibleBlockPlacement(controller, player, world, posNew, side, playerYaw, hitVec, hand, hitPart);
             }

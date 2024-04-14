@@ -15,7 +15,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinMobSpawnerLogic
 {
     @Inject(method = "clientTick", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$cancelParticleRendering(World world, BlockPos pos, CallbackInfo ci)
+    private void cancelParticleRendering(World world, BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_MOB_SPAWNER_MOB_RENDER.getBooleanValue())
         {

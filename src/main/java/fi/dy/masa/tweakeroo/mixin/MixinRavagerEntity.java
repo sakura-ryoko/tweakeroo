@@ -12,7 +12,7 @@ public abstract class MixinRavagerEntity
     @Redirect(method = "tickMovement", at = @At(
                 value = "FIELD",
                 target = "Lnet/minecraft/entity/mob/RavagerEntity;horizontalCollision:Z"))
-    private boolean tweakeroo$fixDontBreakBlocksOnClient(RavagerEntity entity)
+    private boolean fixDontBreakBlocksOnClient(RavagerEntity entity)
     {
         if (Configs.Fixes.RAVAGER_CLIENT_BLOCK_BREAK_FIX.getBooleanValue())
         {

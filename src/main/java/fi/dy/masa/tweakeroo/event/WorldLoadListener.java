@@ -18,12 +18,7 @@ public class WorldLoadListener implements IWorldLoadListener
     @Override
     public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
-        if (worldAfter == null)
-        {
-            // Turns off at logout
-            FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
-        }
-        else if (worldBefore == null)
+        if (worldBefore == null)
         {
             if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
             {

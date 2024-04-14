@@ -14,7 +14,7 @@ public abstract class MixinExplosion
     @ModifyArg(method = "affectWorld",
     at = @At(value = "INVOKE",
     target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
-    private ParticleEffect tweakeroo$addParticleModify(ParticleEffect parameters)
+    private ParticleEffect addParticleModify(ParticleEffect parameters)
     {
         if (FeatureToggle.TWEAK_EXPLOSION_REDUCED_PARTICLES.getBooleanValue())
         {

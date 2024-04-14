@@ -1,6 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import net.minecraft.client.gui.screen.ingame.HangingSignEditScreen;
 import net.minecraft.registry.RegistryWrapper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +35,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
     }
 
     @Inject(method = "readNbt", at = @At("RETURN"))
-    private void tweakeroo$restoreCopiedText(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci)
+    private void restoreCopiedText(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci)
     {
         // Restore the copied/pasted text after the TileEntity sync overrides it with empty lines
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue() && this.getWorld() != null && this.getWorld().isClient)
@@ -45,8 +44,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
 
             if (mc.currentScreen instanceof SignEditScreen || mc.currentScreen instanceof HangingSignEditScreen)
             {
-                // I do not know why IntelliJ is greying this out when it works fine.
-                if (((IGuiEditSign) mc.currentScreen).tweakeroo$getTile() == (Object) this)
+                if (((IGuiEditSign) mc.currentScreen).getTile() == (Object) this)
                 {
                     MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isPlayerFacingFront(mc.player));
                 }
@@ -55,7 +53,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
     }
 
     @Override
-    public SignText tweakeroo$getText(boolean front)
+    public SignText getText(boolean front)
     {
         return front ? this.frontText : this.backText;
     }

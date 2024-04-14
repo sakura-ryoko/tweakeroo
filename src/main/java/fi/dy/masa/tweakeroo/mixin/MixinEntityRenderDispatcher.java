@@ -21,7 +21,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public abstract class MixinEntityRenderDispatcher
 {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo$onShouldRender(Entity entityIn, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
+    private void onShouldRender(Entity entityIn, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Disable.DISABLE_ENTITY_RENDERING.getBooleanValue() && (entityIn instanceof PlayerEntity) == false)
         {

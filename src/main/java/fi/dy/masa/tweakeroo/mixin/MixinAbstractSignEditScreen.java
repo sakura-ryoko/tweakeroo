@@ -39,13 +39,13 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     @Shadow @Final private String[] messages;
 
     @Override
-    public SignBlockEntity tweakeroo$getTile()
+    public SignBlockEntity getTile()
     {
         return this.blockEntity;
     }
 
     @Inject(method = "removed", at = @At("HEAD"))
-    private void tweakeroo$storeText(CallbackInfo ci)
+    private void storeText(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue())
         {
@@ -54,7 +54,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     }
 
     @Inject(method = "init", at = @At("RETURN"))
-    private void tweakeroo$preventGuiOpen(CallbackInfo ci)
+    private void preventGuiOpen(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue())
         {
@@ -78,7 +78,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     }
 
     @Override
-    public void tweakeroo$applyText(SignText text)
+    public void applyText(SignText text)
     {
         this.text = text;
 

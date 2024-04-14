@@ -9,5 +9,5 @@ public interface IMixinAbstractBlock
 {
     @Mutable
     @Accessor("slipperiness")
-    void tweakeroo$setFriction(float friction);
+    void setFriction(float friction);
 }

@@ -10,5 +10,5 @@ import net.minecraft.item.map.MapState;
 public interface IMixinClientWorld
 {
     @Invoker("getMapStates")
-    Map<String, MapState> tweakeroo$getMapStates();
+    Map<String, MapState> tweakeroo_getMapStates();
 }
