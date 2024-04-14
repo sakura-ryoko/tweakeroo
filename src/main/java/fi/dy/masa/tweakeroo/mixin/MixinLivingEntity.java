@@ -38,7 +38,6 @@ public abstract class MixinLivingEntity extends Entity
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
-
         if (Configs.Disable.DISABLE_FP_EFFECT_PARTICLES.getBooleanValue() &&
             ((Object) this) == mc.player && mc.options.getPerspective() == Perspective.FIRST_PERSON)
         {
