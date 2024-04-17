@@ -30,6 +30,7 @@ import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
@@ -269,26 +270,18 @@ public class RenderUtils
         {
             final int resp = EnchantmentHelper.getRespiration(living);
             final int aqua = EnchantmentHelper.getEquipmentLevel(Enchantments.AQUA_AFFINITY, living);
-            float fog = originalFog;
+            float fog = (originalFog > 1.0f) ? 3.3f : 1.3f;
 
-            // With the Vanilla changes, the old values were very Overpowered.
-            //  (was: *1.6f, and *(resp * 1.6f)) -- getting values as high as 38.4f,
-            //   when we really only need around 15.0f at the most for full visibility.
-
-            if (originalFog > 3.0f)
-            {
-                fog += 3.3f;        // Fire Res bonus
-            }
             if (aqua > 0)
             {
-                fog += 1.7f;
+                fog *= 1.6f;
             }
             if (resp > 0)
             {
-                fog += (float) resp * 1.5f;
+                fog *= (float) resp * 1.6f;
             }
 
-            //Tweakeroo.debugLog("getLavaFogDistance(): aqua: {} resp: {} // fog: {} originalFog: {}", aqua, resp, fog, originalFog);
+            //Tweakeroo.debugLog("getLavaFogDistance(): aqua: {} resp: {} // fog: {}, originalFog: {}", aqua, resp, fog, originalFog);
             return Math.max(fog, originalFog);
         }
 
