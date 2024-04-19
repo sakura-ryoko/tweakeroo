@@ -1,6 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -51,10 +50,9 @@ public abstract class MixinPlayerEntity extends LivingEntity
     @Inject(method = "getBlockInteractionRange", at = @At("HEAD"), cancellable = true)
     private void overrideBlockReachDistance(CallbackInfoReturnable<Double> cir)
     {
-        MinecraftServer server = this.getServer();
         if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue())
         {
-            if (server != null)
+            if (this.getServer() != null)
             {
                 cir.setReturnValue(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue());
             }
@@ -62,7 +60,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
             {
                 double rangeRealMax = cir.getReturnValue() + 1.0;
 
-                // Calculate a "safe" range for servers.  It only allows for an extra 1.0 of Interaction range.
+                // Calculate a "safe" range for servers.  This only allows for an extra 1.0 of Interaction range.
                 cir.setReturnValue(Math.min(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
             }
         }
@@ -71,10 +69,9 @@ public abstract class MixinPlayerEntity extends LivingEntity
     @Inject(method = "getEntityInteractionRange", at = @At("HEAD"), cancellable = true)
     private void overrideEntityReachDistance(CallbackInfoReturnable<Double> cir)
     {
-        MinecraftServer server = this.getServer();
         if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue())
         {
-            if (server != null)
+            if (this.getServer() != null)
             {
                 cir.setReturnValue(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue());
             }
@@ -82,7 +79,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
             {
                 double rangeRealMax = cir.getReturnValue() + 1.0;
 
-                // Calculate a "safe" range for servers.  It only allows for an extra 1.0 of Interaction range.
+                // Calculate a "safe" range for servers.  This only allows for an extra 1.0 of Interaction range.
                 cir.setReturnValue(Math.min(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
             }
         }

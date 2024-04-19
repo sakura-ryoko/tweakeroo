@@ -55,6 +55,35 @@ public abstract class MixinBackgroundRenderer
         return original;
     }
 
+    /*
+    @ModifyVariable(
+            method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V",
+            slice = @Slice(
+                    from = @At(value = "FIELD", target = "Lnet/minecraft/client/render/BackgroundRenderer$FogType;FOG_SKY:Lnet/minecraft/client/render/BackgroundRenderer$FogType;")),
+            at = @At(value = "STORE", opcode = Opcodes.FSTORE, ordinal = 2), ordinal = 1)
+    private static float overrideFogStart(float original)
+    {
+        if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
+        {
+            return Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance()) * 1.6f;
+        }
+        return original;
+    }
+    @ModifyVariable(
+            method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZ)V",
+            slice = @Slice(
+                    from = @At(value = "FIELD", target = "Lnet/minecraft/client/render/BackgroundRenderer$FogType;FOG_SKY:Lnet/minecraft/client/render/BackgroundRenderer$FogType;")),
+            at = @At(value = "STORE", opcode = Opcodes.FSTORE, ordinal = 3), ordinal = 2)
+    private static float overrideFogEnd(float original)
+    {
+        if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
+        {
+            return Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance()) * 2.0f;
+        }
+        return original;
+    }
+    */
+
     @Redirect(method = "render",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getHorizonShadingRatio()F"))

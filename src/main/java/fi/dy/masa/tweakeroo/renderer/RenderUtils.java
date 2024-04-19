@@ -30,7 +30,6 @@ import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
@@ -276,12 +275,12 @@ public class RenderUtils
             {
                 fog *= 1.6f;
             }
+
             if (resp > 0)
             {
                 fog *= (float) resp * 1.6f;
             }
 
-            //Tweakeroo.debugLog("getLavaFogDistance(): aqua: {} resp: {} // fog: {}, originalFog: {}", aqua, resp, fog, originalFog);
             return Math.max(fog, originalFog);
         }
 
