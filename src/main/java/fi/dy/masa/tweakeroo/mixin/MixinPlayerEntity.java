@@ -59,7 +59,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
             }
             else
             {
-                // Calculate a "safe" range for servers.  This only allows for +1.0 of the actual Interaction range.
+                // Calculate a "safe" range for servers
                 double rangeRealMax = cir.getReturnValue() + 1.0;
                 cir.setReturnValue(Math.min(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
             }
@@ -77,7 +77,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
             }
             else
             {
-                // Calculate a "safe" range for servers.  This only allows for +1.0 of the actual Interaction range.
+                // Calculate a "safe" range for servers
                 double rangeRealMax = cir.getReturnValue() + 1.0;
                 cir.setReturnValue(Math.min(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
             }
