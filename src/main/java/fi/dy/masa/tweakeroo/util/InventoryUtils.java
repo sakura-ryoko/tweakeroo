@@ -518,6 +518,12 @@ public class InventoryUtils
             }
         }
 
+        // TODO --> Registry-Required method
+        /*
+        Optional<RegistryEntry.Reference<Enchantment>> optional = MinecraftClient.getInstance().world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(enchantment);
+        return optional.map(enchantmentReference -> EnchantmentHelper.getLevel(enchantmentReference, stack)).orElse(-1);
+         */
+
         return -1;
     }
 
