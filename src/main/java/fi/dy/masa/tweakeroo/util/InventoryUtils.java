@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.util;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
@@ -11,7 +12,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,6 +24,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -497,6 +501,26 @@ public class InventoryUtils
         }
     }
 
+    public static int getEnchantmentLevel(ItemStack stack, @Nonnull RegistryKey<Enchantment> enchantment)
+    {
+        ItemEnchantmentsComponent enchants = stack.getEnchantments();
+
+        if (enchants.equals(ItemEnchantmentsComponent.DEFAULT) == false)
+        {
+            Set<RegistryEntry<Enchantment>> enchantList = enchants.getEnchantments();
+
+            for (RegistryEntry<Enchantment> entry : enchantList)
+            {
+                if (entry.matchesKey(enchantment))
+                {
+                    return enchants.getLevel(entry);
+                }
+            }
+        }
+
+        return -1;
+    }
+
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
         return testedStack.isEmpty() == false && isMoreEffectiveTool(testedStack, previousTool, state);
@@ -518,7 +542,7 @@ public class InventoryUtils
 
         if (speed > 1.0f)
         {
-            int effLevel = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
+            int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
 
             if (effLevel > 0)
             {
@@ -690,7 +714,7 @@ public class InventoryUtils
         if (stack.isEmpty() == false &&
             (stack.isDamageable() == false ||
              stack.isDamaged() == false ||
-             EnchantmentHelper.getLevel(Enchantments.MENDING, stack) <= 0))
+             getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
         {
             Slot slot = player.currentScreenHandler.getSlot(slotNum);
             int slotRepairableItem = findRepairableItemNotInRepairableSlot(slot, player);
@@ -716,7 +740,7 @@ public class InventoryUtils
                 // Don't take items from the current hotbar slot
                 if ((slot.id - 36) != player.getInventory().selectedSlot &&
                     stack.isDamageable() && stack.isDamaged() && targetSlot.canInsert(stack) &&
-                    EnchantmentHelper.getLevel(Enchantments.MENDING, stack) > 0)
+                    getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
                 {
                     return slot.id;
                 }
@@ -933,18 +957,18 @@ public class InventoryUtils
 
     private static boolean hasSameIshEnchantments(ItemStack stackReference, ItemStack stack)
     {
-        int level = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stackReference);
+        int level = getEnchantmentLevel(stackReference, Enchantments.SILK_TOUCH);
 
         if (level > 0)
         {
-            return EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) >= level;
+            return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) >= level;
         }
 
-        level = EnchantmentHelper.getLevel(Enchantments.FORTUNE, stackReference);
+        level = getEnchantmentLevel(stackReference, Enchantments.FORTUNE);
 
         if (level > 0)
         {
-            return EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack) >= level;
+            return getEnchantmentLevel(stack, Enchantments.FORTUNE) >= level;
         }
 
         return true;
@@ -971,7 +995,7 @@ public class InventoryUtils
 
                 if (speed > 1.0f)
                 {
-                    int effLevel = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
+                    int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
 
                     if (effLevel > 0)
                     {

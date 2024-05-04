@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.renderer;
 
+import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
@@ -11,15 +12,18 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.Camera;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -267,21 +271,46 @@ public class RenderUtils
     {
         if (entity instanceof LivingEntity living)
         {
-            final int resp = EnchantmentHelper.getRespiration(living);
-            final int aqua = EnchantmentHelper.getEquipmentLevel(Enchantments.AQUA_AFFINITY, living);
-            float fog = (originalFog > 1.0f) ? 3.3f : 1.3f;
+            ItemStack head = living.getEquippedStack(EquipmentSlot.HEAD);
 
-            if (aqua > 0)
+            if (head.isEmpty() == false)
             {
-                fog *= 1.6f;
-            }
+                ItemEnchantmentsComponent enchants = head.getEnchantments();
+                float fog = (originalFog > 1.0f) ? 3.3f : 1.3f;
+                int resp = 0;
+                int aqua = 0;
 
-            if (resp > 0)
-            {
-                fog *= (float) resp * 1.6f;
-            }
+                if (enchants.equals(ItemEnchantmentsComponent.DEFAULT) == false)
+                {
+                    Set<RegistryEntry<Enchantment>> enchantList = enchants.getEnchantments();
 
-            return Math.max(fog, originalFog);
+                    for (RegistryEntry<Enchantment> entry : enchantList)
+                    {
+                        if (entry.matchesKey(Enchantments.AQUA_AFFINITY))
+                        {
+                            aqua = enchants.getLevel(entry);
+                        }
+                        if (entry.matchesKey(Enchantments.RESPIRATION))
+                        {
+                            resp = enchants.getLevel(entry);
+                        }
+                    }
+                }
+
+                if (aqua > 0)
+                {
+                    fog *= 1.6f;
+                }
+
+                if (resp > 0)
+                {
+                    fog *= (float) resp * 1.6f;
+                }
+
+                //Tweakeroo.logger.info("getLavaFogDistance: aqua {} resp {} orig: {} adjusted {}", aqua, resp, originalFog, fog);
+
+                return Math.max(fog, originalFog);
+            }
         }
 
         return originalFog;
