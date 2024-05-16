@@ -1,7 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import net.minecraft.class_9779;
-import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,15 +7,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
-
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
@@ -44,8 +42,7 @@ public abstract class MixinInGameHud
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
         {
-            // FIXME
-            RenderUtils.renderDirectionsCursor(0, this.client.method_60646().method_60637(false));
+            RenderUtils.renderDirectionsCursor(0, this.client.getRenderTickCounter().getTickDelta(false));
             ci.cancel();
         }
     }
@@ -54,7 +51,7 @@ public abstract class MixinInGameHud
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
                      ordinal = 1, shift = At.Shift.AFTER))
-    private void alwaysRenderPlayerList(DrawContext context, class_9779 arg, CallbackInfo ci)
+    private void alwaysRenderPlayerList(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue())
         {
