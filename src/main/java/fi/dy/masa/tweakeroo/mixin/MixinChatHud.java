@@ -18,7 +18,7 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 @Mixin(value = ChatHud.class, priority = 1100)
 public abstract class MixinChatHud
 {
-    @ModifyVariable(method = "Lnet/minecraft/client/gui/hud/ChatHud;addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
+    @ModifyVariable(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
                     at = @At("HEAD"), argsOnly = true)
     private Text tweakeroo_addMessageTimestamp(Text componentIn, Text parameterMessage, MessageSignatureData data, MessageIndicator indicator)
     {

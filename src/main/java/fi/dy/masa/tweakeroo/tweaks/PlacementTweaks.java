@@ -228,7 +228,8 @@ public class PlacementTweaks
             final double reach = mc.player.getBlockInteractionRange();
             final int maxCount = Configs.Generic.FAST_BLOCK_PLACEMENT_COUNT.getIntegerValue();
 
-            mc.crosshairTarget = player.raycast(reach, mc.getTickDelta(), false);
+            // FIXME
+            mc.crosshairTarget = player.raycast(reach, mc.method_60646().method_60637(false), false);
 
             for (int i = 0; i < maxCount; ++i)
             {
@@ -276,7 +277,8 @@ public class PlacementTweaks
                     if (result == ActionResult.SUCCESS)
                     {
                         posLast = posNew;
-                        mc.crosshairTarget = player.raycast(reach, mc.getTickDelta(), false);
+                        // FIXME
+                        mc.crosshairTarget = player.raycast(reach, mc.method_60646().method_60637(false), false);
                     }
                     else
                     {

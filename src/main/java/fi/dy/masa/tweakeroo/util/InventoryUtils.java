@@ -1108,7 +1108,8 @@ public class InventoryUtils
 
         double reach = mc.player.getBlockInteractionRange();
         boolean isCreative = player.isCreative();
-        HitResult trace = player.raycast(reach, mc.getTickDelta(), false);
+        // FIXME
+        HitResult trace = player.raycast(reach, mc.method_60646().method_60637(false), false);
 
         if (trace != null && trace.getType() == HitResult.Type.BLOCK)
         {

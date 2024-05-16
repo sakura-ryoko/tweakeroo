@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import net.minecraft.class_9779;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,7 +44,8 @@ public abstract class MixinInGameHud
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
         {
-            RenderUtils.renderDirectionsCursor(0, this.client.getTickDelta());
+            // FIXME
+            RenderUtils.renderDirectionsCursor(0, this.client.method_60646().method_60637(false));
             ci.cancel();
         }
     }
@@ -52,7 +54,7 @@ public abstract class MixinInGameHud
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
                      ordinal = 1, shift = At.Shift.AFTER))
-    private void alwaysRenderPlayerList(DrawContext drawContext, float tickDelta, CallbackInfo ci)
+    private void alwaysRenderPlayerList(DrawContext context, class_9779 arg, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue())
         {
@@ -60,7 +62,7 @@ public abstract class MixinInGameHud
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
 
             this.playerListHud.setVisible(true);
-            this.playerListHud.render(drawContext, drawContext.getScaledWindowWidth(), scoreboard, objective);
+            this.playerListHud.render(context, context.getScaledWindowWidth(), scoreboard, objective);
         }
     }
 
