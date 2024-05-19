@@ -11,7 +11,7 @@ public abstract class MixinItem implements IItemStackLimit
     @Shadow public abstract Item asItem();
 
     @Override
-    public Integer getMaxStackSize(net.minecraft.item.ItemStack stack)
+    public int getMaxStackSize(net.minecraft.item.ItemStack stack)
     {
         return this.asItem().getMaxCount();
     }
