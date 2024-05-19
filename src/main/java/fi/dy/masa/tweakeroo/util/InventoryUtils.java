@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ContainerComponent;
@@ -1174,5 +1175,18 @@ public class InventoryUtils
         }
 
         return changed;
+    }
+
+    public static boolean updateMaxStackSize(ItemStack stackIn, Integer newSize)
+    {
+        if (stackIn.isEmpty() == false && Objects.equals(stackIn.getComponents().get(DataComponentTypes.MAX_STACK_SIZE), newSize) == false)
+        {
+            Tweakeroo.logger.info("updateMaxStackSize(): applying changes to {}", newSize);
+            stackIn.applyChanges(ComponentChanges.builder().add(DataComponentTypes.MAX_STACK_SIZE, newSize).build());
+
+            return true;
+        }
+
+        return false;
     }
 }

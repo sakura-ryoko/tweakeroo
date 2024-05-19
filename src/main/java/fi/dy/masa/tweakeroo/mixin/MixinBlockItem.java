@@ -68,7 +68,7 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
     */
 
     @Override
-    public int getMaxStackSize(ItemStack stack)
+    public Integer getMaxStackSize(ItemStack stack)
     {
         if (FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue() &&
             ((BlockItem) (Object) this).getBlock() instanceof ShulkerBoxBlock &&
