@@ -127,7 +127,7 @@ public class InventoryUtils
         {
             try
             {
-                Item item = Registries.ITEM.get(new Identifier(name));
+                Item item = Registries.ITEM.get(Identifier.tryParse(name));
 
                 if (item != null && item != Items.AIR)
                 {
@@ -198,7 +198,7 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<Item> weapon = Registries.ITEM.getOrEmpty(new Identifier(itemId));
+                        Optional<Item> weapon = Registries.ITEM.getOrEmpty(Identifier.tryParse(itemId));
 
                         if (weapon.isPresent())
                         {
@@ -222,7 +222,7 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<EntityType<?>> entity = Registries.ENTITY_TYPE.getOrEmpty(new Identifier(entity_id));
+                        Optional<EntityType<?>> entity = Registries.ENTITY_TYPE.getOrEmpty(Identifier.tryParse(entity_id));
 
                         if (entity.isPresent())
                         {

@@ -337,7 +337,7 @@ public class MiscTweaks
     {
         try
         {
-            Identifier identifier = new Identifier(name);
+            Identifier identifier = Identifier.tryParse(name);
             return Registries.BLOCK.getOrEmpty(identifier).orElse(null);
         }
         catch (Exception e)

@@ -42,7 +42,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         super(world, profile);
     }
 
-    @Redirect(method = "updateNausea()V",
+    @Redirect(method = "method_60887",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/gui/screen/Screen;shouldPause()Z"))
     private boolean onDoesGuiPauseGame(Screen gui)
@@ -56,7 +56,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         return gui.shouldPause();
     }
 
-    @Inject(method = "updateNausea", at = @At("HEAD"))
+    @Inject(method = "method_60887", at = @At("HEAD"))
     private void disableNauseaEffectPre(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_NAUSEA_EFFECT.getBooleanValue())
@@ -65,8 +65,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
-    @Inject(method = "updateNausea", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;tickPortalCooldown()V"))
+    @Inject(method = "method_60887", at = @At(value = "TAIL"))
     private void disableNauseaEffectPost(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_NAUSEA_EFFECT.getBooleanValue())

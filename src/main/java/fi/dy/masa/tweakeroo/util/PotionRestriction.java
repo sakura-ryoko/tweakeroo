@@ -19,11 +19,9 @@ public class PotionRestriction extends UsageRestriction<StatusEffect>
 
             try
             {
-                rl = new Identifier(name);
+                rl = Identifier.tryParse(name);
             }
-            catch (Exception e)
-            {
-            }
+            catch (Exception ignored) { }
 
             StatusEffect effect = rl != null ? Registries.STATUS_EFFECT.get(rl) : null;
 

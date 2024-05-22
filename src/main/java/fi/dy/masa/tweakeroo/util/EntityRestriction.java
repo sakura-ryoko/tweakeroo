@@ -18,7 +18,7 @@ public class EntityRestriction extends UsageRestriction<EntityType<?>>
         {
             try
             {
-                Optional<EntityType<?>> entityType = Registries.ENTITY_TYPE.getOrEmpty(new Identifier(name));
+                Optional<EntityType<?>> entityType = Registries.ENTITY_TYPE.getOrEmpty(Identifier.tryParse(name));
                 if (entityType.isPresent())
                 {
                     set.add(entityType.get());

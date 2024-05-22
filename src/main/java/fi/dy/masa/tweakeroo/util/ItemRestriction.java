@@ -32,7 +32,7 @@ public class ItemRestriction
         {
             try
             {
-                Item item = Registries.ITEM.get(new Identifier(name));
+                Item item = Registries.ITEM.get(Identifier.tryParse(name));
 
                 if (item != null && item != Items.AIR)
                 {
