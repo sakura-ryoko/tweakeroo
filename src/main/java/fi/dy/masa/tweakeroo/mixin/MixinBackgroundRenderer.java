@@ -21,7 +21,7 @@ public abstract class MixinBackgroundRenderer
             method = "applyFog",
             slice = @Slice(
                             from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
-                            to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
+                            to   = @At(value = "FIELD", target = "Lnet/minecraft/block/enums/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/block/enums/CameraSubmersionType;")),
             constant = @Constant(floatValue = 0.25f),
             require = 0)
     private static float reduceLavaFogStart(float original)
@@ -40,7 +40,7 @@ public abstract class MixinBackgroundRenderer
             method = "applyFog",
             slice = @Slice(
                     from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
-                    to   = @At(value = "FIELD", target = "Lnet/minecraft/client/render/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/client/render/CameraSubmersionType;")),
+                    to   = @At(value = "FIELD", target = "Lnet/minecraft/block/enums/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/block/enums/CameraSubmersionType;")),
             constant = { @Constant(floatValue = 1.0f), @Constant(floatValue = 5.0f)},
             require = 0)
     private static float reduceLavaFogEnd(float original)
