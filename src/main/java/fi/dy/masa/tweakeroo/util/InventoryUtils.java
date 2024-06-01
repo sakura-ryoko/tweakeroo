@@ -10,7 +10,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -1247,29 +1246,5 @@ public class InventoryUtils
                 }
             }
         }
-    }
-
-    public static boolean cleanUpShulkerBoxNBT(ItemStack stack)
-    {
-        ContainerComponent itemContainer = stack.getComponents().get(DataComponentTypes.CONTAINER);
-        boolean changed = false;
-
-        if (itemContainer != null)
-        {
-            Iterator<ItemStack> iter = itemContainer.stream().iterator();
-
-            while (iter.hasNext())
-            {
-                ItemStack item = iter.next();
-
-                if (item.isEmpty())
-                {
-                    iter.remove();
-                    changed = true;
-                }
-            }
-        }
-
-        return changed;
     }
 }
