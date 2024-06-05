@@ -1,11 +1,12 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -26,11 +27,7 @@ import fi.dy.masa.malilib.util.MessageOutputType;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.CameraEntity;
-import fi.dy.masa.tweakeroo.util.EntityRestriction;
-import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
-import fi.dy.masa.tweakeroo.util.PotionRestriction;
+import fi.dy.masa.tweakeroo.util.*;
 
 public class MiscTweaks
 {
@@ -255,8 +252,7 @@ public class MiscTweaks
                POTION_RESTRICTION.isAllowed(effect.getEffectType().value());
     }
 
-    @Nullable
-    public static FlatChunkGeneratorLayer[] parseBlockString(String blockString)
+    public static @NotNull List<FlatChunkGeneratorLayer> parseBlockString(String blockString)
     {
         List<FlatChunkGeneratorLayer> list = new ArrayList<>();
         String[] strings = blockString.split(",");
@@ -278,7 +274,7 @@ public class MiscTweaks
             thicknessSum += layer.getThickness();
         }
 
-        return list.toArray(new FlatChunkGeneratorLayer[list.size()]);
+        return list;
     }
 
     @Nullable
@@ -325,10 +321,9 @@ public class MiscTweaks
         }
         else
         {
-            FlatChunkGeneratorLayer layer = new FlatChunkGeneratorLayer(finalThickness, block);
             // FIXME 1.17 is this just not needed anymore?
             //layer.setStartY(startY);
-            return layer;
+            return new FlatChunkGeneratorLayer(finalThickness, block);
         }
     }
 
