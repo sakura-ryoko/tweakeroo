@@ -425,7 +425,7 @@ public class InventoryUtils
 
     private static boolean isBetterWeapon(ItemStack testedStack, ItemStack previousWeapon, Entity entity)
     {
-        int itemWeight = 0;
+        //int itemWeight = 0;
 
         if (previousWeapon.isEmpty())
         {
@@ -433,6 +433,8 @@ public class InventoryUtils
         }
         if (testedStack.isEmpty() == false)
         {
+            // TODO Experimental Code
+            /*
             itemWeight += matchesWeaponMapping(testedStack, entity) ? 1 : -1;
             itemWeight += hasTheSameOrBetterRarity(testedStack, previousWeapon) ? 1 : -1;
             itemWeight += hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon) ? 1 : -1;
@@ -440,6 +442,9 @@ public class InventoryUtils
             itemWeight -= matchesWeaponMapping(previousWeapon, entity) ? 1 : -1;
 
             return itemWeight > 0;
+             */
+
+            return testedStack.isEmpty() == false && matchesWeaponMapping(testedStack, entity) && (makesMoreDamage(testedStack, previousWeapon) || matchesWeaponMapping(previousWeapon, entity) == false);
         }
 
         return false;
@@ -538,7 +543,7 @@ public class InventoryUtils
 
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
-        int itemWeight = 0;
+        //int itemWeight = 0;
 
         if (previousTool.isEmpty())
         {
@@ -546,11 +551,16 @@ public class InventoryUtils
         }
         if (testedStack.isEmpty() == false)
         {
+            // TODO Experimental code
+            /*
             itemWeight += hasTheSameOrBetterRarity(testedStack, previousTool) ? 1 : -1;
             itemWeight += hasSameOrBetterToolEnchantments(testedStack, previousTool) ? 1 : -1;
             itemWeight += isMoreEffectiveTool(testedStack, previousTool, state) ? 1 : -1;
 
             return itemWeight > 0;
+             */
+
+            return testedStack.isEmpty() == false && isMoreEffectiveTool(testedStack, previousTool, state);
         }
 
         return false;
@@ -632,8 +642,6 @@ public class InventoryUtils
     {
         float speed = stack.getMiningSpeedMultiplier(state);
 
-        /*  Moved to enchantments check, this will corrupt the results
-
         if (speed > 1.0f)
         {
             int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
@@ -643,7 +651,6 @@ public class InventoryUtils
                 speed += (effLevel * effLevel) + 1;
             }
         }
-         */
 
         if (state.isToolRequired() && stack.isSuitableFor(state) == false)
         {
@@ -1046,7 +1053,8 @@ public class InventoryUtils
             if (fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.id, false) &&
                 ItemStack.areItemsEqual(stackSlot, stackReference) &&
                 stackSlot.getMaxDamage() - stackSlot.getDamage() >= minDurabilityLeft &&
-                hasSameOrBetterToolEnchantments(stackReference, stackSlot))
+                //hasSameOrBetterToolEnchantments(stackReference, stackSlot))
+                hasSameIshEnchantments(stackReference, stackSlot))
             {
                 return slot.id;
             }
@@ -1055,7 +1063,6 @@ public class InventoryUtils
         return -1;
     }
 
-    /*  Replaced by new function
     private static boolean hasSameIshEnchantments(ItemStack stackReference, ItemStack stack)
     {
         int level = getEnchantmentLevel(stackReference, Enchantments.SILK_TOUCH);
@@ -1074,7 +1081,6 @@ public class InventoryUtils
 
         return true;
     }
-     */
 
     private static int findSlotWithEffectiveItemWithDurabilityLeft(ScreenHandler container, BlockState state)
     {
