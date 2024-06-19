@@ -45,6 +45,9 @@ public class ServerDataSyncer {
     private @Nullable BlockEntity getCache(BlockPos pos) {
         var data = blockCache.get(pos);
         if (data != null && System.currentTimeMillis() - data.getRight() <= 1000) {
+            if (System.currentTimeMillis() - data.getRight() > 500) {
+                syncBlockEntity(clientWorld, pos);
+            }
             return data.getLeft();
         }
 
@@ -54,6 +57,9 @@ public class ServerDataSyncer {
     private @Nullable Entity getCache(int networkId) {
         var data = entityCache.get(networkId);
         if (data != null && System.currentTimeMillis() - data.getRight() <= 1000) {
+            if (System.currentTimeMillis() - data.getRight() > 500) {
+                syncEntity(networkId);
+            }
             return data.getLeft();
         }
 
@@ -141,11 +147,11 @@ public class ServerDataSyncer {
         }
     }
 
-    public void syncEntity(Entity entity) {
-        Either<BlockPos, Integer> idEither = Either.right(entity.getId());
+    public void syncEntity(int networkId) {
+        Either<BlockPos, Integer> idEither = Either.right(networkId);
         if (MinecraftClient.getInstance().getNetworkHandler() != null && !pendingQueries.containsValue(idEither)) {
             DataQueryHandler handler = MinecraftClient.getInstance().getNetworkHandler().getDataQueryHandler();
-            handler.queryEntityNbt(entity.getId(), it -> {});
+            handler.queryEntityNbt(networkId, it -> {});
             pendingQueries.put(((IMixinDataQueryHandler) handler).currentTransactionId(), idEither);
         }
     }
@@ -153,7 +159,7 @@ public class ServerDataSyncer {
     public @Nullable Entity getServerEntity(Entity entity) {
         Entity serverEntity = getCache(entity.getId());
         if (serverEntity == null) {
-            syncEntity(entity);
+            syncEntity(entity.getId());
             return null;
         }
         return serverEntity;
