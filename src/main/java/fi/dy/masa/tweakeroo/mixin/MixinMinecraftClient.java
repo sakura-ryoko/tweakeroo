@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -128,6 +129,19 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
             {
                 KeyBinding.setKeyPressed(InputUtil.fromTranslationKey(this.options.useKey.getBoundKeyTranslationKey()), true);
             }
+        }
+    }
+
+    @Inject(
+            method = "setWorld",
+            at = @At("HEAD")
+    )
+    private void onWorldChanged(ClientWorld world, CallbackInfo ci)
+    {
+        if (world == null) {
+            ServerDataSyncer.INSTANCE = null;
+        } else {
+            ServerDataSyncer.INSTANCE = new ServerDataSyncer(world);
         }
     }
 }

@@ -1,10 +1,14 @@
 package fi.dy.masa.tweakeroo.renderer;
 
-import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
+import fi.dy.masa.tweakeroo.util.MiscUtils;
+import fi.dy.masa.tweakeroo.util.RayTraceUtils;
+import fi.dy.masa.tweakeroo.util.SnapAimMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
@@ -31,14 +35,10 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 
-import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
-import fi.dy.masa.tweakeroo.util.MiscUtils;
-import fi.dy.masa.tweakeroo.util.RayTraceUtils;
-import fi.dy.masa.tweakeroo.util.SnapAimMode;
+import java.util.Set;
 
 public class RenderUtils
 {
@@ -133,13 +133,8 @@ public class RenderUtils
 
         HitResult trace = RayTraceUtils.getRayTraceFromEntity(world, cameraEntity, false);
 
-        if (trace == null)
-        {
-            return;
-        }
-
         Inventory inv = null;
-        ShulkerBoxBlock block = null;
+        ShulkerBoxBlock shulkerBoxBlock = null;
         LivingEntity entityLivingBase = null;
 
         if (trace.getType() == HitResult.Type.BLOCK)
@@ -149,14 +144,24 @@ public class RenderUtils
 
             if (blockTmp instanceof ShulkerBoxBlock)
             {
-                block = (ShulkerBoxBlock) blockTmp;
+                shulkerBoxBlock = (ShulkerBoxBlock) blockTmp;
             }
 
-            inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
+            if (world instanceof ServerWorld realWorld) {
+                inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(realWorld, pos);
+            } else {
+                inv = ServerDataSyncer.INSTANCE.getBlockInventory(world, pos);
+            }
         }
         else if (trace.getType() == HitResult.Type.ENTITY)
         {
             Entity entity = ((EntityHitResult) trace).getEntity();
+            if (entity.getWorld().isClient) {
+                Entity serverEntity = ServerDataSyncer.INSTANCE.getServerEntity(entity);
+                if (serverEntity != null) {
+                    entity = serverEntity;
+                }
+            }
 
             if (entity instanceof LivingEntity)
             {
@@ -207,7 +212,7 @@ public class RenderUtils
                 yInv = Math.min(yInv, yCenter - 92);
             }
 
-            fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(block, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+            fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(shulkerBoxBlock, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
 
             if (isHorse)
             {
