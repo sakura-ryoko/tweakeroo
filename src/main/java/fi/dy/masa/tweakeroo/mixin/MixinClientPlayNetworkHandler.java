@@ -49,7 +49,7 @@ public abstract class MixinClientPlayNetworkHandler
         if (FeatureToggle.TWEAK_SERVER_ENTITY_DATA_SYNCER.getBooleanValue())
         {
             // when the player becomes OP, the server sends the command tree to the client
-            ServerDataSyncer.INSTANCE.recheckOpStatus();
+            ServerDataSyncer.getInstance().recheckOpStatus();
         }
     }
 }

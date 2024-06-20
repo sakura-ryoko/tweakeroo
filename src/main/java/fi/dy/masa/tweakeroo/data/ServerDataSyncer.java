@@ -30,7 +30,18 @@ import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings({"deprecation"})
 public class ServerDataSyncer {
-    public static ServerDataSyncer INSTANCE;
+    private static ServerDataSyncer INSTANCE;
+
+    public static ServerDataSyncer getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ServerDataSyncer(MinecraftClient.getInstance().world);
+        }
+        return INSTANCE;
+    }
+
+    public static void resetInstance() {
+        INSTANCE = null;
+    }
 
     /**
      * key: BlockPos
