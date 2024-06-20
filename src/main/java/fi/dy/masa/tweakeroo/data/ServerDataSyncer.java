@@ -32,14 +32,17 @@ import java.util.concurrent.CompletableFuture;
 public class ServerDataSyncer {
     private static ServerDataSyncer INSTANCE;
 
-    public static ServerDataSyncer getInstance() {
-        if (INSTANCE == null) {
+    public static ServerDataSyncer getInstance()
+    {
+        if (INSTANCE == null)
+        {
             INSTANCE = new ServerDataSyncer(MinecraftClient.getInstance().world);
         }
         return INSTANCE;
     }
 
-    public static void resetInstance() {
+    public static void resetInstance()
+    {
         INSTANCE = null;
     }
 
@@ -49,7 +52,7 @@ public class ServerDataSyncer {
      */
     private final Map<BlockPos, Pair<BlockEntity, Long>> blockCache = new HashMap<>();
     private final Map<Integer, Pair<Entity, Long>> entityCache = new HashMap<>();
-    private final Map<Integer, Either<BlockPos, Integer>> pendingQueries = new HashMap<>();
+    private final Map<Either<BlockPos, Integer>, CompletableFuture<@Nullable NbtCompound>> pendingQueries = new HashMap<>();
     private final Map<Integer, CompletableFuture<@Nullable NbtCompound>> pendingQueryFutures = new HashMap<>();
     private final ClientWorld clientWorld;
     /**
@@ -66,8 +69,7 @@ public class ServerDataSyncer {
     {
         var data = blockCache.get(pos);
 
-        if (yesIAmOp.isPresent() && !yesIAmOp.get())
-            return null;
+        if (yesIAmOp.isPresent() && !yesIAmOp.get()) return null;
 
         if (data != null && System.currentTimeMillis() - data.getRight() <= 1000)
         {
@@ -85,8 +87,7 @@ public class ServerDataSyncer {
     {
         var data = entityCache.get(networkId);
 
-        if (yesIAmOp.isPresent() && !yesIAmOp.get())
-            return null;
+        if (yesIAmOp.isPresent() && !yesIAmOp.get()) return null;
 
         if (data != null && System.currentTimeMillis() - data.getRight() <= 1000)
         {
@@ -106,34 +107,9 @@ public class ServerDataSyncer {
         pendingQueryFutures.remove(transactionId).complete(nbt);
 
         if (nbt == null) return;
-        if (pendingQueries.containsKey(transactionId))
+        if (pendingQueryFutures.containsKey(transactionId))
         {
             yesIAmOp = Optional.of(true);
-            Either<BlockPos, Integer> either = pendingQueries.remove(transactionId);
-
-            either.ifLeft(pos ->
-            {
-                if (!clientWorld.isChunkLoaded(pos)) return;
-                BlockState state = clientWorld.getBlockState(pos);
-
-                if (state.getBlock() instanceof BlockEntityProvider provider)
-                {
-                    var be = provider.createBlockEntity(pos, state);
-                    if (be != null)
-                    {
-                        be.read(nbt, clientWorld.getRegistryManager());
-                        blockCache.put(pos, new Pair<>(be, System.currentTimeMillis()));
-                    }
-                }
-            }).ifRight(id ->
-            {
-                Entity entity = clientWorld.getEntityById(id).getType().create(clientWorld);
-                if (entity != null)
-                {
-                    entity.readNbt(nbt);
-                    entityCache.put(id, new Pair<>(entity, System.currentTimeMillis()));
-                }
-            });
         }
 
         if (blockCache.size() > 30)
@@ -148,8 +124,7 @@ public class ServerDataSyncer {
 
     public Inventory getBlockInventory(World world, BlockPos pos)
     {
-        if (yesIAmOp.isPresent() && !yesIAmOp.get())
-            return null;
+        if (yesIAmOp.isPresent() && !yesIAmOp.get()) return null;
         Tweakeroo.logger.debug("getBlockInventory: pos [{}], op status: {}", pos.toShortString(), yesIAmOp);
 
         if (!world.isChunkLoaded(pos)) return null;
@@ -172,10 +147,7 @@ public class ServerDataSyncer {
                         syncBlockEntity(world, posAdj);
                     }
 
-                    if (stateAdj.getBlock() == state.getBlock() &&
-                            dataAdj instanceof ChestBlockEntity inv2 &&
-                            stateAdj.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE &&
-                            stateAdj.get(ChestBlock.FACING) == state.get(ChestBlock.FACING))
+                    if (stateAdj.getBlock() == state.getBlock() && dataAdj instanceof ChestBlockEntity inv2 && stateAdj.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE && stateAdj.get(ChestBlock.FACING) == state.get(ChestBlock.FACING))
                     {
                         Inventory invRight = type == ChestType.RIGHT ? inv : inv2;
                         Inventory invLeft = type == ChestType.RIGHT ? inv2 : inv;
@@ -212,8 +184,7 @@ public class ServerDataSyncer {
     public CompletableFuture<NbtCompound> syncBlockEntity(World world, BlockPos pos)
     {
         Tweakeroo.logger.debug("syncBlockEntity: pos [{}], op status: {}", pos.toShortString(), yesIAmOp);
-        if (yesIAmOp.isPresent() && !yesIAmOp.get())
-            return CompletableFuture.completedFuture(null);
+        if (yesIAmOp.isPresent() && !yesIAmOp.get()) return CompletableFuture.completedFuture(null);
 
         if (MinecraftClient.getInstance().isIntegratedServerRunning())
         {
@@ -225,45 +196,86 @@ public class ServerDataSyncer {
             }
         }
         Either<BlockPos, Integer> posEither = Either.left(pos);
-        if (MinecraftClient.getInstance().getNetworkHandler() != null && !pendingQueries.containsValue(posEither))
+        if (MinecraftClient.getInstance().getNetworkHandler() != null)
         {
-            DataQueryHandler handler = MinecraftClient.getInstance().getNetworkHandler().getDataQueryHandler();
-            handler.queryBlockNbt(pos, it -> {});
-            pendingQueries.put(((IMixinDataQueryHandler) handler).currentTransactionId(), posEither);
+            if (pendingQueries.containsKey(posEither))
+            {
+                return pendingQueries.get(posEither);
+            }
+
             CompletableFuture<NbtCompound> future = new CompletableFuture<>();
+            DataQueryHandler handler = MinecraftClient.getInstance().getNetworkHandler().getDataQueryHandler();
+            handler.queryBlockNbt(pos, it -> {
+            });
+            pendingQueries.put(posEither, future);
             pendingQueryFutures.put(((IMixinDataQueryHandler) handler).currentTransactionId(), future);
+            future.thenAccept(nbt -> {
+                if (!clientWorld.isChunkLoaded(pos) || nbt == null) return;
+                BlockState state = clientWorld.getBlockState(pos);
+
+                if (state.getBlock() instanceof BlockEntityProvider provider)
+                {
+                    var be = provider.createBlockEntity(pos, state);
+                    if (be != null)
+                    {
+                        be.read(nbt, clientWorld.getRegistryManager());
+                        blockCache.put(pos, new Pair<>(be, System.currentTimeMillis()));
+                    }
+                }
+            });
             if (yesIAmOp.isEmpty())
             {
                 yesIAmOp = Optional.of(false);
             }
             return future;
         }
-        throw new IllegalStateException("Not connected to a server");
+        else
+        {
+            throw new IllegalStateException("Not connected to a server");
+        }
     }
 
     public CompletableFuture<NbtCompound> syncEntity(int networkId)
     {
         Tweakeroo.logger.debug("syncEntity: pos [{}], op status: {}", networkId, yesIAmOp);
-        if (yesIAmOp.isPresent() && !yesIAmOp.get())
-            return CompletableFuture.completedFuture(null);
+        if (yesIAmOp.isPresent() && !yesIAmOp.get()) return CompletableFuture.completedFuture(null);
 
         Either<BlockPos, Integer> idEither = Either.right(networkId);
-        if (MinecraftClient.getInstance().getNetworkHandler() != null && !pendingQueries.containsValue(idEither))
+        if (MinecraftClient.getInstance().getNetworkHandler() != null)
         {
-            DataQueryHandler handler = MinecraftClient.getInstance().getNetworkHandler().getDataQueryHandler();
-            handler.queryEntityNbt(networkId, it ->
+            if (pendingQueries.containsKey(idEither))
             {
-            });
-            pendingQueries.put(((IMixinDataQueryHandler) handler).currentTransactionId(), idEither);
+                return pendingQueries.get(idEither);
+            }
+
             CompletableFuture<NbtCompound> future = new CompletableFuture<>();
+            DataQueryHandler handler = MinecraftClient.getInstance().getNetworkHandler().getDataQueryHandler();
+            handler.queryEntityNbt(networkId, it -> {
+            });
+            pendingQueries.put(idEither, future);
             pendingQueryFutures.put(((IMixinDataQueryHandler) handler).currentTransactionId(), future);
+            future.thenAccept(nbt -> {
+                if (nbt == null) return;
+                if (clientWorld.getEntityById(networkId) != null)
+                {
+                    Entity entity = clientWorld.getEntityById(networkId).getType().create(clientWorld);
+                    if (entity != null)
+                    {
+                        entity.readNbt(nbt);
+                        entityCache.put(networkId, new Pair<>(entity, System.currentTimeMillis()));
+                    }
+                }
+            });
             if (yesIAmOp.isEmpty())
             {
                 yesIAmOp = Optional.of(false);
             }
             return future;
         }
-        throw new IllegalStateException("Not connected to a server");
+        else
+        {
+            throw new IllegalStateException("Not connected to a server");
+        }
     }
 
     public @Nullable Entity getServerEntity(Entity entity)
