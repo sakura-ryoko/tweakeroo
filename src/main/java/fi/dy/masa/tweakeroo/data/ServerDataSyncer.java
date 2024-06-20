@@ -108,6 +108,7 @@ public class ServerDataSyncer {
         if (nbt == null) return;
         if (pendingQueries.containsKey(transactionId))
         {
+            yesIAmOp = Optional.of(true);
             Either<BlockPos, Integer> either = pendingQueries.remove(transactionId);
 
             either.ifLeft(pos ->
