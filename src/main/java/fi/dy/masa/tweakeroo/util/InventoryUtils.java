@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.ObjectInputFilter;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -425,26 +426,22 @@ public class InventoryUtils
 
     private static boolean isBetterWeapon(ItemStack testedStack, ItemStack previousWeapon, Entity entity)
     {
-        //int itemWeight = 0;
-
         if (previousWeapon.isEmpty())
         {
             return true;
         }
+
         if (testedStack.isEmpty() == false)
         {
-            // TODO Experimental Code
-            /*
-            itemWeight += matchesWeaponMapping(testedStack, entity) ? 1 : -1;
-            itemWeight += hasTheSameOrBetterRarity(testedStack, previousWeapon) ? 1 : -1;
-            itemWeight += hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon) ? 1 : -1;
-            itemWeight += makesMoreDamage(testedStack, previousWeapon) ? 1 : -1;
-            itemWeight -= matchesWeaponMapping(previousWeapon, entity) ? 1 : -1;
+            if (matchesWeaponMapping(testedStack, entity) && (makesMoreDamage(testedStack, previousWeapon) || matchesWeaponMapping(previousWeapon, entity) == false))
+            {
+                if (Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue())
+                {
+                    return hasTheSameOrBetterRarity(testedStack, previousWeapon) && hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon);
+                }
 
-            return itemWeight > 0;
-             */
-
-            return testedStack.isEmpty() == false && matchesWeaponMapping(testedStack, entity) && (makesMoreDamage(testedStack, previousWeapon) || matchesWeaponMapping(previousWeapon, entity) == false);
+                return true;
+            }
         }
 
         return false;
@@ -543,24 +540,22 @@ public class InventoryUtils
 
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
-        //int itemWeight = 0;
-
         if (previousTool.isEmpty())
         {
             return true;
         }
+
         if (testedStack.isEmpty() == false)
         {
-            // TODO Experimental code
-            /*
-            itemWeight += hasTheSameOrBetterRarity(testedStack, previousTool) ? 1 : -1;
-            itemWeight += hasSameOrBetterToolEnchantments(testedStack, previousTool) ? 1 : -1;
-            itemWeight += isMoreEffectiveTool(testedStack, previousTool, state) ? 1 : -1;
+            if (isMoreEffectiveTool(testedStack, previousTool, state))
+            {
+                if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
+                {
+                    return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
+                }
 
-            return itemWeight > 0;
-             */
-
-            return testedStack.isEmpty() == false && isMoreEffectiveTool(testedStack, previousTool, state);
+                return true;
+            }
         }
 
         return false;
@@ -846,8 +841,6 @@ public class InventoryUtils
                 if ((slot.id - 36) != player.getInventory().selectedSlot &&
                     stack.isDamageable() && stack.isDamaged() && targetSlot.canInsert(stack) &&
                     getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
-                    //(hasSameOrBetterToolEnchantments(stack, targetSlot.getStack()) ||
-                     //hasSameOrBetterWeaponEnchantments(stack, targetSlot.getStack())))
                 {
                     return slot.id;
                 }

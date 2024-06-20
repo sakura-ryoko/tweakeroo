@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.renderer;
 
+import java.util.Set;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -9,6 +10,7 @@ import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
