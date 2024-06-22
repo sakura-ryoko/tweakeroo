@@ -152,6 +152,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
                     if (targetSlot >= 0)
                     {
                         InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
+                        autoSwitchElytraChestplate = ItemStack.EMPTY;
                     }
                 }
             }
