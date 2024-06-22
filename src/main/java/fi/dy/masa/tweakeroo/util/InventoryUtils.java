@@ -942,7 +942,7 @@ public class InventoryUtils
         }
     }
 
-    private static void swapItemToEquipmentSlot(PlayerEntity player, EquipmentSlot type, int sourceSlotNumber)
+    public static void swapItemToEquipmentSlot(PlayerEntity player, EquipmentSlot type, int sourceSlotNumber)
     {
         if (sourceSlotNumber != -1 && player.currentScreenHandler == player.playerScreenHandler)
         {
