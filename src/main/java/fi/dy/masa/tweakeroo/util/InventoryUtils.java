@@ -2,7 +2,6 @@ package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.ObjectInputFilter;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -862,15 +861,41 @@ public class InventoryUtils
 
         Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem && ((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
         Predicate<ItemStack> stackFilterElytra = (s) -> s.getItem() instanceof ElytraItem && ElytraItem.isUsable(s);
-        Predicate<ItemStack> stackFilter = (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack)) ? stackFilterElytra : stackFilterChestPlate;
+        boolean switchingToElytra = (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack));
+        Predicate<ItemStack> stackFilter = switchingToElytra ? stackFilterElytra : stackFilterChestPlate;
         Predicate<ItemStack> finalFilter = (s) -> s.isEmpty() == false && stackFilter.test(s) && s.getDamage() < s.getMaxDamage() - 10;
-        int targetSlot = findSuitableSlot(container, finalFilter);
+        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
+            if (!finalFilter.test(testedStack)) return false;
+            if (switchingToElytra) {
+                if (getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING)) {
+                    return true;
+                }
+                else if (testedStack.getDamage() < previousBestMatch.getDamage()) {
+                    return true;
+                }
+            }
+            else {
+                if (getArmorValue(previousBestMatch, 1, EquipmentSlot.CHEST) < getArmorValue(testedStack, 1, EquipmentSlot.CHEST)) {
+                    return true;
+                }
+                else if (getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) < getEnchantmentLevel(testedStack, Enchantments.PROTECTION)) {
+                    return true;
+                }
+            }
+            return false;
+        }, UniformIntProvider.create(9, container.slots.size() - 1));
 
         if (targetSlot >= 0)
         {
             //targetSlots.sort();
             swapItemToEquipmentSlot(player, EquipmentSlot.CHEST, targetSlot);
         }
+    }
+
+    private static double getArmorValue(ItemStack stack, double base, EquipmentSlot slot)
+    {
+        AttributeModifiersComponent attributeModifiersComponent = stack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
+        return attributeModifiersComponent.applyOperations(base, slot);
     }
 
     /**
