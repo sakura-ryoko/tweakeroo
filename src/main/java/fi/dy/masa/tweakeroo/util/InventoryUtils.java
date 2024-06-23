@@ -891,6 +891,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return true;
         }, UniformIntProvider.create(9, container.slots.size() - 1));
 

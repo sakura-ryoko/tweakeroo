@@ -33,17 +33,12 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 {
     @Shadow public Input input;
     @Shadow protected int ticksLeftToDoubleTapSprint;
-
     @Shadow public float prevNauseaIntensity;
     @Shadow public float nauseaIntensity;
-    @Unique
-    private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
-    @Unique
-    private Input realInput;
-    @Unique
-    private float realNauseaIntensity;
-    @Unique
-    private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
+    @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
+    @Unique private Input realInput;
+    @Unique private float realNauseaIntensity;
+    @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
 
     private MixinClientPlayerEntity(ClientWorld world, GameProfile profile)
     {
@@ -133,18 +128,14 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
             // Sakura's version calculating fall distance...
-            /*
-            if ((!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) && this.fallDistance > 20.0f)
-                || (this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
-                && (!this.getEquippedStack(EquipmentSlot.CHEST).isEmpty() || this.autoSwitchElytraChestplate.isOf(Items.ELYTRA)))
-             */
+            //if ((!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) && this.fallDistance > 20.0f)
 
             // Auto switch if it is not elytra after falling, or is totally broken.
             // This also shouldn't activate on the Ground if the Chest Equipment is EMPTY,
             // or not an Elytra to be swapped back.
             //
             // !isOnGround(): Minecraft also check elytra even if the player is on the ground, skip it.
-            if (!isOnGround()
+            if (!this.isOnGround()
                 && (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
                 || (this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
                 && (!this.getEquippedStack(EquipmentSlot.CHEST).isEmpty() || this.autoSwitchElytraChestplate.isOf(Items.ELYTRA)))
@@ -161,7 +152,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "tickMovement", at = @At("RETURN"))
-    private void onMovementEnd(CallbackInfo ci) {
+    private void onMovementEnd(CallbackInfo ci)
+    {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
             if (!this.isFallFlying() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
