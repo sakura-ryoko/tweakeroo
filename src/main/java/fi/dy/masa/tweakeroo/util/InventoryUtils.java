@@ -865,6 +865,7 @@ public class InventoryUtils
         boolean switchingToElytra = (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack));
         Predicate<ItemStack> stackFilter = switchingToElytra ? stackFilterElytra : stackFilterChestPlate;
         Predicate<ItemStack> finalFilter = (s) -> s.isEmpty() == false && stackFilter.test(s) && s.getDamage() < s.getMaxDamage() - 10;
+
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
             if (!finalFilter.test(testedStack)) return false;
             if (!finalFilter.test(previousBestMatch)) return true;
@@ -903,11 +904,13 @@ public class InventoryUtils
     private static double getArmorAndArmorToughnessValue(ItemStack stack, double base, AttributeModifierSlot slot)
     {
         final double[] total = {base};
+
         stack.applyAttributeModifier(slot, (entry, modifier) -> {
             if (entry.getKey().orElseThrow() == EntityAttributes.GENERIC_ARMOR
                 || entry.getKey().orElseThrow() == EntityAttributes.GENERIC_ARMOR_TOUGHNESS)
             {
-                switch (modifier.operation()) {
+                switch (modifier.operation())
+                {
                     case ADD_VALUE:
                         total[0] += modifier.value();
                         break;
@@ -922,6 +925,7 @@ public class InventoryUtils
                 }
             }
         });
+
         return total[0];
     }
 
