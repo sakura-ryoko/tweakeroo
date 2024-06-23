@@ -172,6 +172,10 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
                         }
                     }
                 }
+                else {
+                    // if cached previous item is empty, try to swap back to the default chest plate.
+                    InventoryUtils.swapElytraWithChestPlate(this);
+                }
             }
         }
     }
