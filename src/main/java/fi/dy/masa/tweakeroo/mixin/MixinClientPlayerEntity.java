@@ -132,10 +132,13 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
-            // auto switch if it is not elytra after falling more than 20 blocks, or is totally broken.
-            // This also shouldn't activate on the Ground if the Chest Equipment is EMPTY, or not an Elytra
-            // To be swapped back.
-            if ((!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) && this.fallDistance > 20.0f)
+            // Auto switch if it is not elytra after falling, or is totally broken.
+            // This also shouldn't activate on the Ground if the Chest Equipment is EMPTY,
+            // or not an Elytra to be swapped back.
+            //
+            // !isOnGround(): Minecraft also check elytra even if the player is on the ground, skip it.
+            if (!isOnGround()
+                && (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
                 || (this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
                 && (!this.getEquippedStack(EquipmentSlot.CHEST).isEmpty() || this.autoSwitchElytraChestplate.isOf(Items.ELYTRA)))
             {
@@ -154,16 +157,19 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void onMovementEnd(CallbackInfo ci) {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
-            if (!this.autoSwitchElytraChestplate.isEmpty() && !this.isFallFlying() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
+            if (!this.isFallFlying() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
             {
-                if (this.playerScreenHandler.getCursorStack().isEmpty())
+                if (!this.autoSwitchElytraChestplate.isEmpty())
                 {
-                    int targetSlot = InventoryUtils.findSlotWithItem(this.playerScreenHandler, this.autoSwitchElytraChestplate, true, false);
-
-                    if (targetSlot >= 0)
+                    if (this.playerScreenHandler.getCursorStack().isEmpty())
                     {
-                        InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
-                        this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                        int targetSlot = InventoryUtils.findSlotWithItem(this.playerScreenHandler, this.autoSwitchElytraChestplate, true, false);
+
+                        if (targetSlot >= 0)
+                        {
+                            InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
+                            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                        }
                     }
                 }
             }
