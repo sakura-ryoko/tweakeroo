@@ -132,6 +132,13 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
+            // Sakura's version calculating fall distance...
+            /*
+            if ((!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) && this.fallDistance > 20.0f)
+                || (this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
+                && (!this.getEquippedStack(EquipmentSlot.CHEST).isEmpty() || this.autoSwitchElytraChestplate.isOf(Items.ELYTRA)))
+             */
+
             // Auto switch if it is not elytra after falling, or is totally broken.
             // This also shouldn't activate on the Ground if the Chest Equipment is EMPTY,
             // or not an Elytra to be swapped back.
