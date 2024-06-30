@@ -94,7 +94,6 @@ public class Hotkeys
             SKIP_WORLD_RENDERING,
             STAND_UP_NEARBY_PETS,
             SWAP_ELYTRA_CHESTPLATE,
-            //TOGGLE_CARPET_AP_PROTOCOL,
             TOGGLE_AP_PROTOCOL,
             TOGGLE_GRAB_CURSOR,
             TOOL_PICK,
