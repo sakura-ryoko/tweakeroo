@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.network.ClientCommonNetworkHandler;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.data.DataManager;
 
 @Mixin(ClientCommonNetworkHandler.class)
@@ -17,7 +16,6 @@ public class MixinClientCommonNetworkHandler
     {
         if (packet.payload().getId().id().equals(DataManager.CARPET_HELLO))
         {
-            Tweakeroo.debugLog("ClientCommonNetworkHandler#tweakeroo_onCustomPayload(): received carpet hello packet");
             DataManager.getInstance().setHasCarpetServer(true);
         }
     }

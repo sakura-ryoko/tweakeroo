@@ -1,8 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,6 +10,8 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.data.DataManager;
+import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
@@ -61,7 +60,6 @@ public abstract class MixinClientPlayNetworkHandler
     {
         if (payload.getId().id().equals(DataManager.CARPET_HELLO))
         {
-            Tweakeroo.debugLog("MixinClientPlayNetworkHandler#tweakeroo_onCustomPayload(): received carpet hello packet");
             DataManager.getInstance().setHasCarpetServer(true);
         }
     }

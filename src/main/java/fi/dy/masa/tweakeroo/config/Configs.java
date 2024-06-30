@@ -47,10 +47,9 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE, "The Breaking Restriction mode to use (hotkey-selectable)");
         public static final ConfigColor         CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000", "The background color for the chat messages,\nif 'tweakChatBackgroundColor' is enabled");
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]", "The time format for chat messages, if tweakChatTimestamp is enabled\nUses the Java SimpleDateFormat format specifiers.");
-        //public static final ConfigBoolean       CARPET_ACCURATE_PLACEMENT_PROTOCOL  = new ConfigBoolean     ("carpetAccuratePlacementProtocol", true, "If enabled, then the Flexible Block Placement and the\nAccurate Block Placement use the protocol implemented in Carpet mod.\n§6Note: This is required for any block rotations to work, other than\n§6blocks that only care about the block side you click on (Hoppers, Logs etc.)");
         public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true, "Enable single player and client side placement rotations,\nsuch as Accurate Placement working in single player without Carpet mod");
         public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10, "The GUI scale value to use for inventory screens, if\n§etweakCustomInventoryScreenScale§r is enabled.");
-        public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false, "Enables some debug log messages in the game console,\nfor debugging certain issues or crashes.");
+        //public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false, "Enables some debug log messages in the game console,\nfor debugging certain issues or crashes.");
         public static final ConfigOptionList    ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY, "Whether or not to render the real pitch angle\nindicator when the elytra camera mode is active");
         public static final ConfigDouble        ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64, "The entity reach distance to use if the override tweak is enabled.\nThe maximum the game allows is 64.\n§6Do not attempt to use this at a value beyond\n[0.5 - 1.0] higher than the Game Rules defined on a server.");
         public static final ConfigOptionList    ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE, "Selects which type of warning message to show (if any)\nwhen the Entity Type Attack Restriction feature prevents attacking an entity");
@@ -122,9 +121,8 @@ public class Configs implements IConfigHandler
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
                 ACCURATE_PLACEMENT_PROTOCOL,
-                //CARPET_ACCURATE_PLACEMENT_PROTOCOL,
                 CLIENT_PLACEMENT_ROTATION,
-                DEBUG_LOGGING,
+                //DEBUG_LOGGING,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
                 FAST_PLACEMENT_REMEMBER_ALWAYS,
                 FREE_CAMERA_PLAYER_INPUTS,

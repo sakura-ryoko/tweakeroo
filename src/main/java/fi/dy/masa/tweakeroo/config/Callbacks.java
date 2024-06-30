@@ -90,7 +90,6 @@ public class Callbacks
         Hotkeys.SIT_DOWN_NEARBY_PETS.getKeybind().setCallback((a, k) -> MiscUtils.commandNearbyPets(true));
         Hotkeys.STAND_UP_NEARBY_PETS.getKeybind().setCallback((a, k) -> MiscUtils.commandNearbyPets(false));
         Hotkeys.SWAP_ELYTRA_CHESTPLATE.getKeybind().setCallback(callbackGeneric);
-        //Hotkeys.TOGGLE_CARPET_AP_PROTOCOL.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.CARPET_ACCURATE_PLACEMENT_PROTOCOL));
         Hotkeys.TOGGLE_AP_PROTOCOL.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL));
         Hotkeys.TOGGLE_GRAB_CURSOR.getKeybind().setCallback(callbackGeneric);
         Hotkeys.TOOL_PICK.getKeybind().setCallback(callbackGeneric);

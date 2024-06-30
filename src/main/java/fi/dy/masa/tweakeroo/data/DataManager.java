@@ -6,6 +6,7 @@ public class DataManager
 {
     private static final DataManager INSTANCE = new DataManager();
     private boolean hasCarpetServer;
+    private boolean hasServuxServer;
     public static final Identifier CARPET_HELLO = Identifier.of("carpet", "hello");
 
     private DataManager()
@@ -19,11 +20,13 @@ public class DataManager
         if (isLogout)
         {
             //Tweakeroo.logger.info("DataManager#reset() - log-out");
+            this.hasCarpetServer = false;
+            this.hasServuxServer = false;
         }
-        else
-        {
+        //else
+        //{
             //Tweakeroo.logger.info("DataManager#reset() - dimension change or log-in");
-        }
+        //}
     }
 
     public void setHasCarpetServer(boolean toggle)
@@ -34,5 +37,15 @@ public class DataManager
     public boolean hasCarpetServer()
     {
         return this.hasCarpetServer;
+    }
+
+    public void setHasServuxServer(boolean toggle)
+    {
+        this.hasServuxServer = toggle;
+    }
+
+    public boolean hasServuxServer()
+    {
+        return this.hasServuxServer;
     }
 }
