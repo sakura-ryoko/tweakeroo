@@ -8,6 +8,7 @@ public class DataManager
     private boolean hasCarpetServer;
     private boolean hasServuxServer;
     public static final Identifier CARPET_HELLO = Identifier.of("carpet", "hello");
+    public static final Identifier SERVUX_ENTITY_DATA = Identifier.of("servux", "entity_data");
 
     private DataManager()
     {

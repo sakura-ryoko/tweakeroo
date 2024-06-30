@@ -62,5 +62,9 @@ public abstract class MixinClientPlayNetworkHandler
         {
             DataManager.getInstance().setHasCarpetServer(true);
         }
+        else if (payload.getId().id().equals(DataManager.SERVUX_ENTITY_DATA))
+        {
+            DataManager.getInstance().setHasServuxServer(true);
+        }
     }
 }
