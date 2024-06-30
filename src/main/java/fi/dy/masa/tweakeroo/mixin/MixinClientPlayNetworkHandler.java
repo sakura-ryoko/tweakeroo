@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -7,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -50,6 +53,16 @@ public abstract class MixinClientPlayNetworkHandler
         {
             // when the player becomes OP, the server sends the command tree to the client
             ServerDataSyncer.getInstance().recheckOpStatus();
+        }
+    }
+
+    @Inject(method = "onCustomPayload", at = @At("HEAD"))
+    private void tweakeroo_onCustomPayload(CustomPayload payload, CallbackInfo ci)
+    {
+        if (payload.getId().id().equals(DataManager.CARPET_HELLO))
+        {
+            Tweakeroo.debugLog("MixinClientPlayNetworkHandler#tweakeroo_onCustomPayload(): received carpet hello packet");
+            DataManager.getInstance().setHasCarpetServer(true);
         }
     }
 }

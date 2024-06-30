@@ -41,7 +41,8 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
             if (stateOrig != null && this.canPlace(ctx, stateOrig))
             {
                 UseContext context = UseContext.from(ctx, ctx.getHand());
-                cir.setReturnValue(PlacementHandler.getStateForPlacement(stateOrig, context));
+                //cir.setReturnValue(PlacementHandler_V2Only.getStateForPlacement(stateOrig, context));
+                cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, context));
             }
         }
     }
@@ -60,7 +61,7 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
         if (stateOriginal != null && Configs.Generic.CLIENT_PLACEMENT_ROTATION.getBooleanValue())
         {
             UseContext context = UseContext.from(ctx, Hand.MAIN);
-            return PlacementHandler.getStateForPlacement(stateOriginal, context);
+            return PlacementHandler_V2Only.getStateForPlacement(stateOriginal, context);
         }
 
         return stateOriginal;
