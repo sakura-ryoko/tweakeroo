@@ -41,7 +41,6 @@ public abstract class MixinBlockItem extends Item implements IItemStackLimit
             if (stateOrig != null && this.canPlace(ctx, stateOrig))
             {
                 UseContext context = UseContext.from(ctx, ctx.getHand());
-                //cir.setReturnValue(PlacementHandler_V2Only.getStateForPlacement(stateOrig, context));
                 cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, context));
             }
         }
