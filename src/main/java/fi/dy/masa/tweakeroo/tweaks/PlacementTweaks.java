@@ -30,6 +30,7 @@ import fi.dy.masa.malilib.util.*;
 import fi.dy.masa.malilib.util.PositionUtils.HitPart;
 import fi.dy.masa.malilib.util.restrictions.BlockRestriction;
 import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
@@ -117,7 +118,7 @@ public class PlacementTweaks
         {
             if (isEmulatedClick == false)
             {
-                //System.out.printf("onProcessRightClickPre storing stack: %s\n", stackOriginal);
+                System.out.printf("onProcessRightClickPre storing stack: %s\n", stackOriginal);
                 cacheStackInHand(hand);
             }
 
@@ -132,7 +133,7 @@ public class PlacementTweaks
 
     public static void onProcessRightClickPost(PlayerEntity player, Hand hand)
     {
-        //System.out.printf("onProcessRightClickPost -> tryRestockHand with: %s, current: %s\n", stackBeforeUse[hand.ordinal()], player.getStackInHand(hand));
+        System.out.printf("onProcessRightClickPost -> tryRestockHand with: %s, current: %s\n", stackBeforeUse[hand.ordinal()], player.getStackInHand(hand));
         tryRestockHand(player, hand, stackBeforeUse[hand.ordinal()]);
     }
 
@@ -346,7 +347,7 @@ public class PlacementTweaks
             return ActionResult.PASS;
         }
 
-        //System.out.printf("onProcessRightClickBlock() pos: %s, side: %s, part: %s, hitVec: %s\n", posIn, sideIn, hitPart, hitVec);
+        System.out.printf("onProcessRightClickBlock() pos: %s, side: %s, part: %s, hitVec: %s\n", posIn, sideIn, hitPart, hitVec);
         ActionResult result = tryPlaceBlock(controller, player, world, posIn, sideIn, sideRotated, yaw, hitVec, hand, hitPart, true);
 
         // Store the initial click data for the fast placement mode
@@ -372,7 +373,7 @@ public class PlacementTweaks
             sideRotatedFirst = sideRotated;
             playerYawFirst = yaw;
             stackBeforeUse[hand.ordinal()] = stackPre;
-            //System.out.printf("plop store @ %s\n", posFirst);
+            System.out.printf("plop store @ %s\n", posFirst);
         }
 
         return result;
@@ -486,7 +487,7 @@ public class PlacementTweaks
                 {
                     facing = facing.getOpposite();
                 }
-                //System.out.printf("accurate - IN - facingOrig: %s, facingNew: %s\n", facing, facing.getOpposite());
+                System.out.printf("accurate - IN - facingOrig: %s, facingNew: %s\n", facing, facing.getOpposite());
             }
             else if (flexible == false || rotation == false)
             {
@@ -511,7 +512,7 @@ public class PlacementTweaks
                     }
 
                     Direction facingTmp = BlockUtils.getFirstPropertyFacingValue(state);
-                    ////System.out.printf("accurate - sideIn: %s, state: %s, hit: %s, f: %s, posNew: %s\n", sideIn, state, hitVec, EnumFacing.getDirectionFromEntityLiving(posIn, player), posNew);
+                    //System.out.printf("accurate - sideIn: %s, state: %s, hit: %s, f: %s, posNew: %s\n", sideIn, state, hitVec, EnumFacing.getDirectionFromEntityLiving(posIn, player), posNew);
 
                     if (facingTmp != null)
                     {
@@ -526,7 +527,7 @@ public class PlacementTweaks
 
             if (accurateReverse)
             {
-                //System.out.printf("accurate - REVERSE - facingOrig: %s, facingNew: %s\n", facing, facing.getOpposite());
+                System.out.printf("accurate - REVERSE - facingOrig: %s, facingNew: %s\n", facing, facing.getOpposite());
                 if (accurateIn || flexible == false || rotation == false)
                 {
                     facing = facing.getOpposite();
@@ -536,7 +537,6 @@ public class PlacementTweaks
                 handleAccurate = true;
             }
 
-            //if ((handleAccurate || afterClicker) && Configs.Generic.CARPET_ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue())
             if ((handleAccurate || afterClicker) && Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue())
             {
                 // Carpet-Extra mod accurate block placement protocol support
@@ -544,23 +544,28 @@ public class PlacementTweaks
                 double x = hitVec.x;
                 int afterClickerClickCount = MathHelper.clamp(Configs.Generic.AFTER_CLICKER_CLICK_COUNT.getIntegerValue(), 0, 32);
 
+                Tweakeroo.debugLog("accurate[0]: x {} // posNew.getX {} // relX {}", x, posNew.getX(), relX);
                 if (handleAccurate && isFacingValidFor(facing, stack))
                 {
                     x = posNew.getX() + relX + 2 + (facing.getId() * 2);
                 }
+
+                Tweakeroo.debugLog("accurate[1]: x {} // posNew.getX {} // relX {}", x, posNew.getX(), relX);
 
                 if (afterClicker)
                 {
                     x += afterClickerClickCount * 16;
                 }
 
-                //System.out.printf("accurate - pre hitVec: %s\n", hitVec);
-                //System.out.printf("processRightClickBlockWrapper facing: %s, x: %.3f, pos: %s, side: %s\n", facing, x, posNew, side);
+                Tweakeroo.debugLog("accurate[2]: x {} // posNew.getX {} // relX {}", x, posNew.getX(), relX);
+
+                System.out.printf("accurate - pre hitVec: %s\n", hitVec);
+                System.out.printf("processRightClickBlockWrapper facing: %s, x: %.3f, pos: %s, side: %s\n", facing, x, posNew, side);
                 hitVec = new Vec3d(x, hitVec.y, hitVec.z);
-                //System.out.printf("accurate - post hitVec: %s\n", hitVec);
+                System.out.printf("accurate - post hitVec: %s\n", hitVec);
             }
 
-            //System.out.printf("accurate - facing: %s, side: %s, posNew: %s, hit: %s\n", facing, side, posNew, hitVec);
+            System.out.printf("accurate - facing: %s, side: %s, posNew: %s, hit: %s\n", facing, side, posNew, hitVec);
             return processRightClickBlockWrapper(controller, player, world, posNew, side, hitVec, hand);
         }
 
@@ -571,7 +576,7 @@ public class PlacementTweaks
 
             if (canPlaceBlockIntoPosition(world, posNew, ctx))
             {
-                //System.out.printf("tryPlaceBlock() pos: %s, side: %s, part: %s, hitVec: %s\n", posNew, side, hitPart, hitVec);
+                System.out.printf("tryPlaceBlock() pos: %s, side: %s, part: %s, hitVec: %s\n", posNew, side, hitPart, hitVec);
                 return handleFlexibleBlockPlacement(controller, player, world, posNew, side, playerYaw, hitVec, hand, hitPart);
             }
             else
@@ -690,7 +695,7 @@ public class PlacementTweaks
             Vec3d hitVecIn,
             Hand hand)
     {
-        //System.out.printf("processRightClickBlockWrapper() start @ %s, side: %s, hand: %s\n", posIn, sideIn, hand);
+        System.out.printf("processRightClickBlockWrapper() start @ %s, side: %s, hand: %s\n", posIn, sideIn, hand);
         if (FeatureToggle.TWEAK_PLACEMENT_LIMIT.getBooleanValue() &&
             placementCount >= Configs.Generic.PLACEMENT_LIMIT.getIntegerValue())
         {
@@ -735,7 +740,7 @@ public class PlacementTweaks
 
         if (posFirst != null && isPositionAllowedByPlacementRestriction(posIn, sideIn) == false)
         {
-            //System.out.printf("processRightClickBlockWrapper() PASS @ %s, side: %s\n", posIn, sideIn);
+            System.out.printf("processRightClickBlockWrapper() PASS @ %s, side: %s\n", posIn, sideIn);
             return ActionResult.PASS;
         }
 
@@ -752,7 +757,6 @@ public class PlacementTweaks
 
         // Carpet-Extra mod accurate block placement protocol support
         if (flexible && rotation && accurate == false &&
-            //Configs.Generic.CARPET_ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() &&
             Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() &&
             isFacingValidFor(facing, stackOriginal))
         {
@@ -761,12 +765,15 @@ public class PlacementTweaks
             //double x = posIn.getX() + relX + 2 + (facing.getId() * 2);
             double x = posIn.getX() + 2 + (facing.getId() * 2);
 
+            Tweakeroo.debugLog("processRightClickBlockWrapper[0]: x {} // posIn.getX {}", x, posIn.getX());
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
             {
                 x += afterClickerClickCount * 16;
             }
 
-            //System.out.printf("processRightClickBlockWrapper req facing: %s, x: %.3f, pos: %s, sideIn: %s\n", facing, x, posIn, sideIn);
+            Tweakeroo.debugLog("processRightClickBlockWrapper[1]: x {} // posIn.getX {}", x, posIn.getX());
+
+            System.out.printf("processRightClickBlockWrapper req facing: %s, x: %.3f, pos: %s, sideIn: %s\n", facing, x, posIn, sideIn);
             hitVecIn = new Vec3d(x, hitVecIn.y, hitVecIn.z);
         }
 
@@ -789,7 +796,7 @@ public class PlacementTweaks
 
         InventoryUtils.trySwapCurrentToolIfNearlyBroken();
 
-        //System.out.printf("processRightClickBlockWrapper() pos: %s, side: %s, hitVec: %s\n", posIn, sideIn, hitVecIn);
+        System.out.printf("processRightClickBlockWrapper() pos: %s, side: %s, hitVec: %s\n", posIn, sideIn, hitVecIn);
         ActionResult result;
 
         if (InventoryUtils.canUnstackingItemNotFitInInventory(stackOriginal, player))
@@ -798,9 +805,9 @@ public class PlacementTweaks
         }
         else
         {
-            //System.out.printf("processRightClickBlockWrapper() PLACE @ %s, side: %s, hit: %s\n", posIn, sideIn, hitVecIn);
+            System.out.printf("processRightClickBlockWrapper() PLACE @ %s, side: %s, hit: %s\n", posIn, sideIn, hitVecIn);
             BlockHitResult context = new BlockHitResult(hitVecIn, sideIn, posIn, false);
-            //Tweakeroo.debugLog("processRightClickBlockWrapper(): BHR pos: {}, side {}, type: {}, inside {}", context.getBlockPos().toShortString(), context.getSide().toString(), context.getType().toString(), context.isInsideBlock());
+            Tweakeroo.debugLog("processRightClickBlockWrapper(): BHR pos: {}, side {}, type: {}, inside {}", context.getBlockPos().toShortString(), context.getSide().toString(), context.getType().toString(), context.isInsideBlock());
             result = controller.interactBlock(player, hand, context);
         }
 
@@ -811,18 +818,17 @@ public class PlacementTweaks
 
         // This restock needs to happen even with the pick-before-place tweak active,
         // otherwise the fast placement mode's checks (getHandWithItem()) will fail...
-        //System.out.printf("processRightClickBlockWrapper -> tryRestockHand with: %s, current: %s\n", stackOriginal, player.getStackInHand(hand));
+        System.out.printf("processRightClickBlockWrapper -> tryRestockHand with: %s, current: %s\n", stackOriginal, player.getStackInHand(hand));
         tryRestockHand(player, hand, stackOriginal);
 
         if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue() &&
-            //Configs.Generic.CARPET_ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() == false &&
             Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() == false &&
             world.getBlockState(posPlacement) != stateBefore)
         {
             // TODO --> Add EasyPlacement handling?
             for (int i = 0; i < afterClickerClickCount; i++)
             {
-                //System.out.printf("processRightClickBlockWrapper() after-clicker - i: %d, pos: %s, side: %s, hitVec: %s\n", i, posPlacement, sideIn, hitVecIn);
+                System.out.printf("processRightClickBlockWrapper() after-clicker - i: %d, pos: %s, side: %s, hitVec: %s\n", i, posPlacement, sideIn, hitVecIn);
                 BlockHitResult context = new BlockHitResult(hitVecIn, sideIn, posPlacement, false);
                 result = controller.interactBlock(player, hand, context);
             }
@@ -886,7 +892,7 @@ public class PlacementTweaks
         player.setYaw(yaw);
         player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround()));
 
-        //System.out.printf("handleFlexibleBlockPlacement() pos: %s, side: %s, facing orig: %s facing new: %s\n", pos, side, facingOrig, facing);
+        System.out.printf("handleFlexibleBlockPlacement() pos: %s, side: %s, facing orig: %s facing new: %s\n", pos, side, facingOrig, facing);
         ActionResult result = processRightClickBlockWrapper(controller, player, world, pos, side, hitVec, hand);
 
         player.setYaw(yawOrig);
