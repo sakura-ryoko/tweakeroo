@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.ComparatorMode;
-import net.minecraft.block.enums.Orientation;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
@@ -26,7 +25,6 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.util.EasyPlacementProtocol;
-import fi.dy.masa.tweakeroo.util.OrientationUtils;
 
 public class PlacementHandler
 {
@@ -184,8 +182,8 @@ public class PlacementHandler
     public static <T extends Comparable<T>> BlockState applyPlacementProtocolV3(BlockState state, UseContext context)
     {
         int protocolValue = (int) (context.getHitVec().x - (double) context.getPos().getX()) - 2;
-        System.out.printf("hit vec.x %s, pos.x: %s\n", context.getHitVec().getX(), context.getPos().getX());
-        System.out.printf("raw protocol value in: 0x%08X\n", protocolValue);
+        //System.out.printf("hit vec.x %s, pos.x: %s\n", context.getHitVec().getX(), context.getPos().getX());
+        //System.out.printf("raw protocol value in: 0x%08X\n", protocolValue);
 
         if (protocolValue < 0)
         {
@@ -197,21 +195,8 @@ public class PlacementHandler
         // DirectionProperty - allow all except: VERTICAL_DIRECTION (PointedDripstone)
         if (property != null && property != Properties.VERTICAL_DIRECTION)
         {
-            System.out.printf("Direction applying: 0x%08X\n", protocolValue);
+            //System.out.printf("applying: 0x%08X\n", protocolValue);
             state = applyDirectionProperty(state, context, property, protocolValue);
-
-            if (state == null)
-            {
-                return null;
-            }
-
-            // Consume the bits used for the facing
-            protocolValue >>>= 3;
-        }
-        else if (state.contains(Properties.ORIENTATION))
-        {
-            System.out.printf("Orientation applying: 0x%08X\n", protocolValue);
-            state = applyOrientationProperty(state, context, protocolValue);
 
             if (state == null)
             {
@@ -242,7 +227,7 @@ public class PlacementHandler
                     int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(list.size()));
                     int bitMask = ~(0xFFFFFFFF << requiredBits);
                     int valueIndex = protocolValue & bitMask;
-                    System.out.printf("trying to apply valInd: %d, bits: %d, prot val: 0x%08X\n", valueIndex, requiredBits, protocolValue);
+                    //System.out.printf("trying to apply valInd: %d, bits: %d, prot val: 0x%08X\n", valueIndex, requiredBits, protocolValue);
 
                     if (valueIndex >= 0 && valueIndex < list.size())
                     {
@@ -251,7 +236,7 @@ public class PlacementHandler
                         if (state.get(prop).equals(value) == false &&
                             value != SlabType.DOUBLE) // don't allow duping slabs by forcing a double slab via the protocol
                         {
-                            System.out.printf("applying %s: %s\n", prop.getName(), value);
+                            //System.out.printf("applying %s: %s\n", prop.getName(), value);
                             state = state.with(prop, value);
                         }
 
@@ -289,7 +274,7 @@ public class PlacementHandler
             }
         }
 
-        System.out.printf("plop facing: %s -> %s (raw: %d, dec: %d)\n", facingOrig, facing, protocolValue, decodedFacingIndex);
+        //System.out.printf("plop facing: %s -> %s (raw: %d, dec: %d)\n", facingOrig, facing, protocolValue, decodedFacingIndex);
 
         if (facing != facingOrig && property.getValues().contains(facing))
         {
@@ -305,42 +290,6 @@ public class PlacementHandler
             }
 
             state = state.with(property, facing);
-        }
-
-        return state;
-    }
-
-    private static BlockState applyOrientationProperty(BlockState state, UseContext context,
-                                                       int protocolValue)
-    {
-        Orientation orig = state.get(Properties.ORIENTATION);
-
-        if (orig == null)
-        {
-            return null;
-        }
-
-        Tweakeroo.debugLog("applyOrientationProperty(): orig: [{}]", orig.asString());
-
-        Direction facingOrig = orig.getFacing();
-        Orientation orientation = orig;
-        int decodedFacingIndex = (protocolValue & 0xF) >> 1;
-
-        if (decodedFacingIndex == 12) // the opposite of the normal facing requested
-        {
-            orientation = OrientationUtils.flipFacing(orig);
-        }
-        else if (decodedFacingIndex >= 0 && decodedFacingIndex <= 11)
-        {
-            Orientation[] values = Orientation.values();
-            orientation = values[decodedFacingIndex];
-        }
-
-        System.out.printf("plop orientation: F: %s -> O: %s (raw: %d, dec: %d)\n", facingOrig.getName(), orientation.asString(), protocolValue, decodedFacingIndex);
-
-        if (orientation != orig)
-        {
-            state = state.with(Properties.ORIENTATION, orientation);
         }
 
         return state;
