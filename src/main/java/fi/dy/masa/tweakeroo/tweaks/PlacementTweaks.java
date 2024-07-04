@@ -1,9 +1,12 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.enums.Orientation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -544,20 +547,33 @@ public class PlacementTweaks
                 double x = hitVec.x;
                 int afterClickerClickCount = MathHelper.clamp(Configs.Generic.AFTER_CLICKER_CLICK_COUNT.getIntegerValue(), 0, 32);
 
-                Tweakeroo.debugLog("accurate[0]: x {} // posNew.getX {} // relX {}", x, posNew.getX(), relX);
+                Tweakeroo.debugLog("accurate[0]: x {} // posNew.getX {} // relX {} // FACING [{}]", x, posNew.getX(), relX, facing.getName());
                 if (handleAccurate && isFacingValidFor(facing, stack))
                 {
                     x = posNew.getX() + relX + 2 + (facing.getId() * 2);
                 }
+                else if (handleAccurate && isFacingValidForOrientation(facing, stack))
+                {
+                    int facingIndex = OrientationUtils.getFacingIndex(stack, facing);
 
-                Tweakeroo.debugLog("accurate[1]: x {} // posNew.getX {} // relX {}", x, posNew.getX(), relX);
+                    if (facingIndex > 0)
+                    {
+                        x = posNew.getX() + relX + 2 + (facingIndex);
+                    }
+                    else
+                    {
+                        x = posNew.getX() + relX + 2 + (facing.getId() * 2);
+                    }
+                }
+
+                Tweakeroo.debugLog("accurate[1]: x {} // posNew.getX {} // relX {} // FACING [{}]", x, posNew.getX(), relX, facing.getName());
 
                 if (afterClicker)
                 {
                     x += afterClickerClickCount * 16;
                 }
 
-                Tweakeroo.debugLog("accurate[2]: x {} // posNew.getX {} // relX {}", x, posNew.getX(), relX);
+                Tweakeroo.debugLog("accurate[2]: x {} // posNew.getX {} // relX {} // FACING [{}]", x, posNew.getX(), relX, facing.getName());
 
                 System.out.printf("accurate - pre hitVec: %s\n", hitVec);
                 System.out.printf("processRightClickBlockWrapper facing: %s, x: %.3f, pos: %s, side: %s\n", facing, x, posNew, side);
@@ -758,7 +774,7 @@ public class PlacementTweaks
         // Carpet-Extra mod accurate block placement protocol support
         if (flexible && rotation && accurate == false &&
             Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() &&
-            isFacingValidFor(facing, stackOriginal))
+            (isFacingValidFor(facing, stackOriginal) || isFacingValidForOrientation(facing, stackOriginal)))
         {
             facing = facing.getOpposite(); // go from block face to click on to the requested facing
             //double relX = hitVecIn.x - posIn.getX();
@@ -1054,6 +1070,19 @@ public class PlacementTweaks
                     return ((DirectionProperty) prop).getValues().contains(facing);
                 }
             }
+        }
+
+        return false;
+    }
+
+    private static boolean isFacingValidForOrientation(Direction facing, ItemStack stack)
+    {
+        Item item = stack.getItem();
+
+        if (stack.isEmpty() == false && item instanceof BlockItem)
+        {
+            Block block = ((BlockItem) item).getBlock();
+            BlockState state = block.getDefaultState();
 
             return state.contains(Properties.ORIENTATION);
         }

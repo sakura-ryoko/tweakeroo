@@ -1,11 +1,18 @@
 package fi.dy.masa.tweakeroo.util;
 
+import java.util.Arrays;
+import java.util.List;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.Orientation;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
+import fi.dy.masa.tweakeroo.Tweakeroo;
 
 public class OrientationUtils
 {
-    public Orientation flipFacing(Orientation orig)
+    public static Orientation flipFacing(Orientation orig)
     {
         Direction facing = orig.getFacing();
         Direction rot = orig.getRotation();
@@ -14,7 +21,44 @@ public class OrientationUtils
         return Orientation.byDirections(adjusted, rot);
     }
 
-    public Orientation flipRotation(Orientation orig)
+    public static int getFacingIndex(ItemStack stackIn, Direction facing)
+    {
+        Tweakeroo.debugLog("getFacingIndex: facing: [{}]", facing.getName());
+
+        if (stackIn.getItem() instanceof BlockItem blockItem)
+        {
+            BlockState defaultState = blockItem.getBlock().getDefaultState();
+
+            if (defaultState.contains(Properties.ORIENTATION))
+            {
+                List<Orientation> list = Arrays.stream(Orientation.values()).toList();
+
+                for (int i = 0; i < list.size(); i++)
+                {
+                    Orientation o = list.get(i);
+
+                    Tweakeroo.debugLog("getFacingIndex[{}]: name: [{}]", i, o.asString());
+
+                    if (o.getFacing().equals(facing))
+                    {
+                        /*
+                        if (facing.equals(Direction.UP) || facing.equals(Direction.DOWN))
+                        {
+                            // North Rotation.
+                            i++;
+                        }
+                         */
+
+                        return i;
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public static Orientation flipRotation(Orientation orig)
     {
         Direction facing = orig.getFacing();
         Direction rot = orig.getRotation();
@@ -23,7 +67,7 @@ public class OrientationUtils
         return Orientation.byDirections(facing, adjusted);
     }
 
-    public Orientation rotateFacingCW(Orientation orig, Direction.Axis axis)
+    public static Orientation rotateFacingCW(Orientation orig, Direction.Axis axis)
     {
         Direction facing = orig.getFacing();
         Direction rot = orig.getRotation();
@@ -39,7 +83,7 @@ public class OrientationUtils
         }
     }
 
-    public Orientation rotateRotationCW(Orientation orig, Direction.Axis axis)
+    public static Orientation rotateRotationCW(Orientation orig, Direction.Axis axis)
     {
         Direction facing = orig.getFacing();
         Direction rot = orig.getRotation();
@@ -55,7 +99,7 @@ public class OrientationUtils
         }
     }
 
-    public Orientation rotateFacingCCW(Orientation orig, Direction.Axis axis)
+    public static Orientation rotateFacingCCW(Orientation orig, Direction.Axis axis)
     {
         Direction facing = orig.getFacing();
         Direction rot = orig.getRotation();
@@ -71,7 +115,7 @@ public class OrientationUtils
         }
     }
 
-    public Orientation rotateRotationCCW(Orientation orig, Direction.Axis axis)
+    public static Orientation rotateRotationCCW(Orientation orig, Direction.Axis axis)
     {
         Direction facing = orig.getFacing();
         Direction rot = orig.getRotation();
