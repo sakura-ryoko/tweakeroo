@@ -12,6 +12,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HangingSignEditScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
@@ -40,9 +41,12 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
         {
             MinecraftClient mc = MinecraftClient.getInstance();
 
-            if ((mc.currentScreen instanceof SignEditScreen) && ((IGuiEditSign) mc.currentScreen).getTile() == (Object) this)
+            if (mc.currentScreen instanceof SignEditScreen || mc.currentScreen instanceof HangingSignEditScreen)
             {
-                MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isPlayerFacingFront(mc.player));
+                if (((IGuiEditSign) mc.currentScreen).getTile() == (Object) this)
+                {
+                    MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isPlayerFacingFront(mc.player));
+                }
             }
         }
     }
