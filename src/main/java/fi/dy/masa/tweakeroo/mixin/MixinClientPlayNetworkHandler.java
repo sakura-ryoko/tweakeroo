@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -46,38 +47,6 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         }
     }
 
-    @Inject(method = "onScreenHandlerSlotUpdate", at = @At("HEAD"))
-    private void beforeHandleSetSlot(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() && packet.getSyncId() == 0)
-        {
-            if (InventoryUtils.isHotbarSlot(packet.getSlot()))
-            {
-                PlacementTweaks.cacheStackInHand(Hand.MAIN_HAND);
-            }
-            else if (InventoryUtils.isOffhandSlot(packet.getSlot()))
-            {
-                PlacementTweaks.cacheStackInHand(Hand.OFF_HAND);
-            }
-        }
-    }
-
-    @Inject(method = "onScreenHandlerSlotUpdate", at = @At("RETURN"))
-    private void afterHandleSetSlot(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() && packet.getSyncId() == 0)
-        {
-            if (InventoryUtils.isHotbarSlot(packet.getSlot()))
-            {
-                PlacementTweaks.onProcessRightClickPost(this.client.player, Hand.MAIN_HAND);
-            }
-            else if (InventoryUtils.isOffhandSlot(packet.getSlot()))
-            {
-                PlacementTweaks.onProcessRightClickPost(this.client.player, Hand.OFF_HAND);
-            }
-        }
-    }
-
     @Inject(method = "onDeathMessage", at = @At(value = "INVOKE", // onCombatEvent
             target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
     private void onPlayerDeath(DeathMessageS2CPacket packetIn, CallbackInfo ci)
@@ -113,6 +82,26 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         else if (payload.getId().id().equals(DataManager.SERVUX_ENTITY_DATA))
         {
             DataManager.getInstance().setHasServuxServer(true);
+        }
+    }
+    @Inject(
+        method = "onEntityStatus",
+        at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveTotemOfUndying(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;")
+    )
+    private void onPlayerUseTotemOfUndying(EntityStatusS2CPacket packet, CallbackInfo ci)
+    {
+        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue())
+        {
+            for (Hand hand : Hand.values())
+            {
+                if (this.client.player.getStackInHand(hand).isOf(Items.TOTEM_OF_UNDYING))
+                {
+                    PlacementTweaks.cacheStackInHand(hand);
+                    // the slot update packet goes after this packet, let's set it to empty and restock
+                    this.client.player.setStackInHand(hand, ItemStack.EMPTY);
+                    PlacementTweaks.onProcessRightClickPost(this.client.player, hand);
+                }
+            }
         }
     }
 }
