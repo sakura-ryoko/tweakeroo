@@ -352,25 +352,18 @@ public class RenderUtils
         return originalFog;
     }
 
-    public static void renderDirectionsCursor(float zLevel, float partialTicks)
+    public static void renderDirectionsCursor(DrawContext context)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
-
-        int width = GuiUtils.getScaledWindowWidth();
-        int height = GuiUtils.getScaledWindowHeight();
         Camera camera = mc.gameRenderer.getCamera();
 
         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
         matrix4fStack.pushMatrix();
-        matrix4fStack.translate((float) (width / 2.0), (float) (height / 2.0), zLevel);
-        float pitch = camera.getPitch();
-        float yaw = camera.getYaw();
-
-        matrix4fStack.rotateXYZ(-(pitch) * ((float) (Math.PI / 180.0)), yaw * ((float) (Math.PI / 180.0)), 0.0F);
-        matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
-        matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
-
-        matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
+        matrix4fStack.mul(context.getMatrices().peek().getPositionMatrix());
+        matrix4fStack.translate(context.getScaledWindowWidth() / 2, context.getScaledWindowHeight() / 2, 0.0f);
+        matrix4fStack.rotateX(-camera.getPitch() * ((float)Math.PI / 180));
+        matrix4fStack.rotateY(camera.getYaw() * ((float)Math.PI / 180));
+        matrix4fStack.scale(-1.0f, -1.0f, -1.0f);
         RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair(10);
         matrix4fStack.popMatrix();
