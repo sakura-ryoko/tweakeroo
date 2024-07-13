@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
