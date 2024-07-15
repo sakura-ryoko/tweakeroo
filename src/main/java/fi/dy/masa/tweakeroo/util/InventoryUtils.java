@@ -549,12 +549,12 @@ public class InventoryUtils
         {
             if (isMoreEffectiveTool(testedStack, previousTool, state))
             {
-                if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
-                {
-                    return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
-                }
-
                 return true;
+            }
+
+            if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
+            {
+                return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
             }
         }
 
