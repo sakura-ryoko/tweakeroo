@@ -434,13 +434,24 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false)
         {
-            if (matchesWeaponMapping(testedStack, entity) && (makesMoreDamage(testedStack, previousWeapon) || matchesWeaponMapping(previousWeapon, entity) == false))
+            if (matchesWeaponMapping(testedStack, entity))
             {
-                return true;
-            }
-            if (Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue())
-            {
-                return hasTheSameOrBetterRarity(testedStack, previousWeapon) && hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon);
+                if (!matchesWeaponMapping(previousWeapon, entity))
+                {
+                    return true;
+                }
+                if (getBaseAttackDamage(testedStack) > getBaseAttackDamage(previousWeapon))
+                {
+                    return true;
+                }
+
+                if (getBaseAttackDamage(testedStack) == getBaseAttackDamage(previousWeapon))
+                {
+                    if (Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue())
+                    {
+                        return hasTheSameOrBetterRarity(testedStack, previousWeapon) && hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon);
+                    }
+                }
             }
         }
 
@@ -450,11 +461,6 @@ public class InventoryUtils
     private static boolean isBetterWeaponAndHasDurability(ItemStack testedStack, ItemStack previousTool, Entity entity)
     {
         return hasEnoughDurability(testedStack) && isBetterWeapon(testedStack, previousTool, entity);
-    }
-
-    private static boolean makesMoreDamage(ItemStack testedStack, ItemStack previousTool)
-    {
-        return getBaseAttackDamage(testedStack) > getBaseAttackDamage(previousTool);
     }
 
     private static float getBaseAttackDamage(ItemStack stack)
@@ -559,13 +565,16 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false)
         {
-            if (isMoreEffectiveTool(testedStack, previousTool, state))
+            if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
             {
                 return true;
             }
-            if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
+            else if (getBaseBlockBreakingSpeed(testedStack, state) == getBaseBlockBreakingSpeed(previousTool, state))
             {
-                return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
+                if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
+                {
+                    return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
+                }
             }
         }
 
@@ -580,11 +589,6 @@ public class InventoryUtils
     private static boolean hasTheSameOrBetterRarity(ItemStack testedStack, ItemStack previousTool)
     {
         return testedStack.getRarity().compareTo(previousTool.getRarity()) >= 0;
-    }
-
-    private static boolean isMoreEffectiveTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
-    {
-        return getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state);
     }
 
     /**
