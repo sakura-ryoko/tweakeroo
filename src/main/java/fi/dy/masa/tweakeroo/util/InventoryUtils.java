@@ -545,9 +545,16 @@ public class InventoryUtils
             return true;
         }
 
-        if (state.isOf(Blocks.BAMBOO) && testedStack.getItem() instanceof SwordItem)
+        if (state.isOf(Blocks.BAMBOO))
         {
-            return true;
+            if (testedStack.getItem() instanceof SwordItem)
+            {
+                return true;
+            }
+            else if (previousTool.getItem() instanceof SwordItem)
+            {
+                return false;
+            }
         }
 
         if (testedStack.isEmpty() == false)
