@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
@@ -435,12 +436,11 @@ public class InventoryUtils
         {
             if (matchesWeaponMapping(testedStack, entity) && (makesMoreDamage(testedStack, previousWeapon) || matchesWeaponMapping(previousWeapon, entity) == false))
             {
-                if (Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue())
-                {
-                    return hasTheSameOrBetterRarity(testedStack, previousWeapon) && hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon);
-                }
-
                 return true;
+            }
+            if (Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue())
+            {
+                return hasTheSameOrBetterRarity(testedStack, previousWeapon) && hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon);
             }
         }
 
@@ -545,13 +545,17 @@ public class InventoryUtils
             return true;
         }
 
+        if (state.isOf(Blocks.BAMBOO) && testedStack.getItem() instanceof SwordItem)
+        {
+            return true;
+        }
+
         if (testedStack.isEmpty() == false)
         {
             if (isMoreEffectiveTool(testedStack, previousTool, state))
             {
                 return true;
             }
-
             if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
             {
                 return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
