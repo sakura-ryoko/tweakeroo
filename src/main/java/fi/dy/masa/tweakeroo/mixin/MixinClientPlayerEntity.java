@@ -124,33 +124,35 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"))
+                    target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"))
     private void onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
-        {
-            // Sakura's version calculating fall distance...
-            //if ((!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) && this.fallDistance > 20.0f)
-
-            // Auto switch if it is not elytra after falling, or is totally broken.
-            // This also shouldn't activate on the Ground if the Chest Equipment is EMPTY,
-            // or not an Elytra to be swapped back.
-            //
-            // !isOnGround(): Minecraft also check elytra even if the player is on the ground, skip it.
-            // !isSwimming(): Check if the Player is swimming so, it doesn't perform the Elytra Swap while underwater.
-            if (!this.isOnGround() && !this.isSwimming()
-                && (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
-                || (this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
-                && (!this.getEquippedStack(EquipmentSlot.CHEST).isEmpty() || this.autoSwitchElytraChestplate.isOf(Items.ELYTRA)))
-            {
-                this.autoSwitchElytraChestplate = this.getEquippedStack(EquipmentSlot.CHEST).copy();
-                InventoryUtils.swapElytraWithChestPlate(this);
-            }
-        }
-        else
-        {
+        if (!FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue()) {
             // reset auto switch item if the feature is disabled.
             this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+            return;
+        }
+
+        if (this.isOnGround() || this.isSwimming() || this.isInFluid()) {
+            return;
+        }
+
+        var chestStack = this.getEquippedStack(EquipmentSlot.CHEST);
+        var isElytraEquipped = chestStack.isOf(Items.ELYTRA);
+
+        if (isElytraEquipped) {
+            var damageThreshold = chestStack.getMaxDamage() - 10;
+            if (chestStack.getDamage() <= damageThreshold) {
+                return;
+            }
+        }
+
+        var isChestPlateEquipped = !chestStack.isEmpty();
+        var autoSwitchIsElytra = this.autoSwitchElytraChestplate.isOf(Items.ELYTRA);
+
+        if (!isElytraEquipped || (isChestPlateEquipped || autoSwitchIsElytra)) {
+            this.autoSwitchElytraChestplate = chestStack.copy();
+            InventoryUtils.swapElytraWithChestPlate(this);
         }
     }
 
