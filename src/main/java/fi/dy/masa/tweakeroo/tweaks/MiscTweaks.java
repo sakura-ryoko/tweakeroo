@@ -135,6 +135,7 @@ public class MiscTweaks
         }
 
         doPeriodicClicks(mc);
+        doConditionalClicks(mc);
         doPotionWarnings(player);
 
         if (FeatureToggle.TWEAK_REPAIR_MODE.getBooleanValue())
@@ -174,6 +175,20 @@ public class MiscTweaks
                     Configs.Generic.PERIODIC_HOLD_USE_DURATION,
                     Configs.Generic.PERIODIC_USE_INTERVAL, mc);
 
+        }
+        else
+        {
+            KEY_STATE_ATTACK.reset();
+            KEY_STATE_USE.reset();
+        }
+    }
+
+    private static void doConditionalClicks(MinecraftClient mc) {
+
+        if (GuiUtils.getCurrentScreen() == null)
+        {
+
+            // Bad Omen Conditionals
 
             Item mainHandItem = mc.player.getStackInHand(Hand.MAIN_HAND).getItem();
             Item offHandItem = mc.player.getStackInHand(Hand.OFF_HAND).getItem();
