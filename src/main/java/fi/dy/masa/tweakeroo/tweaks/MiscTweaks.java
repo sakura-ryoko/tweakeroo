@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
@@ -13,9 +15,15 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import fi.dy.masa.malilib.config.IConfigBoolean;
@@ -88,6 +96,41 @@ public class MiscTweaks
             }
         }
 
+        private void handleAutoBadOmenHold(MinecraftClient mc)
+        {
+
+            Item mainHandItem = mc.player.getStackInHand(Hand.MAIN_HAND).getItem();
+            Item offHandItem = mc.player.getStackInHand(Hand.OFF_HAND).getItem();
+            Collection<StatusEffect> statusEffects = mc.player.getStatusEffects().stream()
+                    .map(StatusEffectInstance::getEffectType)
+                    .map(RegistryEntry::value)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            if (
+                (
+                    mainHandItem == Items.OMINOUS_BOTTLE
+                    || offHandItem == Items.OMINOUS_BOTTLE)
+                && (
+                    !statusEffects.contains(StatusEffects.BAD_OMEN.value())
+                    && !statusEffects.contains(StatusEffects.TRIAL_OMEN.value())
+                    && !statusEffects.contains(StatusEffects.RAID_OMEN.value()))) 
+            {
+                this.setKeyState(true, mc);
+            }
+
+            if (
+                    (statusEffects.contains(StatusEffects.BAD_OMEN.value())
+                    || statusEffects.contains(StatusEffects.TRIAL_OMEN.value())
+                    || statusEffects.contains(StatusEffects.RAID_OMEN.value()))
+                    && (
+                        mainHandItem == Items.OMINOUS_BOTTLE
+                        || offHandItem == Items.OMINOUS_BOTTLE)
+                    )
+            {
+                this.setKeyState(false, mc);
+            }
+        }
+
         private void setKeyState(boolean state, MinecraftClient mc)
         {
             this.state = state;
@@ -151,6 +194,11 @@ public class MiscTweaks
                     Configs.Generic.PERIODIC_HOLD_USE_INTERVAL,
                     Configs.Generic.PERIODIC_HOLD_USE_DURATION,
                     Configs.Generic.PERIODIC_USE_INTERVAL, mc);
+
+            handleAutoBadOmen(
+                KEY_STATE_USE,
+                FeatureToggle.TWEAK_AUTO_BAD_OMEN, mc);
+
         }
         else
         {
@@ -178,6 +226,21 @@ public class MiscTweaks
         {
             int interval = cfgClickInterval.getIntegerValue();
             keyState.handlePeriodicClick(interval, mc);
+        }
+        else
+        {
+            keyState.reset();
+        }
+    }
+
+    private static void handleAutoBadOmen(
+            KeybindState keyState,
+            IConfigBoolean cfgAutoBadOmen,
+            MinecraftClient mc)
+    {
+        if (cfgAutoBadOmen.getBooleanValue())
+        {
+            keyState.handleAutoBadOmenHold(mc);
         }
         else
         {
