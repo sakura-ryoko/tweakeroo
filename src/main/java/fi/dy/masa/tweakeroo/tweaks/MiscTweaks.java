@@ -96,36 +96,15 @@ public class MiscTweaks
             }
         }
 
-        private void handleAutoBadOmenHold(MinecraftClient mc)
+        private void handleConditionalClick(boolean clickCondition, boolean unclickCondition, MinecraftClient mc)
         {
 
-            Item mainHandItem = mc.player.getStackInHand(Hand.MAIN_HAND).getItem();
-            Item offHandItem = mc.player.getStackInHand(Hand.OFF_HAND).getItem();
-            Collection<StatusEffect> statusEffects = mc.player.getStatusEffects().stream()
-                    .map(StatusEffectInstance::getEffectType)
-                    .map(RegistryEntry::value)
-                    .collect(Collectors.toCollection(ArrayList::new));
-
-            if (
-                (
-                    mainHandItem == Items.OMINOUS_BOTTLE
-                    || offHandItem == Items.OMINOUS_BOTTLE)
-                && (
-                    !statusEffects.contains(StatusEffects.BAD_OMEN.value())
-                    && !statusEffects.contains(StatusEffects.TRIAL_OMEN.value())
-                    && !statusEffects.contains(StatusEffects.RAID_OMEN.value()))) 
+            if (clickCondition) 
             {
                 this.setKeyState(true, mc);
             }
 
-            if (
-                    (statusEffects.contains(StatusEffects.BAD_OMEN.value())
-                    || statusEffects.contains(StatusEffects.TRIAL_OMEN.value())
-                    || statusEffects.contains(StatusEffects.RAID_OMEN.value()))
-                    && (
-                        mainHandItem == Items.OMINOUS_BOTTLE
-                        || offHandItem == Items.OMINOUS_BOTTLE)
-                    )
+            else if (unclickCondition)
             {
                 this.setKeyState(false, mc);
             }
@@ -195,8 +174,29 @@ public class MiscTweaks
                     Configs.Generic.PERIODIC_HOLD_USE_DURATION,
                     Configs.Generic.PERIODIC_USE_INTERVAL, mc);
 
-            handleAutoBadOmen(
+
+            Item mainHandItem = mc.player.getStackInHand(Hand.MAIN_HAND).getItem();
+            Item offHandItem = mc.player.getStackInHand(Hand.OFF_HAND).getItem();
+            Collection<StatusEffect> statusEffects = mc.player.getStatusEffects().stream()
+                    .map(StatusEffectInstance::getEffectType)
+                    .map(RegistryEntry::value)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            boolean badOmenClickCondition = (mainHandItem == Items.OMINOUS_BOTTLE || offHandItem == Items.OMINOUS_BOTTLE)
+                && (!statusEffects.contains(StatusEffects.BAD_OMEN.value())
+                && !statusEffects.contains(StatusEffects.TRIAL_OMEN.value())
+                && !statusEffects.contains(StatusEffects.RAID_OMEN.value()));
+
+            boolean badOmenUnclickCondition = (statusEffects.contains(StatusEffects.BAD_OMEN.value())
+                || statusEffects.contains(StatusEffects.TRIAL_OMEN.value())
+                || statusEffects.contains(StatusEffects.RAID_OMEN.value()))
+                && (mainHandItem == Items.OMINOUS_BOTTLE
+                || offHandItem == Items.OMINOUS_BOTTLE);
+            
+            handleConditionals(
                 KEY_STATE_USE,
+                badOmenClickCondition,
+                badOmenUnclickCondition,
                 FeatureToggle.TWEAK_AUTO_BAD_OMEN, mc);
 
         }
@@ -233,14 +233,16 @@ public class MiscTweaks
         }
     }
 
-    private static void handleAutoBadOmen(
+    private static void handleConditionals(
             KeybindState keyState,
-            IConfigBoolean cfgAutoBadOmen,
+            boolean clickCondition,
+            boolean unclickCondition,
+            IConfigBoolean cfgConditional,
             MinecraftClient mc)
     {
-        if (cfgAutoBadOmen.getBooleanValue())
+        if (cfgConditional.getBooleanValue())
         {
-            keyState.handleAutoBadOmenHold(mc);
+            keyState.handleConditionalClick(clickCondition, unclickCondition, mc);
         }
         else
         {
