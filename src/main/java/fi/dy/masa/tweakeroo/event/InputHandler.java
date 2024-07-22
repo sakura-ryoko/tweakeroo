@@ -252,7 +252,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 return true;
             }
-			else if (FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind().isKeybindHeld())
+            else if (FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind().isKeybindHeld())
             {
                 int newValue = Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue() + (dWheel > 0 ? 1 : -1);
                 Configs.Generic.PERIODIC_ATTACK_INTERVAL.setIntegerValue(newValue);
@@ -260,6 +260,39 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 String strValue = preGreen + Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue() + rst;
                 InfoUtils.printActionbarMessage("tweakeroo.message.set_periodic_attack_interval_to", strValue);
+
+                return true;
+            }
+            else if (FeatureToggle.TWEAK_PERIODIC_USE.getKeybind().isKeybindHeld())
+            {
+                int newValue = Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue() + (dWheel > 0 ? 1 : -1);
+                Configs.Generic.PERIODIC_USE_INTERVAL.setIntegerValue(newValue);
+                KeyCallbackAdjustable.setValueChanged();
+
+                String strValue = preGreen + Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue() + rst;
+                InfoUtils.printActionbarMessage("tweakeroo.message.set_periodic_use_interval_to", strValue);
+
+                return true;
+            }
+            else if (FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK.getKeybind().isKeybindHeld())
+            {
+                int newValue = Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue() + (dWheel > 0 ? 1 : -1);
+                Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.setIntegerValue(newValue);
+                KeyCallbackAdjustable.setValueChanged();
+
+                String strValue = preGreen + Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue() + rst;
+                InfoUtils.printActionbarMessage("tweakeroo.message.set_periodic_hold_attack_interval_to", strValue);
+
+                return true;
+            }
+            else if (FeatureToggle.TWEAK_PERIODIC_HOLD_USE.getKeybind().isKeybindHeld())
+            {
+                int newValue = Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue() + (dWheel > 0 ? 1 : -1);
+                Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.setIntegerValue(newValue);
+                KeyCallbackAdjustable.setValueChanged();
+
+                String strValue = preGreen + Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue() + rst;
+                InfoUtils.printActionbarMessage("tweakeroo.message.set_periodic_hold_use_interval_to", strValue);
 
                 return true;
             }
