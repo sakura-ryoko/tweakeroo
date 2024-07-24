@@ -6,14 +6,18 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -26,6 +30,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -53,6 +58,7 @@ public class InventoryUtils
     private static final HashSet<Item> UNSTACKING_ITEMS = new HashSet<>();
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
+    private static final List<String> PREFER_SILK_TOUCH = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
 
     public static void setToolSwitchableSlots(String configStr)
@@ -63,6 +69,12 @@ public class InventoryUtils
     public static void setToolSwitchIgnoreSlots(String configStr)
     {
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
+    }
+
+    public static void setPreferSilkTouchList(List<String> names)
+    {
+        PREFER_SILK_TOUCH.clear();
+        PREFER_SILK_TOUCH.addAll(names);
     }
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
@@ -190,7 +202,7 @@ public class InventoryUtils
             HashSet<Item> weapons = new HashSet<>();
             String entities = split[0].trim();
             String items = split[1].trim();
-            
+
             if (items.equals("<ignore>") == false)
             {
                 for (String itemId : items.split(","))
@@ -565,6 +577,14 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false)
         {
+            if (PREFER_SILK_TOUCH.contains(Registries.BLOCK.getEntry(state.getBlock()).getIdAsString()))
+            {
+                if (toolHasSilkTouch(testedStack) && !toolHasSilkTouch(previousTool))
+                {
+                    return true;
+                }
+            }
+
             if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
             {
                 return true;
@@ -579,6 +599,15 @@ public class InventoryUtils
         }
 
         return false;
+    }
+
+    private static boolean toolHasSilkTouch(ItemStack stack)
+    {
+        if (!stack.hasEnchantments()) {
+            return false;
+        }
+
+        return EnchantmentHelper.hasAnyEnchantmentsIn(stack, EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING);
     }
 
     private static boolean isBetterToolAndHasDurability(ItemStack testedStack, ItemStack previousTool, BlockState state)
@@ -965,7 +994,7 @@ public class InventoryUtils
     }
 
     /**
-     * 
+     *
      * Finds a slot with an identical item than <b>stackReference</b>, ignoring the durability
      * of damageable items. Does not allow crafting or armor slots or the offhand slot
      * in the ContainerPlayer container.
