@@ -601,10 +601,7 @@ public class InventoryUtils
 
     private static boolean toolHasSilkTouch(ItemStack stack)
     {
-        if (!stack.hasEnchantments()) {
-            return false;
-        }
-
+        // 1.21 way of checking for Silk Touch according to the Fabric upgrade blog post.
         return EnchantmentHelper.hasAnyEnchantmentsIn(stack, EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING);
     }
 
