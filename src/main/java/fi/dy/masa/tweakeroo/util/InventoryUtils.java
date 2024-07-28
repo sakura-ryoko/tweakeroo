@@ -577,7 +577,9 @@ public class InventoryUtils
         {
             if (PREFER_SILK_TOUCH.contains(Registries.BLOCK.getEntry(state.getBlock()).getIdAsString()))
             {
-                if (toolHasSilkTouch(testedStack) && !toolHasSilkTouch(previousTool))
+                if (getEnchantmentLevel(testedStack, Enchantments.SILK_TOUCH) > 0 &&
+                    getEnchantmentLevel(previousTool, Enchantments.SILK_TOUCH) == -1 &&
+                    testedStack.isSuitableFor(state))
                 {
                     return true;
                 }
@@ -599,12 +601,6 @@ public class InventoryUtils
         return false;
     }
 
-    private static boolean toolHasSilkTouch(ItemStack stack)
-    {
-        // 1.21 way of checking for Silk Touch according to the Fabric upgrade blog post.
-        return EnchantmentHelper.hasAnyEnchantmentsIn(stack, EnchantmentTags.PREVENTS_BEE_SPAWNS_WHEN_MINING);
-    }
-
     private static boolean isBetterToolAndHasDurability(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
         return hasEnoughDurability(testedStack) && isBetterTool(testedStack, previousTool, state);
@@ -616,15 +612,18 @@ public class InventoryUtils
     }
 
     /**
-     * Creates a total additive value of the essential Enchantment Levels
+     * Creates a total additive value of the essential Enchantment Levels.
      * If one of them does not contain the same Enchantment;
-     * then the level should be -1, and will reduce its total weighted value by 1.
+     * then the level should be -1, and will reduce its total weighted value;
+     * But if the enchantment level is better, then the weight is +1, and adds to it's value.
+     * The same Enchantment Level would then be a 0; and has no weighted change.
+     * The result is then in favor for the testedStack if the total weight is > 0.
      */
     private static boolean hasSameOrBetterToolEnchantments(ItemStack testedStack, ItemStack previousTool)
     {
         int count = 0;
 
-        // Core Tool Enchants, where Mending has the highest weighted value
+        // Core Tool Enchants
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
@@ -637,7 +636,7 @@ public class InventoryUtils
     {
         int count = 0;
 
-        // Core Weapon Enchantments, where Mending has the highest weighted value
+        // Core Weapon Enchantments
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
         count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
