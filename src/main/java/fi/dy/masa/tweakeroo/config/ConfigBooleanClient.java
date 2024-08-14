@@ -4,6 +4,8 @@ import fi.dy.masa.malilib.config.options.ConfigBooleanHotkeyed;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.StringUtils;
 
+import java.util.Objects;
+
 public class ConfigBooleanClient extends ConfigBooleanHotkeyed
 {
     public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey, String comment)
@@ -19,8 +21,8 @@ public class ConfigBooleanClient extends ConfigBooleanHotkeyed
     @Override
     public String getComment()
     {
-        String comment = super.getComment();
-
+//        String comment = super.getComment();
+        String comment = StringUtils.getTranslatedOrFallback(Objects.requireNonNull(super.getComment()), super.getComment());
         if (comment == null)
         {
             return "";
