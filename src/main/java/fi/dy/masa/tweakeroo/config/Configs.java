@@ -122,6 +122,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true, "tweakeroo.config.generic.comment.zoomAdjustMouseSensitivity").translatedName("tweakeroo.config.generic.name.zoomAdjustMouseSensitivity");
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99, "tweakeroo.config.generic.comment.zoomFov").translatedName("tweakeroo.config.generic.name.zoomFov");
         public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true, "tweakeroo.config.generic.comment.zoomResetFovOnActivate").translatedName("tweakeroo.config.generic.name.zoomResetFovOnActivate");
+        public static final ConfigBoolean       ZOOM_SHOW_MESSAGE_ON_PRESS          = new ConfigBoolean     ("zoomShowMessageOnPress", true, "tweakeroo.config.generic.comment.zoomShowMessageOnPress").translatedName("tweakeroo.config.generic.name.zoomShowMessageOnPress");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
@@ -211,7 +212,8 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_BETTER_ENCHANTS,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
-                ZOOM_RESET_FOV_ON_ACTIVATE
+                ZOOM_RESET_FOV_ON_ACTIVATE,
+                ZOOM_SHOW_MESSAGE_ON_PRESS
         );
     }
 

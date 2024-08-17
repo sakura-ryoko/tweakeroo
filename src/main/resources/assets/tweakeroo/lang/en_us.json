@@ -84,6 +84,7 @@
     "tweakeroo.config.generic.name.zoomAdjustMouseSensitivity": "zoomAdjustMouseSensitivity",
     "tweakeroo.config.generic.name.zoomFov": "zoomFov",
     "tweakeroo.config.generic.name.zoomResetFovOnActivate": "zoomResetFovOnActivate",
+    "tweakeroo.config.generic.name.zoomShowMessageOnPress": "zoomShowMessageOnPress",
 
     "tweakeroo.config.generic.comment.accuratePlacementProtocolMode": "The type of \"accurate placement protocol\" to use.\n- Auto: Uses v3 in single player, and by default Slabs-only in multiplayer,\n  unless the server has Carpet mod that sends a 'carpet:hello'\n  packet, in which case v2 is used on that server.\n- Version 3: Supported by Tweakeroo itself (in single player) or with Servux.\n- Version 2: Compatible with servers with the Carpet mod\n  (either QuickCarpet by skyrising and DeadlyMC,\n  or CarpetExtra in addition to FabricCarpet.\n  And in both cases the 'accurateBlockPlacement' Carpet rule needs\n  to be enabled on the server).\n- Slabs only: Only fixes top slabs. Compatible with Paper servers.\n- None: Does not modify coordinates.",
     "tweakeroo.config.generic.comment.accuratePlacementProtocol": "If enabled, then the Flexible Block Placement and the\nAccurate Block Placement use the protocol implemented in Carpet mod.\n§6Note: This is required for any block rotations to work, other than\n§6blocks that only care about the block side you click on (Hoppers, Logs etc.)",
@@ -170,6 +171,7 @@
     "tweakeroo.config.generic.comment.zoomAdjustMouseSensitivity": "If enabled, then the mouse sensitivity is reduced\nwhile the zoom feature is enabled and the zoom key is active",
     "tweakeroo.config.generic.comment.zoomFov": "The FOV value used for the zoom feature",
     "tweakeroo.config.generic.comment.zoomResetFovOnActivate": "Reset the Camera Zoom FOV upon Deactivation,\nif the Mouse Scroll Wheel was used to adjust it",
+    "tweakeroo.config.generic.comment.zoomShowMessageOnPress": "Show the 'Camera Zoom Activated' message in the action bar when pressing the zoom hotkey",
 
     "tweakeroo.config.fixes.name.elytraFix": "elytraFix",
     "tweakeroo.config.fixes.name.macHorizontalScroll": "macHorizontalScroll",
