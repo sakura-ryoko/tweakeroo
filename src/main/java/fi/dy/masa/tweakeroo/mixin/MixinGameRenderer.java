@@ -4,6 +4,7 @@ import java.util.function.Predicate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,8 +32,8 @@ public abstract class MixinGameRenderer
 {
     @Shadow @Final MinecraftClient client;
 
-    private float realYaw;
-    private float realPitch;
+    @Unique private float realYaw;
+    @Unique private float realPitch;
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
     private void onRenderWorld(CallbackInfo ci)
@@ -44,15 +45,15 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "getFov", at = @At("HEAD"), cancellable = true)
-    private void applyZoom(Camera camera, float partialTicks, boolean useFOVSetting, CallbackInfoReturnable<Double> cir)
+    private void applyZoom(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Float> cir)
     {
         if (MiscUtils.isZoomActive())
         {
-            cir.setReturnValue(Configs.Generic.ZOOM_FOV.getDoubleValue());
+            cir.setReturnValue((float) Configs.Generic.ZOOM_FOV.getDoubleValue());
         }
         else if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
-            cir.setReturnValue((double) this.client.options.getFov().getValue());
+            cir.setReturnValue((float) this.client.options.getFov().getValue());
         }
     }
 

@@ -216,7 +216,8 @@ public class PlacementTweaks
             final double reach = mc.player.getBlockInteractionRange();
             final int maxCount = Configs.Generic.FAST_BLOCK_PLACEMENT_COUNT.getIntegerValue();
 
-            mc.crosshairTarget = player.raycast(reach, mc.getRenderTickCounter().getTickDelta(false), false);
+            // TODO --> getRenderTickCounter()
+            mc.crosshairTarget = player.raycast(reach, mc.method_61966().getTickDelta(false), false);
 
             for (int i = 0; i < maxCount; ++i)
             {
@@ -264,7 +265,8 @@ public class PlacementTweaks
                     if (result == ActionResult.SUCCESS)
                     {
                         posLast = posNew;
-                        mc.crosshairTarget = player.raycast(reach, mc.getRenderTickCounter().getTickDelta(false), false);
+                        // TODO --> getRenderTickCounter()
+                        mc.crosshairTarget = player.raycast(reach, mc.method_61966().getTickDelta(false), false);
                     }
                     else
                     {
@@ -923,13 +925,13 @@ public class PlacementTweaks
         float yaw = facing.asRotation();
         float pitch = player.getPitch();
         player.setYaw(yaw);
-        player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround()));
+        player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround(), false));
 
         //System.out.printf("handleFlexibleBlockPlacement() pos: %s, side: %s, facing orig: %s facing new: %s\n", pos, side, facingOrig, facing);
         ActionResult result = processRightClickBlockWrapper(controller, player, world, pos, side, hitVec, hand);
 
         player.setYaw(yawOrig);
-        player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yawOrig, pitch, player.isOnGround()));
+        player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yawOrig, pitch, player.isOnGround(), false));
 
         return result;
     }

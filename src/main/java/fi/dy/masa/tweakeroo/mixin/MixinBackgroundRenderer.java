@@ -1,13 +1,18 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.joml.Vector4f;
+
+import net.minecraft.class_9958;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.FogShape;
 import net.minecraft.client.world.ClientWorld;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
@@ -15,7 +20,7 @@ import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 @Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer
 {
-    private static boolean wasLava;
+    @Unique private static boolean wasLava;
 
     @ModifyConstant(
             method = "applyFog",
@@ -87,7 +92,8 @@ public abstract class MixinBackgroundRenderer
     }
     */
 
-    @Redirect(method = "render",
+    // TODO render()
+    @Redirect(method = "method_62185",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getHorizonShadingRatio()F"))
     private static float tweakeroo_disableSkyDarkness(ClientWorld.Properties props)
@@ -97,21 +103,21 @@ public abstract class MixinBackgroundRenderer
 
     @Inject(method = "applyFog",
             require = 0,
-            at = @At(value = "INVOKE", remap = false,
-                     target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogEnd(F)V",
-                     shift = At.Shift.AFTER))
+            at = @At(value = "RETURN", remap = false), cancellable = true)
     private static void disableRenderDistanceFog(
-            Camera camera,
-            BackgroundRenderer.FogType fogType,
-            float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
+            Camera camera, BackgroundRenderer.FogType fogType, Vector4f v, float viewDistance, boolean thickFog, float tickDelta, CallbackInfoReturnable<class_9958> cir)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {
             if (thickFog == false && wasLava == false)
             {
                 float distance = Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance());
-                RenderSystem.setShaderFogStart(distance * 1.6F);
-                RenderSystem.setShaderFogEnd(distance * 2.0F);
+                cir.setReturnValue(
+                        new class_9958(distance * 1.6F, distance * 2.0F, FogShape.CYLINDER,
+                        v.x, v.y, v.z, v.w));
+
+                //RenderSystem.setShaderFogStart(distance * 1.6F);
+                //RenderSystem.setShaderFogEnd(distance * 2.0F);
             }
 
             wasLava = false;

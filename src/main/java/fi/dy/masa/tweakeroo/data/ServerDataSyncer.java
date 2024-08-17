@@ -19,6 +19,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.DataQueryHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.inventory.DoubleInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
@@ -289,7 +290,7 @@ public class ServerDataSyncer
                 if (nbt == null) return;
                 if (clientWorld.getEntityById(networkId) != null)
                 {
-                    Entity entity = clientWorld.getEntityById(networkId).getType().create(clientWorld);
+                    Entity entity = clientWorld.getEntityById(networkId).getType().create(clientWorld, SpawnReason.LOAD);
                     if (entity != null)
                     {
                         entity.readNbt(nbt);

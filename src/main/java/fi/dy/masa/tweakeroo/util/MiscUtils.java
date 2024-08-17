@@ -463,9 +463,12 @@ public class MiscUtils
             actionResult = mc.interactionManager.interactEntity(player, entity, hand);
         }
 
-        if (actionResult.isAccepted() && actionResult.shouldSwingHand())
+        if (actionResult instanceof ActionResult.Success success)
         {
-            player.swingHand(hand);
+            if (success.swingSource() == ActionResult.SwingSource.CLIENT)
+            {
+                player.swingHand(hand);
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,8 +23,8 @@ public abstract class MixinEntity
     @Shadow public float prevYaw;
     @Shadow public float prevPitch;
 
-    private double forcedPitch;
-    private double forcedYaw;
+    @Unique private double forcedPitch;
+    @Unique private double forcedYaw;
 
     @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
     @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);

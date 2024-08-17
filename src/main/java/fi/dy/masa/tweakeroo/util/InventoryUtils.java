@@ -487,7 +487,7 @@ public class InventoryUtils
 
             for (AttributeModifiersComponent.Entry entry : modifiers)
             {
-                if (entry.attribute().equals(EntityAttributes.GENERIC_ATTACK_DAMAGE))
+                if (entry.attribute().equals(EntityAttributes.ATTACK_DAMAGE))
                 {
                     return (float) entry.modifier().value();
                 }
@@ -964,8 +964,8 @@ public class InventoryUtils
         final double[] total = {base};
 
         stack.applyAttributeModifier(slot, (entry, modifier) -> {
-            if (entry.getKey().orElseThrow() == EntityAttributes.GENERIC_ARMOR
-                || entry.getKey().orElseThrow() == EntityAttributes.GENERIC_ARMOR_TOUGHNESS)
+            if (entry.getKey().orElseThrow() == EntityAttributes.ARMOR
+                || entry.getKey().orElseThrow() == EntityAttributes.ARMOR_TOUGHNESS)
             {
                 switch (modifier.operation())
                 {
@@ -1126,7 +1126,7 @@ public class InventoryUtils
                 return currentHotbarSlot;
             }
 
-            if ((stack.getItem() instanceof ToolItem) == false)
+            if ((stack.getItem() instanceof MiningToolItem) == false)
             {
                 nonTool = currentHotbarSlot;
             }
@@ -1141,7 +1141,7 @@ public class InventoryUtils
                 return hotbarSlot;
             }
 
-            if (nonTool == -1 && (stack.getItem() instanceof ToolItem) == false)
+            if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
             {
                 nonTool = hotbarSlot;
             }
@@ -1322,7 +1322,8 @@ public class InventoryUtils
 
         double reach = mc.player.getBlockInteractionRange();
         boolean isCreative = player.isCreative();
-        HitResult trace = player.raycast(reach, mc.getRenderTickCounter().getTickDelta(false), false);
+        // TODO --> getRenderTickCounter()
+        HitResult trace = player.raycast(reach, mc.method_61966().getTickDelta(false), false);
 
         if (trace != null && trace.getType() == HitResult.Type.BLOCK)
         {

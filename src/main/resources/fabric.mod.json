@@ -33,7 +33,7 @@
 	],
 
 	"depends": {
-		"minecraft": ">=1.21 <=1.21.1",
-		"malilib": ">=0.20.0"
+		"minecraft": ">=1.21-alpha.24.33.a",
+		"malilib": ">=0.20.999-snap"
 	}
 }

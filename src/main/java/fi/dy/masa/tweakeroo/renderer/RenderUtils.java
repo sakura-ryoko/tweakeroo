@@ -404,10 +404,10 @@ public class RenderUtils
         matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
         matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
 
-        RenderSystem.applyModelViewMatrix();
+        //RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair(10);
         matrix4fStack.popMatrix();
-        RenderSystem.applyModelViewMatrix();
+        //RenderSystem.applyModelViewMatrix();
         RenderSystem.disableBlend();
     }
 

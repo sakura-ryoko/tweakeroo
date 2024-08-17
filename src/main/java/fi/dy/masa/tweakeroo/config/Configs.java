@@ -217,12 +217,12 @@ public class Configs implements IConfigHandler
 
     public static class Fixes
     {
-        public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false, "tweakeroo.config.fixes.comment.elytraFix").translatedName("tweakeroo.config.fixes.name.elytraFix");
+        //public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false, "tweakeroo.config.fixes.comment.elytraFix").translatedName("tweakeroo.config.fixes.name.elytraFix");
         public static final ConfigBoolean MAC_HORIZONTAL_SCROLL             = new ConfigBoolean("macHorizontalScroll", false, "tweakeroo.config.fixes.comment.macHorizontalScroll").translatedName("tweakeroo.config.fixes.name.macHorizontalScroll");
         public static final ConfigBoolean RAVAGER_CLIENT_BLOCK_BREAK_FIX    = new ConfigBoolean("ravagerClientBlockBreakFix", false, "tweakeroo.config.fixes.comment.ravagerClientBlockBreakFix").translatedName("tweakeroo.config.fixes.name.ravagerClientBlockBreakFix");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                ELYTRA_FIX,
+                //ELYTRA_FIX,
                 MAC_HORIZONTAL_SCROLL,
                 RAVAGER_CLIENT_BLOCK_BREAK_FIX
         );
