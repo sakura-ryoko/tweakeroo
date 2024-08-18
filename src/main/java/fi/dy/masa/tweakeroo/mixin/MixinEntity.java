@@ -18,16 +18,14 @@ import fi.dy.masa.tweakeroo.util.SnapAimMode;
 @Mixin(net.minecraft.entity.Entity.class)
 public abstract class MixinEntity
 {
+    @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
+    @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
     @Shadow private float yaw;
     @Shadow private float pitch;
     @Shadow public float prevYaw;
     @Shadow public float prevPitch;
-
     @Unique private double forcedPitch;
     @Unique private double forcedYaw;
-
-    @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
-    @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     private void overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
@@ -136,6 +134,7 @@ public abstract class MixinEntity
         }
     }
 
+    @Unique
     private void updateCustomPlayerRotations(double yawChange, double pitchChange, boolean updateYaw, boolean updatePitch, float pitchLimit)
     {
         if (updateYaw)

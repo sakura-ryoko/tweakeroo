@@ -5,7 +5,7 @@ import net.minecraft.block.entity.SignText;
 
 public interface IGuiEditSign
 {
-    SignBlockEntity getTile();
+    SignBlockEntity tweakeroo$getTile();
 
-    void applyText(SignText text);
+    void tweakeroo$applyText(SignText text);
 }

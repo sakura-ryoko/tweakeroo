@@ -27,10 +27,7 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 @Mixin(CommandBlockScreen.class)
 public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
 {
-    @Shadow
-    @Final
-    private CommandBlockBlockEntity blockEntity;
-
+    @Shadow @Final private CommandBlockBlockEntity blockEntity;
     @Shadow private CyclingButtonWidget<CommandBlockBlockEntity.Type> modeButton;
     @Shadow private CyclingButtonWidget<Boolean> conditionalModeButton;
     @Shadow private CyclingButtonWidget<Boolean> redstoneTriggerButton;
@@ -150,6 +147,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         }
     }
 
+    @Unique
     private static Text getDisplayStringForCurrentStatus(boolean updateExecValue)
     {
         String translationKey = "tweakeroo.gui.button.misc.command_block.update_execution";

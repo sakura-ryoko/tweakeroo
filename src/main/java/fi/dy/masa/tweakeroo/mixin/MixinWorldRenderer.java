@@ -3,11 +3,9 @@ package fi.dy.masa.tweakeroo.mixin;
 import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 
-import net.minecraft.class_9909;
-import net.minecraft.class_9922;
-import net.minecraft.class_9958;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -32,9 +30,8 @@ public abstract class MixinWorldRenderer
     @Unique private int lastUpdatePosX;
     @Unique private int lastUpdatePosZ;
 
-    // TODO --> renderWeather
-    @Inject(method = "method_62203", at = @At("HEAD"), cancellable = true)
-    private void cancelRainRender(class_9909 arg, LightmapTextureManager lightmapTextureManager, Vec3d vec3d, float f, class_9958 arg2, CallbackInfo ci)
+    @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
+    private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, LightmapTextureManager lightmapTextureManager, Vec3d vec3d, float f, Fog fog, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {
@@ -44,7 +41,9 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
             target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=terrain_setup"))
-    private void preSetupTerrain(class_9922 arg, RenderTickCounter tickCounter, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
+    private void preSetupTerrain(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl,
+                                 Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
+                                 Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -54,7 +53,9 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
             target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=compile_sections"))
-    private void postSetupTerrain(class_9922 arg, RenderTickCounter tickCounter, boolean bl, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
+    private void postSetupTerrain(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl,
+                                  Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
+                                  Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }

@@ -30,7 +30,6 @@ import fi.dy.masa.tweakeroo.util.InventoryUtils;
 public abstract class MixinClientPlayerInteractionManager
 {
     @Shadow @Final private MinecraftClient client;
-
     @Shadow private int blockBreakingCooldown;
 
     @Inject(method = "interactItem", at = @At(

@@ -14,8 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(value = GameRenderer.class, priority = 999)
 public abstract class MixinGameRenderer_ViewBob
 {
-    @Shadow
-    protected abstract void bobView(MatrixStack matrices, float tickDelta);
+    @Shadow protected abstract void bobView(MatrixStack matrices, float tickDelta);
 
     @Redirect(method = "renderWorld", require = 0, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V"))

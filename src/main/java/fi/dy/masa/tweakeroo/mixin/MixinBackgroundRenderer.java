@@ -2,10 +2,10 @@ package fi.dy.masa.tweakeroo.mixin;
 
 import org.joml.Vector4f;
 
-import net.minecraft.class_9958;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.FogShape;
 import net.minecraft.client.world.ClientWorld;
 import org.spongepowered.asm.mixin.Mixin;
@@ -92,8 +92,8 @@ public abstract class MixinBackgroundRenderer
     }
     */
 
-    // TODO render()
-    @Redirect(method = "method_62185",
+    // TODO render() --> getFogColor()
+    @Redirect(method = "getFogColor",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getHorizonShadingRatio()F"))
     private static float tweakeroo_disableSkyDarkness(ClientWorld.Properties props)
@@ -105,7 +105,7 @@ public abstract class MixinBackgroundRenderer
             require = 0,
             at = @At(value = "RETURN", remap = false), cancellable = true)
     private static void disableRenderDistanceFog(
-            Camera camera, BackgroundRenderer.FogType fogType, Vector4f v, float viewDistance, boolean thickFog, float tickDelta, CallbackInfoReturnable<class_9958> cir)
+            Camera camera, BackgroundRenderer.FogType fogType, Vector4f v, float viewDistance, boolean thickFog, float tickDelta, CallbackInfoReturnable<Fog> cir)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {
@@ -113,7 +113,7 @@ public abstract class MixinBackgroundRenderer
             {
                 float distance = Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance());
                 cir.setReturnValue(
-                        new class_9958(distance * 1.6F, distance * 2.0F, FogShape.CYLINDER,
+                        new Fog(distance * 1.6F, distance * 2.0F, FogShape.CYLINDER,
                         v.x, v.y, v.z, v.w));
 
                 //RenderSystem.setShaderFogStart(distance * 1.6F);

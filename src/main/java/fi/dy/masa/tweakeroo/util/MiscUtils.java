@@ -402,7 +402,7 @@ public class MiscUtils
 
     public static void copyTextFromSign(SignBlockEntity te, boolean front)
     {
-        previousSignText = ((ISignTextAccess) te).getText(front);
+        previousSignText = ((ISignTextAccess) te).tweakeroo$getText(front);
     }
 
     public static void applyPreviousTextToSign(SignBlockEntity te, @Nullable AbstractSignEditScreen guiLines, boolean front)
@@ -412,7 +412,7 @@ public class MiscUtils
             te.setText(previousSignText, front);
 
             if (guiLines != null) {
-                ((IGuiEditSign) guiLines).applyText(previousSignText);
+                ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
             }
         }
     }
