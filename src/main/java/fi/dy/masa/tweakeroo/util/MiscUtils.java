@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SignText;
@@ -20,10 +21,13 @@ import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
 import net.minecraft.text.*;
 import net.minecraft.util.ActionResult;
@@ -668,6 +672,18 @@ public class MiscUtils
         {
             InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.getAbsolutePath());
         }
+    }
+
+    public static boolean isShulkerBox(ItemStack stack)
+    {
+        return stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock;
+    }
+
+    public static boolean hasCustomMaxStackSize(ItemStack stack)
+    {
+        int defaultStackSize = stack.getDefaultComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+        int currentStackSize = stack.getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+        return defaultStackSize != currentStackSize;
     }
 
     public static class PostKeyAction

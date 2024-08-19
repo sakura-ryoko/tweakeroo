@@ -2,7 +2,7 @@
   "required": true,
   "package": "fi.dy.masa.tweakeroo.mixin",
   "minVersion": "0.8",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "client": [
     "IMixinAbstractBlock",
     "IMixinAbstractHorseEntity",
@@ -83,5 +83,8 @@
   "mixinPriority": 990,
   "injectors": {
     "defaultRequire": 0
-  }
+  },
+  "mixins": [
+    "MixinHopperBlockEntity"
+  ]
 }

@@ -93,17 +93,17 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(Matrix4f matrix4f, Matrix4f projMatrix)
+    public void onRenderWorldLast(Matrix4f posMatrix, Matrix4f projMatrix)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc.player != null)
         {
-            this.renderOverlays(matrix4f, mc);
+            this.renderOverlays(posMatrix, mc);
         }
     }
 
-    private void renderOverlays(Matrix4f matrix4f, MinecraftClient mc)
+    private void renderOverlays(Matrix4f posMatrix, MinecraftClient mc)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -130,7 +130,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getSide(),
                     hitResult.getPos(),
                     color,
-                    matrix4f,
+                    posMatrix,
                     mc);
 
             RenderSystem.enableDepthTest();
