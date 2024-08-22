@@ -93,7 +93,7 @@ public abstract class MixinWorldRenderer
     // rendering seems to work fine with Sodium without these anyway
     @Inject(method = "setupTerrain", require = 0,
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(DD)V"))
+            target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(Lnet/minecraft/util/math/ChunkSectionPos;)V"))
     private void rebuildChunksAroundCamera2(
             Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci)
     {
