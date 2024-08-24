@@ -437,15 +437,15 @@ public class Callbacks
             {
                 if (action == KeyAction.PRESS)
                 {
-                    InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_on",
-                            String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+                    //InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_on",
+                            //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
                     MiscUtils.onZoomActivated();
                 }
                 else
                 {
                     MiscUtils.onZoomDeactivated();
-                    InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_off",
-                            String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+                    //InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_off",
+                            //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
                 }
             }
 

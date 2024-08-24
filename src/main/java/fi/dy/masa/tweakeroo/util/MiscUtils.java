@@ -22,6 +22,7 @@ import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
@@ -175,7 +176,7 @@ public class MiscUtils
         if (zoomActive)
         {
             resetMouseSensitivityForZoom();
-            if (lastZoomValue.isActive())
+            if (lastZoomValue != null && lastZoomValue.isActive())
             {
                 if (lastZoomValue.getLastDoubleValue() != Configs.Generic.ZOOM_FOV.getDoubleValue() &&
                     Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
@@ -238,7 +239,7 @@ public class MiscUtils
     {
         if (periodicAttackActive)
         {
-            if (lastPeriodicAttackValue.isActive())
+            if (lastPeriodicAttackValue != null && lastPeriodicAttackValue.isActive())
             {
                 if (lastPeriodicAttackValue.getLastIntValue() != Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue() &&
                     Configs.Generic.PERIODIC_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
@@ -268,7 +269,7 @@ public class MiscUtils
     {
         if (periodicUseActive)
         {
-            if (lastPeriodicUseValue.isActive())
+            if (lastPeriodicUseValue != null && lastPeriodicUseValue.isActive())
             {
                 if (lastPeriodicUseValue.getLastIntValue() != Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue() &&
                     Configs.Generic.PERIODIC_USE_RESET_ON_ACTIVATE.getBooleanValue())
@@ -298,7 +299,7 @@ public class MiscUtils
     {
         if (periodicHoldAttackActive)
         {
-            if (lastPeriodicHoldAttackValue.isActive())
+            if (lastPeriodicHoldAttackValue != null && lastPeriodicHoldAttackValue.isActive())
             {
                 if (lastPeriodicHoldAttackValue.getLastIntValue() != Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue() &&
                     Configs.Generic.PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
@@ -328,7 +329,7 @@ public class MiscUtils
     {
         if (periodicHoldUseActive)
         {
-            if (lastPeriodicHoldUseValue.isActive())
+            if (lastPeriodicHoldUseValue != null && lastPeriodicHoldUseValue.isActive())
             {
                 if (lastPeriodicHoldUseValue.getLastIntValue() != Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue() &&
                     Configs.Generic.PERIODIC_HOLD_USE_RESET_ON_ACTIVATE.getBooleanValue())
@@ -617,7 +618,7 @@ public class MiscUtils
             return true;
         }
 
-        Map<String, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo_getMapStates();
+        Map<MapIdComponent, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo_getMapStates();
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName == null)
@@ -635,9 +636,9 @@ public class MiscUtils
 
         int count = 0;
 
-        for (Map.Entry<String, MapState> entry : data.entrySet())
+        for (Map.Entry<MapIdComponent, MapState> entry : data.entrySet())
         {
-            File file = new File(dir, entry.getKey() + ".png");
+            File file = new File(dir, entry.getKey().asString() + ".png");
             writeMapAsImage(file, entry.getValue());
             ++count;
         }
