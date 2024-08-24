@@ -143,7 +143,8 @@ public abstract class MixinClientPlayerInteractionManager
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
     private void handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
-        if (Configs.Disable.DISABLE_BLOCK_BREAK_COOLDOWN.getBooleanValue())
+        if (Configs.Disable.DISABLE_BLOCK_BREAK_COOLDOWN.getBooleanValue() &&
+            this.client.player.isCreative() == false)
         {
             this.blockBreakingCooldown = 0;
         }
