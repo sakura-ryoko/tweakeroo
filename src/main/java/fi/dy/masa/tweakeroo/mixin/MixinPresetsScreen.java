@@ -5,7 +5,6 @@ public abstract class MixinPresetsScreen
 {
     /*
     @Shadow @Final private static RegistryKey<Biome> BIOME_KEY;
-
     @Shadow @Final private CustomizeFlatLevelScreen parent;
 
     @Inject(method = "init", at = @At("HEAD"))
@@ -14,7 +13,6 @@ public abstract class MixinPresetsScreen
         if (FeatureToggle.TWEAK_CUSTOM_FLAT_PRESETS.getBooleanValue())
         {
             int vanillaEntries = 9;
-
             int toRemove = PRESETS.size() - vanillaEntries;
 
             if (toRemove > 0)
@@ -37,6 +35,7 @@ public abstract class MixinPresetsScreen
         }
     }
 
+    @Unique
     private boolean registerPresetFromString(String str)
     {
         Matcher matcher = MiscUtils.PATTERN_WORLD_PRESET.matcher(str);
@@ -46,13 +45,13 @@ public abstract class MixinPresetsScreen
             // TODO --> I added some code here, and added the IMixinCustomizeFlatLevelScreen
             GeneratorOptionsHolder generatorOptionsHolder = ((IMixinCustomizeFlatLevelScreen) this.parent).tweakeroo_getCreateWorldParent().getWorldCreator().getGeneratorOptionsHolder();
             DynamicRegistryManager.Immutable dynamicRegistryManager = generatorOptionsHolder.getCombinedRegistryManager();
-            //FeatureSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
-            RegistryWrapper.Impl<Biome> biomeLookup = dynamicRegistryManager.getWrapperOrThrow(RegistryKeys.BIOME);
-            RegistryWrapper.Impl<StructureSet> structureLookup = dynamicRegistryManager.getWrapperOrThrow(RegistryKeys.STRUCTURE_SET);
-            RegistryWrapper.Impl<PlacedFeature> featuresLookup = dynamicRegistryManager.getWrapperOrThrow(RegistryKeys.PLACED_FEATURE);
-            //RegistryWrapper.Impl<Block> blockLookup = dynamicRegistryManager.getWrapperOrThrow(RegistryKeys.BLOCK).withFeatureFilter(featureSet);
+            FeatureSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
+            RegistryEntryLookup<Biome> biomeLookup = dynamicRegistryManager.getOrThrow(RegistryKeys.BIOME);
+            RegistryEntryLookup<StructureSet> structureLookup = dynamicRegistryManager.getOrThrow(RegistryKeys.STRUCTURE_SET);
+            RegistryEntryLookup<PlacedFeature> featuresLookup = dynamicRegistryManager.getOrThrow(RegistryKeys.PLACED_FEATURE);
+            RegistryEntryLookup<Block> blockLookup = dynamicRegistryManager.getOrThrow(RegistryKeys.BLOCK).withFeatureFilter(featureSet);
             FlatChunkGeneratorConfig defaultConfig = FlatChunkGeneratorConfig.getDefaultConfig(biomeLookup, structureLookup, featuresLookup);
-            //FlatChunkGeneratorConfig currentConfig = this.parent.getConfig();
+            FlatChunkGeneratorConfig currentConfig = this.parent.getConfig();
             Optional<RegistryEntry.Reference<Biome>> optBiomeEntry = Optional.empty();
 
             String name = matcher.group("name");
@@ -65,7 +64,7 @@ public abstract class MixinPresetsScreen
 
             try
             {
-                optBiomeEntry = dynamicRegistryManager.get(RegistryKeys.BIOME).getEntry(Identifier.ofVanilla(biomeName));
+                optBiomeEntry = Registries.BIOME_SOURCE.get(Identifier.ofVanilla(biomeName));
                 biome = optBiomeEntry.flatMap(RegistryEntry.Reference::getKey).orElseThrow();
             }
             catch (Exception ignore) {}
@@ -80,7 +79,12 @@ public abstract class MixinPresetsScreen
 
             try
             {
-                item = Registries.ITEM.get(Identifier.of(iconItemName));
+                //item = Registries.ITEM.get(Identifier.of(iconItemName));
+                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.get(Identifier.of(iconItemName));
+                if (opt.isPresent())
+                {
+                    item = opt.get().value();
+                }
             }
             catch (Exception ignore) {}
 
@@ -99,11 +103,10 @@ public abstract class MixinPresetsScreen
             }
             FlatChunkGeneratorConfig newConfig = defaultConfig.with(layers, defaultConfig.getStructureOverrides(), optBiomeEntry.orElseThrow());
 
-            //new PresetsScreen.SuperflatPresetsListWidget.SuperflatPresetEntry(null);
-            //addPreset(Text.translatable(name), item, biome, ImmutableSet.of(), false, false, layers);
+            new PresetsScreen.SuperflatPresetsListWidget.SuperflatPresetEntry(null);
+            addPreset(Text.translatable(name), item, biome, ImmutableSet.of(), false, false, layers);
 
-            // TODO --> This might work (Test Me)
-            //this.parent.setConfig(newConfig);
+            this.parent.setConfig(newConfig);
 
             return true;
         }
@@ -114,5 +117,5 @@ public abstract class MixinPresetsScreen
 
         return false;
     }
-    */
+     */
 }

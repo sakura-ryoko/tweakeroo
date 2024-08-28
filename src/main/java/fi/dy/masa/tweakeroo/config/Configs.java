@@ -248,7 +248,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList FAST_RIGHT_CLICK_ITEM_LIST_TYPE    = new ConfigOptionList("fastRightClickListType", ListType.NONE, "tweakeroo.config.lists.comment.fastRightClickListType").translatedName("tweakeroo.config.lists.name.fastRightClickListType");
         public static final ConfigStringList FAST_RIGHT_CLICK_ITEM_BLACKLIST    = new ConfigStringList("fastRightClickBlackList", ImmutableList.of("minecraft:firework_rocket"), "tweakeroo.config.lists.comment.fastRightClickBlackList").translatedName("tweakeroo.config.lists.name.fastRightClickBlackList");
         public static final ConfigStringList FAST_RIGHT_CLICK_ITEM_WHITELIST    = new ConfigStringList("fastRightClickWhiteList", ImmutableList.of("minecraft:bucket", "minecraft:water_bucket", "minecraft:lava_bucket", "minecraft:glass_bottle"), "tweakeroo.config.lists.comment.fastRightClickWhiteList").translatedName("tweakeroo.config.lists.name.fastRightClickWhiteList");
-        public static final ConfigStringList FLAT_WORLD_PRESETS                 = new ConfigStringList("flatWorldPresets", ImmutableList.of("White Glass;1*minecraft:white_stained_glass;minecraft:plains;;minecraft:white_stained_glass", "Glass;1*minecraft:glass;minecraft:plains;;minecraft:glass"), "tweakeroo.config.lists.comment.flatWorldPresets").translatedName("tweakeroo.config.lists.name.flatWorldPresets");
+        //public static final ConfigStringList FLAT_WORLD_PRESETS                 = new ConfigStringList("flatWorldPresets", ImmutableList.of("White Glass;1*minecraft:white_stained_glass;minecraft:plains;;minecraft:white_stained_glass", "Glass;1*minecraft:glass;minecraft:plains;;minecraft:glass"), "tweakeroo.config.lists.comment.flatWorldPresets").translatedName("tweakeroo.config.lists.name.flatWorldPresets");
         public static final ConfigOptionList HAND_RESTOCK_LIST_TYPE             = new ConfigOptionList("handRestockListType", ListType.NONE, "tweakeroo.config.lists.comment.handRestockListType").translatedName("tweakeroo.config.lists.name.handRestockListType");
         public static final ConfigStringList HAND_RESTOCK_BLACKLIST             = new ConfigStringList("handRestockBlackList", ImmutableList.of("minecraft:bucket", "minecraft:lava_bucket", "minecraft:water_bucket"), "tweakeroo.config.lists.comment.handRestockBlackList").translatedName("tweakeroo.config.lists.name.handRestockBlackList");
         public static final ConfigStringList HAND_RESTOCK_WHITELIST             = new ConfigStringList("handRestockWhiteList", ImmutableList.of(), "tweakeroo.config.lists.comment.handRestockWhiteList").translatedName("tweakeroo.config.lists.name.handRestockWhiteList");
@@ -278,7 +278,7 @@ public class Configs implements IConfigHandler
                 FAST_RIGHT_CLICK_BLOCK_WHITELIST,
                 FAST_RIGHT_CLICK_ITEM_BLACKLIST,
                 FAST_RIGHT_CLICK_ITEM_WHITELIST,
-                FLAT_WORLD_PRESETS,
+                //FLAT_WORLD_PRESETS,
                 HAND_RESTOCK_LIST_TYPE,
                 HAND_RESTOCK_BLACKLIST,
                 HAND_RESTOCK_WHITELIST,

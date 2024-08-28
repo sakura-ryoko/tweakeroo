@@ -92,7 +92,6 @@ public abstract class MixinBackgroundRenderer
     }
     */
 
-    // TODO render() --> getFogColor()
     @Redirect(method = "getFogColor",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getHorizonShadingRatio()F"))

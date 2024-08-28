@@ -136,11 +136,12 @@ public class InventoryUtils
         {
             try
             {
-                Item item = Registries.ITEM.get(Identifier.tryParse(name));
+                //Item item = Registries.ITEM.get(Identifier.tryParse(name));
+                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.get(Identifier.tryParse(name));
 
-                if (item != null && item != Items.AIR)
+                if (opt.isPresent() && opt.get().value() != Items.AIR)
                 {
-                    UNSTACKING_ITEMS.add(item);
+                    UNSTACKING_ITEMS.add(opt.get().value());
                 }
             }
             catch (Exception e)
