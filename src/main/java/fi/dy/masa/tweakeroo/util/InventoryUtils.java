@@ -137,7 +137,7 @@ public class InventoryUtils
             try
             {
                 //Item item = Registries.ITEM.get(Identifier.tryParse(name));
-                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.get(Identifier.tryParse(name));
+                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.tryParse(name));
 
                 if (opt.isPresent() && opt.get().value() != Items.AIR)
                 {
@@ -208,11 +208,11 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<Item> weapon = Registries.ITEM.getOrEmpty(Identifier.tryParse(itemId));
+                        Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.tryParse(itemId));
 
-                        if (weapon.isPresent())
+                        if (opt.isPresent())
                         {
-                            weapons.add(weapon.get());
+                            weapons.add(opt.get().value());
                             continue;
                         }
                     }
@@ -232,11 +232,11 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<EntityType<?>> entity = Registries.ENTITY_TYPE.getOrEmpty(Identifier.tryParse(entity_id));
+                        Optional<RegistryEntry.Reference<EntityType<?>>> opt = Registries.ENTITY_TYPE.getEntry(Identifier.tryParse(entity_id));
 
-                        if (entity.isPresent())
+                        if (opt.isPresent())
                         {
-                            WEAPON_MAPPING.computeIfAbsent(entity.get(), s -> new HashSet<>()).addAll(weapons);
+                            WEAPON_MAPPING.computeIfAbsent(opt.get().value(), s -> new HashSet<>()).addAll(weapons);
                             continue;
                         }
                     }

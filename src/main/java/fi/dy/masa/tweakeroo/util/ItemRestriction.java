@@ -36,7 +36,7 @@ public class ItemRestriction
             try
             {
                 //Item item = Registries.ITEM.get(Identifier.tryParse(name));
-                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.get(Identifier.tryParse(name));
+                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.tryParse(name));
 
                 if (opt.isPresent() && opt.get().value() != Items.AIR)
                 {

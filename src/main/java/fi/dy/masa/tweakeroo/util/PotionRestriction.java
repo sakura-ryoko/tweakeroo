@@ -26,7 +26,7 @@ public class PotionRestriction extends UsageRestriction<StatusEffect>
             catch (Exception ignored) { }
 
             //StatusEffect effect = rl != null ? Registries.STATUS_EFFECT.get(rl) : null;
-            Optional<RegistryEntry.Reference<StatusEffect>> opt = Registries.STATUS_EFFECT.get(rl);
+            Optional<RegistryEntry.Reference<StatusEffect>> opt = Registries.STATUS_EFFECT.getEntry(rl);
 
             if (opt.isPresent())
             {
