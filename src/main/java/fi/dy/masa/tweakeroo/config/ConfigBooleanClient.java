@@ -8,14 +8,19 @@ import java.util.Objects;
 
 public class ConfigBooleanClient extends ConfigBooleanHotkeyed
 {
-    public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey, String comment)
+    public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey)
     {
-        this(name, defaultValue, defaultHotkey, comment, name);
+        this(name, defaultValue, defaultHotkey, name+" Comment!", StringUtils.splitCamelCase(name), name);
     }
 
-    public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName)
+    public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey, String comment)
     {
-        super(name, defaultValue, defaultHotkey, comment, prettyName);
+        this(name, defaultValue, defaultHotkey, comment, StringUtils.splitCamelCase(name), name);
+    }
+
+    public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName, String translatedName)
+    {
+        super(name, defaultValue, defaultHotkey, comment, prettyName, translatedName);
     }
 
     @Override

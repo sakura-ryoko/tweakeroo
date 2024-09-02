@@ -127,7 +127,7 @@ public class RenderUtils
         World world = fi.dy.masa.malilib.util.WorldUtils.getBestWorld(mc);
         Entity cameraEntity = EntityUtils.getCameraEntity();
 
-        if (mc.player == null)
+        if (mc.player == null || world == null || cameraEntity == null)
         {
             return;
         }
@@ -403,8 +403,6 @@ public class RenderUtils
         matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
         matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
         matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
-
-        //RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair(10);
         matrix4fStack.popMatrix();
         //RenderSystem.applyModelViewMatrix();
@@ -513,6 +511,11 @@ public class RenderUtils
 
     public static void renderPitchLockIndicator(MinecraftClient mc, DrawContext drawContext)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
+
         final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
         final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
         int width = 12;

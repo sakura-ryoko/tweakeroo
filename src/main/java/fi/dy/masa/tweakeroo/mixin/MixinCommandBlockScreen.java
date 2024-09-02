@@ -1,13 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import java.util.Arrays;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import java.util.Collections;
 
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.client.gui.DrawContext;
@@ -18,6 +11,13 @@ import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -47,6 +47,11 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
             int y = 158;
             int width = 200;
 
+            if (this.client == null || this.client.player == null)
+            {
+                return;
+            }
+
             // Move the vanilla buttons a little bit tighter, otherwise the large GUI scale is a mess
             this.modeButton.setY(y);
             this.conditionalModeButton.setY(y);
@@ -61,7 +66,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
 
             y = 181;
             this.textFieldName = new TextFieldWidget(this.textRenderer, x1, y, width, 20, Text.of(""));
-            this.textFieldName.setText(this.blockEntity.getCommandExecutor().getCustomName().getString());
+            this.textFieldName.setText(this.blockEntity.getCommandExecutor().getName().getString());
             this.addSelectableChild(this.textFieldName);
             final TextFieldWidget tf = this.textFieldName;
             final BlockPos pos = this.blockEntity.getPos();
@@ -107,7 +112,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
 
         if (this.textFieldName != null)
         {
-            String currentName = this.blockEntity.getCommandExecutor().getCustomName().getString();
+            String currentName = this.blockEntity.getCommandExecutor().getName().getString();
 
             if (currentName.equals(this.lastName) == false)
             {
@@ -143,7 +148,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         if (this.buttonUpdateExec != null && this.buttonUpdateExec.isHovered())
         {
             String hover = "tweakeroo.gui.button.misc.command_block.hover.update_execution";
-            RenderUtils.drawHoverText(mouseX, mouseY, Arrays.asList(StringUtils.translate(hover)), drawContext);
+            RenderUtils.drawHoverText(mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)), drawContext);
         }
     }
 
