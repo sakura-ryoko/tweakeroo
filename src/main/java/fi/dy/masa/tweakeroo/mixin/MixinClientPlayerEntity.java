@@ -122,15 +122,16 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
+    // FIXME
     @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"))
+            target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"))
     private void onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
             // PlayerEntity#checkFallFlying
-            if (!this.isOnGround() && !this.isFallFlying() && !this.isInFluid() && !this.hasStatusEffect(StatusEffects.LEVITATION))
+            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.hasStatusEffect(StatusEffects.LEVITATION))
             {
                 if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
                     this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
@@ -154,7 +155,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         {
             if (FLAGS.equals(data) && this.falling)
             {
-                if (!this.isFallFlying() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
+                if (!this.isGliding() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
                 {
                     if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.isOf(Items.ELYTRA))
                     {

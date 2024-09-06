@@ -54,7 +54,7 @@ public abstract class MixinLivingEntity extends Entity
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/LivingEntity;tickFallFlying()V"))
+            target = "Lnet/minecraft/entity/LivingEntity;isGliding()Z"))
     private void tweakeroo_applyCustomDeceleration(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CUSTOM_FLY_DECELERATION.getBooleanValue() &&

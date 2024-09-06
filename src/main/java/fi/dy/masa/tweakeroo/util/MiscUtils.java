@@ -87,7 +87,8 @@ public class MiscUtils
         ClientPlayerEntity player = mc.player;
         Input input = player.input;
 
-        if (input.jumping || input.sneaking ||
+        //if (input.jumping || input.sneaking ||
+        if (input.playerInput.jump() || input.playerInput.sneak() ||
             player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
         {
             return;

@@ -898,7 +898,10 @@ public class InventoryUtils
 
         ScreenHandler container = player.currentScreenHandler;
 
-        Predicate<ItemStack> filter = (s) ->  s.getItem() instanceof ElytraItem && ElytraItem.isUsable(s) && s.getDamage() < s.getMaxDamage() - 10;
+        Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.ELYTRA) &&
+                s.get(DataComponentTypes.EQUIPPABLE).allows(EntityType.PLAYER) &&
+                s.getDamage() < s.getMaxDamage() - 10;
+
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
             if (!filter.test(testedStack)) return false;
             if (!filter.test(previousBestMatch)) return true;
@@ -929,7 +932,9 @@ public class InventoryUtils
         ScreenHandler container = player.currentScreenHandler;
         ItemStack currentStack = player.getEquippedStack(EquipmentSlot.CHEST);
 
-        Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem && ((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
+        Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem &&
+                //((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
+                s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
 
         if (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack))
         {
