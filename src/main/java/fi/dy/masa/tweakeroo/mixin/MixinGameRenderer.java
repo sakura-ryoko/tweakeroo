@@ -30,7 +30,7 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 @Mixin(value = GameRenderer.class, priority = 1001)
 public abstract class MixinGameRenderer
 {
-    @Shadow @Final MinecraftClient client;
+    @Shadow @Final private MinecraftClient client;
 
     @Unique private float realYaw;
     @Unique private float realPitch;

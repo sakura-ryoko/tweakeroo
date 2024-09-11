@@ -24,7 +24,6 @@ public abstract class MixinKeyboardInput extends Input
 {
     @Shadow @Final private GameOptions settings;
 
-    // FIXME
     @Inject(method = "tick(ZF)V", at = @At(
             value = "FIELD",
             target = "Lnet/minecraft/client/input/KeyboardInput;playerInput:Lnet/minecraft/util/PlayerInput;",
