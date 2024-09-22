@@ -1,12 +1,16 @@
 package fi.dy.masa.tweakeroo.renderer;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -27,13 +31,16 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+
 import fi.dy.masa.malilib.render.InventoryOverlay;
+import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -148,7 +155,7 @@ public class RenderUtils
 
         Inventory inv = null;
         ShulkerBoxBlock shulkerBoxBlock = null;
-        //CrafterBlock crafterBlock = null;
+        BlockEntity be = null;
         LivingEntity entityLivingBase = null;
 
         if (trace.getType() == HitResult.Type.BLOCK)
@@ -160,6 +167,10 @@ public class RenderUtils
             {
                 shulkerBoxBlock = (ShulkerBoxBlock) blockTmp;
             }
+            else if (blockTmp instanceof BlockEntityProvider)
+            {
+                be = world.getWorldChunk(pos).getBlockEntity(pos);
+            }
 
             inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
 
@@ -167,6 +178,7 @@ public class RenderUtils
                 && FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos);
+                be = ServerDataSyncer.getInstance().getServerBlockEntity(world, pos);
             }
         }
         else if (trace.getType() == HitResult.Type.ENTITY)
@@ -214,9 +226,10 @@ public class RenderUtils
             final int totalSlots = isHorse ? inv.size() - 1 : inv.size();
             final int firstSlot = isHorse ? 1 : 0;
 
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType.VILLAGER : fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
+            fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType.VILLAGER : fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
             final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
             final int rows = (int) Math.ceil((double) totalSlots / props.slotsPerRow);
+            Set<Integer> lockedSlots = new HashSet<>();
             int xInv = xCenter - (props.width / 2);
             int yInv = yCenter - props.height - 6;
 
@@ -231,6 +244,12 @@ public class RenderUtils
                 x = xCenter - 55;
                 xInv = xCenter + 2;
                 yInv = Math.min(yInv, yCenter - 92);
+            }
+
+            if (type == InventoryOverlay.InventoryRenderType.CRAFTER &&
+                be instanceof CrafterBlockEntity crafter)
+            {
+                lockedSlots = BlockUtils.getDisabledSlots(crafter);
             }
 
             fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(shulkerBoxBlock, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
@@ -250,7 +269,16 @@ public class RenderUtils
             if (totalSlots > 0)
             {
                 fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
-                fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, firstSlot, totalSlots, mc, drawContext);
+
+                if (!lockedSlots.isEmpty() && be instanceof CrafterBlockEntity crafter)
+                {
+                    DefaultedList<ItemStack> stacks = crafter.getHeldStacks();
+                    fi.dy.masa.malilib.render.InventoryOverlay.renderCrafterStacks(stacks, lockedSlots, xInv + props.slotOffsetX, yInv + props.slotOffsetY, firstSlot, mc, drawContext);
+                }
+                else
+                {
+                    fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, firstSlot, totalSlots, mc, drawContext);
+                }
             }
         }
 

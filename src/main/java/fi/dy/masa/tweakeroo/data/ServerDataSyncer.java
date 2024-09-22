@@ -311,6 +311,27 @@ public class ServerDataSyncer
         }
     }
 
+    public @Nullable BlockEntity getServerBlockEntity(World world, BlockPos pos)
+    {
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
+        {
+            return null;
+        }
+        else if (yesIAmOp.isPresent() && !yesIAmOp.get())
+        {
+            return null;
+        }
+
+        BlockEntity serverEntity = getCache(pos);
+        if (serverEntity == null)
+        {
+            syncBlockEntity(world, pos);
+            return null;
+        }
+
+        return serverEntity;
+    }
+
     public @Nullable Entity getServerEntity(Entity entity)
     {
         if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
