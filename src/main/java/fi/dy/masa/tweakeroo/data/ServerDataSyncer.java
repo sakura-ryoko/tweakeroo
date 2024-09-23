@@ -6,14 +6,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.Nullable;
+
 import com.mojang.datafixers.util.Either;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
-import net.minecraft.block.CrafterBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.DataQueryHandler;
@@ -27,7 +26,7 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import fi.dy.masa.malilib.util.InventoryUtils;
+
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.mixin.IMixinDataQueryHandler;
 
@@ -72,7 +71,7 @@ public class ServerDataSyncer
         this.clientWorld = Objects.requireNonNull(world);
     }
 
-    private @Nullable BlockEntity getCache(BlockPos pos)
+    public @Nullable BlockEntity getCache(BlockPos pos)
     {
         var data = blockCache.get(pos);
 
@@ -91,7 +90,7 @@ public class ServerDataSyncer
         return null;
     }
 
-    private @Nullable Entity getCache(int networkId)
+    public @Nullable Entity getCache(int networkId)
     {
         var data = entityCache.get(networkId);
 
@@ -170,10 +169,12 @@ public class ServerDataSyncer
                     }
                 }
             }
+            /*
             else if (state.getBlock() instanceof CrafterBlock && inv instanceof CrafterBlockEntity ce)
             {
                 return InventoryUtils.getAsInventory(ce.getHeldStacks());
             }
+             */
 
             return inv;
         }
@@ -198,10 +199,12 @@ public class ServerDataSyncer
                 }
             }
         }
+        /*
         else if (state.getBlock() instanceof CrafterBlock)
         {
             syncBlockEntity(world, pos);
         }
+         */
 
         return null;
     }
