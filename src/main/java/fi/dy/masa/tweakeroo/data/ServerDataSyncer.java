@@ -53,8 +53,8 @@ public class ServerDataSyncer
      * key: BlockPos
      * value: data, timestamp
      */
-    private final Map<BlockPos, Pair<BlockEntity, Long>> blockCache = new HashMap<>();
-    private final Map<Integer, Pair<Entity, Long>> entityCache = new HashMap<>();
+    private final Map<BlockPos, Pair<BlockEntity, Long>> blockCache  = new HashMap<>();
+    private final Map<Integer , Pair<Entity,      Long>> entityCache = new HashMap<>();
     /**
      * this map is not important, you can clear it anytime you want, but a bit more packets will be sent to the server
      */
@@ -112,6 +112,7 @@ public class ServerDataSyncer
     public void handleQueryResponse(int transactionId, NbtCompound nbt)
     {
         CompletableFuture<@Nullable NbtCompound> future = pendingQueriesById.remove(transactionId);
+
         if (future != null)
         {
             future.complete(nbt);
@@ -161,7 +162,10 @@ public class ServerDataSyncer
                         syncBlockEntity(world, posAdj);
                     }
 
-                    if (stateAdj.getBlock() == state.getBlock() && dataAdj instanceof ChestBlockEntity inv2 && stateAdj.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE && stateAdj.get(ChestBlock.FACING) == state.get(ChestBlock.FACING))
+                    if (stateAdj.getBlock() == state.getBlock() &&
+                        dataAdj instanceof ChestBlockEntity inv2 &&
+                        stateAdj.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE &&
+                        stateAdj.get(ChestBlock.FACING) == state.get(ChestBlock.FACING))
                     {
                         Inventory invRight = type == ChestType.RIGHT ? inv : inv2;
                         Inventory invLeft = type == ChestType.RIGHT ? inv2 : inv;
@@ -335,6 +339,27 @@ public class ServerDataSyncer
         return serverEntity;
     }
 
+    public @Nullable NbtCompound getServerBlockEntityAsNbt(World world, BlockPos pos)
+    {
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
+        {
+            return null;
+        }
+        else if (yesIAmOp.isPresent() && !yesIAmOp.get())
+        {
+            return null;
+        }
+
+        BlockEntity serverEntity = getCache(pos);
+        if (serverEntity == null)
+        {
+            syncBlockEntity(world, pos);
+            return null;
+        }
+
+        return serverEntity.createNbtWithIdentifyingData(world.getRegistryManager());
+    }
+
     public @Nullable Entity getServerEntity(Entity entity)
     {
         if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
@@ -354,6 +379,33 @@ public class ServerDataSyncer
         }
 
         return serverEntity;
+    }
+
+    public @Nullable NbtCompound getServerEntityAsNbt(Entity entity)
+    {
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
+        {
+            return null;
+        }
+        else if (yesIAmOp.isPresent() && !yesIAmOp.get())
+        {
+            return null;
+        }
+
+        Entity serverEntity = getCache(entity.getId());
+        if (serverEntity == null)
+        {
+            syncEntity(entity.getId());
+            return null;
+        }
+
+        NbtCompound nbt = new NbtCompound();
+        if (serverEntity.saveSelfNbt(nbt))
+        {
+            return nbt;
+        }
+
+        return null;
     }
 
     public void recheckOpStatus()

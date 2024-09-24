@@ -6,10 +6,7 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.CrafterBlock;
-import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -30,6 +27,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
@@ -39,10 +37,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
+import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.render.InventoryOverlay;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.*;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
@@ -72,7 +69,7 @@ public class RenderUtils
             int startX = offX;
             int startY = offY;
 
-            fi.dy.masa.malilib.config.HudAlignment align = (fi.dy.masa.malilib.config.HudAlignment) Configs.Generic.HOTBAR_SWAP_OVERLAY_ALIGNMENT.getOptionListValue();
+            HudAlignment align = (HudAlignment) Configs.Generic.HOTBAR_SWAP_OVERLAY_ALIGNMENT.getOptionListValue();
 
             switch (align)
             {
@@ -115,7 +112,7 @@ public class RenderUtils
 
                     if (stack.isEmpty() == false)
                     {
-                        fi.dy.masa.malilib.render.InventoryOverlay.renderStackAt(stack, x, y, 1, mc, drawContext);
+                        InventoryOverlay.renderStackAt(stack, x, y, 1, mc, drawContext);
                     }
 
                     x += 18;
@@ -131,7 +128,7 @@ public class RenderUtils
 
     public static void renderInventoryOverlay(MinecraftClient mc, DrawContext drawContext)
     {
-        World world = fi.dy.masa.malilib.util.WorldUtils.getBestWorld(mc);
+        World world = WorldUtils.getBestWorld(mc);
         Entity cameraEntity = EntityUtils.getCameraEntity();
 
         if (mc.player == null || world == null || cameraEntity == null)
@@ -153,51 +150,77 @@ public class RenderUtils
 
         HitResult trace = RayTraceUtils.getRayTraceFromEntity(world, cameraEntity, false);
 
-        BlockPos pos = null;
-        Inventory inv = null;
-        BlockEntity be = null;
         ShulkerBoxBlock shulkerBoxBlock = null;
         CrafterBlock crafterBlock = null;
         LivingEntity entityLivingBase = null;
+        InventoryOverlay.Context context = null;
+        NbtCompound nbt = new NbtCompound();
+        BlockEntity be = null;
+        Inventory inv = null;
+        BlockPos pos = null;
 
         if (trace.getType() == HitResult.Type.BLOCK)
         {
             pos = ((BlockHitResult) trace).getBlockPos();
-            Block blockTmp = world.getBlockState(pos).getBlock();
+            BlockState state = world.getBlockState(pos);
+            Block blockTmp = state.getBlock();
 
             if (blockTmp instanceof ShulkerBoxBlock)
             {
                 shulkerBoxBlock = (ShulkerBoxBlock) blockTmp;
             }
-            else if (blockTmp instanceof BlockEntityProvider)
-            {
-                be = world.getWorldChunk(pos).getBlockEntity(pos);
-            }
-            if (blockTmp instanceof CrafterBlock)
+            else if (blockTmp instanceof CrafterBlock)
             {
                 crafterBlock = (CrafterBlock) blockTmp;
             }
 
-            inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
+            inv = InventoryUtils.getInventory(world, pos);
 
-            if (world.isClient && world.getBlockState(pos).getBlock() instanceof BlockEntityProvider
-                && FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            if (blockTmp instanceof BlockEntityProvider)
             {
-                inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos);
-                be = ServerDataSyncer.getInstance().getServerBlockEntity(world, pos);
+                if (world instanceof ServerWorld)
+                {
+                    be = world.getWorldChunk(pos).getBlockEntity(pos);
+                }
+                else if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                {
+                    be = ServerDataSyncer.getInstance().getServerBlockEntity(world, pos);
+                    inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos);
+                }
+
+                if (be != null)
+                {
+                    nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+                }
+                if (!nbt.isEmpty())
+                {
+                    Inventory inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, world.getRegistryManager());
+
+                    if (inv == null)
+                    {
+                        inv = inv2;
+                    }
+                }
             }
+
+            context = new InventoryOverlay.Context(InventoryOverlay.getInventoryType(nbt), inv, be, null, nbt);
         }
         else if (trace.getType() == HitResult.Type.ENTITY)
         {
             Entity entity = ((EntityHitResult) trace).getEntity();
 
-            if (entity.getWorld().isClient &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            if (world instanceof ServerWorld)
+            {
+                entity.saveSelfNbt(nbt);
+            }
+            else if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 Entity serverEntity = ServerDataSyncer.getInstance().getServerEntity(entity);
+
                 if (serverEntity != null)
                 {
                     entity = serverEntity;
+                    serverEntity.saveSelfNbt(nbt);
                 }
             }
 
@@ -206,18 +229,28 @@ public class RenderUtils
                 entityLivingBase = (LivingEntity) entity;
             }
 
-            if (entity instanceof Inventory)
+            switch (entity)
             {
-                inv = (Inventory) entity;
+                case Inventory inventory ->
+                        inv = inventory;
+                case VillagerEntity villagerEntity ->
+                        inv = villagerEntity.getInventory();
+                case AbstractHorseEntity abstractHorseEntity ->
+                        inv = ((IMixinAbstractHorseEntity) abstractHorseEntity).tweakeroo_getHorseInventory();
+                default -> {}
             }
-            else if (entity instanceof VillagerEntity)
+
+            if (!nbt.isEmpty())
             {
-                inv = ((VillagerEntity) entity).getInventory();
+                Inventory inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, world.getRegistryManager());
+
+                if (inv == null)
+                {
+                    inv = inv2;
+                }
             }
-            else if (entity instanceof AbstractHorseEntity)
-            {
-                inv = ((IMixinAbstractHorseEntity) entity).tweakeroo_getHorseInventory();
-            }
+
+            context = new InventoryOverlay.Context(InventoryOverlay.getInventoryType(nbt), inv, null, entityLivingBase, nbt);
         }
 
         final boolean isWolf = (entityLivingBase instanceof WolfEntity);
@@ -232,8 +265,8 @@ public class RenderUtils
             final int totalSlots = isHorse ? inv.size() - 1 : inv.size();
             final int firstSlot = isHorse ? 1 : 0;
 
-            fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType.VILLAGER : fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
+            InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? InventoryOverlay.InventoryRenderType.VILLAGER : InventoryOverlay.getBestInventoryType(inv, nbt);
+            final InventoryOverlay.InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
             final int rows = (int) Math.ceil((double) totalSlots / props.slotsPerRow);
             Set<Integer> lockedSlots = new HashSet<>();
             int xInv = xCenter - (props.width / 2);
@@ -254,18 +287,17 @@ public class RenderUtils
 
             if (crafterBlock != null && pos != null)
             {
-                CrafterBlockEntity cbe = null;
-
-                if (be instanceof CrafterBlockEntity)
-                {
-                    cbe = (CrafterBlockEntity) be;
-                }
-
-                if (cbe != null)
+                if (be instanceof CrafterBlockEntity cbe)
                 {
                     lockedSlots = BlockUtils.getDisabledSlots(cbe);
                 }
+                else if (context.nbt() != null)
+                {
+                    lockedSlots = BlockUtils.getDisabledSlotsFromNbt(context.nbt());
+                }
             }
+
+            //Tweakeroo.logger.warn("renderInventoryOverlay: type [{}] // Nbt Type [{}]", type.toString(), context.nbt() != null ? InventoryOverlay.getInventoryType(context.nbt()) : "INVALID");
 
             fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(shulkerBoxBlock, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
 
@@ -276,8 +308,8 @@ public class RenderUtils
                 horseInv.setStack(0, horseArmor != null && !horseArmor.isEmpty() ? horseArmor : ItemStack.EMPTY);
                 horseInv.setStack(1, inv.getStack(0));
 
-                fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
-                fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+                InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
                 xInv += 32 + 4;
             }
 
@@ -291,7 +323,7 @@ public class RenderUtils
         if (isWolf)
         {
             InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.HORSE;
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, 2);
+            final InventoryOverlay.InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, 2);
             final int rows = (int) Math.ceil((double) 2 / props.slotsPerRow);
             int xInv;
             int yInv = yCenter - props.height - 6;
@@ -309,14 +341,14 @@ public class RenderUtils
             Inventory wolfInv = new SimpleInventory(2);
             ItemStack wolfArmor = ((WolfEntity) entityLivingBase).getBodyArmor();
             wolfInv.setStack(0, wolfArmor != null && !wolfArmor.isEmpty() ? wolfArmor : ItemStack.EMPTY);
-            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
-            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+            InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+            InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
         }
 
         if (entityLivingBase != null)
         {
-            fi.dy.masa.malilib.render.InventoryOverlay.renderEquipmentOverlayBackground(x, y, entityLivingBase, drawContext);
-            fi.dy.masa.malilib.render.InventoryOverlay.renderEquipmentStacks(entityLivingBase, x, y, mc, drawContext);
+            InventoryOverlay.renderEquipmentOverlayBackground(x, y, entityLivingBase, drawContext);
+            InventoryOverlay.renderEquipmentStacks(entityLivingBase, x, y, mc, drawContext);
         }
     }
 
@@ -333,12 +365,12 @@ public class RenderUtils
         int y = GuiUtils.getScaledWindowHeight() / 2 + 10;
         int slotOffsetX = 8;
         int slotOffsetY = 8;
-        fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType.GENERIC;
+        InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.GENERIC;
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, x, y, 9, 27, mc);
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, x + slotOffsetX, y + slotOffsetY, 9, 9, 27, mc, drawContext);
+        InventoryOverlay.renderInventoryBackground(type, x, y, 9, 27, mc);
+        InventoryOverlay.renderInventoryStacks(type, inv, x + slotOffsetX, y + slotOffsetY, 9, 9, 27, mc, drawContext);
     }
 
     public static void renderHotbarScrollOverlay(MinecraftClient mc, DrawContext drawContext)
@@ -354,17 +386,17 @@ public class RenderUtils
         final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
         final int x = xCenter - 176 / 2;
         final int y = yCenter + 6;
-        fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType.GENERIC;
+        InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.GENERIC;
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, x, y     , 9, 27, mc);
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, x, y + 70, 9,  9, mc);
+        InventoryOverlay.renderInventoryBackground(type, x, y     , 9, 27, mc);
+        InventoryOverlay.renderInventoryBackground(type, x, y + 70, 9,  9, mc);
 
         // Main inventory
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y +  8, 9, 9, 27, mc, drawContext);
+        InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y +  8, 9, 9, 27, mc, drawContext);
         // Hotbar
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y + 78, 9, 0,  9, mc, drawContext);
+        InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y + 78, 9, 0,  9, mc, drawContext);
 
         int currentRow = Configs.Internal.HOTBAR_SCROLL_CURRENT_ROW.getIntegerValue();
         fi.dy.masa.malilib.render.RenderUtils.drawOutline(x + 5, y + currentRow * 18 + 5, 9 * 18 + 4, 22, 2, 0xFFFF2020);
