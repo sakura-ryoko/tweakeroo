@@ -15,7 +15,7 @@
     "IMixinShovelItem",
     "IMixinSimpleOption",
     "MixinAbstractClientPlayerEntity",
-    "MixinAbstractInventoryScreen",
+    "MixinStatusEffectsDisplay",
     "MixinAbstractSignEditScreen",
     "MixinBackgroundRenderer",
     "MixinBatEntity",
@@ -47,6 +47,7 @@
     "MixinGameRenderer",
     "MixinGameRenderer_ViewBob",
     "MixinHeldItemRenderer",
+    "MixinHopperBlockEntity",
     "MixinInGameHud",
     "MixinItem",
     "MixinItemGroup",
@@ -83,8 +84,5 @@
   "mixinPriority": 990,
   "injectors": {
     "defaultRequire": 0
-  },
-  "mixins": [
-    "MixinHopperBlockEntity"
-  ]
+  }
 }
