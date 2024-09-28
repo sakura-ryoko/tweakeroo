@@ -226,7 +226,7 @@ public class ServerDataSyncer
             if (blockEntity != null)
             {
                 blockCache.put(pos, new Pair<>(blockEntity, System.currentTimeMillis()));
-                return CompletableFuture.completedFuture(blockEntity.createNbt(world.getRegistryManager()));
+                return CompletableFuture.completedFuture(blockEntity.createNbtWithIdentifyingData(world.getRegistryManager()));
             }
         }
         Either<BlockPos, Integer> posEither = Either.left(pos);
