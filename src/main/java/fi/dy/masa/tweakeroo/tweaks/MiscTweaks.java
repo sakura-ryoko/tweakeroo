@@ -249,6 +249,7 @@ public class MiscTweaks
                (effect.getEffectType().value().isBeneficial() ||
                Configs.Generic.POTION_WARNING_BENEFICIAL_ONLY.getBooleanValue() == false) &&
                effect.getDuration() <= Configs.Generic.POTION_WARNING_THRESHOLD.getIntegerValue() &&
+               effect.getDuration() >= 0 &&
                POTION_RESTRICTION.isAllowed(effect.getEffectType().value());
     }
 
