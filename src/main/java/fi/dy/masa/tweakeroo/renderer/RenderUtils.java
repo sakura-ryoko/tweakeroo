@@ -6,7 +6,7 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.*;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -29,23 +29,14 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.render.InventoryOverlay;
-import fi.dy.masa.malilib.util.*;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
-import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
 
 public class RenderUtils
@@ -126,8 +117,11 @@ public class RenderUtils
         }
     }
 
-    public static void renderInventoryOverlay(MinecraftClient mc, DrawContext drawContext)
+    public static void renderInventoryOverlay(InventoryOverlay.Context context, DrawContext drawContext)
     {
+        MinecraftClient mc = MinecraftClient.getInstance();
+
+        /*
         World world = WorldUtils.getBestWorld(mc);
         Entity cameraEntity = EntityUtils.getCameraEntity();
 
@@ -164,6 +158,7 @@ public class RenderUtils
             pos = ((BlockHitResult) trace).getBlockPos();
             BlockState state = world.getBlockState(pos);
             Block blockTmp = state.getBlock();
+            Pair<BlockEntity, NbtCompound> blockPair = null;
 
             if (blockTmp instanceof ShulkerBoxBlock)
             {
@@ -181,17 +176,18 @@ public class RenderUtils
                 if (world instanceof ServerWorld)
                 {
                     be = world.getWorldChunk(pos).getBlockEntity(pos);
+
+                    if (be != null)
+                    {
+                        nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+                    }
                 }
                 else if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
                 {
-                    be = ServerDataSyncer.getInstance().getServerBlockEntity(world, pos);
-                    inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos);
+                    blockPair = ServerDataSyncer.getInstance().requestBlockEntity(world, pos);
+                    inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos, true);
                 }
 
-                if (be != null)
-                {
-                    nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
-                }
                 if (!nbt.isEmpty())
                 {
                     Inventory inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, world.getRegistryManager());
@@ -200,10 +196,28 @@ public class RenderUtils
                     {
                         inv = inv2;
                     }
+
+                    context = new InventoryOverlay.Context(InventoryOverlay.getBestInventoryType(inv, nbt), inv, be, null, nbt);
+                }
+                else if (blockPair != null && !blockPair.getRight().isEmpty())
+                {
+                    be = blockPair.getLeft();
+
+                    Inventory inv2 = InventoryUtils.getNbtInventory(blockPair.getRight(), inv != null ? inv.size() : -1, world.getRegistryManager());
+
+                    if (inv == null)
+                    {
+                        inv = inv2;
+                    }
+
+                    context = new InventoryOverlay.Context(InventoryOverlay.getBestInventoryType(inv, blockPair.getRight()), inv, be, null, blockPair.getRight());
                 }
             }
 
-            context = new InventoryOverlay.Context(InventoryOverlay.getInventoryType(nbt), inv, be, null, nbt);
+            if (inv != null && !nbt.isEmpty())
+            {
+                context = new InventoryOverlay.Context(InventoryOverlay.getBestInventoryType(inv, nbt), inv, be, null, nbt);
+            }
         }
         else if (trace.getType() == HitResult.Type.ENTITY)
         {
@@ -215,12 +229,11 @@ public class RenderUtils
             }
             else if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
-                Entity serverEntity = ServerDataSyncer.getInstance().getServerEntity(entity);
+                Pair<Entity, NbtCompound> entityPair = ServerDataSyncer.getInstance().requestEntity(entity.getId());
 
-                if (serverEntity != null)
+                if (entityPair != null && entityPair.getLeft() != null)
                 {
-                    entity = serverEntity;
-                    serverEntity.saveSelfNbt(nbt);
+                    entity = entityPair.getLeft();
                 }
             }
 
@@ -252,6 +265,34 @@ public class RenderUtils
 
             context = new InventoryOverlay.Context(InventoryOverlay.getInventoryType(nbt), inv, null, entityLivingBase, nbt);
         }
+         */
+
+        LivingEntity entityLivingBase = null;
+        BlockEntity be = null;
+        Inventory inv = null;
+        NbtCompound nbt = new NbtCompound();
+
+        if (context.be() != null)
+        {
+            be = context.be();
+        }
+        else if (context.entity() != null)
+        {
+            if (context.entity() instanceof LivingEntity)
+            {
+                entityLivingBase = context.entity();
+            }
+        }
+        if (context.inv() != null)
+        {
+            inv = context.inv();
+        }
+        if (context.nbt() != null)
+        {
+            nbt.copyFrom(context.nbt());
+        }
+
+        //Tweakeroo.logger.error("render: ctx-type [{}], inv [{}], raw Nbt [{}]", context.type().toString(), inv != null ? inv.size() : "null", nbt.isEmpty() ? "empty" : nbt.toString());
 
         final boolean isWolf = (entityLivingBase instanceof WolfEntity);
         final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
@@ -265,7 +306,7 @@ public class RenderUtils
             final int totalSlots = isHorse ? inv.size() - 1 : inv.size();
             final int firstSlot = isHorse ? 1 : 0;
 
-            InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? InventoryOverlay.InventoryRenderType.VILLAGER : InventoryOverlay.getBestInventoryType(inv, nbt);
+            InventoryOverlay.InventoryRenderType type = (entityLivingBase instanceof VillagerEntity) ? InventoryOverlay.InventoryRenderType.VILLAGER : InventoryOverlay.getBestInventoryType(inv, nbt, context);
             final InventoryOverlay.InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
             final int rows = (int) Math.ceil((double) totalSlots / props.slotsPerRow);
             Set<Integer> lockedSlots = new HashSet<>();
@@ -285,7 +326,7 @@ public class RenderUtils
                 yInv = Math.min(yInv, yCenter - 92);
             }
 
-            if (crafterBlock != null && pos != null)
+            if (be != null && type == InventoryOverlay.InventoryRenderType.CRAFTER)
             {
                 if (be instanceof CrafterBlockEntity cbe)
                 {
@@ -299,7 +340,10 @@ public class RenderUtils
 
             //Tweakeroo.logger.warn("renderInventoryOverlay: type [{}] // Nbt Type [{}]", type.toString(), context.nbt() != null ? InventoryOverlay.getInventoryType(context.nbt()) : "INVALID");
 
-            fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(shulkerBoxBlock, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+            if (context.be() != null && context.be().getCachedState().getBlock() instanceof ShulkerBoxBlock sbb)
+            {
+                fi.dy.masa.malilib.render.RenderUtils.setShulkerboxBackgroundTintColor(sbb, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+            }
 
             if (isHorse)
             {

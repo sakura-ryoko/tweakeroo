@@ -3,7 +3,25 @@ package fi.dy.masa.tweakeroo.util;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nonnull;
+import com.llamalad7.mixinextras.lib.apache.commons.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.PiglinEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -13,12 +31,21 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+import fi.dy.masa.malilib.render.InventoryOverlay;
+import fi.dy.masa.malilib.util.*;
+import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.tweakeroo.data.DataManager;
+import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
+import fi.dy.masa.tweakeroo.mixin.IMixinPiglinEntity;
+
 public class RayTraceUtils
 {
     @Nonnull
     public static HitResult getRayTraceFromEntity(World worldIn, Entity entityIn, boolean useLiquids)
     {
-        double reach = 5.0d;
+        //double reach = 5.0d;
+        double reach = entityIn instanceof PlayerEntity pe ? pe.getBlockInteractionRange() + 1.0d : 5.0d;
         return getRayTraceFromEntity(worldIn, entityIn, useLiquids, reach);
     }
 
@@ -70,5 +97,233 @@ public class RayTraceUtils
         }
 
         return result;
+    }
+
+    public static @Nullable InventoryOverlay.Context getTargetInventory(MinecraftClient mc)
+    {
+        World world = WorldUtils.getBestWorld(mc);
+        Entity cameraEntity = EntityUtils.getCameraEntity();
+
+        if (mc.player == null || world == null)
+        {
+            return null;
+        }
+
+        if (cameraEntity == mc.player && world instanceof ServerWorld)
+        {
+            // We need to get the player from the server world (if available, ie. in single player),
+            // so that the player itself won't be included in the ray trace
+            Entity serverPlayer = world.getPlayerByUuid(mc.player.getUuid());
+
+            if (serverPlayer != null)
+            {
+                cameraEntity = serverPlayer;
+            }
+        }
+
+        HitResult trace = getRayTraceFromEntity(world, cameraEntity, false);
+        NbtCompound nbt = new NbtCompound();
+
+        if (trace.getType() == HitResult.Type.BLOCK)
+        {
+            BlockPos pos = ((BlockHitResult) trace).getBlockPos();
+            BlockState state = world.getBlockState(pos);
+            Block blockTmp = state.getBlock();
+            BlockEntity be = null;
+
+            //Tweakeroo.logger.warn("getTarget():1: pos [{}], state [{}]", pos.toShortString(), state.toString());
+
+            if (blockTmp instanceof BlockEntityProvider)
+            {
+                if (world instanceof ServerWorld)
+                {
+                    be = world.getWorldChunk(pos).getBlockEntity(pos);
+
+                    if (be != null)
+                    {
+                        nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+                    }
+                }
+                else
+                {
+                    Pair<BlockEntity, NbtCompound> pair = ServerDataSyncer.getInstance().requestBlockEntity(world, pos);
+
+                    if (pair != null)
+                    {
+                        nbt = pair.getRight();
+                    }
+                }
+
+                //Tweakeroo.logger.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, nbt != null);
+
+                return getTargetInventoryFromBlock(world, pos, be, nbt);
+            }
+
+            return null;
+        }
+        else if (trace.getType() == HitResult.Type.ENTITY)
+        {
+            Entity entity = ((EntityHitResult) trace).getEntity();
+
+            if (world instanceof ServerWorld)
+            {
+                if (entity.saveSelfNbt(nbt))
+                {
+                    return getTargetInventoryFromEntity(world.getEntityById(entity.getId()), nbt);
+                }
+            }
+            else
+            {
+                Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(entity.getId());
+
+                if (pair != null)
+                {
+                    return getTargetInventoryFromEntity(world.getEntityById(pair.getLeft().getId()), pair.getRight());
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static @Nullable InventoryOverlay.Context getTargetInventoryFromBlock(World world, BlockPos pos, @Nullable BlockEntity be, NbtCompound nbt)
+    {
+        Inventory inv;
+
+        if (be != null)
+        {
+            if (nbt.isEmpty())
+            {
+                nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+            }
+            inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
+        }
+        else
+        {
+            if (nbt.isEmpty())
+            {
+                Pair<BlockEntity, NbtCompound> pair = ServerDataSyncer.getInstance().requestBlockEntity(world, pos);
+
+                if (pair != null)
+                {
+                    nbt = pair.getRight();
+                }
+            }
+
+            inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos, false);
+        }
+
+        if (nbt != null && !nbt.isEmpty())
+        {
+            Inventory inv2 = fi.dy.masa.malilib.util.InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, world.getRegistryManager());
+
+            if (inv == null)
+            {
+                inv = inv2;
+            }
+        }
+
+        //Tweakeroo.logger.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, nbt != null ? nbt.getString("id") : new NbtCompound());
+
+        if (inv == null || nbt == null)
+        {
+            return null;
+        }
+
+        return new InventoryOverlay.Context(InventoryOverlay.getBestInventoryType(inv, nbt), inv, be != null ? be : world.getBlockEntity(pos), null, nbt);
+    }
+
+    public static @Nullable InventoryOverlay.Context getTargetInventoryFromEntity(Entity entity, NbtCompound nbt)
+    {
+        Inventory inv = null;
+        LivingEntity entityLivingBase = null;
+
+        if (entity instanceof LivingEntity)
+        {
+            entityLivingBase = (LivingEntity) entity;
+        }
+
+        if (entity instanceof Inventory)
+        {
+            inv = (Inventory) entity;
+        }
+        else if (entity instanceof PlayerEntity player)
+        {
+            inv = new SimpleInventory(player.getInventory().main.toArray(new ItemStack[36]));
+        }
+        else if (entity instanceof VillagerEntity)
+        {
+            inv = ((VillagerEntity) entity).getInventory();
+        }
+        else if (entity instanceof AbstractHorseEntity)
+        {
+            inv = ((IMixinAbstractHorseEntity) entity).tweakeroo_getHorseInventory();
+        }
+        else if (entity instanceof PiglinEntity)
+        {
+            inv = ((IMixinPiglinEntity) entity).tweakeroo_inventory();
+        }
+        if (!nbt.isEmpty())
+        {
+            Inventory inv2;
+
+            //Tweakeroo.logger.warn("getTargetInventoryFromEntity(): rawNbt: [{}]", nbt.toString());
+
+            // Fix for empty horse inv
+            if (inv != null && inv.size() == 1 &&
+                    nbt.contains(NbtKeys.ITEMS) &&
+                    nbt.getList(NbtKeys.ITEMS, Constants.NBT.TAG_COMPOUND).size() > 1 &&
+                    !DataManager.getInstance().hasIntegratedServer())
+            {
+                if (entity instanceof AbstractHorseEntity)
+                {
+                    inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
+                }
+                else
+                {
+                    inv2 = InventoryUtils.getNbtInventory(nbt, -1, entity.getRegistryManager());
+                }
+                inv = null;
+            }
+            // Fix for saddled horse, no inv
+            else if (inv != null && inv.size() == 1 &&
+                    nbt.contains(NbtKeys.SADDLE) &&
+                    !DataManager.getInstance().hasIntegratedServer())
+            {
+                inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
+                inv = null;
+            }
+            // Fix for empty Villager/Piglin inv
+            else if (inv != null && inv.size() == 8 &&
+                    nbt.contains(NbtKeys.INVENTORY) &&
+                    !nbt.getList(NbtKeys.INVENTORY, Constants.NBT.TAG_COMPOUND).isEmpty() &&
+                    !DataManager.getInstance().hasIntegratedServer())
+            {
+                inv2 = InventoryUtils.getNbtInventory(nbt, 8, entity.getRegistryManager());
+                inv = null;
+            }
+            else
+            {
+                inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, entity.getRegistryManager());
+            }
+
+            //Tweakeroo.logger.error("getTargetInventoryFromEntity(): inv.size [{}], inv2.size [{}]", inv != null ? inv.size() : "null", inv2 != null ? inv2.size() : "null");
+
+            if (inv2 != null)
+            {
+                if (inv == null)
+                {
+                    inv = inv2;
+                }
+            }
+        }
+
+        if (inv == null && entityLivingBase == null)
+        {
+            return null;
+        }
+
+        return new InventoryOverlay.Context(inv != null ? InventoryOverlay.getBestInventoryType(inv, nbt) : InventoryOverlay.getInventoryType(nbt),
+                                            inv, null, entityLivingBase, nbt);
     }
 }

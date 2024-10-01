@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
@@ -52,19 +51,6 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         if (FeatureToggle.TWEAK_PRINT_DEATH_COORDINATES.getBooleanValue() && mc.player != null)
         {
             MiscUtils.printDeathCoordinates(mc);
-        }
-    }
-
-    @Inject(
-            method = "onCommandTree",
-            at = @At("RETURN")
-    )
-    private void onCommandTree(CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
-        {
-            // when the player becomes OP, the server sends the command tree to the client
-            ServerDataSyncer.getInstance().recheckOpStatus();
         }
     }
 

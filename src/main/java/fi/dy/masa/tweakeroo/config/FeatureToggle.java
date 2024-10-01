@@ -89,6 +89,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_REPAIR_MODE               ("tweakRepairMode",                     false, ""),
     TWEAK_SCULK_PULSE_LENGTH        ("tweakSculkPulseLength",               false, true, ""),
     TWEAK_SERVER_DATA_SYNC          ("tweakServerDataSync",                 false, ""),
+    TWEAK_SERVER_DATA_SYNC_BACKUP   ("tweakServerDataSyncBackup",           false, ""),
     TWEAK_SHULKERBOX_DISPLAY        ("tweakShulkerBoxDisplay",              false, ""),
     TWEAK_SIGN_COPY                 ("tweakSignCopy",                       false, ""),
     TWEAK_SNAP_AIM                  ("tweakSnapAim",                        false, "",    KeybindSettings.INGAME_BOTH),

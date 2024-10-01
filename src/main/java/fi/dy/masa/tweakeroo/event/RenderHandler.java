@@ -1,8 +1,8 @@
 package fi.dy.masa.tweakeroo.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Matrix4f;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Camera;
@@ -19,6 +19,7 @@ import net.minecraft.util.profiler.Profiler;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -26,6 +27,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 
 public class RenderHandler implements IRenderer
 {
@@ -46,7 +48,12 @@ public class RenderHandler implements IRenderer
         if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
             Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
         {
-            RenderUtils.renderInventoryOverlay(mc, drawContext);
+            InventoryOverlay.Context context = RayTraceUtils.getTargetInventory(mc);
+
+            if (context != null)
+            {
+                RenderUtils.renderInventoryOverlay(context, drawContext);
+            }
         }
 
         if (FeatureToggle.TWEAK_PLAYER_INVENTORY_PEEK.getBooleanValue() &&

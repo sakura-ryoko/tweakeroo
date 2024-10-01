@@ -15,7 +15,6 @@
     "IMixinShovelItem",
     "IMixinSimpleOption",
     "MixinAbstractClientPlayerEntity",
-    "MixinStatusEffectsDisplay",
     "MixinAbstractSignEditScreen",
     "MixinBackgroundRenderer",
     "MixinBatEntity",
@@ -72,6 +71,7 @@
     "MixinShulkerBoxBlock",
     "MixinSignBlockEntity",
     "MixinSlimeBlock",
+    "MixinStatusEffectsDisplay",
     "MixinStructureBlockBlockEntity",
     "MixinTeleportSpectatorMenu",
     "MixinTradeOffer",
@@ -84,5 +84,8 @@
   "mixinPriority": 990,
   "injectors": {
     "defaultRequire": 0
-  }
+  },
+  "mixins": [
+    "IMixinPiglinEntity"
+  ]
 }

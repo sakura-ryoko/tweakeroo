@@ -55,7 +55,7 @@ public class Configs implements IConfigHandler
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]").apply(GENERIC_KEY);
         public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true).apply(GENERIC_KEY);
         public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10).apply(GENERIC_KEY);
-        //public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
         public static final ConfigOptionList    ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY).apply(GENERIC_KEY);
         public static final ConfigDouble        ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64).apply(GENERIC_KEY);
         public static final ConfigOptionList    ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
@@ -107,6 +107,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
+        public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean     ("shulkerDisplayRequireShift", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SLOT_SYNC_WORKAROUND                = new ConfigBoolean     ("slotSyncWorkaround", true).apply(GENERIC_KEY);
@@ -133,7 +134,7 @@ public class Configs implements IConfigHandler
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
                 ACCURATE_PLACEMENT_PROTOCOL,
                 CLIENT_PLACEMENT_ROTATION,
-                //DEBUG_LOGGING,
+                DEBUG_LOGGING,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
                 FAST_PLACEMENT_REMEMBER_ALWAYS,
                 FREE_CAMERA_PLAYER_INPUTS,
@@ -207,6 +208,7 @@ public class Configs implements IConfigHandler
                 RENDER_LIMIT_ITEM,
                 RENDER_LIMIT_XP_ORB,
                 SCULK_SENSOR_PULSE_LENGTH,
+                SERVER_NBT_REQUEST_RATE,
                 SNAP_AIM_PITCH_STEP,
                 SNAP_AIM_THRESHOLD_PITCH,
                 SNAP_AIM_THRESHOLD_YAW,
