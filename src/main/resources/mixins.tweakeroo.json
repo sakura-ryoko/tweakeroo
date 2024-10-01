@@ -12,6 +12,7 @@
     "IMixinCommandBlockExecutor",
     "IMixinCustomizeFlatLevelScreen",
     "IMixinDataQueryHandler",
+    "IMixinPiglinEntity",
     "IMixinShovelItem",
     "IMixinSimpleOption",
     "MixinAbstractClientPlayerEntity",
@@ -84,8 +85,5 @@
   "mixinPriority": 990,
   "injectors": {
     "defaultRequire": 0
-  },
-  "mixins": [
-    "IMixinPiglinEntity"
-  ]
+  }
 }
