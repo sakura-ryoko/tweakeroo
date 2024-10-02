@@ -332,7 +332,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
     }
 
-    // FIXME
     public void handleMovementKeys(Input m)
     {
         GameOptions settings = MinecraftClient.getInstance().options;
@@ -343,15 +342,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 m.movementSideways = 1;
                 m.playerInput =  new PlayerInput(m.playerInput.forward(), m.playerInput.backward(), true, false, m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
-                //m.pressingLeft = true;
-                //m.pressingRight = false;
             }
             else if (this.lastSidewaysInput == LeftRight.RIGHT)
             {
                 m.movementSideways = -1;
                 m.playerInput =  new PlayerInput(m.playerInput.forward(), m.playerInput.backward(), false, true, m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
-                //m.pressingLeft = false;
-                //m.pressingRight = true;
             }
         }
 
@@ -361,15 +356,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 m.movementForward = 1;
                 m.playerInput = new PlayerInput(true, false, m.playerInput.left(), m.playerInput.right(), m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
-                //m.pressingForward = true;
-                //m.pressingBack = false;
             }
             else if (this.lastForwardInput == ForwardBack.BACK)
             {
                 m.movementForward = -1;
                 m.playerInput = new PlayerInput(false, true, m.playerInput.left(), m.playerInput.right(), m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
-                //m.pressingForward = false;
-                //m.pressingBack = true;
             }
         }
     }
