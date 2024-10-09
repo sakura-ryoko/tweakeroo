@@ -122,20 +122,16 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
-    // FIXME
     @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"))
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;isGliding()Z"))
     private void onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() &&
+            this.input.playerInput.jump() && this.input.playerInput.forward())
         {
             // PlayerEntity#checkFallFlying
-            //this.isFallFlying() --> ?
-
-            System.out.printf("swap [%s] - isOnGround %s, isGliding %s, isInFluid %s, hasLevitation %s\n", this.getEquippedStack(EquipmentSlot.CHEST).toString(), this.isOnGround(), this.isGliding(), this.isInFluid(), this.hasStatusEffect(StatusEffects.LEVITATION));
-
-            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.hasStatusEffect(StatusEffects.LEVITATION))
+            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
             {
                 if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
                     this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
@@ -150,7 +146,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             this.autoSwitchElytraChestplate = ItemStack.EMPTY;
         }
     }
-
 
     @Inject(method = "onTrackedDataSet", at = @At("RETURN"))
     private void onStopFlying(TrackedData<?> data, CallbackInfo ci)
