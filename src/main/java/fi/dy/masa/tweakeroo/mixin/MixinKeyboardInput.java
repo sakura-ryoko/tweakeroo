@@ -41,7 +41,6 @@ public abstract class MixinKeyboardInput extends Input
             (Configs.Generic.PERMANENT_SNEAK_ALLOW_IN_GUIS.getBooleanValue() || GuiUtils.getCurrentScreen() == null))
         {
             this.playerInput = new PlayerInput(this.settings.forwardKey.isPressed(), this.settings.backKey.isPressed(), this.settings.leftKey.isPressed(), this.settings.rightKey.isPressed(), this.settings.jumpKey.isPressed(), true, this.settings.sprintKey.isPressed());
-            // this.sneaking = true;
         }
     }
 }

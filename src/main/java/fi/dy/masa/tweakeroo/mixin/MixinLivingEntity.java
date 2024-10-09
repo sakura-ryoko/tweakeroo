@@ -29,7 +29,7 @@ public abstract class MixinLivingEntity extends Entity
         super(type, worldIn);
     }
 
-    // it seems that Mojang fixed this.
+    // TODO 1.21.2+ - it seems that Mojang fixed this.
     /*
     @Redirect(method = "method_61417", at = @At(value = "FIELD", ordinal = 1,
             target = "Lnet/minecraft/world/World;isClient:Z"))

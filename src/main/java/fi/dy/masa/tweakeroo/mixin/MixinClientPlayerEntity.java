@@ -131,6 +131,10 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
             // PlayerEntity#checkFallFlying
+            //this.isFallFlying() --> ?
+
+            System.out.printf("swap [%s] - isOnGround %s, isGliding %s, isInFluid %s, hasLevitation %s\n", this.getEquippedStack(EquipmentSlot.CHEST).toString(), this.isOnGround(), this.isGliding(), this.isInFluid(), this.hasStatusEffect(StatusEffects.LEVITATION));
+
             if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.hasStatusEffect(StatusEffects.LEVITATION))
             {
                 if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||

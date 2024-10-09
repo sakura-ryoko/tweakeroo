@@ -82,9 +82,6 @@ public abstract class MixinBackgroundRenderer
                 cir.setReturnValue(
                         new Fog(distance * 1.6F, distance * 2.0F, FogShape.CYLINDER,
                         v.x, v.y, v.z, v.w));
-
-                //RenderSystem.setShaderFogStart(distance * 1.6F);
-                //RenderSystem.setShaderFogEnd(distance * 2.0F);
             }
 
             wasLava = false;
