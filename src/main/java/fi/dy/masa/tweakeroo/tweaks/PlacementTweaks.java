@@ -1070,6 +1070,7 @@ public class PlacementTweaks
         return pos.offset(side);
     }
 
+    @SuppressWarnings({"deprecation"})
     private static boolean canPlaceBlockIntoPosition(World world, BlockPos pos, ItemPlacementContext useContext)
     {
         BlockState state = world.getBlockState(pos);
