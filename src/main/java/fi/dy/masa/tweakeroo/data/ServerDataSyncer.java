@@ -309,7 +309,7 @@ public class ServerDataSyncer implements IClientTickHandler
 
     public String getServuxVersion()
     {
-        return servuxVersion;
+        return this.servuxVersion;
     }
 
     public int getPendingBlockEntitiesCount()
