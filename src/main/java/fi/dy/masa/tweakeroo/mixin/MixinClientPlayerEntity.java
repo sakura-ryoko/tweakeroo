@@ -124,13 +124,14 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"))
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;isGliding()Z"))
     private void onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() &&
+            this.input.playerInput.jump() && this.input.playerInput.forward())
         {
             // PlayerEntity#checkFallFlying
-            if (!this.isOnGround() && !this.isFallFlying() && !this.isInFluid() && !this.hasStatusEffect(StatusEffects.LEVITATION))
+            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
             {
                 if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
                     this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
@@ -146,7 +147,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
-
     @Inject(method = "onTrackedDataSet", at = @At("RETURN"))
     private void onStopFlying(TrackedData<?> data, CallbackInfo ci)
     {
@@ -154,7 +154,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         {
             if (FLAGS.equals(data) && this.falling)
             {
-                if (!this.isFallFlying() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
+                if (!this.isGliding() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
                 {
                     if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.isOf(Items.ELYTRA))
                     {

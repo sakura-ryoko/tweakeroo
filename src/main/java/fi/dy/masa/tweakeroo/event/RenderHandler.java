@@ -1,10 +1,13 @@
 package fi.dy.masa.tweakeroo.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.joml.Matrix4f;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Fog;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.FilledMapItem;
@@ -12,9 +15,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.profiler.Profiler;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -22,14 +27,13 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 
 public class RenderHandler implements IRenderer
 {
     @Override
-    public void onRenderGameOverlayPost(DrawContext drawContext)
+    public void onRenderGameOverlayPostAdvanced(DrawContext drawContext, float partialTicks, Profiler profiler, MinecraftClient mc)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-
         if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() &&
             Hotkeys.HOTBAR_SWAP_BASE.getKeybind().isKeybindHeld())
         {
@@ -44,7 +48,12 @@ public class RenderHandler implements IRenderer
         if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
             Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
         {
-            RenderUtils.renderInventoryOverlay(mc, drawContext);
+            InventoryOverlay.Context context = RayTraceUtils.getTargetInventory(mc);
+
+            if (context != null)
+            {
+                RenderUtils.renderInventoryOverlay(context, drawContext);
+            }
         }
 
         if (FeatureToggle.TWEAK_PLAYER_INVENTORY_PEEK.getBooleanValue() &&
@@ -79,7 +88,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_MAP_PREVIEW.getBooleanValue() &&
                 (Configs.Generic.MAP_PREVIEW_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
+                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false, drawContext);
             }
         }
         else if (stack.getComponents().contains(DataComponentTypes.CONTAINER) && InventoryUtils.shulkerBoxHasItems(stack))
@@ -93,17 +102,17 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLast(Matrix4f matrix4f, Matrix4f projMatrix)
+    public void onRenderWorldLastAdvanced(Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, Profiler profiler)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc.player != null)
         {
-            this.renderOverlays(matrix4f, mc);
+            this.renderOverlays(posMatrix, mc);
         }
     }
 
-    private void renderOverlays(Matrix4f matrix4f, MinecraftClient mc)
+    private void renderOverlays(Matrix4f posMatrix, MinecraftClient mc)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -130,7 +139,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getSide(),
                     hitResult.getPos(),
                     color,
-                    matrix4f,
+                    posMatrix,
                     mc);
 
             RenderSystem.enableDepthTest();

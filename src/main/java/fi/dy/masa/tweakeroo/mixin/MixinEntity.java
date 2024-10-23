@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,16 +18,14 @@ import fi.dy.masa.tweakeroo.util.SnapAimMode;
 @Mixin(net.minecraft.entity.Entity.class)
 public abstract class MixinEntity
 {
+    @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
+    @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
     @Shadow private float yaw;
     @Shadow private float pitch;
     @Shadow public float prevYaw;
     @Shadow public float prevPitch;
-
-    private double forcedPitch;
-    private double forcedYaw;
-
-    @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
-    @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
+    @Unique private double forcedPitch;
+    @Unique private double forcedYaw;
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     private void overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
@@ -135,6 +134,7 @@ public abstract class MixinEntity
         }
     }
 
+    @Unique
     private void updateCustomPlayerRotations(double yawChange, double pitchChange, boolean updateYaw, boolean updatePitch, float pitchLimit)
     {
         if (updateYaw)

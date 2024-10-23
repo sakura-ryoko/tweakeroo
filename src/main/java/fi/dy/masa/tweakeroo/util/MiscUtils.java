@@ -5,30 +5,43 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
+import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.world.GeneratorOptionsHolder;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
+import net.minecraft.registry.*;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.structure.StructureSet;
 import net.minecraft.text.*;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -36,6 +49,12 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
+import net.minecraft.world.gen.feature.PlacedFeature;
+
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -47,11 +66,9 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.IMixinAxeItem;
-import fi.dy.masa.tweakeroo.mixin.IMixinClientWorld;
-import fi.dy.masa.tweakeroo.mixin.IMixinCommandBlockExecutor;
-import fi.dy.masa.tweakeroo.mixin.IMixinShovelItem;
+import fi.dy.masa.tweakeroo.mixin.*;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 
 public class MiscUtils
 {
@@ -83,7 +100,8 @@ public class MiscUtils
         ClientPlayerEntity player = mc.player;
         Input input = player.input;
 
-        if (input.jumping || input.sneaking ||
+        //if (input.jumping || input.sneaking ||
+        if (input.playerInput.jump() || input.playerInput.sneak() ||
             player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
         {
             return;
@@ -403,7 +421,7 @@ public class MiscUtils
 
     public static void copyTextFromSign(SignBlockEntity te, boolean front)
     {
-        previousSignText = ((ISignTextAccess) te).getText(front);
+        previousSignText = ((ISignTextAccess) te).tweakeroo$getText(front);
     }
 
     public static void applyPreviousTextToSign(SignBlockEntity te, @Nullable AbstractSignEditScreen guiLines, boolean front)
@@ -413,7 +431,7 @@ public class MiscUtils
             te.setText(previousSignText, front);
 
             if (guiLines != null) {
-                ((IGuiEditSign) guiLines).applyText(previousSignText);
+                ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
             }
         }
     }
@@ -464,9 +482,12 @@ public class MiscUtils
             actionResult = mc.interactionManager.interactEntity(player, entity, hand);
         }
 
-        if (actionResult.isAccepted() && actionResult.shouldSwingHand())
+        if (actionResult instanceof ActionResult.Success success)
         {
-            player.swingHand(hand);
+            if (success.swingSource() == ActionResult.SwingSource.CLIENT)
+            {
+                player.swingHand(hand);
+            }
         }
     }
 
@@ -666,6 +687,101 @@ public class MiscUtils
         {
             InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.getAbsolutePath());
         }
+    }
+
+    public static boolean isShulkerBox(ItemStack stack)
+    {
+        return stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock;
+    }
+
+    public static boolean hasCustomMaxStackSize(ItemStack stack)
+    {
+        int defaultStackSize = stack.getDefaultComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+        int currentStackSize = stack.getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+        return defaultStackSize != currentStackSize;
+    }
+
+    public static boolean registerPresetFromString(CustomizeFlatLevelScreen screen, String str)
+    {
+        Matcher matcher = MiscUtils.PATTERN_WORLD_PRESET.matcher(str);
+
+        if (matcher.matches())
+        {
+            // TODO --> I added some code here, and added the IMixinCustomizeFlatLevelScreen
+            GeneratorOptionsHolder generatorOptionsHolder = ((IMixinCustomizeFlatLevelScreen) screen).tweakeroo_getCreateWorldParent().getWorldCreator().getGeneratorOptionsHolder();
+            DynamicRegistryManager.Immutable registryManager = generatorOptionsHolder.getCombinedRegistryManager();
+            FeatureSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
+            RegistryEntryLookup<Biome> biomeLookup = registryManager.getOrThrow(RegistryKeys.BIOME);
+            RegistryEntryLookup<StructureSet> structureLookup = registryManager.getOrThrow(RegistryKeys.STRUCTURE_SET);
+            RegistryEntryLookup<PlacedFeature> featuresLookup = registryManager.getOrThrow(RegistryKeys.PLACED_FEATURE);
+            RegistryEntryLookup<Block> blockLookup = registryManager.getOrThrow(RegistryKeys.BLOCK).withFeatureFilter(featureSet);
+            FlatChunkGeneratorConfig defaultConfig = FlatChunkGeneratorConfig.getDefaultConfig(biomeLookup, structureLookup, featuresLookup);
+            FlatChunkGeneratorConfig currentConfig = screen.getConfig();
+            RegistryEntry.Reference<Biome> referenceEntry = biomeLookup.getOrThrow(BiomeKeys.PLAINS);
+            RegistryEntry.Reference<Biome> biomeEntry = referenceEntry;
+
+            String name = matcher.group("name");
+            String blocksString = matcher.group("blocks");
+            String biomeName = matcher.group("biome");
+            // TODO add back the features
+            String iconItemName = matcher.group("icon");
+
+            try
+            {
+                Optional<RegistryKey<Biome>> optBiome = Optional.ofNullable(Identifier.tryParse(biomeName)).map((biomeId) ->
+                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
+
+                biomeEntry = optBiome.flatMap(biomeLookup::getOptional).orElse(referenceEntry);
+            }
+            catch (Exception ignore) {}
+
+            if (biomeEntry == null)
+            {
+                Tweakeroo.logger.error("Invalid biome while parsing flat world string: '{}'", biomeName);
+                return false;
+            }
+
+            Item item = null;
+
+            try
+            {
+                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.of(iconItemName));
+                if (opt.isPresent())
+                {
+                    item = opt.get().value();
+                }
+            }
+            catch (Exception ignore) {}
+
+            if (item == null)
+            {
+                Tweakeroo.logger.error("Invalid item for icon while parsing flat world string: '{}'", iconItemName);
+                return false;
+            }
+
+            List<FlatChunkGeneratorLayer> layers = MiscTweaks.parseBlockString(blocksString);
+
+            if (layers == null)
+            {
+                Tweakeroo.logger.error("Failed to get the layers for the flat world preset");
+                return false;
+            }
+
+            FlatChunkGeneratorConfig newConfig = defaultConfig.with(layers, defaultConfig.getStructureOverrides(), biomeEntry);
+
+            //new PresetsScreen.SuperflatPresetsListWidget.SuperflatPresetEntry(null);
+            //addPreset(Text.translatable(name), item, biome, ImmutableSet.of(), false, false, layers);
+
+            screen.setConfig(newConfig);
+
+            return true;
+        }
+        else
+        {
+            Tweakeroo.logger.error("Flat world preset string did not match the regex");
+        }
+
+        return false;
     }
 
     public static class PostKeyAction

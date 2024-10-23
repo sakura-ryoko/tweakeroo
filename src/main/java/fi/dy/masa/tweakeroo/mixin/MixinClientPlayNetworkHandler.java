@@ -1,31 +1,26 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommonNetworkHandler;
 import net.minecraft.client.network.ClientConnectionState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler
@@ -59,19 +54,6 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         }
     }
 
-    @Inject(
-            method = "onCommandTree",
-            at = @At("RETURN")
-    )
-    private void onCommandTree(CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
-        {
-            // when the player becomes OP, the server sends the command tree to the client
-            ServerDataSyncer.getInstance().recheckOpStatus();
-        }
-    }
-
     @Inject(method = "onCustomPayload", at = @At("HEAD"))
     private void tweakeroo_onCustomPayload(CustomPayload payload, CallbackInfo ci)
     {
@@ -84,12 +66,16 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
             DataManager.getInstance().setHasServuxServer(true);
         }
     }
-    @Inject(
-        method = "onEntityStatus",
-        at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveTotemOfUndying(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;")
-    )
+
+    @Inject(method = "onEntityStatus",
+            at = @At(value = "INVOKE", ordinal = 0,
+            target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveDeathProtector(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;"))
     private void onPlayerUseTotemOfUndying(EntityStatusS2CPacket packet, CallbackInfo ci)
     {
+        if (this.client.player == null)
+        {
+            return;
+        }
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue())
         {
             for (Hand hand : Hand.values())

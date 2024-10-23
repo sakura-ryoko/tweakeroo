@@ -66,7 +66,7 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
             final int maxZ = pos.getZ() + maxSize + maxOffset + 2;
 
             final int minY = Math.max(world.getBottomY() , pos.getY() - maxSize - maxOffset - 2);
-            final int maxY = Math.min(world.getTopY() - 1, pos.getY() + maxSize + maxOffset + 2);
+            final int maxY = Math.min(world.getTopYInclusive(), pos.getY() + maxSize + maxOffset + 2);
             List<BlockPos> positions = new ArrayList<>();
 
             for (int cz = minZ >> 4; cz <= (maxZ >> 4); ++cz)

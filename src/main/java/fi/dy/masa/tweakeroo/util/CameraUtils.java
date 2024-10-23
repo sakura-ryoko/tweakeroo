@@ -126,9 +126,15 @@ public class CameraUtils
 
     public static void markChunksForRebuildOnDeactivation(int lastChunkX, int lastChunkZ)
     {
-        Entity entity = EntityUtils.getCameraEntity();
         MinecraftClient mc = MinecraftClient.getInstance();
         final int viewDistance = mc.options.getViewDistance().getValue();
+        Entity entity = EntityUtils.getCameraEntity();
+
+        if (mc.world == null || entity == null)
+        {
+            return;
+        }
+
         final int chunkX = MathHelper.floor(entity.getX() / 16.0) >> 4;
         final int chunkZ = MathHelper.floor(entity.getZ() / 16.0) >> 4;
 
@@ -159,7 +165,7 @@ public class CameraUtils
     {
         for (int cy = 0; cy < 16; ++cy)
         {
-            renderer.scheduleBlockRender(chunkX, cy, chunkZ);
+            renderer.scheduleChunkRender(chunkX, cy, chunkZ);
         }
     }
 

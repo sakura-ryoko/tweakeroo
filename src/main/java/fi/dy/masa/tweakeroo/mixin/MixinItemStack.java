@@ -15,8 +15,7 @@ import net.minecraft.item.ItemStack;
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack
 {
-    @Shadow
-    public abstract Item getItem();
+    @Shadow public abstract Item getItem();
 
     @Inject(method = "getMaxCount", at = @At("RETURN"), cancellable = true)
     public void getMaxStackSizeStackSensitive(CallbackInfoReturnable<Integer> cir)

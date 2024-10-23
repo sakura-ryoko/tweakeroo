@@ -7,6 +7,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.PlayerInput;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
@@ -331,7 +332,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
     }
 
-    public void handleMovementKeys(Input movement)
+    public void handleMovementKeys(Input m)
     {
         GameOptions settings = MinecraftClient.getInstance().options;
 
@@ -339,15 +340,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             if (this.lastSidewaysInput == LeftRight.LEFT)
             {
-                movement.movementSideways = 1;
-                movement.pressingLeft = true;
-                movement.pressingRight = false;
+                m.movementSideways = 1;
+                m.playerInput =  new PlayerInput(m.playerInput.forward(), m.playerInput.backward(), true, false, m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
             }
             else if (this.lastSidewaysInput == LeftRight.RIGHT)
             {
-                movement.movementSideways = -1;
-                movement.pressingLeft = false;
-                movement.pressingRight = true;
+                m.movementSideways = -1;
+                m.playerInput =  new PlayerInput(m.playerInput.forward(), m.playerInput.backward(), false, true, m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
             }
         }
 
@@ -355,15 +354,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             if (this.lastForwardInput == ForwardBack.FORWARD)
             {
-                movement.movementForward = 1;
-                movement.pressingForward = true;
-                movement.pressingBack = false;
+                m.movementForward = 1;
+                m.playerInput = new PlayerInput(true, false, m.playerInput.left(), m.playerInput.right(), m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
             }
             else if (this.lastForwardInput == ForwardBack.BACK)
             {
-                movement.movementForward = -1;
-                movement.pressingForward = false;
-                movement.pressingBack = true;
+                m.movementForward = -1;
+                m.playerInput = new PlayerInput(false, true, m.playerInput.left(), m.playerInput.right(), m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
             }
         }
     }

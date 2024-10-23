@@ -23,10 +23,16 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -35,6 +41,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -42,6 +49,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -136,11 +144,12 @@ public class InventoryUtils
         {
             try
             {
-                Item item = Registries.ITEM.get(Identifier.tryParse(name));
+                //Item item = Registries.ITEM.get(Identifier.tryParse(name));
+                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.tryParse(name));
 
-                if (item != null && item != Items.AIR)
+                if (opt.isPresent() && opt.get().value() != Items.AIR)
                 {
-                    UNSTACKING_ITEMS.add(item);
+                    UNSTACKING_ITEMS.add(opt.get().value());
                 }
             }
             catch (Exception e)
@@ -207,11 +216,11 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<Item> weapon = Registries.ITEM.getOrEmpty(Identifier.tryParse(itemId));
+                        Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.tryParse(itemId));
 
-                        if (weapon.isPresent())
+                        if (opt.isPresent())
                         {
-                            weapons.add(weapon.get());
+                            weapons.add(opt.get().value());
                             continue;
                         }
                     }
@@ -231,11 +240,11 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<EntityType<?>> entity = Registries.ENTITY_TYPE.getOrEmpty(Identifier.tryParse(entity_id));
+                        Optional<RegistryEntry.Reference<EntityType<?>>> opt = Registries.ENTITY_TYPE.getEntry(Identifier.tryParse(entity_id));
 
-                        if (entity.isPresent())
+                        if (opt.isPresent())
                         {
-                            WEAPON_MAPPING.computeIfAbsent(entity.get(), s -> new HashSet<>()).addAll(weapons);
+                            WEAPON_MAPPING.computeIfAbsent(opt.get().value(), s -> new HashSet<>()).addAll(weapons);
                             continue;
                         }
                     }
@@ -487,7 +496,7 @@ public class InventoryUtils
 
             for (AttributeModifiersComponent.Entry entry : modifiers)
             {
-                if (entry.attribute().equals(EntityAttributes.GENERIC_ATTACK_DAMAGE))
+                if (entry.attribute().equals(EntityAttributes.ATTACK_DAMAGE))
                 {
                     return (float) entry.modifier().value();
                 }
@@ -897,7 +906,10 @@ public class InventoryUtils
 
         ScreenHandler container = player.currentScreenHandler;
 
-        Predicate<ItemStack> filter = (s) ->  s.getItem() instanceof ElytraItem && ElytraItem.isUsable(s) && s.getDamage() < s.getMaxDamage() - 10;
+        Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.ELYTRA) &&
+                s.get(DataComponentTypes.EQUIPPABLE).allows(EntityType.PLAYER) &&
+                s.getDamage() < s.getMaxDamage() - 10;
+
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
             if (!filter.test(testedStack)) return false;
             if (!filter.test(previousBestMatch)) return true;
@@ -928,7 +940,9 @@ public class InventoryUtils
         ScreenHandler container = player.currentScreenHandler;
         ItemStack currentStack = player.getEquippedStack(EquipmentSlot.CHEST);
 
-        Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem && ((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
+        Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem &&
+                //((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
+                s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
 
         if (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack))
         {
@@ -964,8 +978,8 @@ public class InventoryUtils
         final double[] total = {base};
 
         stack.applyAttributeModifier(slot, (entry, modifier) -> {
-            if (entry.getKey().orElseThrow() == EntityAttributes.GENERIC_ARMOR
-                || entry.getKey().orElseThrow() == EntityAttributes.GENERIC_ARMOR_TOUGHNESS)
+            if (entry.getKey().orElseThrow() == EntityAttributes.ARMOR
+                || entry.getKey().orElseThrow() == EntityAttributes.ARMOR_TOUGHNESS)
             {
                 switch (modifier.operation())
                 {
@@ -1126,7 +1140,7 @@ public class InventoryUtils
                 return currentHotbarSlot;
             }
 
-            if ((stack.getItem() instanceof ToolItem) == false)
+            if ((stack.getItem() instanceof MiningToolItem) == false)
             {
                 nonTool = currentHotbarSlot;
             }
@@ -1141,7 +1155,7 @@ public class InventoryUtils
                 return hotbarSlot;
             }
 
-            if (nonTool == -1 && (stack.getItem() instanceof ToolItem) == false)
+            if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
             {
                 nonTool = hotbarSlot;
             }

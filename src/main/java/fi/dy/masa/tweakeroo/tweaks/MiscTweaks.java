@@ -1,10 +1,7 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.Block;
@@ -16,6 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import fi.dy.masa.malilib.config.IConfigBoolean;
@@ -333,8 +331,15 @@ public class MiscTweaks
     {
         try
         {
-            Identifier identifier = Identifier.tryParse(name);
-            return Registries.BLOCK.getOrEmpty(identifier).orElse(null);
+            //return Registries.BLOCK.getOrEmpty(identifier).orElse(null);
+            Optional<RegistryEntry.Reference<Block>> opt = Registries.BLOCK.getEntry(Identifier.tryParse(name));
+
+            if (opt.isPresent())
+            {
+                return opt.get().value();
+            }
+
+            return null;
         }
         catch (Exception e)
         {

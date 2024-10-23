@@ -34,12 +34,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     @Shadow @Final public GameOptions options;
     @Shadow private int itemUseCooldown;
     @Shadow protected int attackCooldown;
-
-    @Shadow
-    private boolean doAttack() { return false; }
-
-    @Shadow
-    private void doItemUse() {}
+    @Shadow private boolean doAttack() { return false; }
+    @Shadow private void doItemUse() {}
 
     @Override
     public void tweakeroo_setItemUseCooldown(int value)

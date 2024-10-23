@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -18,10 +19,11 @@ public class EntityRestriction extends UsageRestriction<EntityType<?>>
         {
             try
             {
-                Optional<EntityType<?>> entityType = Registries.ENTITY_TYPE.getOrEmpty(Identifier.tryParse(name));
-                if (entityType.isPresent())
+                Optional<RegistryEntry.Reference<EntityType<?>>> opt = Registries.ENTITY_TYPE.getEntry(Identifier.tryParse(name));
+
+                if (opt.isPresent())
                 {
-                    set.add(entityType.get());
+                    set.add(opt.get().value());
                     continue;
                 }
             }

@@ -31,15 +31,13 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
         super(textComponent);
     }
 
-    @Shadow @Final private SignBlockEntity blockEntity;
+    @Shadow @Final protected SignBlockEntity blockEntity;
     @Shadow private SignText text;
-
     @Shadow @Final private boolean front;
-
     @Shadow @Final private String[] messages;
 
     @Override
-    public SignBlockEntity getTile()
+    public SignBlockEntity tweakeroo$getTile()
     {
         return this.blockEntity;
     }
@@ -78,7 +76,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     }
 
     @Override
-    public void applyText(SignText text)
+    public void tweakeroo$applyText(SignText text)
     {
         this.text = text;
 

@@ -2,16 +2,21 @@ package fi.dy.masa.tweakeroo.mixin;
 
 import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.ObjectAllocator;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
@@ -22,20 +27,11 @@ public abstract class MixinWorldRenderer
     @Shadow private int cameraChunkX;
     @Shadow private int cameraChunkZ;
 
-    private int lastUpdatePosX;
-    private int lastUpdatePosZ;
-
-    @Inject(method = "tickRainSplashing", at = @At("HEAD"), cancellable = true) // renderRain
-    private void cancelRainRender(Camera camera, CallbackInfo ci)
-    {
-        if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
-        {
-            ci.cancel();
-        }
-    }
+    @Unique private int lastUpdatePosX;
+    @Unique private int lastUpdatePosZ;
 
     @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
-    private void cancelRainRender(LightmapTextureManager lightmap, float partialTicks, double x, double y, double z, CallbackInfo ci)
+    private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, LightmapTextureManager lightmapTextureManager, Vec3d vec3d, float f, Fog fog, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {
@@ -45,7 +41,9 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
             target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=terrain_setup"))
-    private void preSetupTerrain(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
+    private void preSetupTerrain(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl,
+                                 Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
+                                 Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -55,13 +53,15 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
             target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=compile_sections"))
-    private void postSetupTerrain(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
+    private void postSetupTerrain(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl,
+                                  Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
+                                  Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }
 
     // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
-    @Redirect(method = "render", require = 0, at = @At(value = "INVOKE",
+    @Redirect(method = "getEntitiesToRender", require = 0, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;", ordinal = 3))
     private Entity allowRenderingClientPlayerInFreeCameraMode(Camera camera)
     {
@@ -93,7 +93,7 @@ public abstract class MixinWorldRenderer
     // rendering seems to work fine with Sodium without these anyway
     @Inject(method = "setupTerrain", require = 0,
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(DD)V"))
+            target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(Lnet/minecraft/util/math/ChunkSectionPos;)V"))
     private void rebuildChunksAroundCamera2(
             Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci)
     {

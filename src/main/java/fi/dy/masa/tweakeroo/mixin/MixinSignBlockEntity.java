@@ -44,7 +44,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
 
             if (mc.currentScreen instanceof SignEditScreen || mc.currentScreen instanceof HangingSignEditScreen)
             {
-                if (((IGuiEditSign) mc.currentScreen).getTile() == (Object) this)
+                if (((IGuiEditSign) mc.currentScreen).tweakeroo$getTile() == (Object) this)
                 {
                     MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isPlayerFacingFront(mc.player));
                 }
@@ -53,7 +53,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
     }
 
     @Override
-    public SignText getText(boolean front)
+    public SignText tweakeroo$getText(boolean front)
     {
         return front ? this.frontText : this.backText;
     }

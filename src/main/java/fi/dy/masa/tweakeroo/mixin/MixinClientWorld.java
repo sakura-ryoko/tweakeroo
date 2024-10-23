@@ -1,11 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import java.util.function.Supplier;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
+import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -14,12 +9,13 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-
-import fi.dy.masa.tweakeroo.config.Configs;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientWorld.class)
 public abstract class MixinClientWorld extends World
@@ -28,10 +24,9 @@ public abstract class MixinClientWorld extends World
                              RegistryKey<World> registryRef,
                              DynamicRegistryManager registryManager,
                              RegistryEntry<DimensionType> dimension,
-                             Supplier<Profiler> supplier,
                              boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates)
     {
-        super(properties, registryRef, registryManager, dimension, supplier, isClient, debugWorld, seed, maxChainedNeighborUpdates);
+        super(properties, registryRef, registryManager, dimension, isClient, debugWorld, seed, maxChainedNeighborUpdates);
     }
 
     @Inject(method = "tickEntity", at = @At("HEAD"), cancellable = true)

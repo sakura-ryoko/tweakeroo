@@ -89,6 +89,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_REPAIR_MODE               ("tweakRepairMode",                     false, ""),
     TWEAK_SCULK_PULSE_LENGTH        ("tweakSculkPulseLength",               false, true, ""),
     TWEAK_SERVER_DATA_SYNC          ("tweakServerDataSync",                 false, ""),
+    TWEAK_SERVER_DATA_SYNC_BACKUP   ("tweakServerDataSyncBackup",           false, ""),
     TWEAK_SHULKERBOX_DISPLAY        ("tweakShulkerBoxDisplay",              false, ""),
     TWEAK_SIGN_COPY                 ("tweakSignCopy",                       false, ""),
     TWEAK_SNAP_AIM                  ("tweakSnapAim",                        false, "",    KeybindSettings.INGAME_BOTH),
@@ -105,6 +106,8 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
 
     public static final ImmutableList<FeatureToggle> VALUES = ImmutableList.copyOf(values());
 
+    private final static String FEATURE_KEY = Reference.MOD_ID+ ".config.feature_toggle";
+
     private final String name;
     private final String comment;
     private final String prettyName;
@@ -118,25 +121,25 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey)
     {
         this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT,
-                Reference.MOD_ID+".config.feature_toggle.comment."+name,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "comment"),
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings)
     {
         this(name, defaultValue, false, defaultHotkey, settings,
-                Reference.MOD_ID+".config.feature_toggle.comment."+name,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "comment"),
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
-                Reference.MOD_ID+".config.feature_toggle.comment."+name,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "comment"),
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName, String translatedName)
@@ -160,32 +163,32 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     {
         this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT,
                 comment,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
                 comment,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings, String comment)
     {
         this(name, defaultValue, false, defaultHotkey, settings,
                 comment,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, settings,
                 comment,
-                Reference.MOD_ID+".config.feature_toggle.prettyName."+name,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "prettyName"),
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName)
@@ -193,7 +196,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this(name, defaultValue, false, defaultHotkey,
                 comment,
                 prettyName,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment, String prettyName)
@@ -201,7 +204,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
                 comment,
                 prettyName,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "name"));
     }
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment, String prettyName)
@@ -209,7 +212,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this(name, defaultValue, singlePlayer, defaultHotkey, settings,
                 comment,
                 prettyName,
-                Reference.MOD_ID+".config.feature_toggle.name."+name);
+                buildTranslateName(name, "name"));
     }
     // Backwards Compatible constructors - END
 
@@ -313,6 +316,11 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     public String getTranslatedName()
     {
         return this.translatedName;
+    }
+
+    private static String buildTranslateName(String name, String type)
+    {
+        return FEATURE_KEY + "." + type + "." + name;
     }
 
     @Override

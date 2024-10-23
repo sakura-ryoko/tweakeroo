@@ -33,7 +33,7 @@
 	],
 
 	"depends": {
-		"minecraft": ">=1.21 <=1.21.1",
-		"malilib": ">=0.20.0"
+		"minecraft": "1.21.2",
+		"malilib": ">=0.22.0-sakura.1"
 	}
 }
