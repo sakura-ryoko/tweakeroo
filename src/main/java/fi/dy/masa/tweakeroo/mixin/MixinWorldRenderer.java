@@ -31,7 +31,7 @@ public abstract class MixinWorldRenderer
     @Unique private int lastUpdatePosZ;
 
     @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
-    private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, LightmapTextureManager lightmapTextureManager, Vec3d vec3d, float f, Fog fog, CallbackInfo ci)
+    private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, Vec3d vec3d, float f, Fog fog, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {
@@ -41,9 +41,8 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
             target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=terrain_setup"))
-    private void preSetupTerrain(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl,
-                                 Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
-                                 Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
+    private void preSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
+                                 Camera camera, GameRenderer gameRenderer, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -53,9 +52,8 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
             target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=compile_sections"))
-    private void postSetupTerrain(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean bl,
-                                  Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager,
-                                  Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci)
+    private void postSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
+                                  Camera camera, GameRenderer gameRenderer, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }

@@ -24,13 +24,13 @@ public abstract class MixinKeyboardInput extends Input
 {
     @Shadow @Final private GameOptions settings;
 
-    @Inject(method = "tick(ZF)V", at = @At(
+    @Inject(method = "tick", at = @At(
             value = "FIELD",
             target = "Lnet/minecraft/client/input/KeyboardInput;playerInput:Lnet/minecraft/util/PlayerInput;",
             ordinal = 0,
             shift = Shift.AFTER,
             opcode = Opcodes.PUTFIELD))
-    private void customMovement(boolean val1, float f, CallbackInfo ci)
+    private void customMovement(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_MOVEMENT_KEYS.getBooleanValue())
         {

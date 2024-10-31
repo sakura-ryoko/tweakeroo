@@ -55,6 +55,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
 public class InventoryUtils
@@ -1342,7 +1343,7 @@ public class InventoryUtils
         {
             BlockPos pos = ((BlockHitResult) trace).getBlockPos();
             BlockState stateTargeted = world.getBlockState(pos);
-            ItemStack stack = stateTargeted.getBlock().getPickStack(world, pos, stateTargeted);
+            ItemStack stack = ((IMixinAbstractBlock) stateTargeted.getBlock()).tweakeroo_getPickStack(world, pos, stateTargeted);
 
             if (stack.isEmpty() == false &&
                 fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandStack()) == false)
@@ -1363,7 +1364,8 @@ public class InventoryUtils
 
                 if (isCreative)
                 {
-                    inventory.addPickBlock(stack);
+                    // FIXME addPickBlock()
+                    inventory.method_65126(stack);
                     mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
                 }
                 else
