@@ -305,16 +305,14 @@ public class RayTraceUtils
             else
             {
                 inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, entity.getRegistryManager());
+                inv = null;
             }
 
             //Tweakeroo.logger.error("getTargetInventoryFromEntity(): inv.size [{}], inv2.size [{}]", inv != null ? inv.size() : "null", inv2 != null ? inv2.size() : "null");
 
             if (inv2 != null)
             {
-                if (inv == null)
-                {
-                    inv = inv2;
-                }
+                inv = inv2;
             }
         }
 

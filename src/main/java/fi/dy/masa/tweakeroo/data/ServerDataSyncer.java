@@ -29,7 +29,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -402,23 +401,22 @@ public class ServerDataSyncer implements IClientTickHandler
         }
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
         {
-            if (world instanceof ServerWorld)
-            {
-                BlockEntity be = world.getWorldChunk(pos).getBlockEntity(pos);
-
-                if (be != null)
-                {
-                    NbtCompound nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
-                    Pair<BlockEntity, NbtCompound> pair = Pair.of(be, nbt);
-
-                    this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), pair));
-
-                    return pair;
-                }
-            }
-            else if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            if (DataManager.getInstance().hasIntegratedServer() == false &&
+                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 this.pendingBlockEntitiesQueue.add(pos);
+            }
+
+            BlockEntity be = world.getWorldChunk(pos).getBlockEntity(pos);
+
+            if (be != null)
+            {
+                NbtCompound nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+                Pair<BlockEntity, NbtCompound> pair = Pair.of(be, nbt);
+
+                this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), pair));
+
+                return pair;
             }
         }
 
@@ -431,7 +429,13 @@ public class ServerDataSyncer implements IClientTickHandler
         {
             return this.entityCache.get(entityId).getRight();
         }
-        else if (this.getWorld() instanceof ServerWorld)
+        if (DataManager.getInstance().hasIntegratedServer() == false &&
+            FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        {
+            this.pendingEntitiesQueue.add(entityId);
+        }
+
+        if (this.getWorld() != null)
         {
             Entity entity = this.getWorld().getEntityById(entityId);
             NbtCompound nbt = new NbtCompound();
@@ -442,10 +446,6 @@ public class ServerDataSyncer implements IClientTickHandler
                 this.entityCache.put(entityId, Pair.of(System.currentTimeMillis(), pair));
                 return pair;
             }
-        }
-        else if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
-        {
-            this.pendingEntitiesQueue.add(entityId);
         }
 
         return null;
