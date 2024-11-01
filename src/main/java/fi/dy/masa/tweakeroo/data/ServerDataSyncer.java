@@ -647,13 +647,16 @@ public class ServerDataSyncer implements IClientTickHandler
                     nbt.putString(NbtKeys.ID, id.toString());
                 }
             }
-            if (this.blockEntityCache.containsKey(pos))
+            synchronized (this.blockEntityCache)
             {
-                this.blockEntityCache.replace(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
-            }
-            else
-            {
-                this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
+                if (this.blockEntityCache.containsKey(pos))
+                {
+                    this.blockEntityCache.replace(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
+                }
+                else
+                {
+                    this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
+                }
             }
 
             blockEntity.read(nbt, this.getClientWorld().getRegistryManager());
@@ -681,13 +684,16 @@ public class ServerDataSyncer implements IClientTickHandler
                             nbt.putString(NbtKeys.ID, id.toString());
                         }
                     }
-                    if (this.blockEntityCache.containsKey(pos))
+                    synchronized (this.blockEntityCache)
                     {
-                        this.blockEntityCache.replace(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
-                    }
-                    else
-                    {
-                        this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
+                        if (this.blockEntityCache.containsKey(pos))
+                        {
+                            this.blockEntityCache.replace(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
+                        }
+                        else
+                        {
+                            this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
+                        }
                     }
 
                     return blockEntity2;
@@ -716,13 +722,16 @@ public class ServerDataSyncer implements IClientTickHandler
                     nbt.putString(NbtKeys.ID, id.toString());
                 }
             }
-            if (this.entityCache.containsKey(entityId))
+            synchronized (this.entityCache)
             {
-                this.entityCache.replace(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
-            }
-            else
-            {
-                this.entityCache.put(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
+                if (this.entityCache.containsKey(entityId))
+                {
+                    this.entityCache.replace(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
+                }
+                else
+                {
+                    this.entityCache.put(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
+                }
             }
         }
         return entity;
