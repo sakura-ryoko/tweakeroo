@@ -28,6 +28,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_BLOCK_TYPE_BREAK_RESTRICTION("tweakBlockTypeBreakRestriction",    false, ""),
     TWEAK_BREAKING_GRID             ("tweakBreakingGrid",                   false, "",    KeybindSettings.INGAME_BOTH),
     TWEAK_BREAKING_RESTRICTION      ("tweakBreakingRestriction",            false, ""),
+    TWEAK_BUNDLE_DISPLAY            ("tweakBundleDisplay",                  false, ""),
     TWEAK_CHAT_BACKGROUND_COLOR     ("tweakChatBackgroundColor",            false, ""),
     TWEAK_CHAT_PERSISTENT_TEXT      ("tweakChatPersistentText",             false, ""),
     TWEAK_CHAT_TIMESTAMP            ("tweakChatTimestamp",                  false, ""),

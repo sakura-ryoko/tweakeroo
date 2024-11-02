@@ -24,6 +24,7 @@
     "MixinBlockItem",
     "MixinBossBarHud",
     "MixinBuiltChunk",
+    "MixinBundleItem",
     "MixinChatHud",
     "MixinChatScreen",
     "MixinChunkBuilder_BuiltChunk",
