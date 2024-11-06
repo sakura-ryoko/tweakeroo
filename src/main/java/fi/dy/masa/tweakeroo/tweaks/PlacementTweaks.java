@@ -336,7 +336,7 @@ public class PlacementTweaks
         if (FeatureToggle.TWEAK_PLACEMENT_REST_FIRST.getBooleanValue() && stateClickedOn == null)
         {
             BlockState state = world.getBlockState(posIn);
-            stackClickedOn = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, posIn, state);
+            stackClickedOn = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, posIn, state, false);
             stateClickedOn = state;
         }
 
@@ -607,7 +607,7 @@ public class PlacementTweaks
 
             if (stackClickedOn.isEmpty() == false)
             {
-                ItemStack stack = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state);
+                ItemStack stack = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
 
                 if (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClickedOn, stack) == false)
                 {
@@ -626,7 +626,7 @@ public class PlacementTweaks
         if (FeatureToggle.TWEAK_PLACEMENT_REST_HAND.getBooleanValue())
         {
             BlockState state = world.getBlockState(pos);
-            ItemStack stackClicked = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state);
+            ItemStack stackClicked = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
             ItemStack stackHand = player.getStackInHand(hand);
 
             return fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClicked, stackHand);

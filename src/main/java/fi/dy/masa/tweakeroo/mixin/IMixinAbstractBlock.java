@@ -17,5 +17,5 @@ public interface IMixinAbstractBlock
     void setFriction(float friction);
 
     @Invoker("getPickStack")
-    ItemStack tweakeroo_getPickStack(WorldView worldView, BlockPos blockPos, BlockState blockState);
+    ItemStack tweakeroo_getPickStack(WorldView world, BlockPos pos, BlockState state, boolean bl);
 }
