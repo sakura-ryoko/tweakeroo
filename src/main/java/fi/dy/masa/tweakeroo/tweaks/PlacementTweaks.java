@@ -896,7 +896,7 @@ public class PlacementTweaks
             Hand hand,
             @Nullable HitPart hitPart)
     {
-        Direction facing = Direction.fromHorizontal(MathHelper.floor((playerYaw * 4.0F / 360.0F) + 0.5D) & 3);
+        Direction facing = Direction.fromHorizontalQuarterTurns(MathHelper.floor((playerYaw * 4.0F / 360.0F) + 0.5D) & 3);
         Direction facingOrig = facing;
         float yawOrig = player.getYaw();
 
@@ -913,7 +913,7 @@ public class PlacementTweaks
             facing = facing.rotateYClockwise();
         }
 
-        float yaw = facing.asRotation();
+        float yaw = facing.getPositiveHorizontalDegrees();
         float pitch = player.getPitch();
         player.setYaw(yaw);
         player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround(), false));
