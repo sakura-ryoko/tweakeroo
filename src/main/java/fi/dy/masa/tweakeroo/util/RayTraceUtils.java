@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -210,6 +211,22 @@ public class RayTraceUtils
             }
 
             inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos, false);
+        }
+
+        if (be instanceof EnderChestBlockEntity)
+        {
+            //System.out.print("fetch self enderItems from EnderChest\n");
+            if (MinecraftClient.getInstance().player != null)
+            {
+                PlayerEntity player = world.getPlayerByUuid(MinecraftClient.getInstance().player.getUuid());
+
+                if (player != null)
+                {
+                    // Fetch your own EnderItems
+                    inv = player.getEnderChestInventory();
+                    //System.out.printf("ENDER SIZE: %d\n", inv.size());
+                }
+            }
         }
 
         if (nbt != null && !nbt.isEmpty())

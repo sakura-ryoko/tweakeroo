@@ -111,6 +111,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean     ("shulkerDisplayRequireShift", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SLOT_SYNC_WORKAROUND                = new ConfigBoolean     ("slotSyncWorkaround", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SLOT_SYNC_WORKAROUND_ALWAYS         = new ConfigBoolean     ("slotSyncWorkaroundAlways", false).apply(GENERIC_KEY);
@@ -152,6 +153,7 @@ public class Configs implements IConfigHandler
                 POTION_WARNING_BENEFICIAL_ONLY,
                 REMEMBER_FLEXIBLE,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
+                SHULKER_DISPLAY_ENDER_CHEST,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
                 SLOT_SYNC_WORKAROUND,
                 SLOT_SYNC_WORKAROUND_ALWAYS,
