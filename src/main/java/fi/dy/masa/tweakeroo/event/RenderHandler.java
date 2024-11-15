@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.event;
 
+import com.llamalad7.mixinextras.lib.apache.commons.tuple.Pair;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -29,6 +30,7 @@ import fi.dy.masa.malilib.util.*;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 
@@ -129,10 +131,24 @@ public class RenderHandler implements IRenderer
 
                 if (player != null)
                 {
-                    EnderChestInventory inv = player.getEnderChestInventory();
+                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(player.getId());
                     NbtCompound nbt = new NbtCompound();
-                    nbt.put(NbtKeys.ENDER_ITEMS, inv.toNbtList(world.getRegistryManager()));
-                    fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(stack, nbt, x, y, false, drawContext);
+                    EnderChestInventory inv;
+
+                    if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
+                    {
+                        inv = InventoryUtils.getPlayerEnderItemsFromNbt(pair.getRight(), world.getRegistryManager());
+                    }
+                    else
+                    {
+                        inv = player.getEnderChestInventory();
+                    }
+
+                    if (inv != null)
+                    {
+                        nbt.put(NbtKeys.ENDER_ITEMS, inv.toNbtList(world.getRegistryManager()));
+                        fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(stack, nbt, x, y, false, drawContext);
+                    }
                 }
             }
         }

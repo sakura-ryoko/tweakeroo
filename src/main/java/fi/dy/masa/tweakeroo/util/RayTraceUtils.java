@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -18,6 +19,7 @@ import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -213,18 +215,34 @@ public class RayTraceUtils
             inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos, false);
         }
 
-        if (be instanceof EnderChestBlockEntity)
+        BlockEntityType<?> beType = nbt != null ? BlockUtils.getBlockEntityTypeFromNbt(nbt) : null;
+
+        if ((beType != null && beType.equals(BlockEntityType.ENDER_CHEST)) ||
+            be instanceof EnderChestBlockEntity)
         {
-            //System.out.print("fetch self enderItems from EnderChest\n");
             if (MinecraftClient.getInstance().player != null)
             {
                 PlayerEntity player = world.getPlayerByUuid(MinecraftClient.getInstance().player.getUuid());
 
                 if (player != null)
                 {
-                    // Fetch your own EnderItems
-                    inv = player.getEnderChestInventory();
-                    //System.out.printf("ENDER SIZE: %d\n", inv.size());
+                    // Fetch your own EnderItems from Server ...
+                    Pair<Entity, NbtCompound> enderPair = ServerDataSyncer.getInstance().requestEntity(player.getId());
+                    EnderChestInventory enderItems;
+
+                    if (enderPair != null && enderPair.getRight() != null && enderPair.getRight().contains(NbtKeys.ENDER_ITEMS))
+                    {
+                        enderItems = InventoryUtils.getPlayerEnderItemsFromNbt(enderPair.getRight(), world.getRegistryManager());
+                    }
+                    else
+                    {
+                        enderItems = player.getEnderChestInventory();
+                    }
+
+                    if (enderItems != null)
+                    {
+                        inv = enderItems;
+                    }
                 }
             }
         }
