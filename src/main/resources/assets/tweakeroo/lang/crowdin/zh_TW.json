@@ -88,7 +88,7 @@
     "tweakeroo.config.generic.name.zoomAdjustMouseSensitivity": "縮放調整滑鼠靈敏度",
     "tweakeroo.config.generic.name.zoomFov": "變焦視野",
     "tweakeroo.config.generic.name.zoomResetFovOnActivate": "縮放重置FovOn激活",
-    "tweakeroo.config.generic.comment.accuratePlacementProtocolMode": "要使用的“準確放置協議”的類型。\n- 自動：在單人遊戲中使用v3，預設在多人遊戲中僅使用Slabs，\n  除非伺服器具有發送'carpet:hello'\n  封包的Carpet mod，在該伺服器上使用的是 v2 的情況。\n- 版本 3：由 Tweakeroo 本身（在單人遊戲中）或 Servux 支援。\n- 版本2：與帶有Carpet mod 的服務器兼容\n  （skyrising 和DeadlyMC 的QuickCarpet、\n  或CarpetExtra 除了FabricCarpet 之外。\n  在這兩種情況下「accurateBlockPlacement」地毯規則需要\n  在伺服器上啟用）。\n- 僅板：僅修復頂部板。與 Paper 伺服器相容。\n- None：不修改座標。",
+    "tweakeroo.config.generic.comment.accuratePlacementProtocolMode": "要使用的“準確放置協議”的類型。\n- 自動：在單人遊戲中使用v3，預設在多人遊戲中僅使用Slabs，\n  除非伺服器具有發送'carpet:hello'\n  封包的Carpet mod，在該伺服器上使用的是 v2 的情況。\n- 版本 3：由 Tweakeroo 本身（在單人遊戲中）或 Servux 支援。\n- 版本 2：與帶有Carpet mod 的服務器兼容\n  （skyrising 和DeadlyMC 的QuickCarpet、\n  或CarpetExtra 除了FabricCarpet 之外。\n  在這兩種情況下「accurateBlockPlacement」地毯規則需要\n  在伺服器上啟用）。\n- 僅板：僅修復頂部板。與 Paper 伺服器相容。\n- None：不修改座標。",
     "tweakeroo.config.generic.comment.accuratePlacementProtocol": "如果啟用，則靈活區塊放置和\n準確區塊放置將使用 Carpet mod 中實現的協定。\n§6注意：這是任何塊旋轉工作所必需的，除了\n§6塊只關心您點擊的塊邊（料斗、原木等）",
     "tweakeroo.config.generic.comment.afterClickerClickCount": "啟用\ntweakAfterClicker 時，每個放置區塊的右鍵次數",
     "tweakeroo.config.generic.comment.angelBlockPlacementDistance": "與玩家方塊的距離可以寫在\n啟用tweakAngelBlock 時的空氣。\n5 是伺服器允許的最大值。",
