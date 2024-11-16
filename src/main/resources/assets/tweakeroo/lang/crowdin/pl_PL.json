@@ -3,7 +3,7 @@
     "tweakeroo.config.generic.name.accuratePlacementProtocol": "Dokładne umieszczenieProtokół",
     "tweakeroo.config.generic.name.afterClickerClickCount": "po ClickerClickckCount",
     "tweakeroo.config.generic.name.angelBlockPlacementDistance": "angelBlockPlacementDistance",
-    "tweakeroo.config.generic.name.blockReachDistance": "blockReachDistance",
+    "tweakeroo.config.generic.name.blockReachDistance": "blokZasięgOdległość",
     "tweakeroo.config.generic.name.blockTypeBreakRestrictionWarn": "Ostrzeżenie blockTypeBreakRestrictionWarn",
     "tweakeroo.config.generic.name.breakingGridSize": "Rozmiar siatki łamania",
     "tweakeroo.config.generic.name.breakingRestrictionMode": "tryb przerwania",
