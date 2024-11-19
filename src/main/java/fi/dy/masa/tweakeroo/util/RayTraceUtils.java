@@ -43,6 +43,9 @@ import fi.dy.masa.tweakeroo.mixin.IMixinPiglinEntity;
 
 public class RayTraceUtils
 {
+    private static Pair<BlockPos, InventoryOverlay.Context> lastBlockEntityContext = null;
+    private static Pair<Integer,  InventoryOverlay.Context> lastEntityContext = null;
+
     @Nonnull
     public static HitResult getRayTraceFromEntity(World worldIn, Entity entityIn, boolean useLiquids)
     {
@@ -74,9 +77,8 @@ public class RayTraceUtils
         Optional<Vec3d> entityTrace = Optional.empty();
         Entity targetEntity = null;
 
-        for (int i = 0; i < list.size(); i++)
+        for (Entity entity : list)
         {
-            Entity entity = list.get(i);
             bb = entity.getBoundingBox();
             Optional<Vec3d> traceTmp = bb.raycast(lookVec, eyesVec);
 
@@ -158,7 +160,23 @@ public class RayTraceUtils
 
                 //Tweakeroo.logger.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, nbt != null);
 
-                return getTargetInventoryFromBlock(world, pos, be, nbt);
+                InventoryOverlay.Context ctx = getTargetInventoryFromBlock(world, pos, be, nbt);
+
+                if (lastBlockEntityContext != null && !lastBlockEntityContext.getLeft().equals(pos))
+                {
+                    lastBlockEntityContext = null;
+                }
+
+                if (ctx != null &&
+                        (ctx.inv() != null && !ctx.inv().isEmpty()))
+                {
+                    lastBlockEntityContext = Pair.of(pos, ctx);
+                    return ctx;
+                }
+                else if (lastBlockEntityContext != null && lastBlockEntityContext.getLeft().equals(pos))
+                {
+                    return lastBlockEntityContext.getRight();
+                }
             }
 
             return null;
@@ -169,10 +187,7 @@ public class RayTraceUtils
 
             if (world instanceof ServerWorld)
             {
-                if (entity.saveSelfNbt(nbt))
-                {
-                    return getTargetInventoryFromEntity(world.getEntityById(entity.getId()), nbt);
-                }
+                entity.saveSelfNbt(nbt);
             }
             else
             {
@@ -180,8 +195,27 @@ public class RayTraceUtils
 
                 if (pair != null)
                 {
-                    return getTargetInventoryFromEntity(world.getEntityById(pair.getLeft().getId()), pair.getRight());
+                    nbt = pair.getRight();
                 }
+            }
+
+            //Tweakeroo.logger.error("getTarget(): Entity [{}] raw NBT [{}]", entity.getId(), nbt.toString());
+            InventoryOverlay.Context ctx = getTargetInventoryFromEntity(world.getEntityById(entity.getId()), nbt);
+
+            if (lastEntityContext != null && !lastEntityContext.getLeft().equals(entity.getId()))
+            {
+                lastEntityContext = null;
+            }
+
+            if (ctx != null &&
+                    (ctx.inv() != null && !ctx.inv().isEmpty()))
+            {
+                lastEntityContext = Pair.of(entity.getId(), ctx);
+                return ctx;
+            }
+            else if (lastEntityContext != null && lastEntityContext.getLeft().equals(entity.getId()))
+            {
+                return lastEntityContext.getRight();
             }
         }
 

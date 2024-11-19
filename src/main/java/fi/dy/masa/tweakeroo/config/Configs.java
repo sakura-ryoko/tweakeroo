@@ -10,14 +10,7 @@ import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigHandler;
 import fi.dy.masa.malilib.config.IHotkeyTogglable;
-import fi.dy.masa.malilib.config.options.ConfigBoolean;
-import fi.dy.masa.malilib.config.options.ConfigBooleanHotkeyed;
-import fi.dy.masa.malilib.config.options.ConfigColor;
-import fi.dy.masa.malilib.config.options.ConfigDouble;
-import fi.dy.masa.malilib.config.options.ConfigInteger;
-import fi.dy.masa.malilib.config.options.ConfigOptionList;
-import fi.dy.masa.malilib.config.options.ConfigString;
-import fi.dy.masa.malilib.config.options.ConfigStringList;
+import fi.dy.masa.malilib.config.options.*;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -109,6 +102,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
+        public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 1.0f, 0.25f, 5.0f).apply(GENERIC_KEY);
         public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
@@ -214,6 +208,7 @@ public class Configs implements IConfigHandler
                 RENDER_LIMIT_ITEM,
                 RENDER_LIMIT_XP_ORB,
                 SCULK_SENSOR_PULSE_LENGTH,
+                SERVER_DATA_SYNC_CACHE_TIMEOUT,
                 SERVER_NBT_REQUEST_RATE,
                 SNAP_AIM_PITCH_STEP,
                 SNAP_AIM_THRESHOLD_PITCH,
