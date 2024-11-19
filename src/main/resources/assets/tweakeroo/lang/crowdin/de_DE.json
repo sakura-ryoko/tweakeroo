@@ -155,7 +155,7 @@
     "tweakeroo.config.generic.comment.renderLimitItem": "Maximale Anzahl von Objekten pro Frame.\nVerwende -1 für normales Verhalten, z. B. um dieses Limit zu deaktivieren.",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "Maximale Anzahl gerenderter XP-Orb-Entitäten pro Frame.\nVerwenden Sie -1 für normales Verhalten, d. h. um diese Begrenzung zu deaktivieren.",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "Die Impulslänge für Sculk-Sensoren, wenn die Optimierung „tweakSculkPulseLength“ aktiviert ist.",
-    "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "The Cache timeout value in seconds that\nthe Entity Cache keeps records for.\nA lower value means more frequent updates.",
+    "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "Der Cache-Timeout-Wert in Sekunden, für den\nder Entity Cache Aufzeichnungen speichert.\nEin niedrigerer Wert bedeutet häufigere Aktualisierungen.",
     "tweakeroo.config.generic.comment.serverNbtRequestRate": "Begrenzen Sie die Anforderungsrate für die Server-Entitätsdatensynchronisierung",
     "tweakeroo.config.generic.comment.shulkerDisplayBgColor": "Ermöglicht das Einfärben/Färben der Hintergrundtextur der Shulker-Box-Anzeige\nmit der Farbstofffarbe der Box",
     "tweakeroo.config.generic.comment.shulkerDisplayEnderChest": "Aktiviert die Ender-Chest-Anzeige ähnlich der Shulker-Box-Anzeige.",
