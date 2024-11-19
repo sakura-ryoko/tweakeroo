@@ -155,7 +155,7 @@
     "tweakeroo.config.generic.comment.renderLimitItem": "الحد الأقصى لعدد كيانات العناصر التي يتم عرضها لكل إطار.\nاستخدم -1 للسلوك الطبيعي، أي لتعطيل هذا الحد.",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "الحد الأقصى لعدد كيانات كرة XP التي يتم عرضها لكل إطار.\nاستخدم -1 للسلوك الطبيعي، أي لتعطيل هذا الحد.",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "طول النبضة لأجهزة استشعار Sculk، إذا تم تمكين التعديل 'tweakSculkPulseLength'.",
-    "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "The Cache timeout value in seconds that\nthe Entity Cache keeps records for.\nA lower value means more frequent updates.",
+    "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "قيمة مهلة ذاكرة التخزين المؤقت بالثواني التي تحتفظ ذاكرة التخزين المؤقت للكيان بالسجلات لها\n.\nالقيمة المنخفضة تعني تحديثات أكثر تكرارًا.",
     "tweakeroo.config.generic.comment.serverNbtRequestRate": "الحد من معدل طلب مزامنة بيانات الكيان الخادم",
     "tweakeroo.config.generic.comment.shulkerDisplayBgColor": "يتيح صبغ/تلوين نسيج الخلفية لشاشة Shulker Box\nبلون صبغة الصندوق",
     "tweakeroo.config.generic.comment.shulkerDisplayEnderChest": "يتيح عرض Ender Chest بشكل مشابه لعرض Shulker Box.",
