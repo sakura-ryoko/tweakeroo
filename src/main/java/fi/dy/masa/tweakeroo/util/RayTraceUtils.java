@@ -213,6 +213,16 @@ public class RayTraceUtils
                 lastEntityContext = Pair.of(entity.getId(), ctx);
                 return ctx;
             }
+            // Non-Inventory/Empty Entity
+            else if (ctx != null &&
+                   (ctx.type() == InventoryOverlay.InventoryRenderType.WOLF ||
+                    ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
+                    ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
+                    ctx.type() == InventoryOverlay.InventoryRenderType.PLAYER))
+            {
+                lastEntityContext = Pair.of(entity.getId(), ctx);
+                return ctx;
+            }
             else if (lastEntityContext != null && lastEntityContext.getLeft().equals(entity.getId()))
             {
                 return lastEntityContext.getRight();
