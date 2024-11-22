@@ -181,6 +181,9 @@
     "tweakeroo.config.generic.comment.zoomFov": "The FOV value used for the zoom feature",
     "tweakeroo.config.generic.comment.zoomResetFovOnActivate": "Reset the Camera Zoom FOV upon Deactivation,\nif the Mouse Scroll Wheel was used to adjust it",
 
+    "tweakeroo.config.generic.prettyName.freeCameraPlayerInputs": "Free Camera Player Inputs",
+    "tweakeroo.config.generic.prettyName.freeCameraPlayerMovement": "Free Camera Player Movement",
+    
     "tweakeroo.config.fixes.name.elytraFix": "elytraFix",
     "tweakeroo.config.fixes.name.macHorizontalScroll": "macHorizontalScroll",
     "tweakeroo.config.fixes.name.ravagerClientBlockBreakFix": "ravagerClientBlockBreakFix",
