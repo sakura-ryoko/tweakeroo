@@ -331,7 +331,7 @@
     "tweakeroo.config.disable.comment.disableWorldViewBob": "停用世界的視野擺動效果，但不禁用手\n如果您安裝了 Iris，此設定將失敗。",
     "tweakeroo.config.internal.name.flySpeedPreset": "飛行速度預設",
     "tweakeroo.config.internal.name.gammaValueOriginal": "gamma值原始",
-    "tweakeroo.config.internal.name.hotbarScrollCurrentRow": "hotbarScrollCurrentRow",
+    "tweakeroo.config.internal.name.hotbarScrollCurrentRow": "hotbar 滚动当前行",
     "tweakeroo.config.internal.name.slimeBlockSlipperinessOriginal": "slimeBlockSlipperiness原創",
     "tweakeroo.config.internal.name.snapAimLastPitch": "快速瞄準最後投球",
     "tweakeroo.config.internal.name.snapAimLastYaw": "快速瞄準最後偏航",
