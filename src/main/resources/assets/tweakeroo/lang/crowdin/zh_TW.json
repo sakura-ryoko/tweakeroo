@@ -155,7 +155,7 @@
     "tweakeroo.config.generic.comment.renderLimitItem": "每幀渲染的項目實體的最大數量。\n使用 -1 表示正常行為，即。停用此限制。",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "每幀渲染的 XP 球實體的最大數量。\n使用 -1 表示正常行為，即。停用此限制。",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "Sculk 感測器的脈衝長度（如果啟用了「tweakSculkPulseLength」調整）。",
-    "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "The Cache timeout value in seconds that\nthe Entity Cache keeps records for.\nA lower value means more frequent updates.",
+    "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "快取逾時值（以秒為單位）\n實體快取保存記錄。\n值越低意味著更新越頻繁。",
     "tweakeroo.config.generic.comment.serverNbtRequestRate": "限制伺服器實體資料同步器的請求速率",
     "tweakeroo.config.generic.comment.shulkerDisplayBgColor": "啟用使用盒子的染料顏色對潛影盒顯示\n背景紋理進行著色/著色",
     "tweakeroo.config.generic.comment.shulkerDisplayEnderChest": "啟用末影箱顯示，類似潛影盒顯示。",
