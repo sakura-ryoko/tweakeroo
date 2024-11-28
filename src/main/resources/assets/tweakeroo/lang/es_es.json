@@ -179,6 +179,8 @@
     "tweakeroo.config.generic.comment.zoomAdjustMouseSensitivity": "Si se activa, la sensibilidad del ratón se reduce\nmientras que la función de zoom está activada y la tecla de zoom está activa",
     "tweakeroo.config.generic.comment.zoomFov": "El valor FOV usado para la función de zoom",
     "tweakeroo.config.generic.comment.zoomResetFovOnActivate": "Restablecer el zoom de la cámara al desactivar,\nsi la rueda de desplazamiento del ratón fue usada para ajustarla",
+    "tweakeroo.config.generic.prettyName.freeCameraPlayerInputs": "Entradas gratuitas del reproductor de cámara",
+    "tweakeroo.config.generic.prettyName.freeCameraPlayerMovement": "Movimiento gratuito del reproductor de cámara",
     "tweakeroo.config.fixes.name.elytraFix": "elytraFix",
     "tweakeroo.config.fixes.name.macHorizontalScroll": "desplazamiento macHorizontal",
     "tweakeroo.config.fixes.name.ravagerClientBlockBreakFix": "ravagerClientBlockBreakFix",
