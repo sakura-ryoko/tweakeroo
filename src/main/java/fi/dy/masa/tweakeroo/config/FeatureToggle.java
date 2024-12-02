@@ -258,18 +258,15 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
             name = GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
         }
 
-        System.out.printf("FeatureToggle#getConfigGuiDisplayName(): translatedName [%s] // test [%s]\n", this.translatedName, name);
+        //System.out.printf("FeatureToggle#getConfigGuiDisplayName(): translatedName [%s] // test [%s]\n", this.translatedName, name);
         return name;
     }
 
     @Override
     public String getPrettyName()
     {
-        String test = StringUtils.getTranslatedOrFallback(this.prettyName,
-                !this.prettyName.isEmpty() ? this.prettyName : StringUtils.splitCamelCase(this.name.substring(5)));
-
-        System.out.printf("FeatureToggle#getPrettyName(): prettyName [%s] // test [%s]\n", this.prettyName, test);
-        return test;
+        return StringUtils.getTranslatedOrFallback(this.prettyName,
+                                                   !this.prettyName.isEmpty() ? this.prettyName : StringUtils.splitCamelCase(this.name.substring(5)));
     }
 
     @Override
@@ -314,7 +311,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
             return comment + "\n" + StringUtils.translate("tweakeroo.label.config_comment.single_player_only");
         }
 
-        System.out.printf("FeatureToggle#getComment(): comment [%s] // test [%s]\n", this.comment, comment);
+        //System.out.printf("FeatureToggle#getComment(): comment [%s] // test [%s]\n", this.comment, comment);
         return comment;
     }
 
