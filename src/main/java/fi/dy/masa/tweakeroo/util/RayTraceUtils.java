@@ -168,7 +168,7 @@ public class RayTraceUtils
                 }
 
                 if (ctx != null &&
-                        (ctx.inv() != null && !ctx.inv().isEmpty()))
+                   (ctx.inv() != null && !ctx.inv().isEmpty()))
                 {
                     lastBlockEntityContext = Pair.of(pos, ctx);
                     return ctx;
@@ -208,17 +208,17 @@ public class RayTraceUtils
             }
 
             if (ctx != null &&
-                    (ctx.inv() != null && !ctx.inv().isEmpty()))
+               (ctx.inv() != null && !ctx.inv().isEmpty()))
             {
                 lastEntityContext = Pair.of(entity.getId(), ctx);
                 return ctx;
             }
             // Non-Inventory/Empty Entity
             else if (ctx != null &&
-                   (ctx.type() == InventoryOverlay.InventoryRenderType.WOLF ||
-                    ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
-                    ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
-                    ctx.type() == InventoryOverlay.InventoryRenderType.PLAYER))
+                    (ctx.type() == InventoryOverlay.InventoryRenderType.WOLF ||
+                     ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
+                     ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
+                     ctx.type() == InventoryOverlay.InventoryRenderType.PLAYER))
             {
                 lastEntityContext = Pair.of(entity.getId(), ctx);
                 return ctx;
@@ -349,10 +349,8 @@ public class RayTraceUtils
 
             // Fix for empty horse inv
             if (inv != null &&
-                    //inv.size() == 1 &&
-                    nbt.contains(NbtKeys.ITEMS) &&
-                    nbt.getList(NbtKeys.ITEMS, Constants.NBT.TAG_COMPOUND).size() > 1)
-                    //!DataManager.getInstance().hasIntegratedServer())
+                nbt.contains(NbtKeys.ITEMS) &&
+                nbt.getList(NbtKeys.ITEMS, Constants.NBT.TAG_COMPOUND).size() > 1)
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
@@ -365,19 +363,15 @@ public class RayTraceUtils
                 inv = null;
             }
             // Fix for saddled horse, no inv
-            else if (inv != null &&
-                    //inv.size() == 1 &&
-                    nbt.contains(NbtKeys.SADDLE))
-                    //!DataManager.getInstance().hasIntegratedServer())
+            else if (inv != null && nbt.contains(NbtKeys.SADDLE))
             {
                 inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
                 inv = null;
             }
             // Fix for empty Villager/Piglin inv
             else if (inv != null && inv.size() == 8 &&
-                    nbt.contains(NbtKeys.INVENTORY) &&
-                    !nbt.getList(NbtKeys.INVENTORY, Constants.NBT.TAG_COMPOUND).isEmpty())
-                    //!DataManager.getInstance().hasIntegratedServer())
+                     nbt.contains(NbtKeys.INVENTORY) &&
+                     !nbt.getList(NbtKeys.INVENTORY, Constants.NBT.TAG_COMPOUND).isEmpty())
             {
                 inv2 = InventoryUtils.getNbtInventory(nbt, 8, entity.getRegistryManager());
                 inv = null;
