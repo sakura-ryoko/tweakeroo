@@ -124,14 +124,13 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;isGliding()Z"))
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;checkGliding()Z"))
     private void onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() &&
-            this.input.playerInput.jump() && this.input.playerInput.forward())
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
-            // PlayerEntity#checkFallFlying
-            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
+            // this.checkGliding()
+            if (!this.isOnGround() && !this.hasVehicle() && this.glidingTicks == 0 && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
             {
                 if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
                     this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
