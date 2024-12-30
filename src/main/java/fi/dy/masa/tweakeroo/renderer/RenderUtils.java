@@ -118,6 +118,7 @@ public class RenderUtils
         }
     }
 
+    // OG Method
     public static void renderInventoryOverlay(InventoryOverlay.Context context, DrawContext drawContext)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
