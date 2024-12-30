@@ -37,6 +37,7 @@ public class Hotkeys
     public static final ConfigHotkey HOTBAR_SWAP_2                      = new ConfigHotkey("hotbarSwap2",                       "").apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SWAP_3                      = new ConfigHotkey("hotbarSwap3",                       "").apply(HOTKEY_KEY);
     public static final ConfigHotkey INVENTORY_PREVIEW                  = new ConfigHotkey("inventoryPreview",                  "LEFT_ALT", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
+    public static final ConfigHotkey INVENTORY_PREVIEW_TOGGLE_SCREEN    = new ConfigHotkey("inventoryPreviewToggleScreen",      "BUTTON_3", KeybindSettings.create(KeybindSettings.Context.ANY, KeyAction.PRESS, true, true, false, true)).apply(HOTKEY_KEY);
     public static final ConfigHotkey OPEN_CONFIG_GUI                    = new ConfigHotkey("openConfigGui",                     "X,C").apply(HOTKEY_KEY);
     public static final ConfigHotkey PLACEMENT_Y_MIRROR                 = new ConfigHotkey("placementYMirror",                  "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey PLAYER_INVENTORY_PEEK              = new ConfigHotkey("playerInventoryPeek",               "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
@@ -83,6 +84,7 @@ public class Hotkeys
             HOTBAR_SWAP_2,
             HOTBAR_SWAP_3,
             INVENTORY_PREVIEW,
+            INVENTORY_PREVIEW_TOGGLE_SCREEN,
             OPEN_CONFIG_GUI,
             PLACEMENT_Y_MIRROR,
             PLAYER_INVENTORY_PEEK,

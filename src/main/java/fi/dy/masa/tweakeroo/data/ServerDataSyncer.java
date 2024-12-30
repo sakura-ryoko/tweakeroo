@@ -2,8 +2,8 @@ package fi.dy.masa.tweakeroo.data;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
-import com.llamalad7.mixinextras.lib.apache.commons.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.block.BlockEntityProvider;
@@ -35,6 +35,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
+import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.util.Constants;
@@ -52,7 +53,7 @@ import fi.dy.masa.tweakeroo.network.ServuxTweaksHandler;
 import fi.dy.masa.tweakeroo.network.ServuxTweaksPacket;
 
 @SuppressWarnings({"deprecation"})
-public class ServerDataSyncer implements IClientTickHandler
+public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 {
     private static final ServerDataSyncer INSTANCE = new ServerDataSyncer();
     public static ServerDataSyncer getInstance()
@@ -78,13 +79,15 @@ public class ServerDataSyncer implements IClientTickHandler
     private final Map<Integer, Either<BlockPos, Integer>> transactionToBlockPosOrEntityId = new HashMap<>();
     private ClientWorld clientWorld;
 
+    @Override
     @Nullable
     public World getWorld()
     {
         return WorldUtils.getBestWorld(mc);
     }
 
-    private ClientWorld getClientWorld()
+    @Override
+    public ClientWorld getClientWorld()
     {
         if (this.clientWorld == null)
         {
@@ -182,6 +185,7 @@ public class ServerDataSyncer implements IClientTickHandler
         return HANDLER;
     }
 
+    @Override
     public void reset(boolean isLogout)
     {
         if (isLogout)
@@ -247,6 +251,7 @@ public class ServerDataSyncer implements IClientTickHandler
         }
     }
 
+    @Override
     public @Nullable NbtCompound getFromBlockEntityCacheNbt(BlockPos pos)
     {
         if (this.blockEntityCache.containsKey(pos))
@@ -257,6 +262,7 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
+    @Override
     public @Nullable BlockEntity getFromBlockEntityCache(BlockPos pos)
     {
         if (this.blockEntityCache.containsKey(pos))
@@ -267,6 +273,7 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
+    @Override
     public @Nullable NbtCompound getFromEntityCacheNbt(int entityId)
     {
         if (this.entityCache.containsKey(entityId))
@@ -277,6 +284,7 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
+    @Override
     public @Nullable Entity getFromEntityCache(int entityId)
     {
         if (this.entityCache.containsKey(entityId))
@@ -336,12 +344,14 @@ public class ServerDataSyncer implements IClientTickHandler
         return this.entityCache.size();
     }
 
+    @Override
     public void onGameInit()
     {
         ClientPlayHandler.getInstance().registerClientPlayHandler(HANDLER);
         HANDLER.registerPlayPayload(ServuxTweaksPacket.Payload.ID, ServuxTweaksPacket.Payload.CODEC, IPluginClientPlayHandler.BOTH_CLIENT);
     }
 
+    @Override
     public void onWorldPre()
     {
         if (DataManager.getInstance().hasIntegratedServer() == false)
@@ -350,6 +360,7 @@ public class ServerDataSyncer implements IClientTickHandler
         }
     }
 
+    @Override
     public void onWorldJoin()
     {
         // NO-OP
@@ -398,6 +409,7 @@ public class ServerDataSyncer implements IClientTickHandler
         this.hasInValidServux = true;
     }
 
+    @Override
     public @Nullable Pair<BlockEntity, NbtCompound> requestBlockEntity(World world, BlockPos pos)
     {
         if (this.blockEntityCache.containsKey(pos))
@@ -431,7 +443,8 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
-    public @Nullable Pair<Entity, NbtCompound> requestEntity(int entityId)
+    @Override
+    public @Nullable Pair<Entity, NbtCompound> requestEntity(World world, int entityId)
     {
         if (this.entityCache.containsKey(entityId))
         {
@@ -464,6 +477,7 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
+    @Override
     @Nullable
     public Inventory getBlockInventory(World world, BlockPos pos, boolean useNbt)
     {
@@ -536,8 +550,9 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
+    @Override
     @Nullable
-    public Inventory getEntityInventory(int entityId, boolean useNbt)
+    public Inventory getEntityInventory(World world, int entityId, boolean useNbt)
     {
         if (this.entityCache.containsKey(entityId) && this.getWorld() != null)
         {
@@ -581,7 +596,7 @@ public class ServerDataSyncer implements IClientTickHandler
 
         if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {
-            this.requestEntity(entityId);
+            this.requestEntity(world, entityId);
         }
 
         return null;
@@ -641,6 +656,7 @@ public class ServerDataSyncer implements IClientTickHandler
         }
     }
 
+    @Override
     @Nullable
     public BlockEntity handleBlockEntityData(BlockPos pos, NbtCompound nbt, @Nullable Identifier type)
     {
@@ -717,6 +733,7 @@ public class ServerDataSyncer implements IClientTickHandler
         return null;
     }
 
+    @Override
     @Nullable
     public Entity handleEntityData(int entityId, NbtCompound nbt)
     {
@@ -750,11 +767,13 @@ public class ServerDataSyncer implements IClientTickHandler
         return entity;
     }
 
+    @Override
     public void handleBulkEntityData(int transactionId, NbtCompound nbt)
     {
         // todo
     }
 
+    @Override
     public void handleVanillaQueryNbt(int transactionId, NbtCompound nbt)
     {
         Either<BlockPos, Integer> either = this.transactionToBlockPosOrEntityId.remove(transactionId);
