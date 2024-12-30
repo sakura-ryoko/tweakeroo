@@ -10,27 +10,20 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.malilib.config.IConfigBase;
+
 import fi.dy.masa.malilib.config.IConfigBoolean;
-import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeyAction;
-import fi.dy.masa.malilib.hotkeys.KeyCallbackAdjustable;
-import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.hotkeys.*;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
+import fi.dy.masa.malilib.render.InventoryOverlayScreen;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.mixin.IMixinSimpleOption;
-import fi.dy.masa.tweakeroo.util.CameraEntity;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
-import fi.dy.masa.tweakeroo.util.MiscUtils;
-import fi.dy.masa.tweakeroo.util.PlacementRestrictionMode;
-import fi.dy.masa.tweakeroo.util.SnapAimMode;
+import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
+import fi.dy.masa.tweakeroo.util.*;
 
 public class Callbacks
 {
@@ -82,6 +75,7 @@ public class Callbacks
         Hotkeys.HOTBAR_SWAP_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_3.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SCROLL.getKeybind().setCallback(callbackGeneric);
+        Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.OPEN_CONFIG_GUI.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_COLUMN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_DIAGONAL.getKeybind().setCallback(callbackGeneric);
@@ -446,6 +440,18 @@ public class Callbacks
                     MiscUtils.onZoomDeactivated();
                     //InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_off",
                             //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+                }
+            }
+            else if (key == Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind())
+            {
+                if (mc.currentScreen instanceof InventoryOverlayScreen)
+                {
+                    mc.setScreen(null);
+                }
+                else if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
+                         Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
+                {
+                    InventoryOverlayHandler.getInstance().refreshInventoryOverlay(mc, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
                 }
             }
 
