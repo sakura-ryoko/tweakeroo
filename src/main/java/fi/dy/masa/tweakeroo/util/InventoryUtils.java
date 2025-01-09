@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -41,6 +43,7 @@ import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -474,8 +477,9 @@ public class InventoryUtils
         return hasEnoughDurability(testedStack) && isBetterWeapon(testedStack, previousTool, entity);
     }
 
-    private static float getBaseAttackDamage(ItemStack stack)
+    private static double getBaseAttackDamage(ItemStack stack)
     {
+        /*
         Item item = stack.getItem();
         if ((item instanceof SwordItem) == false && (item instanceof MiningToolItem) == false)
             return 0F;
@@ -496,6 +500,18 @@ public class InventoryUtils
         }
 
         return 0F;
+         */
+
+        Pair<Double, Double> pair = EquipmentUtils.getDamageAndSpeedAttributes(stack);
+
+        if (pair.getLeft() > 0)
+        {
+            return pair.getLeft();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     protected static boolean matchesWeaponMapping(ItemStack stack, Entity entity)
@@ -535,6 +551,7 @@ public class InventoryUtils
         }
     }
 
+    /*
     public static int getEnchantmentLevel(ItemStack stack, @Nonnull RegistryKey<Enchantment> enchantment)
     {
         ItemEnchantmentsComponent enchants = stack.getEnchantments();
@@ -554,6 +571,7 @@ public class InventoryUtils
 
         return -1;
     }
+     */
 
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
@@ -564,6 +582,7 @@ public class InventoryUtils
 
         if (state.isOf(Blocks.BAMBOO))
         {
+            /*
             if (testedStack.getItem() instanceof SwordItem)
             {
                 return true;
@@ -572,14 +591,26 @@ public class InventoryUtils
             {
                 return false;
             }
+             */
+
+            if (EquipmentUtils.isMeleeWeapon(testedStack))
+            {
+                return true;
+            }
+            else if (EquipmentUtils.isMeleeWeapon(previousTool))
+            {
+                return false;
+            }
         }
 
         if (testedStack.isEmpty() == false)
         {
+            state.getBlock().getSettings();
+
             if (PREFER_SILK_TOUCH.contains(Registries.BLOCK.getEntry(state.getBlock()).getIdAsString()))
             {
-                if (getEnchantmentLevel(testedStack, Enchantments.SILK_TOUCH) > 0 &&
-                    getEnchantmentLevel(previousTool, Enchantments.SILK_TOUCH) == -1 &&
+                if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.SILK_TOUCH) > 0 &&
+                    EquipmentUtils.getEnchantmentLevel(previousTool, Enchantments.SILK_TOUCH) == -1 &&
                     testedStack.isSuitableFor(state))
                 {
                     return true;
@@ -625,10 +656,10 @@ public class InventoryUtils
         int count = 0;
 
         // Core Tool Enchants
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
 
         return count >= 0;
     }
@@ -638,47 +669,50 @@ public class InventoryUtils
         int count = 0;
 
         // Core Weapon Enchantments
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
 
         // Damage Dealing
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SHARPNESS);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SMITE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BANE_OF_ARTHROPODS);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.POWER);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.IMPALING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.DENSITY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SHARPNESS);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SMITE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BANE_OF_ARTHROPODS);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.POWER);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.IMPALING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.DENSITY);
 
         // Support
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SWEEPING_EDGE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FIRE_ASPECT);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PUNCH);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.INFINITY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FLAME);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MULTISHOT);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.QUICK_CHARGE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PIERCING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.RIPTIDE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOYALTY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.CHANNELING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BREACH);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SWEEPING_EDGE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FIRE_ASPECT);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PUNCH);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.INFINITY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FLAME);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MULTISHOT);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.QUICK_CHARGE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PIERCING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.RIPTIDE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOYALTY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.CHANNELING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BREACH);
 
         return count >= 0;
     }
 
+    /*
     private static int hasSameOrBetterEnchantment(ItemStack testedStack, ItemStack previous, RegistryKey<Enchantment> enchantment)
     {
-        return getEnchantmentLevel(testedStack, enchantment) - getEnchantmentLevel(previous, enchantment);
+        return EquipmentUtils.getEnchantmentLevel(testedStack, enchantment) - EquipmentUtils.getEnchantmentLevel(previous, enchantment);
     }
+     */
 
     protected static float getBaseBlockBreakingSpeed(ItemStack stack, BlockState state)
     {
-        float speed = stack.getMiningSpeedMultiplier(state);
+        //float speed = stack.getMiningSpeedMultiplier(state);
+        float speed = EquipmentUtils.getMiningSpeed(stack, state);
 
         if (speed > 1.0f)
         {
-            int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
+            int effLevel = EquipmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
 
             if (effLevel > 0)
             {
@@ -850,7 +884,7 @@ public class InventoryUtils
         if (stack.isEmpty() == false &&
             (stack.isDamageable() == false ||
              stack.isDamaged() == false ||
-             getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
+            EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
         {
             Slot slot = player.currentScreenHandler.getSlot(slotNum);
             int slotRepairableItem = findRepairableItemNotInRepairableSlot(slot, player);
@@ -879,7 +913,7 @@ public class InventoryUtils
                 // Don't take items from the current hotbar slot
                 if ((slot.id - 36) != player.getInventory().selectedSlot &&
                     stack.isDamageable() && stack.isDamaged() && targetSlot.canInsert(stack) &&
-                    getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
+                    EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
                 {
                     return slot.id;
                 }
@@ -905,11 +939,11 @@ public class InventoryUtils
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
             if (!filter.test(testedStack)) return false;
             if (!filter.test(previousBestMatch)) return true;
-            if (getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
+            if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return true;
             }
-            if (getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) < getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
+            if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) < EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return false;
             }
@@ -932,9 +966,10 @@ public class InventoryUtils
         ScreenHandler container = player.currentScreenHandler;
         ItemStack currentStack = player.getEquippedStack(EquipmentSlot.CHEST);
 
-        Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem &&
+        Predicate<ItemStack> stackFilterChestPlate = (s) -> EquipmentUtils.matchArmorSlot(s, EquipmentSlot.CHEST);
+                //s.getItem() instanceof ArmorItem &&
                 //((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
-                s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
+                //s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
 
         if (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack))
         {
@@ -955,7 +990,7 @@ public class InventoryUtils
                 {
                     return false;
                 }
-                return getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) <= getEnchantmentLevel(testedStack, Enchantments.PROTECTION);
+                return EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) <= EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.PROTECTION);
             }, UniformIntProvider.create(9, container.slots.size() - 1));
 
             if (targetSlot >= 0)
@@ -1132,7 +1167,13 @@ public class InventoryUtils
                 return currentHotbarSlot;
             }
 
+            /*
             if ((stack.getItem() instanceof MiningToolItem) == false)
+            {
+                nonTool = currentHotbarSlot;
+            }
+             */
+            if (EquipmentUtils.isRegularTool(stack) == false)
             {
                 nonTool = currentHotbarSlot;
             }
@@ -1147,7 +1188,8 @@ public class InventoryUtils
                 return hotbarSlot;
             }
 
-            if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
+            //if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
+            if (nonTool == -1 && EquipmentUtils.isRegularTool(stack) == false)
             {
                 nonTool = hotbarSlot;
             }
@@ -1183,18 +1225,18 @@ public class InventoryUtils
 
     private static boolean hasSameIshEnchantments(ItemStack stackReference, ItemStack stack)
     {
-        int level = getEnchantmentLevel(stackReference, Enchantments.SILK_TOUCH);
+        int level = EquipmentUtils.getEnchantmentLevel(stackReference, Enchantments.SILK_TOUCH);
 
         if (level > 0)
         {
-            return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) >= level;
+            return EquipmentUtils.getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) >= level;
         }
 
-        level = getEnchantmentLevel(stackReference, Enchantments.FORTUNE);
+        level = EquipmentUtils.getEnchantmentLevel(stackReference, Enchantments.FORTUNE);
 
         if (level > 0)
         {
-            return getEnchantmentLevel(stack, Enchantments.FORTUNE) >= level;
+            return EquipmentUtils.getEnchantmentLevel(stack, Enchantments.FORTUNE) >= level;
         }
 
         return true;
@@ -1221,7 +1263,7 @@ public class InventoryUtils
 
                 if (speed > 1.0f)
                 {
-                    int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
+                    int effLevel = EquipmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
 
                     if (effLevel > 0)
                     {

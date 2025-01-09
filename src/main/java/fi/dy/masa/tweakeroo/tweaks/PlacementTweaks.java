@@ -1,18 +1,7 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
 import java.util.Optional;
-
-import fi.dy.masa.malilib.gui.Message;
-import fi.dy.masa.malilib.util.*;
-import fi.dy.masa.malilib.util.PositionUtils.HitPart;
-import fi.dy.masa.malilib.util.restrictions.BlockRestriction;
-import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
-import fi.dy.masa.tweakeroo.util.*;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
+import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -36,14 +25,26 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
+import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.EquipmentUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.MessageOutputType;
+import fi.dy.masa.malilib.util.position.PositionUtils;
+import fi.dy.masa.malilib.util.restrictions.BlockRestriction;
+import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.util.*;
 
 public class PlacementTweaks
 {
     private static BlockPos posFirst = null;
     private static BlockPos posFirstBreaking = null;
     private static BlockPos posLast = null;
-    private static HitPart hitPartFirst = null;
+    private static PositionUtils.HitPart hitPartFirst = null;
     private static Hand handFirst = Hand.MAIN_HAND;
     private static Vec3d hitVecFirst = null;
     private static Direction sideFirst = null;
@@ -178,7 +179,7 @@ public class PlacementTweaks
         if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())
         {
             if (mc.player.getAbilities().creativeMode ||
-                (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (mc.player.getMainHandStack().getItem() instanceof MiningToolItem) == false))
+                (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (EquipmentUtils.isAnyTool(mc.player.getMainHandStack())) == false))
             {
                 final int count = Configs.Generic.FAST_LEFT_CLICK_COUNT.getIntegerValue();
 
@@ -330,7 +331,7 @@ public class PlacementTweaks
         Direction sideIn = hitResult.getSide();
         Vec3d hitVec = hitResult.getPos();
         Direction playerFacingH = player.getHorizontalFacing();
-        HitPart hitPart = PositionUtils.getHitPart(sideIn, playerFacingH, posIn, hitVec);
+        PositionUtils.HitPart hitPart = PositionUtils.getHitPart(sideIn, playerFacingH, posIn, hitVec);
         Direction sideRotated = getRotatedFacing(sideIn, playerFacingH, hitPart);
         float yaw = player.getYaw();
 
@@ -390,7 +391,7 @@ public class PlacementTweaks
             float playerYaw,
             Vec3d hitVec,
             Hand hand,
-            HitPart hitPart,
+            PositionUtils.HitPart hitPart,
             boolean isFirstClick)
     {
         Direction side = sideIn;
@@ -412,7 +413,7 @@ public class PlacementTweaks
             posNew = isFirstClick && (rotation || offset || adjacent) ? getPlacementPositionForTargetedPosition(world, posIn, sideIn, ctx) : posIn;
 
             // Place the block into the adjacent position
-            if (adjacent && hitPart != null && hitPart != HitPart.CENTER)
+            if (adjacent && hitPart != null && hitPart != PositionUtils.HitPart.CENTER)
             {
                 posNew = posNew.offset(sideRotatedIn.getOpposite()).offset(sideIn.getOpposite());
                 hitVec = hitVec.add(Vec3d.of(sideRotatedIn.getOpposite().getVector().add(sideIn.getOpposite().getVector())));
@@ -897,21 +898,21 @@ public class PlacementTweaks
             float playerYaw,
             Vec3d hitVec,
             Hand hand,
-            @Nullable HitPart hitPart)
+            @Nullable PositionUtils.HitPart hitPart)
     {
         Direction facing = Direction.fromHorizontalQuarterTurns(MathHelper.floor((playerYaw * 4.0F / 360.0F) + 0.5D) & 3);
         Direction facingOrig = facing;
         float yawOrig = player.getYaw();
 
-        if (hitPart == HitPart.CENTER)
+        if (hitPart == PositionUtils.HitPart.CENTER)
         {
             facing = facing.getOpposite();
         }
-        else if (hitPart == HitPart.LEFT)
+        else if (hitPart == PositionUtils.HitPart.LEFT)
         {
             facing = facing.rotateYCounterclockwise();
         }
-        else if (hitPart == HitPart.RIGHT)
+        else if (hitPart == PositionUtils.HitPart.RIGHT)
         {
             facing = facing.rotateYClockwise();
         }
@@ -951,7 +952,7 @@ public class PlacementTweaks
         sideFirstBreaking = null;
     }
 
-    private static Direction getRotatedFacing(Direction originalSide, Direction playerFacingH, HitPart hitPart)
+    private static Direction getRotatedFacing(Direction originalSide, Direction playerFacingH, PositionUtils.HitPart hitPart)
     {
         if (originalSide.getAxis().isVertical())
         {

@@ -334,21 +334,22 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
     }
 
-    public void handleMovementKeys(Input m)
+    public void handleMovementKeys(Input input)
     {
         GameOptions settings = MinecraftClient.getInstance().options;
+        PlayerInput m = input.playerInput;
 
         if (settings.leftKey.isPressed() && settings.rightKey.isPressed())
         {
             if (this.lastSidewaysInput == LeftRight.LEFT)
             {
-                m.movementSideways = 1;
-                m.playerInput =  new PlayerInput(m.playerInput.forward(), m.playerInput.backward(), true, false, m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
+                //m.movementSideways = 1;
+                input.playerInput = new PlayerInput(m.forward(), m.backward(), true, false, m.jump(), m.sneak(), m.sprint());
             }
             else if (this.lastSidewaysInput == LeftRight.RIGHT)
             {
-                m.movementSideways = -1;
-                m.playerInput =  new PlayerInput(m.playerInput.forward(), m.playerInput.backward(), false, true, m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
+                //m.movementSideways = -1;
+                input.playerInput =  new PlayerInput(m.forward(), m.backward(), false, true, m.jump(), m.sneak(), m.sprint());
             }
         }
 
@@ -356,13 +357,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             if (this.lastForwardInput == ForwardBack.FORWARD)
             {
-                m.movementForward = 1;
-                m.playerInput = new PlayerInput(true, false, m.playerInput.left(), m.playerInput.right(), m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
+                //m.movementForward = 1;
+                input.playerInput = new PlayerInput(true, false, m.left(), m.right(), m.jump(), m.sneak(), m.sprint());
             }
             else if (this.lastForwardInput == ForwardBack.BACK)
             {
-                m.movementForward = -1;
-                m.playerInput = new PlayerInput(false, true, m.playerInput.left(), m.playerInput.right(), m.playerInput.jump(), m.playerInput.sneak(), m.playerInput.sprint());
+                //m.movementForward = -1;
+                input.playerInput = new PlayerInput(false, true, m.left(), m.right(), m.jump(), m.sneak(), m.sprint());
             }
         }
     }

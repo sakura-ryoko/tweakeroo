@@ -1,7 +1,5 @@
 package fi.dy.masa.tweakeroo.util;
 
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -9,6 +7,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,6 +17,7 @@ import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SignText;
+import net.minecraft.class_10583;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
@@ -59,8 +60,8 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -389,8 +390,10 @@ public class MiscUtils
         MutableText message = Text.literal(str);
         Style style = message.getStyle();
         String coords = pos.getX() + " " + pos.getY() + " " + pos.getZ();
-        style = style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, coords));
-        style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(coords)));
+        //style = style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, coords));
+        //style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(coords)));
+        style = style.withClickEvent(new ClickEvent.SuggestCommand(coords));
+        style = style.withHoverEvent(new HoverEvent.ShowText(Text.literal(coords)));
         message.setStyle(style);
         mc.inGameHud.getChatHud().addMessage(message);
         Tweakeroo.logger.info(str);
@@ -467,9 +470,21 @@ public class MiscUtils
 
     public static boolean isTameableOwnedBy(Entity entity, UUID ownerUuid)
     {
+        /*
         return ((entity instanceof TameableEntity) &&
                ownerUuid.equals(((TameableEntity) entity).getOwnerUuid())) &&
                ((TameableEntity) entity).isTamed();
+         */
+
+        // todo new 'TamableEntityHolder<>` Generic type class is used here.
+        if (entity instanceof TameableEntity te)
+        {
+            LivingEntity owner = te.getOwner();
+
+            return owner != null && owner.getUuid().equals(ownerUuid);
+        }
+
+        return false;
     }
 
     public static void rightClickEntity(Entity entity, MinecraftClient mc, PlayerEntity player)

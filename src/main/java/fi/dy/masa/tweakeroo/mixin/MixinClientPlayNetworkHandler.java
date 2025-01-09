@@ -61,7 +61,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         {
             DataManager.getInstance().setHasCarpetServer(true);
         }
-        else if (payload.getId().id().equals(DataManager.SERVUX_ENTITY_DATA))
+        else if (payload.getId().id().equals(DataManager.SERVUX_LITEMATIC_DATA))
         {
             DataManager.getInstance().setHasServuxServer(true);
         }

@@ -13,6 +13,8 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+
+import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(ClientCommandSource.class)
@@ -26,7 +28,8 @@ public abstract class MixinClientCommandSource
         if (FeatureToggle.TWEAK_TAB_COMPLETE_COORDINATE.getBooleanValue() &&
             mc.player != null && (mc.crosshairTarget == null || mc.crosshairTarget.getType() == HitResult.Type.MISS))
         {
-            BlockPos pos = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
+            BlockPos pos = PositionUtils.getEntityBlockPos(mc.player);
+            //System.out.printf("onGetBlockPositionSuggestions(): suggestedPos: [%s]\n", pos.toShortString());
             cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(formatInt(pos.getX()), formatInt(pos.getY()), formatInt(pos.getZ()))));
         }
     }

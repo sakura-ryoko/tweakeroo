@@ -16,7 +16,7 @@ public class DataManager implements IServerListener
     private boolean hasCarpetServer;
     private boolean hasServuxServer;
     public static final Identifier CARPET_HELLO = Identifier.of("carpet", "hello");
-    public static final Identifier SERVUX_ENTITY_DATA = Identifier.of("servux", "entity_data");
+    public static final Identifier SERVUX_LITEMATIC_DATA = Identifier.of("servux", "litematics");
     //private IntegratedServer integratedServer;
     //private DynamicRegistryManager.Immutable registryManager = DynamicRegistryManager.EMPTY;
     private boolean hasIntegratedServer;

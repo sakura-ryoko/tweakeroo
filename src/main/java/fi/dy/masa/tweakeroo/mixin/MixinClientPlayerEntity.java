@@ -89,7 +89,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
-            ! this.isSprinting() && ! this.isUsingItem() && this.input.movementForward >= 0.8F &&
+            //! this.isSprinting() && ! this.isUsingItem() && this.input.movementForward >= 0.8F &&
+            ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardMovement() &&
             (this.getHungerManager().getFoodLevel() > 6.0F || this.getAbilities().allowFlying) &&
             ! this.hasStatusEffect(StatusEffects.BLINDNESS) && ! this.isTouchingWater())
         {
