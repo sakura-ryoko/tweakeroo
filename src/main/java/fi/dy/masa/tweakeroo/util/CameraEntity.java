@@ -37,6 +37,21 @@ public class CameraEntity extends ClientPlayerEntity
         return true;
     }
 
+    /**
+     * Apparently, some mods complain about us not returning an entityId
+     * @return (id)
+     */
+    @Override
+    public int getId()
+    {
+        if (originalCameraEntity != null)
+        {
+            return originalCameraEntity.getId();
+        }
+
+        return super.getId();
+    }
+
     public static void movementTick()
     {
         CameraEntity camera = getCamera();
