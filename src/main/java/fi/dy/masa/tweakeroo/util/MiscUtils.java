@@ -17,7 +17,6 @@ import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SignText;
-import net.minecraft.class_10583;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
@@ -520,14 +519,14 @@ public class MiscUtils
     {
         entity.setYaw(yaw);
         entity.setPitch(pitch);
-        entity.prevYaw = yaw;
-        entity.prevPitch = pitch;
+        entity.lastYaw = yaw;
+        entity.lastPitch = pitch;
 
         if (entity instanceof LivingEntity)
         {
             LivingEntity living = (LivingEntity) entity;
             living.headYaw = yaw;
-            living.prevHeadYaw = yaw;
+            living.lastHeadYaw = yaw;
         }
     }
 

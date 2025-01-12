@@ -34,7 +34,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 {
     @Shadow public Input input;
     @Shadow protected int ticksLeftToDoubleTapSprint;
-    @Shadow public float prevNauseaIntensity;
+    @Shadow public float lastNauseaIntensity;
     @Shadow public float nauseaIntensity;
     @Shadow private boolean falling;
     @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
@@ -78,7 +78,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             // This is used to set the value to the correct value for the duration of the
             // updateNausea() method, so that the portal sound plays correctly only once.
             this.realNauseaIntensity = this.nauseaIntensity;
-            this.prevNauseaIntensity = 0.0f;
+            this.lastNauseaIntensity = 0.0f;
             this.nauseaIntensity = 0.0f;
         }
     }

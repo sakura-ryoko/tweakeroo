@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nullable;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
@@ -96,14 +97,14 @@ public class CameraEntity extends ClientPlayerEntity
         this.lastRenderY = this.getY();
         this.lastRenderZ = this.getZ();
 
-        this.prevX = this.getX();
-        this.prevY = this.getY();
-        this.prevZ = this.getZ();
+        this.lastX = this.getX();
+        this.lastY = this.getY();
+        this.lastZ = this.getZ();
 
-        this.prevYaw = this.getYaw();
-        this.prevPitch = this.getPitch();
+        this.lastYaw = this.getYaw();
+        this.lastPitch = this.getPitch();
 
-        this.prevHeadYaw = this.headYaw;
+        this.lastHeadYaw = this.headYaw;
     }
 
     public void setCameraRotations(float yaw, float pitch)
@@ -113,10 +114,10 @@ public class CameraEntity extends ClientPlayerEntity
 
         this.headYaw = yaw;
 
-        //this.prevRotationYaw = this.rotationYaw;
-        //this.prevRotationPitch = this.rotationPitch;
+        //this.lastRotationYaw = this.rotationYaw;
+        //this.lastRotationPitch = this.rotationPitch;
 
-        //this.prevRotationYawHead = this.rotationYaw;
+        //this.lastRotationYawHead = this.rotationYaw;
         //this.setRenderYawOffset(this.rotationYaw);
     }
 
