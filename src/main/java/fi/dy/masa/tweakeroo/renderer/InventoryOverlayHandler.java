@@ -33,6 +33,8 @@ import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.interfaces.IInventoryOverlayHandler;
+import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
+import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -43,8 +45,6 @@ import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
-import fi.dy.masa.tweakeroo.mixin.IMixinPiglinEntity;
 import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 
 public class InventoryOverlayHandler implements IInventoryOverlayHandler
@@ -122,7 +122,9 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
         if (!this.isEmpty())
         {
-            this.renderInventoryOverlay(this.getRenderContextNullable(), drawContext, mc, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+            this.renderInventoryOverlay(this.getRenderContextNullable(), drawContext, mc,
+                                        Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(),
+                                        Configs.Generic.INVENTORY_PREVIEW_VILLAGER_BG_COLOR.getBooleanValue());
         }
 
         profiler.pop();
@@ -205,7 +207,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 {
                     this.lastBlockEntityContext = Pair.of(pos, ctx);
                     this.context = ctx;
-                    return ctx;
+                    return this.context;
                 }
                 else if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
                 {
@@ -226,7 +228,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             else
             {
-                Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, entity.getId());
+                Pair<Entity, NbtCompound> pair = this.getDataSyncer().requestEntity(world, entity.getId());
 
                 if (pair != null)
                 {
@@ -238,19 +240,28 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             InventoryOverlay.Context ctx = getTargetInventoryFromEntity(world.getEntityById(entity.getId()), nbt);
             //dumpContext(ctx);
 
-            if (this.lastEntityContext != null && !this.lastEntityContext.getLeft().equals(entity.getId()))
+            if (this.lastEntityContext != null && this.lastEntityContext.getLeft() != entity.getId())
             {
                 this.lastEntityContext = null;
             }
 
-            if (ctx != null && ctx.inv() != null)
+            // Has Inventory, Not Empty
+            if (ctx != null && ctx.inv() != null && !ctx.inv().isEmpty())
             {
                 this.lastEntityContext = Pair.of(entity.getId(), ctx);
                 this.context = ctx;
-                return ctx;
+                return this.context;
+            }
+            // Has Inventory, Empty, but Has the Offers tag (Villager/Merchant)
+            else if (ctx != null && ctx.inv() != null && ctx.inv().isEmpty() &&
+                     ctx.nbt() != null && ctx.nbt().contains(NbtKeys.OFFERS))
+            {
+                this.lastEntityContext = Pair.of(entity.getId(), ctx);
+                this.context = ctx;
+                return this.context;
             }
             // Non-Inventory/Empty Entity
-            else if (ctx != null &&
+            else if (ctx != null && ctx.inv() == null &&
                     (ctx.type() == InventoryOverlay.InventoryRenderType.WOLF ||
                      ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
                      ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
@@ -260,9 +271,20 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             {
                 this.lastEntityContext = Pair.of(entity.getId(), ctx);
                 this.context = ctx;
-                return ctx;
+                return this.context;
             }
-            else if (this.lastEntityContext != null && this.lastEntityContext.getLeft().equals(entity.getId()))
+            // Has Inventory, but empty, and exists in lastEntityContext
+            else if (this.lastEntityContext != null && this.lastEntityContext.getLeft() == entity.getId() &&
+                    ctx != null && ctx.inv() != null && ctx.inv().isEmpty() &&
+                    (ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
+                     ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
+                     ctx.type() == InventoryOverlay.InventoryRenderType.PLAYER))
+            {
+                this.context = this.lastEntityContext.getRight();
+                return this.context;
+            }
+            // Other, and exists in lastEntityContext
+            else if (this.lastEntityContext != null && this.lastEntityContext.getLeft() == entity.getId())
             {
                 this.context = this.lastEntityContext.getRight();
                 return this.context;
@@ -300,13 +322,13 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 }
             }
 
-            inv = ServerDataSyncer.getInstance().getBlockInventory(world, pos, false);
+            inv = this.getDataSyncer().getBlockInventory(world, pos, false);
         }
 
         BlockEntityType<?> beType = nbt != null ? NbtBlockUtils.getBlockEntityTypeFromNbt(nbt) : null;
 
         if ((beType != null && beType.equals(BlockEntityType.ENDER_CHEST)) ||
-                be instanceof EnderChestBlockEntity)
+            be instanceof EnderChestBlockEntity)
         {
             if (MinecraftClient.getInstance().player != null)
             {
@@ -315,7 +337,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 if (player != null)
                 {
                     // Fetch your own EnderItems from Server ...
-                    Pair<Entity, NbtCompound> enderPair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
+                    Pair<Entity, NbtCompound> enderPair = this.getDataSyncer().requestEntity(world, player.getId());
                     EnderChestInventory enderItems;
 
                     if (enderPair != null && enderPair.getRight() != null && enderPair.getRight().contains(NbtKeys.ENDER_ITEMS))
@@ -384,11 +406,11 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         }
         else if (entity instanceof AbstractHorseEntity)
         {
-            inv = ((IMixinAbstractHorseEntity) entity).tweakeroo_getHorseInventory();
+            inv = ((IMixinAbstractHorseEntity) entity).malilib_getHorseInventory();
         }
         else if (entity instanceof PiglinEntity)
         {
-            inv = ((IMixinPiglinEntity) entity).tweakeroo_inventory();
+            inv = ((IMixinPiglinEntity) entity).malilib_getInventory();
         }
         if (!nbt.isEmpty())
         {
@@ -414,7 +436,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             // Fix for saddled horse, no inv
             else if (inv != null &&
-                     inv.size() == 1 &&
+                     //inv.size() == 1 &&
                      nbt.contains(NbtKeys.SADDLE))
             {
                 inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());

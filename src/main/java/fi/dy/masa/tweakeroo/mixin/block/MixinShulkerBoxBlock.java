@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.block;
 
 import java.util.List;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.entity;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.Perspective;

@@ -67,6 +67,9 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.mixin.*;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinCommandBlockExecutor;
+import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
+import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 

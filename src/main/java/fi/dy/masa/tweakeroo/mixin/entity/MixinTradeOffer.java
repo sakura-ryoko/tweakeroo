@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.entity;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

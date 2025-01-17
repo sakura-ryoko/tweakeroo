@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.item;
 
 import java.util.Map;
 import org.spongepowered.asm.mixin.Mixin;

@@ -36,6 +36,9 @@ import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
 import fi.dy.masa.malilib.interfaces.IDataSyncer;
+import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
+import fi.dy.masa.malilib.mixin.entity.IMixinDataQueryHandler;
+import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
 import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -46,9 +49,6 @@ import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
-import fi.dy.masa.tweakeroo.mixin.IMixinDataQueryHandler;
-import fi.dy.masa.tweakeroo.mixin.IMixinPiglinEntity;
 import fi.dy.masa.tweakeroo.network.ServuxTweaksHandler;
 import fi.dy.masa.tweakeroo.network.ServuxTweaksPacket;
 
@@ -102,13 +102,15 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     @Override
     public void onClientTick(MinecraftClient mc)
     {
+        long now = System.currentTimeMillis();
+
         this.uptimeTicks++;
-        if (System.currentTimeMillis() - this.serverTickTime > 50)
+        if (now - this.serverTickTime > 50)
         {
             // In this block, we do something every server tick
             if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() == false)
             {
-                this.serverTickTime = System.currentTimeMillis();
+                this.serverTickTime = now;
                 if (DataManager.getInstance().hasIntegratedServer() == false && this.hasServuxServer())
                 {
                     this.servuxServer = false;
@@ -127,7 +129,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
 
             // Expire cached NBT
-            this.tickCache();
+            this.tickCache(now);
 
             // 5 queries / server tick
             for (int i = 0; i < Configs.Generic.SERVER_NBT_REQUEST_RATE.getIntegerValue(); i++)
@@ -137,6 +139,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     var iter = this.pendingBlockEntitiesQueue.iterator();
                     BlockPos pos = iter.next();
                     iter.remove();
+
                     if (this.hasServuxServer())
                     {
                         requestServuxBlockEntityData(pos);
@@ -161,7 +164,8 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     }
                 }
             }
-            this.serverTickTime = System.currentTimeMillis();
+
+            this.serverTickTime = now;
         }
     }
 
@@ -199,9 +203,10 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         else
         {
             Tweakeroo.printDebug("ServerDataSyncer#reset() - dimension change or log-in");
-            this.serverTickTime = System.currentTimeMillis() - (this.getCacheTimeout() + 5000L);
-            this.tickCache();
-            this.serverTickTime = System.currentTimeMillis();
+            long now = System.currentTimeMillis();
+            this.serverTickTime = now - (this.getCacheTimeout() + 5000L);
+            this.tickCache(now);
+            this.serverTickTime = now;
             this.clientWorld = mc.world;
         }
         // Clear data
@@ -216,11 +221,10 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         return (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue(), 0.25f, 25.0f) * 1000L);
     }
 
-    private void tickCache()
+    private void tickCache(long nowTime)
     {
-        long nowTime = System.currentTimeMillis();
         long blockTimeout = this.getCacheTimeout();
-        long entityTimeout = this.getCacheTimeout() * 2;
+        long entityTimeout = this.getCacheTimeout();
 
         synchronized (this.blockEntityCache)
         {
@@ -228,7 +232,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 Pair<Long, Pair<BlockEntity, NbtCompound>> pair = this.blockEntityCache.get(pos);
 
-                if (nowTime - pair.getLeft() > blockTimeout || pair.getLeft() - nowTime > 0)
+                if (nowTime - pair.getLeft() > blockTimeout || pair.getLeft() > nowTime)
                 {
                     //Tweakeroo.printDebug("entityCache: be at pos [{}] has timed out", pos.toShortString());
                     this.blockEntityCache.remove(pos);
@@ -242,7 +246,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 Pair<Long, Pair<Entity, NbtCompound>> pair = this.entityCache.get(entityId);
 
-                if (nowTime - pair.getLeft() > entityTimeout || pair.getLeft() - nowTime > 0)
+                if (nowTime - pair.getLeft() > entityTimeout || pair.getLeft() > nowTime)
                 {
                     //Tweakeroo.printDebug("entityCache: entity Id [{}] has timed out", entityId);
                     this.entityCache.remove(entityId);
@@ -580,11 +584,11 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                 }
                 else if (entity instanceof AbstractHorseEntity)
                 {
-                    inv = ((IMixinAbstractHorseEntity) entity).tweakeroo_getHorseInventory();
+                    inv = ((IMixinAbstractHorseEntity) entity).malilib_getHorseInventory();
                 }
                 else if (entity instanceof PiglinEntity)
                 {
-                    inv = ((IMixinPiglinEntity) entity).tweakeroo_inventory();
+                    inv = ((IMixinPiglinEntity) entity).malilib_getInventory();
                 }
             }
 
@@ -617,7 +621,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 handleBlockEntityData(pos, nbtCompound, null);
             });
-            this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).currentTransactionId(), Either.left(pos));
+            this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).malilib_currentTransactionId(), Either.left(pos));
         }
     }
 
@@ -636,7 +640,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 handleEntityData(entityId, nbtCompound);
             });
-            this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).currentTransactionId(), Either.right(entityId));
+            this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).malilib_currentTransactionId(), Either.right(entityId));
         }
     }
 
@@ -678,14 +682,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
             synchronized (this.blockEntityCache)
             {
-                if (this.blockEntityCache.containsKey(pos))
-                {
-                    this.blockEntityCache.replace(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
-                }
-                else
-                {
-                    this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
-                }
+                this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, nbt)));
             }
 
             blockEntity.read(nbt, this.getClientWorld().getRegistryManager());
@@ -715,14 +712,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     }
                     synchronized (this.blockEntityCache)
                     {
-                        if (this.blockEntityCache.containsKey(pos))
-                        {
-                            this.blockEntityCache.replace(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
-                        }
-                        else
-                        {
-                            this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
-                        }
+                        this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity2, nbt)));
                     }
 
                     return blockEntity2;
@@ -754,14 +744,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
             synchronized (this.entityCache)
             {
-                if (this.entityCache.containsKey(entityId))
-                {
-                    this.entityCache.replace(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
-                }
-                else
-                {
-                    this.entityCache.put(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
-                }
+                this.entityCache.put(entityId, Pair.of(System.currentTimeMillis(), Pair.of(entity, nbt)));
             }
         }
         return entity;
