@@ -49,7 +49,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
 public class InventoryUtils

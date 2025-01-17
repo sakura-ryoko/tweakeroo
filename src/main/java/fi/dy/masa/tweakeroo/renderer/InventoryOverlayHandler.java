@@ -437,7 +437,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Fix for saddled horse, no inv
             else if (inv != null &&
                      //inv.size() == 1 &&
-                     nbt.contains(NbtKeys.SADDLE))
+                     nbt.contains(NbtKeys.EQUIPMENT) && nbt.contains(NbtKeys.EATING_HAY))
             {
                 inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
                 inv = null;
