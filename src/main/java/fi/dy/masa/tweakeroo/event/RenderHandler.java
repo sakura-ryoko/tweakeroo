@@ -199,6 +199,8 @@ public class RenderHandler implements IRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
+            // todo already updated in future versions, I just don't want to break existing
+            @SuppressWarnings("deprecation")
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
             fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
