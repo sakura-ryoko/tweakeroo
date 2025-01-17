@@ -92,7 +92,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
                     this.readingSessionKey = Random.create(Util.getMeasuringTimeMs()).nextLong();
                 }
 
-                //Tweakeroo.printDebug("ServuxEntitiesHandler#decodeClientData(): received Entity Data Packet Slice of size {} (in bytes) // reading session key [{}]", packet.getTotalSize(), this.readingSessionKey);
+                //Tweakeroo.printDebug("ServuxTweaksHandler#decodeClientData(): received Tweaks Data Packet Slice of size {} (in bytes) // reading session key [{}]", packet.getTotalSize(), this.readingSessionKey);
                 PacketByteBuf fullPacket = PacketSplitter.receive(this, this.readingSessionKey, packet.getBuffer());
 
                 if (fullPacket != null)
@@ -104,11 +104,11 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
                     }
                     catch (Exception e)
                     {
-                        Tweakeroo.logger.error("ServuxEntitiesHandler#decodeClientData(): Entity Data: error reading fullBuffer [{}]", e.getLocalizedMessage());
+                        Tweakeroo.logger.error("ServuxTweaksHandler#decodeClientData(): Tweaks Data: error reading fullBuffer [{}]", e.getLocalizedMessage());
                     }
                 }
             }
-            default -> Tweakeroo.logger.warn("ServuxEntitiesHandler#decodeClientData(): received unhandled packetType {} of size {} bytes.", packet.getPacketType(), packet.getTotalSize());
+            default -> Tweakeroo.logger.warn("ServuxTweaksHandler#decodeClientData(): received unhandled packetType {} of size {} bytes.", packet.getPacketType(), packet.getTotalSize());
         }
     }
 
@@ -163,7 +163,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
         {
             if (this.failures > MAX_FAILURES)
             {
-                Tweakeroo.printDebug("encodeClientData(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", MAX_FAILURES);
+                Tweakeroo.printDebug("ServuxTweaksHandler#encodeClientData(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", MAX_FAILURES);
                 this.servuxRegistered = false;
                 ServuxTweaksHandler.INSTANCE.unregisterPlayReceiver();
                 ServerDataSyncer.getInstance().onPacketFailure();
