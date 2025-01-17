@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.FacingBlock;

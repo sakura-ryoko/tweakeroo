@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.item;
 
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;

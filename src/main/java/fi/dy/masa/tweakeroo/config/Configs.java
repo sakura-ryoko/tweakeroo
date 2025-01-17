@@ -78,6 +78,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    HOTBAR_SWAP_OVERLAY_ALIGNMENT       = new ConfigOptionList  ("hotbarSwapOverlayAlignment", HudAlignment.BOTTOM_RIGHT).apply(GENERIC_KEY);
         public static final ConfigInteger       HOTBAR_SWAP_OVERLAY_OFFSET_X        = new ConfigInteger     ("hotbarSwapOverlayOffsetX", 4).apply(GENERIC_KEY);
         public static final ConfigInteger       HOTBAR_SWAP_OVERLAY_OFFSET_Y        = new ConfigInteger     ("hotbarSwapOverlayOffsetY", 4).apply(GENERIC_KEY);
+        public static final ConfigBoolean       INVENTORY_PREVIEW_VILLAGER_BG_COLOR = new ConfigBoolean     ("inventoryPreviewVillagerBGColor", false).apply(GENERIC_KEY);
         public static final ConfigInteger       ITEM_SWAP_DURABILITY_THRESHOLD      = new ConfigInteger     ("itemSwapDurabilityThreshold", 20, 5, 10000).apply(GENERIC_KEY);
         public static final ConfigBoolean       ITEM_USE_PACKET_CHECK_BYPASS        = new ConfigBoolean     ("itemUsePacketCheckBypass", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       MAP_PREVIEW_REQUIRE_SHIFT           = new ConfigBoolean     ("mapPreviewRequireShift", true).apply(GENERIC_KEY);
@@ -142,6 +143,7 @@ public class Configs implements IConfigHandler
                 FREE_CAMERA_PLAYER_MOVEMENT,
                 HAND_RESTOCK_PRE,
                 HANGABLE_ENTITY_BYPASS_INVERSE,
+                INVENTORY_PREVIEW_VILLAGER_BG_COLOR,
                 ITEM_USE_PACKET_CHECK_BYPASS,
                 MAP_PREVIEW_REQUIRE_SHIFT,
                 PERMANENT_SNEAK_ALLOW_IN_GUIS,

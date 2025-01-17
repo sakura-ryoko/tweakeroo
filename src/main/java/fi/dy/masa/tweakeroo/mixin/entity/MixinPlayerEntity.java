@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.entity;
 
 import fi.dy.masa.tweakeroo.data.DataManager;
 import org.spongepowered.asm.mixin.Mixin;
