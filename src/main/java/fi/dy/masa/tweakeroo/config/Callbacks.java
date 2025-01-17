@@ -20,7 +20,7 @@ import fi.dy.masa.malilib.render.InventoryOverlayScreen;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.mixin.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.util.*;
