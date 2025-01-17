@@ -36,7 +36,7 @@ import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.util.*;
 
 public class PlacementTweaks
