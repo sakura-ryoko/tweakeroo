@@ -11,8 +11,8 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(ServerChunkLoadingManager.class)
 public abstract class MixinServerChunkLoadingManager
 {
-    @Inject(method = "unloadChunks", cancellable = true, at = @At(value = "FIELD",
-            target = "Lnet/minecraft/server/world/ServerChunkLoadingManager;chunksToUnload:Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;"))
+    @Inject(method = "saveChunks", cancellable = true, at = @At(value = "FIELD",
+            target = "Lnet/minecraft/server/world/ServerChunkLoadingManager;chunkHolders:Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;"))
     private void tweakeroo_disableSaving20ChunksEveryTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CONSTANT_CHUNK_SAVING.getBooleanValue())
