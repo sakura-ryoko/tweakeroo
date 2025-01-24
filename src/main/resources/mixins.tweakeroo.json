@@ -12,7 +12,6 @@
     "block.MixinObserverBlock",
     "block.MixinScaffoldingBlock",
     "block.MixinSculkSensor",
-    "block.MixinShulkerBoxBlock",
     "block.MixinSignBlockEntity",
     "block.MixinSlimeBlock",
     "block.MixinStructureBlockBlockEntity",
