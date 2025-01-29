@@ -231,11 +231,13 @@ public class Configs implements IConfigHandler
     public static class Fixes
     {
         //public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false).apply(FIXES_KEY);
+        public static final ConfigBoolean ELYTRA_SPRINT_CANCEL              = new ConfigBoolean("elytraSprintCancel", false).apply(FIXES_KEY);
         public static final ConfigBoolean MAC_HORIZONTAL_SCROLL             = new ConfigBoolean("macHorizontalScroll", false).apply(FIXES_KEY);
         public static final ConfigBoolean RAVAGER_CLIENT_BLOCK_BREAK_FIX    = new ConfigBoolean("ravagerClientBlockBreakFix", false).apply(FIXES_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 //ELYTRA_FIX,
+                ELYTRA_SPRINT_CANCEL,
                 MAC_HORIZONTAL_SCROLL,
                 RAVAGER_CLIENT_BLOCK_BREAK_FIX
         );
@@ -320,7 +322,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_CREATIVE_INFESTED_BLOCKS= new ConfigBooleanHotkeyed("disableCreativeMenuInfestedBlocks",    false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_DEAD_MOB_RENDERING      = new ConfigBooleanHotkeyed("disableDeadMobRendering",              false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_DEAD_MOB_TARGETING      = new ConfigBooleanHotkeyed("disableDeadMobTargeting",              false, "").apply(DISABLE_KEY);
-        public static final ConfigBooleanHotkeyed       DISABLE_ELYTRA_SPRINT_CANCEL    = new ConfigBooleanHotkeyed("disableElytraSprintCancel",            false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_ENTITY_RENDERING        = new ConfigBooleanHotkeyed("disableEntityRendering",               false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_ENTITY_TICKING          = new ConfigBooleanClient  ("disableEntityTicking",                 false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_FALLING_BLOCK_RENDER    = new ConfigBooleanHotkeyed("disableFallingBlockEntityRendering",   false, "").apply(DISABLE_KEY);
@@ -372,7 +373,6 @@ public class Configs implements IConfigHandler
                 DISABLE_ENTITY_TICKING,
                 DISABLE_FALLING_BLOCK_RENDER,
                 DISABLE_FP_EFFECT_PARTICLES,
-                DISABLE_ELYTRA_SPRINT_CANCEL,
                 DISABLE_INVENTORY_EFFECTS,
                 DISABLE_ITEM_SWITCH_COOLDOWN,
                 DISABLE_MOB_SPAWNER_MOB_RENDER,
