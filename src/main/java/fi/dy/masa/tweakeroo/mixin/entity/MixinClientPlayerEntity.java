@@ -98,6 +98,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
+    // FIXME (Do this later)
     @Redirect(method = "tickMovement", at = @At(value = "FIELD",
                 target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z"))
     private boolean overrideCollidedHorizontally(ClientPlayerEntity player)
@@ -110,6 +111,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         return player.horizontalCollision;
     }
 
+    // FIXME (Do this later)
     @Inject(method = "tickMovement",
             slice = @Slice(from = @At(value = "FIELD",
                                       target = "Lnet/minecraft/client/option/GameOptions;sprintKey:Lnet/minecraft/client/option/KeyBinding;")),
