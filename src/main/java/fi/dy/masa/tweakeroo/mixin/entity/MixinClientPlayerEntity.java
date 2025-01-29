@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.authlib.GameProfile;
@@ -89,7 +88,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
-            //! this.isSprinting() && ! this.isUsingItem() && this.input.movementForward >= 0.8F &&
             ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardMovement() &&
             (this.getHungerManager().getFoodLevel() > 6.0F || this.getAbilities().allowFlying) &&
             ! this.hasStatusEffect(StatusEffects.BLINDNESS) && ! this.isTouchingWater())
@@ -98,8 +96,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
-    // FIXME (Do this later)
-    @Redirect(method = "tickMovement", at = @At(value = "FIELD",
+    @Redirect(method = "shouldStopSprinting", at = @At(value = "FIELD",
                 target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z"))
     private boolean overrideCollidedHorizontally(ClientPlayerEntity player)
     {
@@ -111,11 +108,12 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         return player.horizontalCollision;
     }
 
-    // FIXME (Do this later)
     @Inject(method = "tickMovement",
+            /*
             slice = @Slice(from = @At(value = "FIELD",
                                       target = "Lnet/minecraft/client/option/GameOptions;sprintKey:Lnet/minecraft/client/option/KeyBinding;")),
-            at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER,
+             */
+            at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, ordinal = 2, shift = At.Shift.AFTER,
                      target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksLeftToDoubleTapSprint:I"))
     private void disableDoubleTapSprint(CallbackInfo ci)
     {
@@ -146,20 +144,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         {
             // reset auto switch item if the feature is disabled.
             this.autoSwitchElytraChestplate = ItemStack.EMPTY;
-        }
-    }
-
-    @Inject(method = "shouldStopSprinting", at = @At("RETURN"), cancellable = true)
-    private void tweakeroo_fixSprintCancelWhenFlying(CallbackInfoReturnable<Boolean> cir)
-    {
-        if (Configs.Disable.DISABLE_ELYTRA_SPRINT_CANCEL.getBooleanValue() &&
-            cir.getReturnValue() &&
-            !this.hasVehicle() &&
-            !this.isInFluid() &&
-            this.isGliding() &&
-            this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
-        {
-            cir.setReturnValue(false);
         }
     }
 
