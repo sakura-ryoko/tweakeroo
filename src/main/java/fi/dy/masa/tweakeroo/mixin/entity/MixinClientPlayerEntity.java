@@ -147,6 +147,20 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         }
     }
 
+    @Inject(method = "shouldStopSprinting", at = @At("RETURN"), cancellable = true)
+    private void tweakeroo_fixSprintCancelWhenFlying(CallbackInfoReturnable<Boolean> cir)
+    {
+        if (Configs.Disable.DISABLE_ELYTRA_SPRINT_CANCEL.getBooleanValue() &&
+            cir.getReturnValue() &&
+            !this.hasVehicle() &&
+            !this.isInFluid() &&
+            this.isGliding() &&
+            this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
+        {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Inject(method = "onTrackedDataSet", at = @At("RETURN"))
     private void onStopFlying(TrackedData<?> data, CallbackInfo ci)
     {
