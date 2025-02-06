@@ -146,7 +146,7 @@ public class InventoryUtils
             }
             catch (Exception e)
             {
-                Tweakeroo.logger.warn("Failed to set an unstacking protected item from name '{}'", name, e);
+                Tweakeroo.LOGGER.warn("Failed to set an unstacking protected item from name '{}'", name, e);
             }
         }
     }
@@ -194,7 +194,7 @@ public class InventoryUtils
 
             if (split.length != 2)
             {
-                Tweakeroo.logger.warn("Expected weapon mapping to be `entity_ids => weapon_ids` got '{}'", mapping);
+                Tweakeroo.LOGGER.warn("Expected weapon mapping to be `entity_ids => weapon_ids` got '{}'", mapping);
                 continue;
             }
 
@@ -218,7 +218,7 @@ public class InventoryUtils
                     }
                     catch (Exception ignore) {}
 
-                    Tweakeroo.logger.warn("Unable to find item to use as weapon: '{}'", itemId);
+                    Tweakeroo.LOGGER.warn("Unable to find item to use as weapon: '{}'", itemId);
                 }
             }
 
