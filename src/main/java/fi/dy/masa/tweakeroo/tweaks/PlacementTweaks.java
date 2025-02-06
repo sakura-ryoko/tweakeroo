@@ -170,7 +170,7 @@ public class PlacementTweaks
             canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             stackBeforeUse[hand.ordinal()] = stackOriginal.copy();
-            hotbarSlot = player.getInventory().selectedSlot;
+            hotbarSlot = player.getInventory().getSelectedSlot();
         }
     }
 
@@ -682,7 +682,7 @@ public class PlacementTweaks
         {
             ItemStack stackCurrent = player.getStackInHand(hand);
 
-            if (stackOriginal.isEmpty() == false && player.getInventory().selectedSlot == hotbarSlot &&
+            if (stackOriginal.isEmpty() == false && player.getInventory().getSelectedSlot() == hotbarSlot &&
                 (stackCurrent.isEmpty() || ItemStack.areItemsEqual(stackCurrent, stackOriginal) == false))
             {
                 // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
@@ -871,18 +871,18 @@ public class PlacementTweaks
 
             if (FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue())
             {
-                int newSlot = inv.selectedSlot + 1;
+                int newSlot = inv.getSelectedSlot() + 1;
 
                 if (newSlot >= 9 || newSlot >= Configs.Generic.HOTBAR_SLOT_CYCLE_MAX.getIntegerValue())
                 {
                     newSlot = 0;
                 }
 
-                inv.selectedSlot = newSlot;
+                inv.setSelectedSlot(newSlot);
             }
             else if (FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue())
             {
-                inv.selectedSlot = player.getRandom().nextInt(Configs.Generic.HOTBAR_SLOT_RANDOMIZER_MAX.getIntegerValue());
+                inv.setSelectedSlot(player.getRandom().nextInt(Configs.Generic.HOTBAR_SLOT_RANDOMIZER_MAX.getIntegerValue()));
             }
         }
 
@@ -1208,7 +1208,7 @@ public class PlacementTweaks
         if (Configs.Generic.SLOT_SYNC_WORKAROUND.getBooleanValue() &&
             FeatureToggle.TWEAK_PICK_BEFORE_PLACE.getBooleanValue() == false &&
             container != null && container == player.playerScreenHandler &&
-            (slotNumber == 45 || (slotNumber - 36) == player.getInventory().selectedSlot))
+            (slotNumber == 45 || (slotNumber - 36) == player.getInventory().getSelectedSlot()))
         {
             if (mc.options.useKey.isPressed() &&
                 (Configs.Generic.SLOT_SYNC_WORKAROUND_ALWAYS.getBooleanValue() ||

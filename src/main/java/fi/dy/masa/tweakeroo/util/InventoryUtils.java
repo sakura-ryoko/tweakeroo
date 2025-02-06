@@ -240,7 +240,7 @@ public class InventoryUtils
                     }
                     catch (Exception ignore) {}
 
-                    Tweakeroo.logger.warn("Unable to find entity: '{}'", entity_id);
+                    Tweakeroo.LOGGER.warn("Unable to find entity: '{}'", entity_id);
                 }
             }
         }
@@ -249,7 +249,7 @@ public class InventoryUtils
     private static boolean isConfiguredRepairSlot(int slotNum, PlayerEntity player)
     {
         if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
-            (slotNum - 36) == player.getInventory().selectedSlot)
+            (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return true;
         }
@@ -265,7 +265,7 @@ public class InventoryUtils
     private static EquipmentSlot getEquipmentTypeForSlot(int slotNum, PlayerEntity player)
     {
         if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
-            (slotNum - 36) == player.getInventory().selectedSlot)
+            (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return EquipmentSlot.MAINHAND;
         }
@@ -290,7 +290,7 @@ public class InventoryUtils
     {
         switch (type)
         {
-            case MAINHAND:  return player != null ? player.getInventory().selectedSlot + 36 : -1;
+            case MAINHAND:  return player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
             case OFFHAND:   return 45;
             case HEAD:      return 5;
             case CHEST:     return 6;
@@ -350,7 +350,7 @@ public class InventoryUtils
             MinecraftClient mc = MinecraftClient.getInstance();
             ScreenHandler container = player.playerScreenHandler;
             int endSlot = allowHotbar ? 44 : 35;
-            int currentMainHandSlot = player.getInventory().selectedSlot + 36;
+            int currentMainHandSlot = player.getInventory().getSelectedSlot() + 36;
             int currentSlot = hand == Hand.MAIN_HAND ? currentMainHandSlot : 45;
 
             for (int slotNum = 9; slotNum <= endSlot; ++slotNum)
@@ -410,7 +410,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().selectedSlot) == false)
+            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
         {
             ScreenHandler container = player.playerScreenHandler;
             ItemPickerTest test;
@@ -426,7 +426,7 @@ public class InventoryUtils
 
             int slotNumber = findSlotWithBestItemMatch(container, test, UniformIntProvider.create(36, 44), UniformIntProvider.create(9, 35));
 
-            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().selectedSlot)
+            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().getSelectedSlot())
             {
                 swapToolToHand(slotNumber, mc);
                 PlacementTweaks.cacheStackInHand(Hand.MAIN_HAND);
@@ -522,7 +522,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().selectedSlot) == false)
+            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
         {
             BlockState state = mc.world.getBlockState(pos);
             ScreenHandler container = player.playerScreenHandler;
@@ -539,7 +539,7 @@ public class InventoryUtils
 
             int slotNumber = findSlotWithBestItemMatch(container, test, UniformIntProvider.create(36, 44), UniformIntProvider.create(9, 35));
 
-            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().selectedSlot)
+            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().getSelectedSlot())
             {
                 swapToolToHand(slotNumber, mc);
             }
@@ -906,7 +906,7 @@ public class InventoryUtils
                 ItemStack stack = slot.getStack();
 
                 // Don't take items from the current hotbar slot
-                if ((slot.id - 36) != player.getInventory().selectedSlot &&
+                if ((slot.id - 36) != player.getInventory().getSelectedSlot() &&
                     stack.isDamageable() && stack.isDamaged() && targetSlot.canInsert(stack) &&
                     EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
                 {
@@ -1078,12 +1078,12 @@ public class InventoryUtils
 
             if (hand == Hand.MAIN_HAND)
             {
-                int currentHotbarSlot = inventory.selectedSlot;
+                int currentHotbarSlot = inventory.getSelectedSlot();
 
                 if (isHotbarSlot(slotNumber))
                 {
-                    inventory.selectedSlot = slotNumber - 36;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                    inventory.setSelectedSlot(slotNumber - 36);
+                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.getSelectedSlot()));
                 }
                 else
                 {
@@ -1126,20 +1126,20 @@ public class InventoryUtils
 
             if (isHotbarSlot(slotNumber))
             {
-                inventory.selectedSlot = slotNumber - 36;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                inventory.setSelectedSlot(slotNumber - 36);
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.getSelectedSlot()));
             }
             else
             {
-                int selectedSlot = inventory.selectedSlot;
+                int selectedSlot = inventory.getSelectedSlot();
                 int hotbarSlot = getUsableHotbarSlotForTool(selectedSlot, TOOL_SWITCHABLE_SLOTS, container);
 
                 if (PlayerInventory.isValidHotbarIndex(hotbarSlot))
                 {
                     if (hotbarSlot != selectedSlot)
                     {
-                        inventory.selectedSlot = hotbarSlot;
-                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                        inventory.setSelectedSlot(hotbarSlot);
+                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.getSelectedSlot()));
                     }
 
                     mc.interactionManager.clickSlot(container.syncId, slotNumber, hotbarSlot, SlotActionType.SWAP, mc.player);
@@ -1315,7 +1315,7 @@ public class InventoryUtils
                     mc.interactionManager.clickSlot(container.syncId, slot2.id, 0, SlotActionType.PICKUP, player);
 
                     // If the items didn't all fit, return the rest
-                    if (player.getInventory().getMainHandStack().isEmpty() == false)
+                    if (player.getInventory().getSelectedStack().isEmpty() == false)
                     {
                         mc.interactionManager.clickSlot(container.syncId, slot1.id, 0, SlotActionType.PICKUP, player);
                     }
@@ -1393,7 +1393,7 @@ public class InventoryUtils
                 if (isCreative)
                 {
                     inventory.swapStackWithHotbar(stack);
-                    mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
+                    mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.getSelectedSlot());
                 }
                 else
                 {

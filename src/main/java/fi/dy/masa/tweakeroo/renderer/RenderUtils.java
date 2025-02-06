@@ -11,6 +11,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.GlUsage;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.Camera;
@@ -376,11 +378,33 @@ public class RenderUtils
         matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
         matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
         matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
-        RenderSystem.renderCrosshair(10);
+        //RenderSystem.renderCrosshair(10);
+        mc.getDebugHud().method_67545();
+
         matrix4fStack.popMatrix();
         //RenderSystem.applyModelViewMatrix();
         RenderSystem.disableBlend();
     }
+
+    /*
+    public void method_67545()
+    {
+        GlStateManager._depthMask(false);
+        GlStateManager._disableCull();
+        RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
+        this.field_56578.bind();
+        RenderSystem.lineWidth(4.0F);
+        RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
+        this.field_56578.draw(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+        RenderSystem.lineWidth(2.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        this.field_56578.draw(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+        VertexBuffer.unbind();
+        RenderSystem.lineWidth(1.0F);
+        GlStateManager._enableCull();
+        GlStateManager._depthMask(true);
+    }
+     */
 
     public static void notifyRotationChanged()
     {
