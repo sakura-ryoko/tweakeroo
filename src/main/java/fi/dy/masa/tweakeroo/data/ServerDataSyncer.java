@@ -194,7 +194,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         if (isLogout)
         {
-            Tweakeroo.printDebug("ServerDataSyncer#reset() - log-out");
+            Tweakeroo.debugLog("ServerDataSyncer#reset() - log-out");
             HANDLER.reset(this.getNetworkChannel());
             HANDLER.resetFailures(this.getNetworkChannel());
             this.servuxServer = false;
@@ -202,7 +202,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         }
         else
         {
-            Tweakeroo.printDebug("ServerDataSyncer#reset() - dimension change or log-in");
+            Tweakeroo.debugLog("ServerDataSyncer#reset() - dimension change or log-in");
             long now = System.currentTimeMillis();
             this.serverTickTime = now - (this.getCacheTimeout() + 5000L);
             this.tickCache(now);
@@ -315,7 +315,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         if (ver != null && ver.isEmpty() == false)
         {
             this.servuxVersion = ver;
-            Tweakeroo.printDebug("tweaksDataChannel: joining Servux version {}", ver);
+            Tweakeroo.debugLog("tweaksDataChannel: joining Servux version {}", ver);
         }
         else
         {
@@ -386,13 +386,13 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         if (DataManager.getInstance().hasIntegratedServer() == false)
         {
-            Tweakeroo.printDebug("ServerDataSyncer#receiveServuxMetadata(): received METADATA from Servux");
+            Tweakeroo.debugLog("ServerDataSyncer#receiveServuxMetadata(): received METADATA from Servux");
 
             if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
                 if (data.getInt("version") != ServuxTweaksPacket.PROTOCOL_VERSION)
                 {
-                    Tweakeroo.logger.warn("tweaksDataChannel: Mis-matched protocol version!");
+                    Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version!");
                 }
 
                 DataManager.getInstance().setHasServuxServer(true);

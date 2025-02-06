@@ -288,7 +288,7 @@ public class PlacementHandler
         }
         catch (Exception e)
         {
-            Tweakeroo.logger.warn("Exception trying to apply placement protocol value", e);
+            Tweakeroo.LOGGER.warn("Exception trying to apply placement protocol value", e);
         }
 
         // Strip Blacklisted properties, and use the Block's default state.

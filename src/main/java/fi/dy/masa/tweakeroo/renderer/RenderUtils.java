@@ -386,26 +386,6 @@ public class RenderUtils
         RenderSystem.disableBlend();
     }
 
-    /*
-    public void method_67545()
-    {
-        GlStateManager._depthMask(false);
-        GlStateManager._disableCull();
-        RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
-        this.field_56578.bind();
-        RenderSystem.lineWidth(4.0F);
-        RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
-        this.field_56578.draw(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-        RenderSystem.lineWidth(2.0F);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        this.field_56578.draw(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-        VertexBuffer.unbind();
-        RenderSystem.lineWidth(1.0F);
-        GlStateManager._enableCull();
-        GlStateManager._depthMask(true);
-    }
-     */
-
     public static void notifyRotationChanged()
     {
         lastRotationChangeTime = System.currentTimeMillis();
