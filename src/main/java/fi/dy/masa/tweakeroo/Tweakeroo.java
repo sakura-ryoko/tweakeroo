@@ -8,7 +8,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 
 public class Tweakeroo implements ModInitializer
 {
-    public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
+    public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_ID);
 
     public static int renderCountItems;
     public static int renderCountXPOrbs;
@@ -19,11 +19,11 @@ public class Tweakeroo implements ModInitializer
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
-    public static void printDebug(String msg, Object... args)
+    public static void debugLog(String msg, Object... args)
     {
         if (Configs.Generic.DEBUG_LOGGING.getBooleanValue())
         {
-            Tweakeroo.logger.info(msg, args);
+            Tweakeroo.LOGGER.info(msg, args);
         }
     }
 }

@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Predicate;
@@ -61,6 +63,7 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.time.TimeFormat;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -396,7 +399,7 @@ public class MiscUtils
         style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(coords)));
         message.setStyle(style);
         mc.inGameHud.getChatHud().addMessage(message);
-        Tweakeroo.logger.info(str);
+        Tweakeroo.LOGGER.info(str);
     }
 
     public static String getChatTimestamp()
@@ -640,32 +643,40 @@ public class MiscUtils
 
         if (worldName == null)
         {
-            worldName = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
+            //worldName = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
+            worldName = TimeFormat.REGULAR.formatNow();
         }
 
-        File dir = FileUtils.getConfigDirectory().toPath().resolve(Reference.MOD_ID).resolve("map_images").resolve(worldName).toFile();
+        Path dir = FileUtils.getConfigDirectoryAsPath().resolve(Reference.MOD_ID).resolve("map_images").resolve(worldName);
 
-        if (dir.exists() == false && dir.mkdirs() == false)
+        if (!Files.exists(dir))
         {
-            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to create directory: " + dir.getAbsolutePath());
-            return true;
+            FileUtils.createDirectoriesIfMissing(dir);
+            //Tweakeroo.debugLog("writeAllMapsAsImages(): Creating directory '{}'.", dir.toAbsolutePath());
         }
 
-        int count = 0;
-
-        for (Map.Entry<MapIdComponent, MapState> entry : data.entrySet())
+        if (Files.isDirectory(dir))
         {
-            File file = new File(dir, entry.getKey().asString() + ".png");
-            writeMapAsImage(file, entry.getValue());
-            ++count;
-        }
+            int count = 0;
 
-        InfoUtils.showGuiOrInGameMessage(Message.MessageType.INFO, String.format("Wrote %d maps to image files", count));
+            for (Map.Entry<MapIdComponent, MapState> entry : data.entrySet())
+            {
+                Path file = dir.resolve(entry.getKey().asString() + ".png");
+                writeMapAsImage(file, entry.getValue());
+                ++count;
+            }
+
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.INFO, String.format("Wrote %d maps to image files", count));
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to create directory: " + dir.toAbsolutePath());
+        }
 
         return true;
     }
 
-    private static void writeMapAsImage(File fileOut, MapState state)
+    private static void writeMapAsImage(Path fileOut, MapState state)
     {
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 
@@ -740,7 +751,7 @@ public class MiscUtils
 
             if (biomeEntry == null)
             {
-                Tweakeroo.logger.error("Invalid biome while parsing flat world string: '{}'", biomeName);
+                Tweakeroo.LOGGER.error("Invalid biome while parsing flat world string: '{}'", biomeName);
                 return false;
             }
 
@@ -758,7 +769,7 @@ public class MiscUtils
 
             if (item == null)
             {
-                Tweakeroo.logger.error("Invalid item for icon while parsing flat world string: '{}'", iconItemName);
+                Tweakeroo.LOGGER.error("Invalid item for icon while parsing flat world string: '{}'", iconItemName);
                 return false;
             }
 
@@ -766,7 +777,7 @@ public class MiscUtils
 
             if (layers == null)
             {
-                Tweakeroo.logger.error("Failed to get the layers for the flat world preset");
+                Tweakeroo.LOGGER.error("Failed to get the layers for the flat world preset");
                 return false;
             }
 
@@ -781,7 +792,7 @@ public class MiscUtils
         }
         else
         {
-            Tweakeroo.logger.error("Flat world preset string did not match the regex");
+            Tweakeroo.LOGGER.error("Flat world preset string did not match the regex");
         }
 
         return false;

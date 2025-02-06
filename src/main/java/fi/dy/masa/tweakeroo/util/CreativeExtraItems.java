@@ -57,7 +57,7 @@ public class CreativeExtraItems
             return;
         }
 
-        Tweakeroo.logger.info("Adding extra items to creative inventory group '{}'", group.getDisplayName().getString());
+        Tweakeroo.LOGGER.info("Adding extra items to creative inventory group '{}'", group.getDisplayName().getString());
 
         for (String str : items)
         {
