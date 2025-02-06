@@ -104,11 +104,11 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
                     }
                     catch (Exception e)
                     {
-                        Tweakeroo.logger.error("ServuxTweaksHandler#decodeClientData(): Tweaks Data: error reading fullBuffer [{}]", e.getLocalizedMessage());
+                        Tweakeroo.LOGGER.error("ServuxTweaksHandler#decodeClientData(): Tweaks Data: error reading fullBuffer [{}]", e.getLocalizedMessage());
                     }
                 }
             }
-            default -> Tweakeroo.logger.warn("ServuxTweaksHandler#decodeClientData(): received unhandled packetType {} of size {} bytes.", packet.getPacketType(), packet.getTotalSize());
+            default -> Tweakeroo.LOGGER.warn("ServuxTweaksHandler#decodeClientData(): received unhandled packetType {} of size {} bytes.", packet.getPacketType(), packet.getTotalSize());
         }
     }
 
@@ -163,7 +163,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
         {
             if (this.failures > MAX_FAILURES)
             {
-                Tweakeroo.printDebug("ServuxTweaksHandler#encodeClientData(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", MAX_FAILURES);
+                Tweakeroo.debugLog("ServuxTweaksHandler#encodeClientData(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", MAX_FAILURES);
                 this.servuxRegistered = false;
                 ServuxTweaksHandler.INSTANCE.unregisterPlayReceiver();
                 ServerDataSyncer.getInstance().onPacketFailure();

@@ -40,12 +40,12 @@ public class ItemRestriction
                 }
                 else
                 {
-                    Tweakeroo.logger.warn("Invalid item name in a black- or whitelist: '{}", name);
+                    Tweakeroo.LOGGER.warn("Invalid item name in a black- or whitelist: '{}", name);
                 }
             }
             catch (Exception e)
             {
-                Tweakeroo.logger.warn("Invalid item name in a black- or whitelist: '{}", name, e);
+                Tweakeroo.LOGGER.warn("Invalid item name in a black- or whitelist: '{}", name, e);
             }
         }
     }

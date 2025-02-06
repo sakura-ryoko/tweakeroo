@@ -414,12 +414,12 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
             }
             else
             {
-                Tweakeroo.logger.warn("Failed to set config value for '{}' from the JSON element '{}'", this.getName(), element);
+                Tweakeroo.LOGGER.warn("Failed to set config value for '{}' from the JSON element '{}'", this.getName(), element);
             }
         }
         catch (Exception e)
         {
-            Tweakeroo.logger.warn("Failed to set config value for '{}' from the JSON element '{}'", this.getName(), element, e);
+            Tweakeroo.LOGGER.warn("Failed to set config value for '{}' from the JSON element '{}'", this.getName(), element, e);
         }
     }
 }

@@ -27,7 +27,7 @@ public class DataManager implements IServerListener
     {
         if (isLogout)
         {
-            Tweakeroo.printDebug("DataManager#reset() - log-out");
+            Tweakeroo.debugLog("DataManager#reset() - log-out");
             this.hasCarpetServer = false;
             this.hasServuxServer = false;
             //this.registryManager = DynamicRegistryManager.EMPTY;

@@ -31,7 +31,7 @@ public class PotionRestriction extends UsageRestriction<StatusEffect>
             }
             else
             {
-                Tweakeroo.logger.warn("Invalid potion effect name '{}'", name);
+                Tweakeroo.LOGGER.warn("Invalid potion effect name '{}'", name);
             }
         }
     }
