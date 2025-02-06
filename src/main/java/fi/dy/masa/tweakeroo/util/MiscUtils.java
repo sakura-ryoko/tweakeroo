@@ -676,19 +676,19 @@ public class MiscUtils
                 int index = x + y * 128;
                 int color = MapColor.getRenderColor(state.colors[index]);
                 // Swap the color channels from ABGR to ARGB
-                int outputColor = (color & 0xFF00FF00) | (color & 0xFF0000) >> 16 | (color & 0xFF) << 16;
+                //int outputColor = (color & 0xFF00FF00) | (color & 0xFF0000) >> 16 | (color & 0xFF) << 16;
 
-                image.setRGB(x, y, outputColor);
+                image.setRGB(x, y, color);
             }
         }
 
         try
         {
-            ImageIO.write(image, "png", fileOut);
+            ImageIO.write(image, "png", fileOut.toFile());
         }
         catch (Exception e)
         {
-            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.getAbsolutePath());
+            InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.toAbsolutePath());
         }
     }
 
