@@ -36,6 +36,7 @@ import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 
 public class RenderHandler implements IRenderer
 {
@@ -176,6 +177,7 @@ public class RenderHandler implements IRenderer
 
         if (mc.player != null)
         {
+            RenderTweaks.render(posMatrix, projMatrix, profiler);
             this.renderOverlays(posMatrix, mc);
         }
     }

@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
 import org.jetbrains.annotations.Nullable;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,22 +21,38 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
 
 @Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
 {
-    @Shadow @Nullable public ClientPlayerEntity player;
-    @Shadow @Nullable public ClientWorld world;
-    @Shadow @Nullable public Screen currentScreen;
-    @Shadow @Final public GameOptions options;
-    @Shadow private int itemUseCooldown;
-    @Shadow protected int attackCooldown;
-    @Shadow private boolean doAttack() { return false; }
-    @Shadow private void doItemUse() {}
+    @Shadow
+    @Nullable
+    public ClientPlayerEntity player;
+    @Shadow
+    @Nullable
+    public ClientWorld world;
+    @Shadow
+    @Nullable
+    public Screen currentScreen;
+    @Shadow
+    @Final
+    public GameOptions options;
+    @Shadow
+    private int itemUseCooldown;
+    @Shadow
+    protected int attackCooldown;
+
+    @Shadow
+    private boolean doAttack() {return false;}
+
+    @Shadow
+    private void doItemUse() {}
 
     @Override
     public void tweakeroo_setItemUseCooldown(int value)
@@ -64,16 +81,44 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
         }
     }
 
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
+    private void onLeftClickMouse(CallbackInfoReturnable<Boolean> cir)
+    {
+        if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
+        {
+            RenderTweaks.select(false);
+            cir.cancel();
+            return;
+        }
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
+    private void onRightClickMouse(CallbackInfo ci)
+    {
+        if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
+        {
+            RenderTweaks.select(true);
+            ci.cancel();
+            return;
+        }
+    }
+
     @Inject(method = "doAttack", at = {
             @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackEntity(" +
-                         "Lnet/minecraft/entity/player/PlayerEntity;" +
-                         "Lnet/minecraft/entity/Entity;)V"),
+                        "Lnet/minecraft/entity/player/PlayerEntity;" +
+                        "Lnet/minecraft/entity/Entity;)V"),
             @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackBlock(" +
-                         "Lnet/minecraft/util/math/BlockPos;" +
-                         "Lnet/minecraft/util/math/Direction;)Z")
-            })
+                        "Lnet/minecraft/util/math/BlockPos;" +
+                        "Lnet/minecraft/util/math/Direction;)Z")
+    })
     private void onLeftClickMousePre(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePre();
@@ -88,12 +133,12 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     }
 
     @Redirect(method = "doItemUse()V", at = @At(
-                value = "INVOKE",
-                target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;interactBlock(" +
-                         "Lnet/minecraft/client/network/ClientPlayerEntity;" +
-                         "Lnet/minecraft/util/Hand;" +
-                         "Lnet/minecraft/util/hit/BlockHitResult;" +
-                         ")Lnet/minecraft/util/ActionResult;"))
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;interactBlock(" +
+                    "Lnet/minecraft/client/network/ClientPlayerEntity;" +
+                    "Lnet/minecraft/util/Hand;" +
+                    "Lnet/minecraft/util/hit/BlockHitResult;" +
+                    ")Lnet/minecraft/util/ActionResult;"))
     private ActionResult onProcessRightClickBlock(
             ClientPlayerInteractionManager controller,
             ClientPlayerEntity player,

@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.render;
 
 import java.util.function.Predicate;
 
@@ -92,7 +92,8 @@ public abstract class MixinGameRenderer
         // Normally in Free Camera mode the Tweakeroo CameraEntity is set as the
         // render view/camera entity, which would then also ray trace from the camera point of view.
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-            Configs.Generic.FREE_CAMERA_PLAYER_INPUTS.getBooleanValue() &&
+            Configs.Generic.FREE_CAMERA_PLAYER_INPUTS.getBooleanValue()  &&
+            !FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() &&
             mc.player != null)
         {
             return mc.player;

@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.render;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,11 +11,15 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
+
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+import fi.dy.masa.tweakeroo.util.IDecorationEntity;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderDispatcher
@@ -23,6 +27,24 @@ public abstract class MixinEntityRenderDispatcher
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void onShouldRender(Entity entityIn, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
     {
+        boolean isPlayer = (entityIn instanceof PlayerEntity);
+
+        if (entityIn instanceof AbstractDecorationEntity)
+        {
+            if (!RenderTweaks.isPositionValidForRendering(((IDecorationEntity) entityIn).tweakeroo$getAttached()))
+            {
+                cir.setReturnValue(false);
+            }
+        }
+
+        if (!isPlayer && Configs.Generic.SELECTIVE_BLOCKS_HIDE_ENTITIES.getBooleanValue())
+        {
+            if (!RenderTweaks.isPositionValidForRendering(entityIn.getBlockPos()))
+            {
+                cir.setReturnValue(false);
+            }
+        }
+
         if (Configs.Disable.DISABLE_ENTITY_RENDERING.getBooleanValue() && (entityIn instanceof PlayerEntity) == false)
         {
             cir.setReturnValue(false);
@@ -61,7 +83,7 @@ public abstract class MixinEntityRenderDispatcher
             }
         }
         else if (Configs.Disable.DISABLE_DEAD_MOB_RENDERING.getBooleanValue() &&
-                 entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getHealth() <= 0f)
+                entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getHealth() <= 0f)
         {
             cir.setReturnValue(false);
         }

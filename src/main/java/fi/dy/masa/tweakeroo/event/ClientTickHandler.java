@@ -3,6 +3,7 @@ package fi.dy.masa.tweakeroo.event;
 import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 
 public class ClientTickHandler implements IClientTickHandler
 {
@@ -12,6 +13,7 @@ public class ClientTickHandler implements IClientTickHandler
         if (mc.world != null && mc.player != null)
         {
             MiscTweaks.onTick(mc);
+            RenderTweaks.onTick();
         }
     }
 }
