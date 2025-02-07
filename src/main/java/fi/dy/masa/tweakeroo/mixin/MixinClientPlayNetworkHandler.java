@@ -170,7 +170,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
                                 {
                                     BlockEntity be = worldChunk.getBlockEntity(pos);
                                     BlockState state = section.getBlockState(x, y, z);
-                                    worldChunk.setBlockState(pos, Blocks.AIR.getDefaultState(), -1);
+                                    worldChunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
                                     RenderTweaks.setFakeBlockState(this.world, pos, state, be);
                                 }
                             }
