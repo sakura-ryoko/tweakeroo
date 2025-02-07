@@ -23,6 +23,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_AFTER_CLICKER             ("tweakAfterClicker",                   false, "",    KeybindSettings.INGAME_BOTH),
     TWEAK_AIM_LOCK                  ("tweakAimLock",                        false, ""),
     TWEAK_ANGEL_BLOCK               ("tweakAngelBlock",                     false, ""),
+    TWEAK_AREA_SELECTOR             ("tweakAreaSelector",                   false, ""),
     TWEAK_AUTO_SWITCH_ELYTRA        ("tweakAutoSwitchElytra",               false, ""),
     TWEAK_BLOCK_REACH_OVERRIDE      ("tweakBlockReachOverride",             false, true,  ""),
     TWEAK_BLOCK_TYPE_BREAK_RESTRICTION("tweakBlockTypeBreakRestriction",    false, ""),
@@ -89,6 +90,8 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_RENDER_LIMIT_ENTITIES     ("tweakRenderLimitEntities",            false, ""),
     TWEAK_REPAIR_MODE               ("tweakRepairMode",                     false, ""),
     TWEAK_SCULK_PULSE_LENGTH        ("tweakSculkPulseLength",               false, true, ""),
+    TWEAK_SELECTIVE_BLOCKS_RENDERING        ("tweakSelectiveBlocksRendering",      false, ""),
+    TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE   ("tweakSelectiveBlocksRenderOutline",  false, ""),
     TWEAK_SERVER_DATA_SYNC          ("tweakServerDataSync",                 false, ""),
     TWEAK_SERVER_DATA_SYNC_BACKUP   ("tweakServerDataSyncBackup",           false, ""),
     TWEAK_SHULKERBOX_DISPLAY        ("tweakShulkerBoxDisplay",              false, ""),
@@ -103,7 +106,8 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_TOOL_SWITCH               ("tweakToolSwitch",                     false, ""),
     TWEAK_WEAPON_SWITCH             ("tweakWeaponSwitch",                   false, ""),
     TWEAK_Y_MIRROR                  ("tweakYMirror",                        false, ""),
-    TWEAK_ZOOM                      ("tweakZoom",                           false, "",    KeybindSettings.INGAME_BOTH);
+    TWEAK_ZOOM                      ("tweakZoom",                           false, "",    KeybindSettings.INGAME_BOTH),
+    ;
 
     public static final ImmutableList<FeatureToggle> VALUES = ImmutableList.copyOf(values());
 

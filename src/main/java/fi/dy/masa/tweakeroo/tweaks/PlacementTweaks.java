@@ -57,7 +57,7 @@ public class PlacementTweaks
     private static Direction sideFirstBreaking = null;
     private static Direction sideRotatedFirst = null;
     private static float playerYawFirst;
-    private static ItemStack[] stackBeforeUse = new ItemStack[] { ItemStack.EMPTY, ItemStack.EMPTY };
+    private static ItemStack[] stackBeforeUse = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY};
     private static boolean isFirstClick;
     private static boolean isEmulatedClick;
     private static boolean firstWasRotation;
@@ -65,7 +65,8 @@ public class PlacementTweaks
     private static int placementCount;
     private static int hotbarSlot = -1;
     private static ItemStack stackClickedOn = ItemStack.EMPTY;
-    @Nullable private static BlockState stateClickedOn = null;
+    @Nullable
+    private static BlockState stateClickedOn = null;
     public static final BlockRestriction BLOCK_TYPE_BREAK_RESTRICTION = new BlockRestriction();
     public static final BlockRestriction FAST_RIGHT_CLICK_BLOCK_RESTRICTION = new BlockRestriction();
     public static final ItemRestriction FAST_RIGHT_CLICK_ITEM_RESTRICTION = new ItemRestriction();
@@ -77,7 +78,7 @@ public class PlacementTweaks
         boolean attack = mc.options.attackKey.isPressed();
         boolean use = mc.options.useKey.isPressed();
 
-        if (GuiUtils.getCurrentScreen() == null)
+        if (GuiUtils.getCurrentScreen() == null && !FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
         {
             if (use)
             {
@@ -121,8 +122,8 @@ public class PlacementTweaks
         ItemStack stackOriginal = player.getStackInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-            stackOriginal.isEmpty() == false &&
-            canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
+                stackOriginal.isEmpty() == false &&
+                canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             if (isEmulatedClick == false)
             {
@@ -132,7 +133,7 @@ public class PlacementTweaks
 
             // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
             boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
-                                  FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false;
+                    FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false;
             InventoryUtils.preRestockHand(player, hand, allowHotbar);
         }
 
@@ -265,7 +266,7 @@ public class PlacementTweaks
 
                     hitVec = hitVecFirst.add(posNew.getX(), posNew.getY(), posNew.getZ());
                     ActionResult result = tryPlaceBlock(mc.interactionManager, player, mc.world,
-                            posNew, sideFirst, sideRotatedFirst, playerYawFirst, hitVec, hand, hitPartFirst, false);
+                                                        posNew, sideFirst, sideRotatedFirst, playerYawFirst, hitVec, hand, hitPartFirst, false);
 
                     if (result == ActionResult.SUCCESS)
                     {
@@ -696,7 +697,7 @@ public class PlacementTweaks
             {
                 // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
                 boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
-                                      FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false;
+                        FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false;
 
                 InventoryUtils.restockNewStackToHand(player, hand, stackOriginal, allowHotbar);
             }
@@ -1045,7 +1046,7 @@ public class PlacementTweaks
     }
 
     private static boolean isPositionAllowedByRestrictions(BlockPos pos, Direction side,
-            BlockPos posFirst, Direction sideFirst, boolean restrictionEnabled, PlacementRestrictionMode mode, boolean gridEnabled, int gridSize)
+                                                           BlockPos posFirst, Direction sideFirst, boolean restrictionEnabled, PlacementRestrictionMode mode, boolean gridEnabled, int gridSize)
     {
         if (gridEnabled)
         {
@@ -1124,7 +1125,22 @@ public class PlacementTweaks
 
     private static boolean isNewPositionValidForLayerMode(BlockPos posNew, BlockPos posFirst, Direction sideFirst)
     {
-        return posNew.getY() == posFirst.getY();
+        int height = Configs.Generic.RESTRICTION_LAYER_HEIGHT.getIntegerValue();
+
+        if (height > 0)
+        {
+            int diff = posNew.getY() - posFirst.getY() + 1;
+
+            return diff > 0 && diff <= height;
+        }
+        else if (height < 0)
+        {
+            int diff = posFirst.getY() - posNew.getY() + 1;
+
+            return diff > 0 && diff <= -height;
+        }
+
+        return true;
     }
 
     private static boolean isNewPositionValidForLineMode(BlockPos posNew, BlockPos posFirst, Direction sideFirst)
