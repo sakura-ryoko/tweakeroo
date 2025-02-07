@@ -29,6 +29,7 @@ import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -46,10 +47,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -108,7 +106,7 @@ public class MiscUtils
 
         //if (input.jumping || input.sneaking ||
         if (input.playerInput.jump() || input.playerInput.sneak() ||
-            player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
+                player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
         {
             return;
         }
@@ -126,17 +124,35 @@ public class MiscUtils
         int vertical = 0;
         int strafe = 0;
 
-        if (options.forwardKey.isPressed()) { forward += 1;  }
-        if (options.backKey.isPressed())    { forward -= 1;  }
-        if (options.leftKey.isPressed())    { strafe += 1;   }
-        if (options.rightKey.isPressed())   { strafe -= 1;   }
-        if (options.jumpKey.isPressed())    { vertical += 1; }
-        if (options.sneakKey.isPressed())   { vertical -= 1; }
+        if (options.forwardKey.isPressed())
+        {
+            forward += 1;
+        }
+        if (options.backKey.isPressed())
+        {
+            forward -= 1;
+        }
+        if (options.leftKey.isPressed())
+        {
+            strafe += 1;
+        }
+        if (options.rightKey.isPressed())
+        {
+            strafe -= 1;
+        }
+        if (options.jumpKey.isPressed())
+        {
+            vertical += 1;
+        }
+        if (options.sneakKey.isPressed())
+        {
+            vertical -= 1;
+        }
 
         double speed = (forward != 0 && strafe != 0) ? 1.2 : 1.0;
-        double forwardRamped  = getRampedMotion(lastMotion.x, forward , rampAmount, decelerationFactor) / speed;
+        double forwardRamped = getRampedMotion(lastMotion.x, forward, rampAmount, decelerationFactor) / speed;
         double verticalRamped = getRampedMotion(lastMotion.y, vertical, rampAmount, decelerationFactor);
-        double strafeRamped   = getRampedMotion(lastMotion.z, strafe  , rampAmount, decelerationFactor) / speed;
+        double strafeRamped = getRampedMotion(lastMotion.z, strafe, rampAmount, decelerationFactor) / speed;
 
         return new Vec3d(forwardRamped, verticalRamped, strafeRamped);
     }
@@ -169,7 +185,7 @@ public class MiscUtils
     public static boolean isZoomActive()
     {
         return FeatureToggle.TWEAK_ZOOM.getBooleanValue() &&
-               Hotkeys.ZOOM_ACTIVATE.getKeybind().isKeybindHeld();
+                Hotkeys.ZOOM_ACTIVATE.getKeybind().isKeybindHeld();
     }
 
     public static void checkZoomStatus()
@@ -199,7 +215,7 @@ public class MiscUtils
             if (lastZoomValue != null && lastZoomValue.isActive())
             {
                 if (lastZoomValue.getLastDoubleValue() != Configs.Generic.ZOOM_FOV.getDoubleValue() &&
-                    Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.ZOOM_FOV.setDoubleValue(lastZoomValue.getLastDoubleValue());
                 }
@@ -262,11 +278,11 @@ public class MiscUtils
             if (lastPeriodicAttackValue != null && lastPeriodicAttackValue.isActive())
             {
                 if (lastPeriodicAttackValue.getLastIntValue() != Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_ATTACK_INTERVAL.setIntegerValue(lastPeriodicAttackValue.getLastIntValue());
                 }
-                
+
                 lastPeriodicAttackValue.setActionHandled();
             }
 
@@ -292,7 +308,7 @@ public class MiscUtils
             if (lastPeriodicUseValue != null && lastPeriodicUseValue.isActive())
             {
                 if (lastPeriodicUseValue.getLastIntValue() != Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_USE_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_USE_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_USE_INTERVAL.setIntegerValue(lastPeriodicUseValue.getLastIntValue());
                 }
@@ -322,11 +338,11 @@ public class MiscUtils
             if (lastPeriodicHoldAttackValue != null && lastPeriodicHoldAttackValue.isActive())
             {
                 if (lastPeriodicHoldAttackValue.getLastIntValue() != Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.setIntegerValue(lastPeriodicHoldAttackValue.getLastIntValue());
                 }
-                
+
                 lastPeriodicHoldAttackValue.setActionHandled();
             }
 
@@ -352,7 +368,7 @@ public class MiscUtils
             if (lastPeriodicHoldUseValue != null && lastPeriodicHoldUseValue.isActive())
             {
                 if (lastPeriodicHoldUseValue.getLastIntValue() != Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue() &&
-                    Configs.Generic.PERIODIC_HOLD_USE_RESET_ON_ACTIVATE.getBooleanValue())
+                        Configs.Generic.PERIODIC_HOLD_USE_RESET_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.setIntegerValue(lastPeriodicHoldUseValue.getLastIntValue());
                 }
@@ -436,7 +452,8 @@ public class MiscUtils
         {
             te.setText(previousSignText, front);
 
-            if (guiLines != null) {
+            if (guiLines != null)
+            {
                 ((IGuiEditSign) guiLines).tweakeroo$applyText(previousSignText);
             }
         }
@@ -553,10 +570,13 @@ public class MiscUtils
             }
 
             double offset = Math.abs(MathHelper.wrapDegrees((float) (snappedPitch - realPitch)));
-            if (GuiBase.isCtrlDown()) System.out.printf("real: %.2f, snapped: %.2f, offset: %.2f\n", realPitch, snappedPitch, offset);
+            if (GuiBase.isCtrlDown())
+            {
+                System.out.printf("real: %.2f, snapped: %.2f, offset: %.2f\n", realPitch, snappedPitch, offset);
+            }
 
             if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue() == false ||
-                offset <= Configs.Generic.SNAP_AIM_THRESHOLD_PITCH.getDoubleValue())
+                    offset <= Configs.Generic.SNAP_AIM_THRESHOLD_PITCH.getDoubleValue())
             {
                 snappedPitch = MathHelper.clamp(MathHelper.wrapDegrees(snappedPitch), -limit, limit);
 
@@ -600,7 +620,7 @@ public class MiscUtils
             double snappedYaw = calculateSnappedAngle(realYaw, step);
 
             if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue() == false ||
-                Math.abs(MathHelper.wrapDegrees((float) (snappedYaw - realYaw))) <= Configs.Generic.SNAP_AIM_THRESHOLD_YAW.getDoubleValue())
+                    Math.abs(MathHelper.wrapDegrees((float) (snappedYaw - realYaw))) <= Configs.Generic.SNAP_AIM_THRESHOLD_YAW.getDoubleValue())
             {
                 if (Configs.Internal.SNAP_AIM_LAST_YAW.getDoubleValue() != snappedYaw)
                 {
@@ -627,6 +647,34 @@ public class MiscUtils
     {
         double offsetRealRotation = MathHelper.floorMod(realRotation, 360.0D) + (step / 2.0);
         return MathHelper.floorMod(((int) (offsetRealRotation / step)) * step, 360.0D);
+    }
+
+    /**
+     * Copied from Tweak Fork by Andrew54757
+     */
+    public static Vec3d getEyesPos(PlayerEntity player)
+    {
+        return new Vec3d(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+    }
+
+    /**
+     * Copied from Tweak Fork by Andrew54757
+     */
+    public static BlockPos getPlayerHeadPos(PlayerEntity player)
+    {
+        return (player.getPose() == EntityPose.STANDING) ? player.getBlockPos().offset(Direction.UP) : player.getBlockPos();
+    }
+
+    /**
+     * Copied from Tweak Fork by Andrew54757
+     */
+    public static boolean isInReach(BlockPos pos, PlayerEntity player, double reach)
+    {
+        Vec3d playerpos = getEyesPos(player);
+        double d = playerpos.getX() - ((double) pos.getX() + 0.5D);
+        double d1 = playerpos.getY() - ((double) pos.getY() + 0.5D);
+        double d2 = playerpos.getZ() - ((double) pos.getZ() + 0.5D);
+        return d * d + d1 * d1 + d2 * d2 <= reach * reach;
     }
 
     public static boolean writeAllMapsAsImages()
@@ -743,11 +791,13 @@ public class MiscUtils
             try
             {
                 Optional<RegistryKey<Biome>> optBiome = Optional.ofNullable(Identifier.tryParse(biomeName)).map((biomeId) ->
-                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
+                                                                                                                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
 
                 biomeEntry = optBiome.flatMap(biomeLookup::getOptional).orElse(referenceEntry);
             }
-            catch (Exception ignore) {}
+            catch (Exception ignore)
+            {
+            }
 
             if (biomeEntry == null)
             {
@@ -765,7 +815,9 @@ public class MiscUtils
                     item = opt.get().value();
                 }
             }
-            catch (Exception ignore) {}
+            catch (Exception ignore)
+            {
+            }
 
             if (item == null)
             {

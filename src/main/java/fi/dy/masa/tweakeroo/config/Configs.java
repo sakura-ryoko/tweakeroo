@@ -1,17 +1,14 @@
 package fi.dy.masa.tweakeroo.config;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import net.minecraft.client.MinecraftClient;
-import fi.dy.masa.malilib.config.ConfigUtils;
-import fi.dy.masa.malilib.config.HudAlignment;
-import fi.dy.masa.malilib.config.IConfigBase;
-import fi.dy.masa.malilib.config.IConfigHandler;
-import fi.dy.masa.malilib.config.IHotkeyTogglable;
+
+import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.config.options.*;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -22,6 +19,7 @@ import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.EasyPlacementProtocol;
 import fi.dy.masa.tweakeroo.util.InventoryUtils;
 import fi.dy.masa.tweakeroo.util.PlacementRestrictionMode;
@@ -43,9 +41,11 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ACCURATE_PLACEMENT_PROTOCOL         = new ConfigBoolean     ("accuratePlacementProtocol", true).apply(GENERIC_KEY);
         public static final ConfigInteger       AFTER_CLICKER_CLICK_COUNT           = new ConfigInteger     ("afterClickerClickCount",  1, 1, 32).apply(GENERIC_KEY);
         public static final ConfigDouble        ANGEL_BLOCK_PLACEMENT_DISTANCE      = new ConfigDouble      ("angelBlockPlacementDistance",  3, 1, 5).apply(GENERIC_KEY);
+        public static final ConfigBoolean       AREA_SELECTION_USE_ALL              = new ConfigBoolean     ("areaSelectionUseAll", false).apply(GENERIC_KEY);
         public static final ConfigDouble        BLOCK_REACH_DISTANCE                = new ConfigDouble      ("blockReachDistance", 4.5, 1, 64).apply(GENERIC_KEY);
         public static final ConfigOptionList    BLOCK_TYPE_BREAK_RESTRICTION_WARN   = new ConfigOptionList  ("blockTypeBreakRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
         public static final ConfigInteger       BREAKING_GRID_SIZE                  = new ConfigInteger     ("breakingGridSize", 3, 1, 1000).apply(GENERIC_KEY);
+        public static final ConfigInteger       RESTRICTION_LAYER_HEIGHT            = new ConfigInteger     ("restrictionLayerHeight", 1, -1000, 1000, "The layer height for the layer restriction mode.\nTo quickly adjust the value, scroll while\nholding down the tweak toggle keybind.");
         public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE).apply(GENERIC_KEY);
         public static final ConfigBoolean       BUNDLE_DISPLAY_BACKGROUND_COLOR     = new ConfigBoolean     ("bundleDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       BUNDLE_DISPLAY_REQUIRE_SHIFT        = new ConfigBoolean     ("bundleDisplayRequireShift", true).apply(GENERIC_KEY);
@@ -107,6 +107,10 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SELECTIVE_BLOCKS_TRACK_PISTONS      = new ConfigBoolean     ("selectiveBlocksTrackPistons", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_PARTICLES     = new ConfigBoolean     ("selectiveBlocksHideParticles", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_ENTITIES      = new ConfigBoolean     ("selectiveBlocksHideEntities", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SELECTIVE_BLOCKS_NO_HIT             = new ConfigBoolean     ("selectiveBlocksNoHit", true).apply(GENERIC_KEY);
         public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 1.0f, 0.25f, 5.0f).apply(GENERIC_KEY);
         public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
@@ -163,12 +167,18 @@ public class Configs implements IConfigHandler
                 SNAP_AIM_PITCH_OVERSHOOT,
                 ZOOM_ADJUST_MOUSE_SENSITIVITY,
 
+                AREA_SELECTION_USE_ALL,
+                RESTRICTION_LAYER_HEIGHT,
                 BLOCK_TYPE_BREAK_RESTRICTION_WARN,
                 BREAKING_RESTRICTION_MODE,
                 ELYTRA_CAMERA_INDICATOR,
                 ENTITY_TYPE_ATTACK_RESTRICTION_WARN,
                 PLACEMENT_RESTRICTION_MODE,
                 HOTBAR_SWAP_OVERLAY_ALIGNMENT,
+                SELECTIVE_BLOCKS_TRACK_PISTONS,
+                SELECTIVE_BLOCKS_HIDE_PARTICLES,
+                SELECTIVE_BLOCKS_HIDE_ENTITIES,
+                SELECTIVE_BLOCKS_NO_HIT,
                 SNAP_AIM_MODE,
 
                 CHAT_TIME_FORMAT,
@@ -274,6 +284,9 @@ public class Configs implements IConfigHandler
         public static final ConfigStringList POTION_WARNING_BLACKLIST           = new ConfigStringList("potionWarningBlackList", ImmutableList.of("minecraft:hunger", "minecraft:mining_fatigue", "minecraft:nausea", "minecraft:poison", "minecraft:slowness", "minecraft:weakness")).apply(LISTS_KEY);
         public static final ConfigStringList POTION_WARNING_WHITELIST           = new ConfigStringList("potionWarningWhiteList", ImmutableList.of("minecraft:fire_resistance", "minecraft:invisibility", "minecraft:water_breathing")).apply(LISTS_KEY);
         public static final ConfigStringList REPAIR_MODE_SLOTS                  = new ConfigStringList("repairModeSlots", ImmutableList.of("mainhand", "offhand")).apply(LISTS_KEY);
+        public static final ConfigOptionList SELECTIVE_BLOCKS_LIST_TYPE         = new ConfigOptionList("selectiveBlocksListType", ListType.NONE).apply(LISTS_KEY);
+        public static final ConfigString     SELECTIVE_BLOCKS_WHITELIST         = new ConfigString("selectiveBlocksWhitelist", "").apply(LISTS_KEY);
+        public static final ConfigString     SELECTIVE_BLOCKS_BLACKLIST         = new ConfigString("selectiveBlocksBlacklist", "").apply(LISTS_KEY);
         public static final ConfigStringList UNSTACKING_ITEMS                   = new ConfigStringList("unstackingItems", ImmutableList.of("minecraft:bucket", "minecraft:glass_bottle")).apply(LISTS_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
@@ -303,7 +316,10 @@ public class Configs implements IConfigHandler
                 POTION_WARNING_BLACKLIST,
                 POTION_WARNING_WHITELIST,
                 REPAIR_MODE_SLOTS,
-                UNSTACKING_ITEMS
+                UNSTACKING_ITEMS,
+                SELECTIVE_BLOCKS_LIST_TYPE,
+                SELECTIVE_BLOCKS_WHITELIST,
+                SELECTIVE_BLOCKS_BLACKLIST
         );
     }
 
@@ -500,6 +516,8 @@ public class Configs implements IConfigHandler
         MiscTweaks.POTION_RESTRICTION.setListContents(
                 Lists.POTION_WARNING_BLACKLIST.getStrings(),
                 Lists.POTION_WARNING_WHITELIST.getStrings());
+
+        RenderTweaks.rebuildLists();
 
         MiscTweaks.ENTITY_TYPE_ATTACK_RESTRICTION.setListType((ListType) Lists.ENTITY_TYPE_ATTACK_RESTRICTION_LIST_TYPE.getOptionListValue());
         MiscTweaks.ENTITY_TYPE_ATTACK_RESTRICTION.setListContents(
