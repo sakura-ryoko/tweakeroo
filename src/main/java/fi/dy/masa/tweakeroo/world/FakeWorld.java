@@ -1,10 +1,8 @@
 package fi.dy.masa.tweakeroo.world;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
-
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
@@ -13,13 +11,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.dragon.EnderDragonPart;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.map.MapState;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -33,7 +27,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.profiler.Profilers;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
@@ -46,7 +39,6 @@ import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.event.GameEvent.Emitter;
-import net.minecraft.world.explosion.ExplosionBehavior;
 import net.minecraft.world.tick.QueryableTickScheduler;
 import net.minecraft.world.tick.TickManager;
 
@@ -60,7 +52,7 @@ public class FakeWorld extends World
 {
     private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(Reference.MOD_ID, "selective_world"));
     private static final ClientWorld.Properties LEVEL_INFO = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
-    private static final RegistryEntry<DimensionType> DIMENSION_TYPE = RenderTweaks.getDynamicRegistryManager().getOptionalEntry(DimensionTypes.OVERWORLD).orElseThrow();
+    private static final RegistryEntry<DimensionType> DIMENSION_TYPE = RenderTweaks.getDynamicRegistryManager().createRegistryLookup().getOrThrow(RegistryKeys.DIMENSION_TYPE).getOrThrow(DimensionTypes.OVERWORLD);
 
     private final MinecraftClient mc;
     private final FakeChunkManager chunkManager;
@@ -76,7 +68,7 @@ public class FakeWorld extends World
     )
     {
         //MutableWorldProperties properties, RegistryKey<World> registryRef, RegistryEntry<DimensionType> dimension, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates
-        super(properties, REGISTRY_KEY, registryManager, dimension, true, true, 0L, 0);
+        super(properties, REGISTRY_KEY, registryManager, dimension, profiler, true, false, 0L, 0);
         this.mc = MinecraftClient.getInstance();
         this.registryManager = registryManager;
         this.chunkManager = new FakeChunkManager(this, loadDistance);
@@ -85,7 +77,7 @@ public class FakeWorld extends World
 
     public FakeWorld(DynamicRegistryManager registryManager, int loadDistance)
     {
-        this(registryManager, LEVEL_INFO, DIMENSION_TYPE, Profilers::get, loadDistance);
+        this(registryManager, LEVEL_INFO, DIMENSION_TYPE, MinecraftClient.getInstance()::getProfiler, loadDistance);
     }
 
     public Profiler getProfiler()
@@ -137,7 +129,7 @@ public class FakeWorld extends World
     @Override
     public boolean setBlockState(BlockPos pos, BlockState newState, int flags)
     {
-        if (pos.getY() < this.getBottomY() || pos.getY() >= this.getTopYInclusive())
+        if (pos.getY() < this.getBottomY() || pos.getY() >= this.getTopY())
         {
             return false;
         }
@@ -188,7 +180,7 @@ public class FakeWorld extends World
     // The following HeightLimitView overrides are to work around an incompatibility with Lithium 0.7.4+
 
     @Override
-    public int getTopYInclusive()
+    public int getTopY()
     {
         return this.getBottomY() + this.getHeight();
     }
@@ -202,7 +194,7 @@ public class FakeWorld extends World
     @Override
     public int getTopSectionCoord()
     {
-        return this.getTopYInclusive() >> 4;
+        return this.getTopY() >> 4;
     }
 
     @Override
@@ -220,7 +212,7 @@ public class FakeWorld extends World
     @Override
     public boolean isOutOfHeightLimit(int y)
     {
-        return (y < this.getBottomY()) || (y >= this.getTopYInclusive());
+        return (y < this.getBottomY()) || (y >= this.getTopY());
     }
 
     @Override
@@ -260,12 +252,6 @@ public class FakeWorld extends World
 
     @Override
     public BrewingRecipeRegistry getBrewingRecipeRegistry()
-    {
-        return null;
-    }
-
-    @Override
-    public FuelRegistry getFuelRegistry()
     {
         return null;
     }
@@ -330,12 +316,6 @@ public class FakeWorld extends World
 
     @Override
     public void playSoundFromEntity(@Nullable PlayerEntity source, Entity entity, RegistryEntry<SoundEvent> sound, SoundCategory category, float volume, float pitch, long seed)
-    {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void createExplosion(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionBehavior behavior, double x, double y, double z, float power, boolean createFire, ExplosionSourceType explosionSourceType, ParticleEffect smallParticle, ParticleEffect largeParticle, RegistryEntry<SoundEvent> soundEvent)
     {
         // TODO Auto-generated method stub
     }

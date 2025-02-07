@@ -11,7 +11,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
@@ -561,15 +560,23 @@ public class RenderUtils
         fi.dy.masa.malilib.render.RenderUtils.drawRect(x, lineY - 1, width, 2, 0xFFFFFFFF);
     }
 
+    static void startDrawingLines()
+    {
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.applyModelViewMatrix();
+        //buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+    }
+
     public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth, Color4f color, MinecraftClient mc)
     {
         RenderSystem.lineWidth(lineWidth);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BuiltBuffer meshData;
 
+        startDrawingLines();
         drawBlockBoundingBoxOutlinesBatchedLines(pos, color, expand, buffer, mc);
 
         try
@@ -644,11 +651,12 @@ public class RenderUtils
         final float maxZ = (float) (pos.getZ() - dz + expand + 1);
 
         RenderSystem.lineWidth(lineWidth);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BuiltBuffer meshData;
+
+        startDrawingLines();
 
         // Min corner
         buffer.vertex(minX, minY, minZ).color(color1.r, color1.g, color1.b, color1.a);
@@ -720,11 +728,11 @@ public class RenderUtils
 
     private static void drawBoundingBoxEdges(float minX, float minY, float minZ, float maxX, float maxY, float maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BuiltBuffer meshData;
+
+        startDrawingLines();
 
         drawBoundingBoxLinesX(buffer, minX, minY, minZ, maxX, maxY, maxZ, colorX);
         drawBoundingBoxLinesY(buffer, minX, minY, minZ, maxX, maxY, maxZ, colorY);
@@ -785,11 +793,10 @@ public class RenderUtils
     }
 
     public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, Matrix4f matrix4f, MinecraftClient mc)
-    {
-        RenderSystem.enableBlend();
+    {RenderSystem.enableBlend();
         RenderSystem.disableCull();
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         BuiltBuffer meshData;
@@ -861,11 +868,12 @@ public class RenderUtils
         int start, end;
 
         RenderSystem.lineWidth(lineWidth);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BuiltBuffer meshData;
+
+        startDrawingLines();
 
         // Edges along the X-axis
         start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? xMin + 1 : xMin;

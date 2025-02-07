@@ -176,7 +176,7 @@ public class RenderHandler implements IRenderer
 
         if (mc.player != null)
         {
-            RenderTweaks.render(posMatrix, projMatrix, profiler);
+            RenderTweaks.render(posMatrix, projMatrix, mc.getProfiler());
             this.renderOverlays(posMatrix, mc);
         }
     }

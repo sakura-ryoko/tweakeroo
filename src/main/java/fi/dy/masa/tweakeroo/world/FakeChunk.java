@@ -22,7 +22,7 @@ public class FakeChunk extends WorldChunk
     {
         super(world, pos);
         this.bottomY = world.getBottomY();
-        this.topY = world.getTopYInclusive();
+        this.topY = world.getTopY();
     }
 
     @Override
