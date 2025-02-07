@@ -348,12 +348,6 @@ public class FakeWorld extends World
     }
 
     @Override
-    public Collection<EnderDragonPart> getEnderDragonParts()
-    {
-        return List.of();
-    }
-
-    @Override
     public TickManager getTickManager()
     {
         return null;
