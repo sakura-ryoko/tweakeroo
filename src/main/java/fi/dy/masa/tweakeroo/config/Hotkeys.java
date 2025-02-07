@@ -14,6 +14,9 @@ public class Hotkeys
 
     public static final ConfigHotkey ACCURATE_BLOCK_PLACEMENT_IN        = new ConfigHotkey("accurateBlockPlacementInto",        "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey ACCURATE_BLOCK_PLACEMENT_REVERSE   = new ConfigHotkey("accurateBlockPlacementReverse",     "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
+    public static final ConfigHotkey AREA_SELECTION_OFFSET              = new ConfigHotkey("areaSelectionOffset",     "LEFT_SHIFT", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
+    public static final ConfigHotkey AREA_SELECTION_ADD_TO_LIST         = new ConfigHotkey("areaSelectionAddToList",            "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
+    public static final ConfigHotkey AREA_SELECTION_REMOVE_FROM_LIST    = new ConfigHotkey("areaSelectionRemoveFromList",       "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey BREAKING_RESTRICTION_MODE_COLUMN   = new ConfigHotkey("breakingRestrictionModeColumn",     "").apply(HOTKEY_KEY);
     public static final ConfigHotkey BREAKING_RESTRICTION_MODE_DIAGONAL = new ConfigHotkey("breakingRestrictionModeDiagonal",   "").apply(HOTKEY_KEY);
     public static final ConfigHotkey BREAKING_RESTRICTION_MODE_FACE     = new ConfigHotkey("breakingRestrictionModeFace",       "").apply(HOTKEY_KEY);
@@ -102,6 +105,9 @@ public class Hotkeys
             TOGGLE_AP_PROTOCOL,
             TOGGLE_GRAB_CURSOR,
             TOOL_PICK,
+            AREA_SELECTION_OFFSET,
+            AREA_SELECTION_ADD_TO_LIST,
+            AREA_SELECTION_REMOVE_FROM_LIST,
             WRITE_MAPS_AS_IMAGES,
             ZOOM_ACTIVATE
     );

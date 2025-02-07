@@ -129,7 +129,7 @@ public abstract class MixinClientPlayerInteractionManager
     @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
     private void handleBreakingRestriction1(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
-        if (CameraUtils.shouldPreventPlayerInputs() ||
+        if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() || CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
         {
             cir.setReturnValue(false);

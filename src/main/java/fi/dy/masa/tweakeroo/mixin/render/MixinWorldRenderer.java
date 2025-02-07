@@ -1,12 +1,15 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.render;
 
 import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.entity.Entity;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,9 +19,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 
 @Mixin(value = WorldRenderer.class, priority = 1001)
@@ -62,7 +67,7 @@ public abstract class MixinWorldRenderer
 
     // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
     @Redirect(method = "getEntitiesToRender", require = 0, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;", ordinal = 3))
+                                                                    target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;", ordinal = 3))
     private Entity allowRenderingClientPlayerInFreeCameraMode(Camera camera)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
@@ -73,11 +78,27 @@ public abstract class MixinWorldRenderer
         return camera.getFocusedEntity();
     }
 
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "spawnParticle(Lnet/minecraft/particle/ParticleEffect;ZZDDDDDD)Lnet/minecraft/client/particle/Particle;", at = @At("HEAD"), cancellable = true)
+    private void spawnParticleInject(ParticleEffect parameters, boolean alwaysSpawn, boolean canSpawnOnMinimal, double x, double y, double z, double velocityX, double velocityY, double velocityZ, CallbackInfoReturnable<Particle> ci)
+    {
+        if (Configs.Generic.SELECTIVE_BLOCKS_HIDE_PARTICLES.getBooleanValue())
+        {
+            if (!RenderTweaks.isPositionValidForRendering(BlockPos.ofFloored(x, y, z)))
+            {
+                ci.setReturnValue(null);
+                ci.cancel();
+            }
+        }
+    }
+
     // These injections will fail when Sodium is present, but the Free Camera
     // rendering seems to work fine with Sodium without these anyway
     @Inject(method = "setupTerrain", require = 0,
             at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
-            target = "Lnet/minecraft/client/render/WorldRenderer;lastCameraX:D"))
+                     target = "Lnet/minecraft/client/render/WorldRenderer;lastCameraX:D"))
     private void rebuildChunksAroundCamera1(
             Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci)
     {
@@ -93,7 +114,7 @@ public abstract class MixinWorldRenderer
     // rendering seems to work fine with Sodium without these anyway
     @Inject(method = "setupTerrain", require = 0,
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(Lnet/minecraft/util/math/ChunkSectionPos;)V"))
+                     target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(Lnet/minecraft/util/math/ChunkSectionPos;)V"))
     private void rebuildChunksAroundCamera2(
             Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci)
     {

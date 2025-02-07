@@ -23,6 +23,7 @@ import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.mixin.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.*;
 
 public class Callbacks
@@ -35,12 +36,13 @@ public class Callbacks
         Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.setValueChangeCallback(new FeatureCallbackSlime(Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN));
 
         FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.getKeybind().setCallback(new KeyCallbackToggleFastMode(FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT));
-        FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.setValueChangeCallback((cfg) -> {
-            if (Configs.Generic.PLACEMENT_RESTRICTION_TIED_TO_FAST.getBooleanValue())
-            {
-                FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.setBooleanValue(cfg.getBooleanValue());
-            }
-        });
+        FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.setValueChangeCallback((cfg) ->
+                                                                        {
+                                                                            if (Configs.Generic.PLACEMENT_RESTRICTION_TIED_TO_FAST.getBooleanValue())
+                                                                            {
+                                                                                FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.setBooleanValue(cfg.getBooleanValue());
+                                                                            }
+                                                                        });
         FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> CameraEntity.setCameraState(cfg.getBooleanValue()));
         FeatureToggle.TWEAK_HOLD_ATTACK.setValueChangeCallback(new FeatureCallbackHold(mc.options.attackKey));
         FeatureToggle.TWEAK_HOLD_USE.setValueChangeCallback(new FeatureCallbackHold(mc.options.useKey));
@@ -59,18 +61,20 @@ public class Callbacks
         Hotkeys.FLY_PRESET_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.FLY_PRESET_3.getKeybind().setCallback(callbackGeneric);
         Hotkeys.FLY_PRESET_4.getKeybind().setCallback(callbackGeneric);
-        Hotkeys.FREE_CAMERA_PLAYER_INPUTS.getKeybind().setCallback((action, key) -> {
-            IConfigBoolean config = Configs.Generic.FREE_CAMERA_PLAYER_INPUTS;
-            config.toggleBooleanValue();
-            InfoUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
-            return true;
-        });
-        Hotkeys.FREE_CAMERA_PLAYER_MOVEMENT.getKeybind().setCallback((action, key) -> {
-            IConfigBoolean config = Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT;
-            config.toggleBooleanValue();
-            InfoUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
-            return true;
-        });
+        Hotkeys.FREE_CAMERA_PLAYER_INPUTS.getKeybind().setCallback((action, key) ->
+                                                                   {
+                                                                       IConfigBoolean config = Configs.Generic.FREE_CAMERA_PLAYER_INPUTS;
+                                                                       config.toggleBooleanValue();
+                                                                       InfoUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
+                                                                       return true;
+                                                                   });
+        Hotkeys.FREE_CAMERA_PLAYER_MOVEMENT.getKeybind().setCallback((action, key) ->
+                                                                     {
+                                                                         IConfigBoolean config = Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT;
+                                                                         config.toggleBooleanValue();
+                                                                         InfoUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
+                                                                         return true;
+                                                                     });
         Hotkeys.HOTBAR_SWAP_1.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_3.getKeybind().setCallback(callbackGeneric);
@@ -91,6 +95,8 @@ public class Callbacks
         Hotkeys.TOOL_PICK.getKeybind().setCallback(callbackGeneric);
         Hotkeys.WRITE_MAPS_AS_IMAGES.getKeybind().setCallback((a, k) -> MiscUtils.writeAllMapsAsImages());
         Hotkeys.ZOOM_ACTIVATE.getKeybind().setCallback(callbackGeneric);
+        Hotkeys.AREA_SELECTION_ADD_TO_LIST.getKeybind().setCallback(callbackGeneric);
+        Hotkeys.AREA_SELECTION_REMOVE_FROM_LIST.getKeybind().setCallback(callbackGeneric);
 
         Hotkeys.SKIP_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.SKIP_WORLD_RENDERING.getKeybind().setCallback(callbackMessage);
@@ -114,6 +120,10 @@ public class Callbacks
         FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK));
         FeatureToggle.TWEAK_PERIODIC_HOLD_USE.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_HOLD_USE));
 
+        Configs.Lists.SELECTIVE_BLOCKS_BLACKLIST.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
+        Configs.Lists.SELECTIVE_BLOCKS_WHITELIST.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
+        Configs.Lists.SELECTIVE_BLOCKS_LIST_TYPE.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
+        FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
         Configs.Disable.DISABLE_RENDERING_SCAFFOLDING.setValueChangeCallback((cfg) -> mc.worldRenderer.reload());
     }
 
@@ -229,7 +239,7 @@ public class Callbacks
         {
             if (key == Hotkeys.SKIP_ALL_RENDERING.getKeybind())
             {
-                this.mc.skipGameRender = ! this.mc.skipGameRender;
+                this.mc.skipGameRender = !this.mc.skipGameRender;
 
                 String pre = mc.skipGameRender ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
                 String status = StringUtils.translate("tweakeroo.message.value." + (this.mc.skipGameRender ? "on" : "off"));
@@ -238,7 +248,7 @@ public class Callbacks
             }
             else if (key == Hotkeys.SKIP_WORLD_RENDERING.getKeybind())
             {
-                skipWorldRendering = ! skipWorldRendering;
+                skipWorldRendering = !skipWorldRendering;
 
                 boolean enabled = skipWorldRendering;
                 String pre = enabled ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
@@ -263,7 +273,17 @@ public class Callbacks
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
-            if (key == Hotkeys.TOOL_PICK.getKeybind())
+            if (key == Hotkeys.AREA_SELECTION_ADD_TO_LIST.getKeybind())
+            {
+                RenderTweaks.addSelectionToList();
+                return true;
+            }
+            else if (key == Hotkeys.AREA_SELECTION_REMOVE_FROM_LIST.getKeybind())
+            {
+                RenderTweaks.removeSelectionFromList();
+                return true;
+            }
+            else if (key == Hotkeys.TOOL_PICK.getKeybind())
             {
                 if (this.mc.crosshairTarget != null && this.mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
                 {
@@ -432,14 +452,14 @@ public class Callbacks
                 if (action == KeyAction.PRESS)
                 {
                     //InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_on",
-                            //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+                    //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
                     MiscUtils.onZoomActivated();
                 }
                 else
                 {
                     MiscUtils.onZoomDeactivated();
                     //InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_off",
-                            //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+                    //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
                 }
             }
             else if (key == Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind())
@@ -449,7 +469,7 @@ public class Callbacks
                     mc.setScreen(null);
                 }
                 else if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
-                         Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
+                        Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
                 {
                     InventoryOverlayHandler.getInstance().refreshInventoryOverlay(mc, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
                 }
