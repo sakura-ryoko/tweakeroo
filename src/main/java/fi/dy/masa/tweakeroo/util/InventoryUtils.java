@@ -241,7 +241,7 @@ public class InventoryUtils
                     }
                     catch (Exception ignore) {}
 
-                    Tweakeroo.logger.warn("Unable to find entity: '{}'", entity_id);
+                    Tweakeroo.LOGGER.warn("Unable to find entity: '{}'", entity_id);
                 }
             }
         }
