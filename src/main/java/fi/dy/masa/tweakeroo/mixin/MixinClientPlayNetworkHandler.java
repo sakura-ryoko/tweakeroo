@@ -89,10 +89,9 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         }
     }
 
-    @Inject(
-            method = "onEntityStatus",
-            at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveTotemOfUndying(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;")
-    )
+    @Inject(method = "onEntityStatus",
+            at = @At(value = "INVOKE", ordinal = 0,
+                     target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveTotemOfUndying(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;"))
     private void onPlayerUseTotemOfUndying(EntityStatusS2CPacket packet, CallbackInfo ci)
     {
         if (this.client.player == null)
@@ -112,5 +111,102 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
                 }
             }
         }
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onPlayerRespawn", at = @At(value = "NEW",
+                                                 target = "net/minecraft/client/world/ClientWorld"))
+    private void onPlayerRespawnInject(PlayerRespawnS2CPacket packet, CallbackInfo ci)
+    {
+        RenderTweaks.resetWorld(this.simulationDistance);
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onGameJoin", at = @At(value = "NEW",
+                                            target = "net/minecraft/client/world/ClientWorld"))
+    private void onGameJoinInject(GameJoinS2CPacket packet, CallbackInfo ci)
+    {
+        RenderTweaks.resetWorld(this.simulationDistance);
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onChunkData", at = @At("RETURN"))
+    private void onChunkDataInject(ChunkDataS2CPacket packet, CallbackInfo ci)
+    {
+        int cx = packet.getChunkX();
+        int cz = packet.getChunkZ();
+        RenderTweaks.loadFakeChunk(cx, cz);
+
+        if (!FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.getBooleanValue())
+        {
+            return;
+        }
+        WorldChunk worldChunk = this.world.getChunkManager().getWorldChunk(cx, cz);
+
+        if (worldChunk != null)
+        {
+            BlockPos.Mutable pos = new BlockPos.Mutable();
+            ChunkSection[] sections = worldChunk.getSectionArray();
+            for (int i = 0; i < sections.length; i++)
+            {
+                ChunkSection section = sections[i];
+                if (section != null && !section.isEmpty())
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        for (int y = 0; y < 16; y++)
+                        {
+                            for (int z = 0; z < 16; z++)
+                            {
+                                pos.set(x + worldChunk.getPos().getStartX(), y + this.world.sectionIndexToCoord(i), z + worldChunk.getPos().getStartZ());
+
+                                if (!RenderTweaks.isPositionValidForRendering(pos))
+                                {
+                                    BlockEntity be = worldChunk.getBlockEntity(pos);
+                                    BlockState state = section.getBlockState(x, y, z);
+                                    worldChunk.setBlockState(pos, Blocks.AIR.getDefaultState(), false);
+                                    RenderTweaks.setFakeBlockState(this.world, pos, state, be);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onUnloadChunk", at = @At("RETURN"))
+    private void onUnloadChunkInject(UnloadChunkS2CPacket packet, CallbackInfo ci)
+    {
+        int i = packet.pos().x;
+        int j = packet.pos().z;
+        RenderTweaks.unloadFakeChunk(i, j);
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onChunkLoadDistance", at = @At("RETURN"))
+    private void onChunkLoadDistanceInject(ChunkLoadDistanceS2CPacket packet, CallbackInfo ci)
+    {
+        RenderTweaks.getFakeWorld().getChunkManager().updateLoadDistance(packet.getDistance());
+    }
+
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onChunkRenderDistanceCenter", at = @At("RETURN"))
+    private void onChunkRenderDistanceCenterInject(ChunkRenderDistanceCenterS2CPacket packet, CallbackInfo ci)
+    {
+        RenderTweaks.getFakeWorld().getChunkManager().setChunkMapCenter(packet.getChunkX(), packet.getChunkZ());
     }
 }

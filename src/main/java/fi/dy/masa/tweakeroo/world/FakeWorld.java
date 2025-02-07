@@ -60,7 +60,7 @@ public class FakeWorld extends World
 {
     private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(Reference.MOD_ID, "selective_world"));
     private static final ClientWorld.Properties LEVEL_INFO = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
-    private static final RegistryEntry<DimensionType> DIMENSION_TYPE = RenderTweaks.getDynamicRegistryManager().getEntryOrThrow(DimensionTypes.OVERWORLD);
+    private static final RegistryEntry<DimensionType> DIMENSION_TYPE = RenderTweaks.getDynamicRegistryManager().getOptionalEntry(DimensionTypes.OVERWORLD).orElseThrow();
 
     private final MinecraftClient mc;
     private final FakeChunkManager chunkManager;
@@ -105,7 +105,7 @@ public class FakeWorld extends World
     }
 
     @Override
-    public void syncWorldEvent(@Nullable Entity source, int eventId, BlockPos pos, int data)
+    public void syncWorldEvent(@Nullable PlayerEntity player, int eventId, BlockPos pos, int data)
     {
         // TODO Auto-generated method stub
     }
@@ -143,7 +143,7 @@ public class FakeWorld extends World
         }
         else
         {
-            return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).setBlockState(pos, newState, -1) != null;
+            return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).setBlockState(pos, newState, false) != null;
         }
     }
 
@@ -323,13 +323,13 @@ public class FakeWorld extends World
     }
 
     @Override
-    public void playSound(@Nullable Entity source, double x, double y, double z, RegistryEntry<SoundEvent> sound, SoundCategory category, float volume, float pitch, long seed)
+    public void playSound(@Nullable PlayerEntity source, double x, double y, double z, RegistryEntry<SoundEvent> sound, SoundCategory category, float volume, float pitch, long seed)
     {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void playSoundFromEntity(@Nullable Entity source, Entity entity, RegistryEntry<SoundEvent> sound, SoundCategory category, float volume, float pitch, long seed)
+    public void playSoundFromEntity(@Nullable PlayerEntity source, Entity entity, RegistryEntry<SoundEvent> sound, SoundCategory category, float volume, float pitch, long seed)
     {
         // TODO Auto-generated method stub
     }

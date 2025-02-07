@@ -30,7 +30,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;

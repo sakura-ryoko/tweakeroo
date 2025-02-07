@@ -50,7 +50,7 @@ public class FakeChunk extends WorldChunk
     }
 
     @Override
-    public BlockState setBlockState(BlockPos pos, BlockState state, int flags)
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean flags)
     {
         BlockState stateOld = this.getBlockState(pos);
         int y = pos.getY();
