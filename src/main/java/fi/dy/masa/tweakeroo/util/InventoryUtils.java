@@ -56,7 +56,7 @@ public class InventoryUtils
     private static final HashSet<Item> UNSTACKING_ITEMS = new HashSet<>();
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
-    private static final List<String> PREFER_SILK_TOUCH = new ArrayList<>();
+    //private static final List<String> PREFER_SILK_TOUCH = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
 
     public static void setToolSwitchableSlots(String configStr)
@@ -69,11 +69,13 @@ public class InventoryUtils
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
     }
 
+    /*
     public static void setPreferSilkTouchList(List<String> names)
     {
         PREFER_SILK_TOUCH.clear();
         PREFER_SILK_TOUCH.addAll(names);
     }
+     */
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
     {
@@ -564,11 +566,11 @@ public class InventoryUtils
 
         if (state.isOf(Blocks.BAMBOO))
         {
-            if (testedStack.getItem() instanceof SwordItem)
+            if (EquipmentUtils.isMeleeWeapon(testedStack))
             {
                 return true;
             }
-            else if (previousTool.getItem() instanceof SwordItem)
+            else if (EquipmentUtils.isMeleeWeapon(previousTool))
             {
                 return false;
             }
@@ -576,26 +578,32 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false)
         {
-            if (PREFER_SILK_TOUCH.contains(Registries.BLOCK.getEntry(state.getBlock()).getIdAsString()))
+            if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() &&
+                EquipmentUtils.hasSilkTouch(testedStack) &&
+                state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH))
             {
-                if (getEnchantmentLevel(testedStack, Enchantments.SILK_TOUCH) > 0 &&
-                    getEnchantmentLevel(previousTool, Enchantments.SILK_TOUCH) == -1 &&
-                    testedStack.isSuitableFor(state))
-                {
-                    return true;
-                }
+                return hasTheSameOrBetterMaterial(testedStack, previousTool);
             }
 
-            if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
+            return isBetterToolEach(testedStack, previousTool, state);
+        }
+
+        return false;
+    }
+
+    private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state)
+    {
+        if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
+        {
+            return EquipmentUtils.isCorrectTool(testedStack, state);
+        }
+        else if (getBaseBlockBreakingSpeed(testedStack, state) == getBaseBlockBreakingSpeed(previousTool, state))
+        {
+            if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
             {
-                return true;
-            }
-            else if (getBaseBlockBreakingSpeed(testedStack, state) == getBaseBlockBreakingSpeed(previousTool, state))
-            {
-                if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
-                {
-                    return hasTheSameOrBetterRarity(testedStack, previousTool) && hasSameOrBetterToolEnchantments(testedStack, previousTool);
-                }
+                return hasTheSameOrBetterRarity(testedStack, previousTool) &&
+                       hasSameOrBetterToolEnchantments(testedStack, previousTool) &&
+                       EquipmentUtils.isCorrectTool(testedStack, state);
             }
         }
 
@@ -610,6 +618,25 @@ public class InventoryUtils
     private static boolean hasTheSameOrBetterRarity(ItemStack testedStack, ItemStack previousTool)
     {
         return testedStack.getRarity().compareTo(previousTool.getRarity()) >= 0;
+    }
+
+    private static boolean hasTheSameOrBetterMaterial(ItemStack testedStack, ItemStack previousTool)
+    {
+        return Integer.compare(getMaterialWeight(testedStack), getMaterialWeight(previousTool)) > 0;
+    }
+
+    private static int getMaterialWeight(ItemStack stack)
+    {
+        String itemType = Registries.ITEM.getId(stack.getItem()).getPath();
+
+        if (itemType.contains("netherite")) return 5;
+        if (itemType.contains("diamond")) return 4;
+        if (itemType.contains("iron")) return 3;
+        if (itemType.contains("stone")) return 2;
+        if (itemType.contains("gold")) return 1;
+        if (itemType.contains("wood")) return 0;
+
+        return -1;
     }
 
     /**
