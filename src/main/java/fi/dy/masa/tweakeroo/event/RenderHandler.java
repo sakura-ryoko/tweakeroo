@@ -42,10 +42,12 @@ public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final MinecraftClient mc;
+    private Pair<Entity, NbtCompound> lastEnderItems;
 
     public RenderHandler()
     {
         this.mc = MinecraftClient.getInstance();
+        this.lastEnderItems = null;
     }
 
     public static RenderHandler getInstance()
@@ -146,9 +148,19 @@ public class RenderHandler implements IRenderer
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
                     {
                         inv = InventoryUtils.getPlayerEnderItemsFromNbt(pair.getRight(), world.getRegistryManager());
+                        this.lastEnderItems = pair;
+                    }
+                    else if (pair != null && pair.getLeft() instanceof PlayerEntity pe && !pe.getEnderChestInventory().isEmpty())
+                    {
+                        inv = pe.getEnderChestInventory();
+                    }
+                    else if (this.lastEnderItems != null)
+                    {
+                        inv = InventoryUtils.getPlayerEnderItemsFromNbt(this.lastEnderItems.getRight(), world.getRegistryManager());
                     }
                     else
                     {
+                        // Last Ditch effort
                         inv = player.getEnderChestInventory();
                     }
 

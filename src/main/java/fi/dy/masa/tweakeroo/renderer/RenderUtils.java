@@ -11,7 +11,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
@@ -37,6 +36,7 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderContext;
+import fi.dy.masa.malilib.render.shader.ShaderProgramKeysTemp;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.game.BlockUtils;
@@ -382,7 +382,7 @@ public class RenderUtils
         matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
         matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
         //RenderSystem.renderCrosshair(10);
-        mc.getDebugHud().method_67545();
+        mc.getDebugHud().renderDebugCrosshair();
 
         matrix4fStack.popMatrix();
         //RenderSystem.applyModelViewMatrix();
@@ -572,11 +572,6 @@ public class RenderUtils
         RenderSystem.lineWidth(lineWidth);
         //RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
-        /*
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        BuiltBuffer meshData;
-         */
         RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BufferBuilder buffer = ctx.getBuilder();
 
@@ -584,13 +579,7 @@ public class RenderUtils
 
         try
         {
-            /*
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-             */
-
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeys.POSITION_COLOR);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -660,11 +649,6 @@ public class RenderUtils
 
         RenderSystem.lineWidth(lineWidth);
 
-        /*
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        BuiltBuffer meshData;
-         */
         RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BufferBuilder buffer = ctx.getBuilder();
 
@@ -709,13 +693,7 @@ public class RenderUtils
 
         try
         {
-            /*
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-             */
-
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeys.POSITION_COLOR);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -743,12 +721,6 @@ public class RenderUtils
 
     private static void drawBoundingBoxEdges(float minX, float minY, float minZ, float maxX, float maxY, float maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
-        /*
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        BuiltBuffer meshData;
-         */
-
         RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BufferBuilder buffer = ctx.getBuilder();
 
@@ -758,13 +730,7 @@ public class RenderUtils
 
         try
         {
-            /*
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-             */
-
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeys.POSITION_COLOR);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -821,11 +787,6 @@ public class RenderUtils
         RenderSystem.disableCull();
 
         //RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        /*
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        BuiltBuffer meshData;
-         */
         RenderContext ctx = new RenderContext(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         BufferBuilder buffer = ctx.getBuilder();
 
@@ -833,13 +794,7 @@ public class RenderUtils
 
         try
         {
-            /*
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-             */
-
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeys.POSITION_COLOR);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -901,12 +856,6 @@ public class RenderUtils
         int start, end;
 
         RenderSystem.lineWidth(lineWidth);
-
-        /*
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        BuiltBuffer meshData;
-         */
 
         RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         BufferBuilder buffer = ctx.getBuilder();
@@ -1024,13 +973,8 @@ public class RenderUtils
 
         try
         {
-            /*
-            meshData = buffer.end();
-            BufferRenderer.drawWithGlobalProgram(meshData);
-            meshData.close();
-             */
-
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeys.POSITION_COLOR);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
+            ctx.close();
         }
         catch (Exception ignored) { }
     }
