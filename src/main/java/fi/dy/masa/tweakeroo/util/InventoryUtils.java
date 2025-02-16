@@ -584,6 +584,13 @@ public class InventoryUtils
                     return true;
                 }
             }
+            /*
+            else if (testedStack.getItem() instanceof ShearsItem &&
+                    state.isIn(MaLiLibTag.Blocks.NEEDS_SHEARS))
+            {
+                return getBaseBlockBreakingSpeed(testedStack, state) >= getBaseBlockBreakingSpeed(previousTool, state);
+            }
+             */
 
             if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
             {
