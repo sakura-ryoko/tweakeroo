@@ -11,9 +11,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramLayers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -36,7 +40,6 @@ import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.render.RenderContext;
-import fi.dy.masa.malilib.render.shader.ShaderProgramKeysTemp;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.game.BlockUtils;
@@ -579,7 +582,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -693,7 +696,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -730,7 +733,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -794,7 +797,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -973,7 +976,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramKeysTemp.POSITION_COLOR_LEGACY);
+            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
