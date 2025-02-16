@@ -586,6 +586,13 @@ public class InventoryUtils
             {
                 return hasTheSameOrBetterMaterial(testedStack, previousTool);
             }
+            /*
+            else if (testedStack.getItem() instanceof ShearsItem &&
+                    state.isIn(MaLiLibTag.Blocks.NEEDS_SHEARS))
+            {
+                return getBaseBlockBreakingSpeed(testedStack, state) >= getBaseBlockBreakingSpeed(previousTool, state);
+            }
+             */
 
             return isBetterToolEach(testedStack, previousTool, state);
         }
