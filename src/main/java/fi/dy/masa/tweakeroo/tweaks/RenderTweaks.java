@@ -389,7 +389,7 @@ public class RenderTweaks
             return;
         }
 
-        Direction pushDirection = Direction.byId(data & 7);
+        Direction pushDirection = Direction.byIndex(data & 7);
 
         PistonHandler pistonHandler = new PistonHandler(world, pos, pushDirection, type == 0);
 

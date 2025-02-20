@@ -549,7 +549,7 @@ public class PlacementTweaks
 
                 if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForDirection(stack, facing))
                 {
-                    x = posNew.getX() + relX + 2 + (facing.getId() * 2);
+                    x = posNew.getX() + relX + 2 + (facing.getIndex() * 2);
                 }
                 else if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForOrientation(stack, facing))
                 {
@@ -561,7 +561,7 @@ public class PlacementTweaks
                     }
                     else
                     {
-                        x = posNew.getX() + relX + 2 + (facing.getId() * 2);
+                        x = posNew.getX() + relX + 2 + (facing.getIndex() * 2);
                     }
                 }
 
@@ -772,7 +772,7 @@ public class PlacementTweaks
             facing = facing.getOpposite(); // go from block face to click on to the requested facing
             //double relX = hitVecIn.x - posIn.getX();
             //double x = posIn.getX() + relX + 2 + (facing.getId() * 2);
-            double x = posIn.getX() + 2 + (facing.getId() * 2);
+            double x = posIn.getX() + 2 + (facing.getIndex() * 2);
 
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
             {
@@ -798,7 +798,7 @@ public class PlacementTweaks
             }
             else
             {
-                x = posIn.getX() + 2 + (facing.getId() * 2);
+                x = posIn.getX() + 2 + (facing.getIndex() * 2);
             }
 
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
