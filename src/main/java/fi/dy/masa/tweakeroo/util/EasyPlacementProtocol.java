@@ -1,6 +1,9 @@
 package fi.dy.masa.tweakeroo.util;
 
 import com.google.common.collect.ImmutableList;
+
+import com.mojang.serialization.Codec;
+
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -21,6 +24,12 @@ public enum EasyPlacementProtocol implements IConfigOptionListEntry
     {
         this.configString = configString;
         this.translationKey = translationKey;
+    }
+
+    @Override
+    public Codec<EasyPlacementProtocol> codec()
+    {
+        return null;
     }
 
     @Override

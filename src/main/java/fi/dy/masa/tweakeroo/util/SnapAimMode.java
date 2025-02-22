@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.util;
 
+import com.mojang.serialization.Codec;
+
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -12,10 +14,16 @@ public enum SnapAimMode implements IConfigOptionListEntry
     private final String configString;
     private final String translationKey;
 
-    private SnapAimMode(String configString, String translationKey)
+    SnapAimMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
+    }
+
+    @Override
+    public Codec<SnapAimMode> codec()
+    {
+        return null;
     }
 
     @Override

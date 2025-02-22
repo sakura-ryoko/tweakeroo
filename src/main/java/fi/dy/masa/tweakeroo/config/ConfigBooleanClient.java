@@ -1,10 +1,13 @@
 package fi.dy.masa.tweakeroo.config;
 
+import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBooleanHotkeyed;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.StringUtils;
 
 import java.util.Objects;
+
+import com.mojang.serialization.Codec;
 
 public class ConfigBooleanClient extends ConfigBooleanHotkeyed
 {
@@ -21,6 +24,12 @@ public class ConfigBooleanClient extends ConfigBooleanHotkeyed
     public ConfigBooleanClient(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName, String translatedName)
     {
         super(name, defaultValue, defaultHotkey, comment, prettyName, translatedName);
+    }
+
+    @Override
+    public Codec<ConfigBoolean> codec()
+    {
+        return null;
     }
 
     @Override

@@ -3,10 +3,10 @@ package fi.dy.masa.tweakeroo.config;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.config.IConfigBoolean;
-import fi.dy.masa.malilib.config.IConfigNotifiable;
-import fi.dy.masa.malilib.config.IHotkeyTogglable;
+
+import com.mojang.serialization.Codec;
+
+import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
@@ -238,6 +238,12 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     public ConfigType getType()
     {
         return ConfigType.HOTKEY;
+    }
+
+    @Override
+    public Codec<FeatureToggle> codec()
+    {
+        return null;
     }
 
     @Override

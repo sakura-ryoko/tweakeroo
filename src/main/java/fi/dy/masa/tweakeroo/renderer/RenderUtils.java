@@ -11,7 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramLayers;
+import net.minecraft.client.gl.ShaderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.BufferBuilder;
@@ -582,7 +582,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
+            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -696,7 +696,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
+            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -733,7 +733,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
+            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -797,7 +797,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
+            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -976,7 +976,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderProgramLayers.DEBUG_LINE_STRIP);
+            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
             ctx.close();
         }
         catch (Exception ignored) { }
