@@ -696,7 +696,7 @@
   "tweakeroo.config.hotkey.name.zoomActivate": "확대 활성화",
   "tweakeroo.config.internal.comment.flySpeedPreset": "이것은 모드가 현재 선택된 비행 속도 프리셋을\n확인하기 위해 내부적으로 사용하는 값입니다.",
   "tweakeroo.config.internal.comment.gammaValueOriginal": "감마 오버라이드가 활성화되기 전의 원래 감마 값입니다.",
-  "tweakeroo.config.internal.comment.hotbarScrollCurrentRow": "이것은 모드가 단축바 스크롤 기능에 대해\n"현재 단축바 행"을 확인하기 위해 내부적으로\n사용하는 값입니다.",
+  "tweakeroo.config.internal.comment.hotbarScrollCurrentRow": "이것은 모드가 단축바 스크롤 기능에 대해\n\"현재 단축바 행\"을 확인하기 위해 내부적으로\n사용하는 값입니다.",
   "tweakeroo.config.internal.comment.slimeBlockSlipperinessOriginal": "슬라임 블록의 원래 미끄러짐 값입니다.",
   "tweakeroo.config.internal.comment.snapAimLastPitch": "마지막으로 스냅 된 피치 값입니다.",
   "tweakeroo.config.internal.comment.snapAimLastYaw": "마지막으로 스냅 된 요 값입니다.",
