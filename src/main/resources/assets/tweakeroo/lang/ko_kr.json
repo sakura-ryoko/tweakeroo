@@ -650,7 +650,7 @@
     "tweakeroo.config.hotkey.name.accurateBlockPlacementReverse": "정확한 블록 설치 역방향",
     "tweakeroo.config.hotkey.name.areaSelectionAddToList": "영역 선택 리스트에 추가",
     "tweakeroo.config.hotkey.name.areaSelectionOffset": "영역 선택 오프셋",
-    "tweakeroo.config.hotkey.name.areaSelectionRemoveFromList": "영역 선택 리스트에서 랜덤 ",
+    "tweakeroo.config.hotkey.name.areaSelectionRemoveFromList": "영역 선택 리스트에서 랜덤",
     "tweakeroo.config.hotkey.name.breakingRestrictionModeColumn": "파괴 제한 모드 열",
     "tweakeroo.config.hotkey.name.breakingRestrictionModeDiagonal": "파괴 제한 모드 대각",
     "tweakeroo.config.hotkey.name.breakingRestrictionModeFace": "파괴 제한 모드 면",
