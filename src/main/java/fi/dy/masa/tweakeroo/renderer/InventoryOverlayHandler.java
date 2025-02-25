@@ -171,7 +171,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             Block blockTmp = state.getBlock();
             BlockEntity be = null;
 
-            //Tweakeroo.logger.warn("getTarget():1: pos [{}], state [{}]", pos.toShortString(), state.toString());
+            //Tweakeroo.LOGGER.warn("getTarget():1: pos [{}], state [{}]", pos.toShortString(), state.toString());
 
             if (blockTmp instanceof BlockEntityProvider)
             {
@@ -194,7 +194,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     }
                 }
 
-                //Tweakeroo.logger.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, nbt != null);
+                //Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, nbt != null);
                 InventoryOverlay.Context ctx = getTargetInventoryFromBlock(world, pos, be, nbt);
                 //dumpContext(ctx);
 
@@ -236,7 +236,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 }
             }
 
-            //Tweakeroo.logger.error("getTarget(): Entity [{}] raw NBT [{}]", entity.getId(), nbt.toString());
+            //Tweakeroo.LOGGER.error("getTarget(): Entity [{}] raw NBT [{}]", entity.getId(), nbt.toString());
             InventoryOverlay.Context ctx = getTargetInventoryFromEntity(world.getEntityById(entity.getId()), nbt);
             //dumpContext(ctx);
 
@@ -326,6 +326,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         }
 
         BlockEntityType<?> beType = nbt != null ? NbtBlockUtils.getBlockEntityTypeFromNbt(nbt) : null;
+        //Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beType != null ? beType.toString() : "<null>", inv != null ? inv.size() : "<null>");
 
         if ((beType != null && beType.equals(BlockEntityType.ENDER_CHEST)) ||
             be instanceof EnderChestBlockEntity)
@@ -359,8 +360,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
         if (nbt != null && !nbt.isEmpty())
         {
-            //Tweakeroo.logger.warn("getTargetInventoryFromBlock(): rawNbt: [{}]", nbt.toString());
-
+            //Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock(): rawNbt: [{}]", nbt.toString());
             Inventory inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, world.getRegistryManager());
 
             if (inv == null)
@@ -369,7 +369,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
         }
 
-        //Tweakeroo.logger.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, nbt != null ? nbt.getString("id") : new NbtCompound());
+        //Tweakeroo.LOGGER.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, nbt != null ? nbt.getString("id") : new NbtCompound());
 
         if (inv == null || nbt == null)
         {
@@ -416,7 +416,8 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         {
             Inventory inv2;
 
-            //Tweakeroo.logger.warn("getTargetInventoryFromEntity(): rawNbt: [{}]", nbt.toString());
+            //Tweakeroo.LOGGER.warn("getTargetInventoryFromEntity(): rawNbt: [{}]", nbt.toString());
+            //Tweakeroo.LOGGER.warn("getTargetInventoryFromEntity(): pre-inv: [{}]", inv != null ? inv.size() : "<NULL>");
 
             // Fix for empty horse inv
             if (inv != null &&
@@ -436,7 +437,6 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             // Fix for saddled horse, no inv
             else if (inv != null &&
-                     //inv.size() == 1 &&
                      nbt.contains(NbtKeys.SADDLE))
             {
                 inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
@@ -460,7 +460,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 }
             }
 
-            //Tweakeroo.logger.error("getTargetInventoryFromEntity(): inv.size [{}], inv2.size [{}]", inv != null ? inv.size() : "null", inv2 != null ? inv2.size() : "null");
+            //Tweakeroo.LOGGER.error("getTargetInventoryFromEntity(): inv.size [{}], inv2.size [{}]", inv != null ? inv.size() : "null", inv2 != null ? inv2.size() : "null");
 
             if (inv2 != null)
             {
