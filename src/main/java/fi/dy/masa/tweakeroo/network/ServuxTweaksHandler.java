@@ -41,7 +41,6 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     private static final int MAX_FAILURES = 4;
     private long readingSessionKey = -1;
 
-
     @Override
     public Identifier getPayloadChannel() { return CHANNEL_ID; }
 

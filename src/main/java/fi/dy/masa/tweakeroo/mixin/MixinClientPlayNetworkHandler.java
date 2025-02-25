@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
+import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
@@ -44,7 +45,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "onOpenScreen", at = @At("HEAD"), cancellable = true)
-    private void onOpenScreenListener(OpenScreenS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onOpenScreenListener(OpenScreenS2CPacket packet, CallbackInfo ci)
     {
         if (!RenderTweaks.onOpenScreen(packet.getName(), packet.getScreenHandlerType(), packet.getSyncId()))
         {
@@ -56,7 +57,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
             value = "INVOKE",
             target = "Lnet/minecraft/screen/ScreenHandler;setStackInSlot(IILnet/minecraft/item/ItemStack;)V"),
             cancellable = true)
-    private void onHandleSetSlot(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onHandleSetSlot(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci)
     {
         if (PlacementTweaks.shouldSkipSlotSync(packet.getSlot(), packet.getStack()))
         {
@@ -66,7 +67,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 
     @Inject(method = "onDeathMessage", at = @At(value = "INVOKE", // onCombatEvent
                                                 target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"))
-    private void onPlayerDeath(DeathMessageS2CPacket packetIn, CallbackInfo ci)
+    private void tweakeroo_onPlayerDeath(DeathMessageS2CPacket packetIn, CallbackInfo ci)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -89,10 +90,20 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         }
     }
 
+    @Inject(method = "onCommandTree", at = @At("RETURN"))
+    private void tweakeroo_onCommandTree(CallbackInfo ci)
+    {
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        {
+            // when the player becomes OP, the server sends the command tree to the client
+            ServerDataSyncer.getInstance().resetOpCheck();
+        }
+    }
+
     @Inject(method = "onEntityStatus",
             at = @At(value = "INVOKE", ordinal = 0,
                      target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;getActiveDeathProtector(Lnet/minecraft/entity/player/PlayerEntity;)Lnet/minecraft/item/ItemStack;"))
-    private void onPlayerUseTotemOfUndying(EntityStatusS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onPlayerUseTotemOfUndying(EntityStatusS2CPacket packet, CallbackInfo ci)
     {
         if (this.client.player == null)
         {
@@ -118,7 +129,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      */
     @Inject(method = "onPlayerRespawn", at = @At(value = "NEW",
                                                  target = "net/minecraft/client/world/ClientWorld"))
-    private void onPlayerRespawnInject(PlayerRespawnS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onPlayerRespawnInject(PlayerRespawnS2CPacket packet, CallbackInfo ci)
     {
         RenderTweaks.resetWorld(this.simulationDistance);
     }
@@ -128,7 +139,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      */
     @Inject(method = "onGameJoin", at = @At(value = "NEW",
                                             target = "net/minecraft/client/world/ClientWorld"))
-    private void onGameJoinInject(GameJoinS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onGameJoinInject(GameJoinS2CPacket packet, CallbackInfo ci)
     {
         RenderTweaks.resetWorld(this.simulationDistance);
     }
@@ -137,7 +148,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "onChunkData", at = @At("RETURN"))
-    private void onChunkDataInject(ChunkDataS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onChunkDataInject(ChunkDataS2CPacket packet, CallbackInfo ci)
     {
         int cx = packet.getChunkX();
         int cz = packet.getChunkZ();
@@ -185,7 +196,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "onUnloadChunk", at = @At("RETURN"))
-    private void onUnloadChunkInject(UnloadChunkS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onUnloadChunkInject(UnloadChunkS2CPacket packet, CallbackInfo ci)
     {
         int i = packet.pos().x;
         int j = packet.pos().z;
@@ -196,7 +207,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "onChunkLoadDistance", at = @At("RETURN"))
-    private void onChunkLoadDistanceInject(ChunkLoadDistanceS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onChunkLoadDistanceInject(ChunkLoadDistanceS2CPacket packet, CallbackInfo ci)
     {
         RenderTweaks.getFakeWorld().getChunkManager().updateLoadDistance(packet.getDistance());
     }
@@ -205,7 +216,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "onChunkRenderDistanceCenter", at = @At("RETURN"))
-    private void onChunkRenderDistanceCenterInject(ChunkRenderDistanceCenterS2CPacket packet, CallbackInfo ci)
+    private void tweakeroo_onChunkRenderDistanceCenterInject(ChunkRenderDistanceCenterS2CPacket packet, CallbackInfo ci)
     {
         RenderTweaks.getFakeWorld().getChunkManager().setChunkMapCenter(packet.getChunkX(), packet.getChunkZ());
     }

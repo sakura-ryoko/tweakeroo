@@ -17,7 +17,7 @@ public class MixinDataQueryHandler
             method = "handleQueryResponse",
             at = @At("HEAD")
     )
-    private void queryResponse(int transactionId, NbtCompound nbt, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_queryResponse(int transactionId, NbtCompound nbt, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {
