@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CrafterBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -39,6 +40,7 @@ import net.minecraft.util.math.Vec3d;
 
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.render.InventoryOverlay;
+import fi.dy.masa.malilib.render.MaLiLibPipelines;
 import fi.dy.masa.malilib.render.RenderContext;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -97,8 +99,8 @@ public class RenderUtils
             Matrix4f modelViewMatrix = new Matrix4f();
             modelViewMatrix.set(RenderSystem.getModelViewMatrix());
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            fi.dy.masa.malilib.render.RenderUtils.bindTexture(HandledScreen.BACKGROUND_TEXTURE);
-            fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(x - 1, y - 1, 7, 83, 9 * 18, 3 * 18);
+            //fi.dy.masa.malilib.render.RenderUtils.bindTexture(HandledScreen.BACKGROUND_TEXTURE);
+            fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(HandledScreen.BACKGROUND_TEXTURE, x - 1, y - 1, 7, 83, 9 * 18, 3 * 18, drawContext);
 
             drawContext.drawTextWithShadow(textRenderer, "1", x - 10, y +  4, 0xFFFFFF);
             drawContext.drawTextWithShadow(textRenderer, "2", x - 10, y + 22, 0xFFFFFF);
@@ -215,7 +217,7 @@ public class RenderUtils
                 horseInv.setStack(0, horseArmor != null && !horseArmor.isEmpty() ? horseArmor : ItemStack.EMPTY);
                 horseInv.setStack(1, inv.getStack(0));
 
-                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc, drawContext);
                 InventoryOverlay.renderInventoryBackgroundSlots(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
                 InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
                 xInv += 32 + 4;
@@ -223,7 +225,7 @@ public class RenderUtils
 
             if (totalSlots > 0)
             {
-                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
+                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc, drawContext);
               
                 if (type == InventoryOverlay.InventoryRenderType.BREWING_STAND)
                 {
@@ -255,7 +257,7 @@ public class RenderUtils
             Inventory wolfInv = new SimpleInventory(2);
             ItemStack wolfArmor = ((WolfEntity) entityLivingBase).getBodyArmor();
             wolfInv.setStack(0, wolfArmor != null && !wolfArmor.isEmpty() ? wolfArmor : ItemStack.EMPTY);
-            InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc);
+            InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc, drawContext);
             InventoryOverlay.renderWolfArmorBackgroundSlots(wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
             InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
         }
@@ -284,7 +286,7 @@ public class RenderUtils
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        InventoryOverlay.renderInventoryBackground(type, x, y, 9, 27, mc);
+        InventoryOverlay.renderInventoryBackground(type, x, y, 9, 27, mc, drawContext);
         InventoryOverlay.renderInventoryStacks(type, inv, x + slotOffsetX, y + slotOffsetY, 9, 9, 27, mc, drawContext);
     }
 
@@ -305,8 +307,8 @@ public class RenderUtils
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        InventoryOverlay.renderInventoryBackground(type, x, y     , 9, 27, mc);
-        InventoryOverlay.renderInventoryBackground(type, x, y + 70, 9,  9, mc);
+        InventoryOverlay.renderInventoryBackground(type, x, y     , 9, 27, mc, drawContext);
+        InventoryOverlay.renderInventoryBackground(type, x, y + 70, 9,  9, mc, drawContext);
 
         // Main inventory
         InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y +  8, 9, 9, 27, mc, drawContext);
@@ -376,7 +378,7 @@ public class RenderUtils
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();
 
-        RenderSystem.enableBlend();
+        fi.dy.masa.malilib.render.RenderUtils.blend(true);
         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
         matrix4fStack.pushMatrix();
         matrix4fStack.mul(drawContext.getMatrices().peek().getPositionMatrix());
@@ -389,7 +391,7 @@ public class RenderUtils
 
         matrix4fStack.popMatrix();
         //RenderSystem.applyModelViewMatrix();
-        RenderSystem.disableBlend();
+        fi.dy.masa.malilib.render.RenderUtils.blend(false);
     }
 
     public static void notifyRotationChanged()
@@ -573,16 +575,16 @@ public class RenderUtils
     public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth, Color4f color, MinecraftClient mc)
     {
         RenderSystem.lineWidth(lineWidth);
-        //RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        //RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR); // DEBUG_LINE_STRIP
 
-        RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderContext ctx = new RenderContext(MaLiLibPipelines.DEBUG_LINES_SIMPLE, GlUsage.STATIC_WRITE);
         BufferBuilder buffer = ctx.getBuilder();
 
         drawBlockBoundingBoxOutlinesBatchedLines(pos, color, expand, buffer, mc);
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
+            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -652,7 +654,7 @@ public class RenderUtils
 
         RenderSystem.lineWidth(lineWidth);
 
-        RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderContext ctx = new RenderContext(MaLiLibPipelines.DEBUG_LINES_SIMPLE, GlUsage.STATIC_WRITE);
         BufferBuilder buffer = ctx.getBuilder();
 
         // Min corner
@@ -696,7 +698,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
+            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -724,7 +726,7 @@ public class RenderUtils
 
     private static void drawBoundingBoxEdges(float minX, float minY, float minZ, float maxX, float maxY, float maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
-        RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderContext ctx = new RenderContext(MaLiLibPipelines.DEBUG_LINES_SIMPLE, GlUsage.STATIC_WRITE);
         BufferBuilder buffer = ctx.getBuilder();
 
         drawBoundingBoxLinesX(buffer, minX, minY, minZ, maxX, maxY, maxZ, colorX);
@@ -733,7 +735,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
+            ctx.drawLayer(MinecraftClient.getInstance().getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -786,24 +788,24 @@ public class RenderUtils
 
     public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, Matrix4f matrix4f, MinecraftClient mc)
     {
-        RenderSystem.enableBlend();
-        RenderSystem.disableCull();
+        fi.dy.masa.malilib.render.RenderUtils.blend(true);
+        fi.dy.masa.malilib.render.RenderUtils.culling(false);
 
         //RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        RenderContext ctx = new RenderContext(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        RenderContext ctx = new RenderContext(MaLiLibPipelines.DEBUG_LINES_SIMPLE, GlUsage.STATIC_WRITE);
         BufferBuilder buffer = ctx.getBuilder();
 
         renderAreaSidesBatched(pos1, pos2, color, 0.002, buffer, mc);
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
+            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
 
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
+        fi.dy.masa.malilib.render.RenderUtils.culling(true);
+        fi.dy.masa.malilib.render.RenderUtils.blend(false);
     }
 
     /**
@@ -860,7 +862,7 @@ public class RenderUtils
 
         RenderSystem.lineWidth(lineWidth);
 
-        RenderContext ctx = new RenderContext(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderContext ctx = new RenderContext(MaLiLibPipelines.DEBUG_LINES_SIMPLE, GlUsage.STATIC_WRITE);
         BufferBuilder buffer = ctx.getBuilder();
 
         // Edges along the X-axis
@@ -976,7 +978,7 @@ public class RenderUtils
 
         try
         {
-            ctx.drawWithShaders(buffer.end(), ShaderPipelines.DEBUG_LINE_STRIP);
+            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }

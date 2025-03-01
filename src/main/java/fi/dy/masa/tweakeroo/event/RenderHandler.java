@@ -3,9 +3,10 @@ package fi.dy.masa.tweakeroo.event;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.Frustum;
@@ -183,7 +184,8 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLastAdvanced(Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, Profiler profiler)
+    //public void onRenderWorldLastAdvanced(Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, Profiler profiler)
+    public void onRenderWorldLastAdvanced(Framebuffer fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, BufferBuilderStorage buffers, Profiler profiler)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -207,11 +209,10 @@ public class RenderHandler implements IRenderer
              Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld()))
         {
             BlockHitResult hitResult = (BlockHitResult) mc.crosshairTarget;
-            RenderSystem.depthMask(false);
-            RenderSystem.disableCull();
-            RenderSystem.disableDepthTest();
-
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            fi.dy.masa.malilib.render.RenderUtils.depthMask(false);
+            fi.dy.masa.malilib.render.RenderUtils.culling(false);
+            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
+            fi.dy.masa.malilib.render.RenderUtils.blend(true);
 
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
@@ -220,14 +221,12 @@ public class RenderHandler implements IRenderer
                     hitResult.getBlockPos(),
                     hitResult.getSide(),
                     hitResult.getPos(),
-                    color,
-                    posMatrix,
-                    mc);
+                    color, posMatrix, mc);
 
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
-            RenderSystem.enableCull();
-            RenderSystem.depthMask(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthTest(true);
+            fi.dy.masa.malilib.render.RenderUtils.blend(false);
+            fi.dy.masa.malilib.render.RenderUtils.culling(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
         }
     }
 }

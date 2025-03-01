@@ -140,17 +140,11 @@ public class RenderTweaks
             Matrix4fStack globalStack = RenderSystem.getModelViewStack();
 
             globalStack.pushMatrix();
-            //matrices.push();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-            RenderSystem.disableDepthTest();
-            // RenderSystem.disableLighting();
-            // RenderSystem.depthMask(false);
-            // RenderSystem.disableTexture();
-            // RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
-
-            RenderSystem.enablePolygonOffset();
-            RenderSystem.polygonOffset(-1.2f, -0.2f);
+            fi.dy.masa.malilib.render.RenderUtils.blend(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(true);
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(-1.2f, -0.2f);
 
             if (FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE.getBooleanValue())
             {
@@ -165,12 +159,10 @@ public class RenderTweaks
                 renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
             }
 
-            RenderSystem.polygonOffset(0f, 0f);
-            RenderSystem.disablePolygonOffset();
-            //matrices.pop();
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(0f, 0f);
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(false);
             globalStack.popMatrix();
-            // RenderSystem.enableTexture();
-            RenderSystem.depthMask(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
             profiler.pop();
         }
     }

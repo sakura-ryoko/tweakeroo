@@ -43,7 +43,6 @@ import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -428,13 +427,13 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
             if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
-                if (data.getInt("version") != ServuxTweaksPacket.PROTOCOL_VERSION)
+                if (data.getInt("version", -1) != ServuxTweaksPacket.PROTOCOL_VERSION)
                 {
                     Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version!");
                 }
 
                 DataManager.getInstance().setHasServuxServer(true);
-                this.setServuxVersion(data.getString("servux"));
+                this.setServuxVersion(data.getString("servux", ""));
                 this.setIsServuxServer();
 
                 return true;
@@ -725,7 +724,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (blockEntity != null && (type == null || type.equals(BlockEntityType.getId(blockEntity.getType()))))
         {
-            if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
+            if (!nbt.contains(NbtKeys.ID))
             {
                 Identifier id = BlockEntityType.getId(blockEntity.getType());
 
@@ -755,7 +754,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
                 if (blockEntity2 != null)
                 {
-                    if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
+                    if (!nbt.contains(NbtKeys.ID))
                     {
                         Identifier id = BlockEntityType.getId(beType);
 
@@ -787,7 +786,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (entity != null)
         {
-            if (!nbt.contains(NbtKeys.ID, Constants.NBT.TAG_STRING))
+            if (!nbt.contains(NbtKeys.ID))
             {
                 Identifier id = EntityType.getId(entity.getType());
 
