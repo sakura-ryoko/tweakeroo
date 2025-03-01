@@ -393,9 +393,11 @@
     "tweakeroo.config.feature_toggle.prettyName.tweakYMirror": "Y Mirror",
     "tweakeroo.config.feature_toggle.prettyName.tweakZoom": "Camera Zoom",
     "tweakeroo.config.fixes.comment.elytraFix": "Elytra landing fix by Earthcomputer and Nessie.\nThe deployment fix is now in vanilla, so this only affects landing now.",
+    "tweakeroo.config.fixes.comment.elytraSprintCancel": "Fixes the Vanilla bug (MC-279688) that removes\nyou from sprinting while using an Elytra.\nThis setting is only needed for 1.21.4, but for 1.21.5 this is fixed.",
     "tweakeroo.config.fixes.comment.macHorizontalScroll": "If you are on Mac/OSX, this applies the same fix/change\nas the hscroll mod, while not breaking all the scroll handling\nin malilib-based mods.",
     "tweakeroo.config.fixes.comment.ravagerClientBlockBreakFix": "Fixes Ravagers breaking blocks on the client side,\nwhich causes annoying ghost blocks/block desyncs",
     "tweakeroo.config.fixes.name.elytraFix": "elytraFix",
+    "tweakeroo.config.fixes.name.elytraSprintCancel": "elytraSprintCancel",
     "tweakeroo.config.fixes.name.macHorizontalScroll": "macHorizontalScroll",
     "tweakeroo.config.fixes.name.ravagerClientBlockBreakFix": "ravagerClientBlockBreakFix",
     "tweakeroo.config.generic.comment.accuratePlacementProtocol": "If enabled, then the Flexible Block Placement and the\nAccurate Block Placement use the protocol implemented in Carpet mod.\n§6Note: This is required for any block rotations to work, other than\n§6blocks that only care about the block side you click on (Hoppers, Logs etc.)",
@@ -471,6 +473,7 @@
     "tweakeroo.config.generic.comment.selectiveBlocksHideParticles": "Whether or not to hide particles for selective block rendering\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.generic.comment.selectiveBlocksNoHit": "Whether or not to disable targeting hidden blocks\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.generic.comment.selectiveBlocksTrackPistons": "Whether or not to track piston movements for selective block rendering\nWritten by Andrew54757 under TweakFork",
+    "tweakeroo.config.generic.comment.serverDataSyncCacheRefresh": "The Cache refresh value as a fraction of a second.\nThis value is the trigger for whenever requesting entity data\ngets refreshed from the server, even if it still exists in the Cache.\nThis should be set around 25% or less of\nthe \"entityDataSyncCacheTimeout\" value.\nA value of '0.05f' means 50 ms or once every game tick.",
     "tweakeroo.config.generic.comment.serverDataSyncCacheTimeout": "The Cache timeout value in seconds that\nthe Entity Cache keeps records for.\nA lower value means more frequent updates.",
     "tweakeroo.config.generic.comment.serverNbtRequestRate": "Limit request rate for server entity data syncer",
     "tweakeroo.config.generic.comment.shulkerDisplayBgColor": "Enables tinting/coloring the Shulker Box display\nbackground texture with the dye color of the box",
@@ -569,6 +572,7 @@
     "tweakeroo.config.generic.name.selectiveBlocksHideParticles": "selectiveBlocksHideParticles",
     "tweakeroo.config.generic.name.selectiveBlocksNoHit": "selectiveBlocksNoHit",
     "tweakeroo.config.generic.name.selectiveBlocksTrackPistons": "selectiveBlocksTrackPistons",
+    "tweakeroo.config.generic.name.serverDataSyncCacheRefresh": "serverDataSyncCacheRefresh",
     "tweakeroo.config.generic.name.serverDataSyncCacheTimeout": "serverDataSyncCacheTimeout",
     "tweakeroo.config.generic.name.serverNbtRequestRate": "serverNbtRequestRate",
     "tweakeroo.config.generic.name.shulkerDisplayBgColor": "shulkerDisplayBgColor",
@@ -842,7 +846,5 @@
     "tweakeroo.message.value.off": "OFF",
     "tweakeroo.message.value.on": "ON",
     "tweakeroo.message.warning.block_type_break_restriction": "§6Block breaking prevented by Block Type Break Restriction tweak",
-    "tweakeroo.message.warning.entity_type_attack_restriction": "§6Entity attack prevented by Entity Type Attack Restriction tweak",
-    "tweakeroo.config.fixes.name.elytraSprintCancel": "elytraSprintCancel",
-    "tweakeroo.config.fixes.comment.elytraSprintCancel": "Fixes the Vanilla bug (MC-279688) that removes\nyou from sprinting while using an Elytra.\nThis setting is only needed for 1.21.4, but for 1.21.5 this is fixed."
+    "tweakeroo.message.warning.entity_type_attack_restriction": "§6Entity attack prevented by Entity Type Attack Restriction tweak"
 }
