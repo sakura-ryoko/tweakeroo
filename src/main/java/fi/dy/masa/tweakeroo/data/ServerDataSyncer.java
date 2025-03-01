@@ -247,9 +247,17 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         this.lastOpCheck = System.currentTimeMillis();
     }
 
+    public long getCacheRefresh()
+    {
+        long result = (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_REFRESH.getFloatValue(), 0.05f, 1.0f) * 1000L);
+        long clamp = (this.getCacheTimeout() / 2);
+
+        return Math.min(result, clamp);
+    }
+
     private long getCacheTimeout()
     {
-        return (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue(), 0.15f, 25.0f) * 1000L);
+        return (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue(), 0.25f, 15.0f) * 1000L);
     }
 
     private void tickCache(long nowTime)
@@ -452,9 +460,9 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             if (!DataManager.getInstance().hasIntegratedServer() &&
                 FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
-                if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > (this.getCacheTimeout() / 4))
+                if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > this.getCacheRefresh())
                 {
-                    //Tweakeroo.debugLog("requestBlockEntity: be at pos [{}] requeue at [{}] ms", pos.toShortString(), this.getCacheTimeout() / 4);
+                    //Tweakeroo.debugLog("requestBlockEntity: be at pos [{}] requeue at [{}] ms", pos.toShortString(), this.getCacheRefresh());
                     this.pendingBlockEntitiesQueue.add(pos);
                 }
             }
@@ -497,9 +505,9 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             if (!DataManager.getInstance().hasIntegratedServer() &&
                 FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
-                if (System.currentTimeMillis() - this.entityCache.get(entityId).getLeft() > (this.getCacheTimeout() / 4))
+                if (System.currentTimeMillis() - this.entityCache.get(entityId).getLeft() > this.getCacheRefresh())
                 {
-                    //Tweakeroo.debugLog("requestEntity: entity Id [{}] requeue at [{}] ms", entityId, this.getCacheTimeout() / 4);
+                    //Tweakeroo.debugLog("requestEntity: entity Id [{}] requeue at [{}] ms", entityId, this.getCacheRefresh());
                     this.pendingEntitiesQueue.add(entityId);
                 }
             }
@@ -669,10 +677,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (handler != null)
         {
-            handler.getDataQueryHandler().queryBlockNbt(pos, nbtCompound ->
-            {
-                handleBlockEntityData(pos, nbtCompound, null);
-            });
+            handler.getDataQueryHandler().queryBlockNbt(pos, nbtCompound -> handleBlockEntityData(pos, nbtCompound, null));
             this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).malilib_currentTransactionId(), Either.left(pos));
         }
     }
@@ -688,10 +693,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
         if (handler != null)
         {
-            handler.getDataQueryHandler().queryEntityNbt(entityId, nbtCompound ->
-            {
-                handleEntityData(entityId, nbtCompound);
-            });
+            handler.getDataQueryHandler().queryEntityNbt(entityId, nbtCompound -> handleEntityData(entityId, nbtCompound));
             this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDataQueryHandler()).malilib_currentTransactionId(), Either.right(entityId));
         }
     }
