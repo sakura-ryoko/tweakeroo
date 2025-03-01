@@ -111,7 +111,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_PARTICLES     = new ConfigBoolean     ("selectiveBlocksHideParticles", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_ENTITIES      = new ConfigBoolean     ("selectiveBlocksHideEntities", false).apply(GENERIC_KEY);
         public static final ConfigBoolean       SELECTIVE_BLOCKS_NO_HIT             = new ConfigBoolean     ("selectiveBlocksNoHit", true).apply(GENERIC_KEY);
-        public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 0.75f, 0.15f, 5.0f).apply(GENERIC_KEY);
+        public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("serverDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
+        public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 0.75f, 0.25f, 5.0f).apply(GENERIC_KEY);
         public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
@@ -226,6 +227,7 @@ public class Configs implements IConfigHandler
                 RENDER_LIMIT_ITEM,
                 RENDER_LIMIT_XP_ORB,
                 SCULK_SENSOR_PULSE_LENGTH,
+                SERVER_DATA_SYNC_CACHE_REFRESH,
                 SERVER_DATA_SYNC_CACHE_TIMEOUT,
                 SERVER_NBT_REQUEST_RATE,
                 SNAP_AIM_PITCH_STEP,
