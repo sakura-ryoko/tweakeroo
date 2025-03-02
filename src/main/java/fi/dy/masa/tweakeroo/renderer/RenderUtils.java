@@ -584,7 +584,8 @@ public class RenderUtils
 
         try
         {
-            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
+            ctx = ctx.setBuilder(buffer);
+            ctx.drawColor(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -698,7 +699,8 @@ public class RenderUtils
 
         try
         {
-            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
+            ctx = ctx.setBuilder(buffer);
+            ctx.drawColor(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -735,7 +737,8 @@ public class RenderUtils
 
         try
         {
-            ctx.drawLayer(MinecraftClient.getInstance().getFramebuffer(), buffer.endNullable());
+            ctx = ctx.setBuilder(buffer);
+            ctx.drawColor(MinecraftClient.getInstance().getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -799,7 +802,8 @@ public class RenderUtils
 
         try
         {
-            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
+            ctx = ctx.setBuilder(buffer);
+            ctx.drawColor(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
@@ -978,7 +982,8 @@ public class RenderUtils
 
         try
         {
-            ctx.drawLayer(mc.getFramebuffer(), buffer.endNullable());
+            ctx = ctx.setBuilder(buffer);
+            ctx.drawColor(mc.getFramebuffer(), buffer.endNullable());
             ctx.close();
         }
         catch (Exception ignored) { }
