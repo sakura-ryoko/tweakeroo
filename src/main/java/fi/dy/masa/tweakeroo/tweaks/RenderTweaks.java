@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+
+import fi.dy.masa.malilib.render.RenderUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -38,7 +40,6 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinPistonBlock;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.world.FakeChunk;
 import fi.dy.masa.tweakeroo.world.FakeWorld;
 
@@ -154,8 +155,9 @@ public class RenderTweaks
             {
                 if (posLookingAt != null)
                 {
-                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, mc);
+                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking);
                 }
+
                 renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
             }
 
@@ -176,11 +178,11 @@ public class RenderTweaks
         profiler.push("lists");
         for (ListMapEntry entry : SELECTIVE_BLACKLIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist, mc);
+            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist);
         }
         for (ListMapEntry entry : SELECTIVE_WHITELIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist, mc);
+            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist);
         }
         profiler.pop();
     }
@@ -337,29 +339,29 @@ public class RenderTweaks
         {
             if (pos1.equals(pos2) == false)
             {
-                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, mc);
+                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
 
-                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix, mc);
+                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix);
 
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, mc);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, mc);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
             }
             else
             {
                 RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, posMatrix, mc);
+                                                          colorOverlapping, posMatrix);
             }
         }
         else
         {
             if (pos1 != null)
             {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, mc);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
             }
 
             if (pos2 != null)
             {
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, mc);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
             }
         }
 

@@ -421,7 +421,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Fix for empty horse inv
             if (inv != null &&
                 nbt.contains(NbtKeys.ITEMS) &&
-                nbt.getOrCreateList(NbtKeys.ITEMS).size() > 1)
+                nbt.getListOrEmpty(NbtKeys.ITEMS).size() > 1)
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
@@ -444,7 +444,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Fix for empty Villager/Piglin inv
             else if (inv != null && inv.size() == 8 &&
                      nbt.contains(NbtKeys.INVENTORY) &&
-                     !nbt.getOrCreateList(NbtKeys.INVENTORY).isEmpty())
+                     !nbt.getListOrEmpty(NbtKeys.INVENTORY).isEmpty())
             {
                 inv2 = InventoryUtils.getNbtInventory(nbt, 8, entity.getRegistryManager());
                 inv = null;

@@ -221,7 +221,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getBlockPos(),
                     hitResult.getSide(),
                     hitResult.getPos(),
-                    color, posMatrix, mc);
+                    color, posMatrix);
 
             fi.dy.masa.malilib.render.RenderUtils.depthTest(true);
             fi.dy.masa.malilib.render.RenderUtils.blend(false);
