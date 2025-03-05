@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.render;
 
 import net.minecraft.client.particle.ExplosionEmitterParticle;
 import net.minecraft.client.particle.NoRenderParticle;

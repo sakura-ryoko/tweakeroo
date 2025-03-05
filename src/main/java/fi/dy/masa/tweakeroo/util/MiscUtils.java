@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.util;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -12,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
+import fi.dy.masa.tweakeroo.mixin.world.IMixinClientWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;

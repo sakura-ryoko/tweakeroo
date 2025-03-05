@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.world;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.block.BlockState;
