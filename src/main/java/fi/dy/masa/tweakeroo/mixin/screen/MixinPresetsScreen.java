@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.screen;
 
 //@Mixin(PresetsScreen.class)
 public abstract class MixinPresetsScreen

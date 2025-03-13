@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
+import fi.dy.masa.tweakeroo.mixin.screen.IMixinCustomizeFlatLevelScreen;
 import fi.dy.masa.tweakeroo.mixin.world.IMixinClientWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -67,7 +68,6 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.*;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinCommandBlockExecutor;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
