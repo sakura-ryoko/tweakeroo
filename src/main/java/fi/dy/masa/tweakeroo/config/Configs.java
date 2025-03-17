@@ -70,6 +70,8 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        FLY_SPEED_PRESET_2                  = new ConfigDouble      ("flySpeedPreset2", 0.064, 0, 4).apply(GENERIC_KEY);
         public static final ConfigDouble        FLY_SPEED_PRESET_3                  = new ConfigDouble      ("flySpeedPreset3", 0.128, 0, 4).apply(GENERIC_KEY);
         public static final ConfigDouble        FLY_SPEED_PRESET_4                  = new ConfigDouble      ("flySpeedPreset4", 0.32, 0, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        FLY_SPEED_INCREMENT_1               = new ConfigDouble      ("flySpeedIncrement1", 0.128, -4, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        FLY_SPEED_INCREMENT_2               = new ConfigDouble      ("flySpeedIncrement2", -0.128, -4, 4).apply(GENERIC_KEY);
         public static final ConfigBoolean       FREE_CAMERA_PLAYER_INPUTS           = new ConfigBoolean     ("freeCameraPlayerInputs", false).apply(GENERIC_KEY);
         public static final ConfigBoolean       FREE_CAMERA_PLAYER_MOVEMENT         = new ConfigBoolean     ("freeCameraPlayerMovement", false).apply(GENERIC_KEY);
         public static final ConfigDouble        GAMMA_OVERRIDE_VALUE                = new ConfigDouble      ("gammaOverrideValue", 16, 0, 32).apply(GENERIC_KEY);
@@ -203,6 +205,8 @@ public class Configs implements IConfigHandler
                 FLY_SPEED_PRESET_2,
                 FLY_SPEED_PRESET_3,
                 FLY_SPEED_PRESET_4,
+                FLY_SPEED_INCREMENT_1,
+                FLY_SPEED_INCREMENT_2,
                 GAMMA_OVERRIDE_VALUE,
                 HAND_RESTOCK_PRE_THRESHOLD,
                 HOTBAR_SLOT_CYCLE_MAX,
