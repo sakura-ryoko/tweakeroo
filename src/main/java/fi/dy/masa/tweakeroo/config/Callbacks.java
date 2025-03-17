@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.config;
 
+import fi.dy.masa.malilib.config.options.ConfigDouble;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
@@ -61,6 +62,8 @@ public class Callbacks
         Hotkeys.FLY_PRESET_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.FLY_PRESET_3.getKeybind().setCallback(callbackGeneric);
         Hotkeys.FLY_PRESET_4.getKeybind().setCallback(callbackGeneric);
+        Hotkeys.FLY_INCREMENT_1.getKeybind().setCallback(callbackGeneric);
+        Hotkeys.FLY_INCREMENT_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.FREE_CAMERA_PLAYER_INPUTS.getKeybind().setCallback((action, key) ->
                                                                    {
                                                                        IConfigBoolean config = Configs.Generic.FREE_CAMERA_PLAYER_INPUTS;
@@ -350,6 +353,28 @@ public class Callbacks
             else if (key == Hotkeys.FLY_PRESET_4.getKeybind())
             {
                 this.setFlySpeedPreset(3);
+                return true;
+            }
+            else if (key == Hotkeys.FLY_INCREMENT_1.getKeybind())
+            {
+                ConfigDouble config = Configs.getActiveFlySpeedConfig();
+                double newValue = config.getDoubleValue() + (Configs.Generic.FLY_SPEED_INCREMENT_1.getDoubleValue());
+                config.setDoubleValue(newValue);
+
+                String strIndex = GuiBase.TXT_GREEN + (Configs.Internal.FLY_SPEED_PRESET.getIntegerValue() + 1) + GuiBase.TXT_RST;
+                String strValue = GuiBase.TXT_GREEN + String.format("%.3f", config.getDoubleValue()) + GuiBase.TXT_RST;
+                InfoUtils.printActionbarMessage("tweakeroo.message.set_fly_speed_to", strIndex, strValue);
+                return true;
+            }
+            else if (key == Hotkeys.FLY_INCREMENT_2.getKeybind())
+            {
+                ConfigDouble config = Configs.getActiveFlySpeedConfig();
+                double newValue = config.getDoubleValue() + (Configs.Generic.FLY_SPEED_INCREMENT_2.getDoubleValue());
+                config.setDoubleValue(newValue);
+
+                String strIndex = GuiBase.TXT_GREEN + (Configs.Internal.FLY_SPEED_PRESET.getIntegerValue() + 1) + GuiBase.TXT_RST;
+                String strValue = GuiBase.TXT_GREEN + String.format("%.3f", config.getDoubleValue()) + GuiBase.TXT_RST;
+                InfoUtils.printActionbarMessage("tweakeroo.message.set_fly_speed_to", strIndex, strValue);
                 return true;
             }
             else if (key == Hotkeys.HOTBAR_SCROLL.getKeybind())
