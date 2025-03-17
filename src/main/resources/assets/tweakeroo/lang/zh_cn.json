@@ -846,5 +846,13 @@
     "tweakeroo.message.value.off": "关闭",
     "tweakeroo.message.value.on": "开启",
     "tweakeroo.message.warning.block_type_break_restriction": "§6根据方块类型破坏限制，操作已被阻止",
-    "tweakeroo.message.warning.entity_type_attack_restriction": "§6根据实体类型攻击限制，操作已被阻止"
+    "tweakeroo.message.warning.entity_type_attack_restriction": "§6根据实体类型攻击限制，操作已被阻止",
+    "tweakeroo.config.generic.comment.flySpeedIncrement1": "How much the fly speed changes for increment 1",
+    "tweakeroo.config.generic.comment.flySpeedIncrement2": "How much the fly speed changes for increment 2",
+    "tweakeroo.config.generic.name.flySpeedIncrement1": "flySpeedIncrement1",
+    "tweakeroo.config.generic.name.flySpeedIncrement2": "flySpeedIncrement2",
+    "tweakeroo.config.hotkey.comment.flyIncrement1": "Change fly speed by increment 1",
+    "tweakeroo.config.hotkey.comment.flyIncrement2": "Change fly speed by increment 2",
+    "tweakeroo.config.hotkey.name.flyIncrement1": "flyIncrement1",
+    "tweakeroo.config.hotkey.name.flyIncrement2": "flyIncrement2"
 }
