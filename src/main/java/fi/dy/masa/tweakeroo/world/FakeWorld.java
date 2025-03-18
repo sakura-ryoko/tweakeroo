@@ -366,18 +366,6 @@ public class FakeWorld extends World
     }
 
     @Override
-    public void putMapState(MapIdComponent id, MapState state)
-    {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public MapIdComponent increaseAndGetMapId()
-    {
-        return null;
-    }
-
-    @Override
     public void setBlockBreakingInfo(int var1, BlockPos var2, int var3)
     {
         // TODO Auto-generated method stub

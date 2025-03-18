@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.util.CameraUtils;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity
@@ -90,6 +91,15 @@ public abstract class MixinPlayerEntity extends LivingEntity
                 double rangeRealMax = cir.getReturnValue() + 1.0;
                 cir.setReturnValue(Math.min(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
             }
+        }
+    }
+
+    @Inject(method = "isSpectator", at = @At("HEAD"), cancellable = true)
+    private void overrideIsSpectator(CallbackInfoReturnable<Boolean> cir)
+    {
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && CameraUtils.getFreeCameraSpectator())
+        {
+            cir.setReturnValue(true);
         }
     }
 }
