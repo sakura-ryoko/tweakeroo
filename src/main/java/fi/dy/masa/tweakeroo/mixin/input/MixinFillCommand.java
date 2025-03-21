@@ -1,10 +1,10 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.input;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.server.command.CloneCommand;
+import net.minecraft.server.command.FillCommand;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.IntRule;
 import net.minecraft.world.GameRules.Key;
@@ -12,8 +12,8 @@ import net.minecraft.world.GameRules.Key;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = CloneCommand.class, priority = 999)
-public abstract class MixinCloneCommand
+@Mixin(value = FillCommand.class, priority = 1001)
+public abstract class MixinFillCommand
 {
     @Redirect(method = "execute", require = 0,
               at = @At(value = "INVOKE",

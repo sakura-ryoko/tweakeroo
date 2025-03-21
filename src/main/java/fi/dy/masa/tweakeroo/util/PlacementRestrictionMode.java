@@ -1,7 +1,5 @@
 package fi.dy.masa.tweakeroo.util;
 
-import com.mojang.serialization.Codec;
-
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -21,12 +19,6 @@ public enum PlacementRestrictionMode implements IConfigOptionListEntry
     {
         this.configString = configString;
         this.unlocName = unlocName;
-    }
-
-    @Override
-    public Codec<PlacementRestrictionMode> codec()
-    {
-        return null;
     }
 
     @Override
