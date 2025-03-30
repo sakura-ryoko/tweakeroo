@@ -252,13 +252,11 @@ public class Configs implements IConfigHandler
     public static class Fixes
     {
         //public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false).apply(FIXES_KEY);
-        public static final ConfigBoolean ELYTRA_SPRINT_CANCEL              = new ConfigBoolean("elytraSprintCancel", false).apply(FIXES_KEY);
         public static final ConfigBoolean MAC_HORIZONTAL_SCROLL             = new ConfigBoolean("macHorizontalScroll", false).apply(FIXES_KEY);
         public static final ConfigBoolean RAVAGER_CLIENT_BLOCK_BREAK_FIX    = new ConfigBoolean("ravagerClientBlockBreakFix", false).apply(FIXES_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 //ELYTRA_FIX,
-                ELYTRA_SPRINT_CANCEL,
                 MAC_HORIZONTAL_SCROLL,
                 RAVAGER_CLIENT_BLOCK_BREAK_FIX
         );

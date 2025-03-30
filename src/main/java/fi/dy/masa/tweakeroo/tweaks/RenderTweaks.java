@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+
+import fi.dy.masa.malilib.render.RenderUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -30,7 +32,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -38,7 +40,6 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinPistonBlock;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.world.FakeChunk;
 import fi.dy.masa.tweakeroo.world.FakeWorld;
 
@@ -140,17 +141,11 @@ public class RenderTweaks
             Matrix4fStack globalStack = RenderSystem.getModelViewStack();
 
             globalStack.pushMatrix();
-            //matrices.push();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-            RenderSystem.disableDepthTest();
-            // RenderSystem.disableLighting();
-            // RenderSystem.depthMask(false);
-            // RenderSystem.disableTexture();
-            // RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
-
-            RenderSystem.enablePolygonOffset();
-            RenderSystem.polygonOffset(-1.2f, -0.2f);
+            fi.dy.masa.malilib.render.RenderUtils.blend(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(true);
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(-1.2f, -0.2f);
 
             if (FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE.getBooleanValue())
             {
@@ -160,17 +155,16 @@ public class RenderTweaks
             {
                 if (posLookingAt != null)
                 {
-                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, mc);
+                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking);
                 }
+
                 renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
             }
 
-            RenderSystem.polygonOffset(0f, 0f);
-            RenderSystem.disablePolygonOffset();
-            //matrices.pop();
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(0f, 0f);
+            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(false);
             globalStack.popMatrix();
-            // RenderSystem.enableTexture();
-            RenderSystem.depthMask(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
             profiler.pop();
         }
     }
@@ -184,11 +178,11 @@ public class RenderTweaks
         profiler.push("lists");
         for (ListMapEntry entry : SELECTIVE_BLACKLIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist, mc);
+            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist);
         }
         for (ListMapEntry entry : SELECTIVE_WHITELIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist, mc);
+            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist);
         }
         profiler.pop();
     }
@@ -345,29 +339,29 @@ public class RenderTweaks
         {
             if (pos1.equals(pos2) == false)
             {
-                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, mc);
+                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
 
-                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix, mc);
+                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix);
 
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, mc);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, mc);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
             }
             else
             {
                 RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, posMatrix, mc);
+                                                          colorOverlapping, posMatrix);
             }
         }
         else
         {
             if (pos1 != null)
             {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, mc);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
             }
 
             if (pos2 != null)
             {
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, mc);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
             }
         }
 
@@ -389,7 +383,7 @@ public class RenderTweaks
             return;
         }
 
-        Direction pushDirection = Direction.byId(data & 7);
+        Direction pushDirection = Direction.byIndex(data & 7);
 
         PistonHandler pistonHandler = new PistonHandler(world, pos, pushDirection, type == 0);
 

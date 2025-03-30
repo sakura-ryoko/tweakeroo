@@ -15,7 +15,7 @@ public enum PlacementRestrictionMode implements IConfigOptionListEntry
     private final String configString;
     private final String unlocName;
 
-    private PlacementRestrictionMode(String configString, String unlocName)
+    PlacementRestrictionMode(String configString, String unlocName)
     {
         this.configString = configString;
         this.unlocName = unlocName;

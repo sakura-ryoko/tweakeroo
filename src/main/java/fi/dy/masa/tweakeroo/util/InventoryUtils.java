@@ -1,20 +1,21 @@
 package fi.dy.masa.tweakeroo.util;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import fi.dy.masa.malilib.data.MaLiLibTag;
+import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.EquipmentUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.game.BlockUtils;
+import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,10 +23,11 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
@@ -39,17 +41,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.tuple.Pair;
 
-import fi.dy.masa.malilib.data.MaLiLibTag;
-import fi.dy.masa.malilib.gui.Message;
-import fi.dy.masa.malilib.util.EquipmentUtils;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
-import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class InventoryUtils
 {
@@ -255,7 +253,7 @@ public class InventoryUtils
     private static boolean isConfiguredRepairSlot(int slotNum, PlayerEntity player)
     {
         if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
-            (slotNum - 36) == player.getInventory().selectedSlot)
+            (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return true;
         }
@@ -271,7 +269,7 @@ public class InventoryUtils
     private static EquipmentSlot getEquipmentTypeForSlot(int slotNum, PlayerEntity player)
     {
         if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
-            (slotNum - 36) == player.getInventory().selectedSlot)
+            (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return EquipmentSlot.MAINHAND;
         }
@@ -296,7 +294,7 @@ public class InventoryUtils
     {
         switch (type)
         {
-            case MAINHAND:  return player != null ? player.getInventory().selectedSlot + 36 : -1;
+            case MAINHAND:  return player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
             case OFFHAND:   return 45;
             case HEAD:      return 5;
             case CHEST:     return 6;
@@ -356,7 +354,7 @@ public class InventoryUtils
             MinecraftClient mc = MinecraftClient.getInstance();
             ScreenHandler container = player.playerScreenHandler;
             int endSlot = allowHotbar ? 44 : 35;
-            int currentMainHandSlot = player.getInventory().selectedSlot + 36;
+            int currentMainHandSlot = player.getInventory().getSelectedSlot() + 36;
             int currentSlot = hand == Hand.MAIN_HAND ? currentMainHandSlot : 45;
 
             for (int slotNum = 9; slotNum <= endSlot; ++slotNum)
@@ -416,7 +414,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().selectedSlot) == false)
+            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
         {
             ScreenHandler container = player.playerScreenHandler;
             ItemPickerTest test;
@@ -432,7 +430,7 @@ public class InventoryUtils
 
             int slotNumber = findSlotWithBestItemMatch(container, test, UniformIntProvider.create(36, 44), UniformIntProvider.create(9, 35));
 
-            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().selectedSlot)
+            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().getSelectedSlot())
             {
                 swapToolToHand(slotNumber, mc);
                 PlacementTweaks.cacheStackInHand(Hand.MAIN_HAND);
@@ -478,8 +476,9 @@ public class InventoryUtils
         return hasEnoughDurability(testedStack) && isBetterWeapon(testedStack, previousTool, entity);
     }
 
-    private static float getBaseAttackDamage(ItemStack stack)
+    private static double getBaseAttackDamage(ItemStack stack)
     {
+        /*
         Item item = stack.getItem();
         if ((item instanceof SwordItem) == false && (item instanceof MiningToolItem) == false)
             return 0F;
@@ -500,6 +499,18 @@ public class InventoryUtils
         }
 
         return 0F;
+         */
+
+        Pair<Double, Double> pair = EquipmentUtils.getDamageAndSpeedAttributes(stack);
+
+        if (pair.getLeft() > 0)
+        {
+            return pair.getLeft();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     protected static boolean matchesWeaponMapping(ItemStack stack, Entity entity)
@@ -515,7 +526,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().selectedSlot) == false)
+            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
         {
             BlockState state = mc.world.getBlockState(pos);
             ScreenHandler container = player.playerScreenHandler;
@@ -532,13 +543,14 @@ public class InventoryUtils
 
             int slotNumber = findSlotWithBestItemMatch(container, test, UniformIntProvider.create(36, 44), UniformIntProvider.create(9, 35));
 
-            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().selectedSlot)
+            if (slotNumber != -1 && (slotNumber - 36) != player.getInventory().getSelectedSlot())
             {
                 swapToolToHand(slotNumber, mc);
             }
         }
     }
 
+    /*
     public static int getEnchantmentLevel(ItemStack stack, @Nonnull RegistryKey<Enchantment> enchantment)
     {
         ItemEnchantmentsComponent enchants = stack.getEnchantments();
@@ -558,6 +570,7 @@ public class InventoryUtils
 
         return -1;
     }
+     */
 
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
@@ -661,10 +674,10 @@ public class InventoryUtils
         int count = 0;
 
         // Core Tool Enchants
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
 
         return count >= 0;
     }
@@ -674,47 +687,43 @@ public class InventoryUtils
         int count = 0;
 
         // Core Weapon Enchantments
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
 
         // Damage Dealing
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SHARPNESS);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SMITE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BANE_OF_ARTHROPODS);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.POWER);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.IMPALING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.DENSITY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SHARPNESS);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SMITE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BANE_OF_ARTHROPODS);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.POWER);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.IMPALING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.DENSITY);
 
         // Support
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SWEEPING_EDGE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FIRE_ASPECT);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PUNCH);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.INFINITY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FLAME);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MULTISHOT);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.QUICK_CHARGE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PIERCING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.RIPTIDE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOYALTY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.CHANNELING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BREACH);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SWEEPING_EDGE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FIRE_ASPECT);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PUNCH);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.INFINITY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FLAME);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MULTISHOT);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.QUICK_CHARGE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PIERCING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.RIPTIDE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOYALTY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.CHANNELING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BREACH);
 
         return count >= 0;
     }
 
-    private static int hasSameOrBetterEnchantment(ItemStack testedStack, ItemStack previous, RegistryKey<Enchantment> enchantment)
-    {
-        return getEnchantmentLevel(testedStack, enchantment) - getEnchantmentLevel(previous, enchantment);
-    }
-
     protected static float getBaseBlockBreakingSpeed(ItemStack stack, BlockState state)
     {
-        float speed = stack.getMiningSpeedMultiplier(state);
+        //float speed = stack.getMiningSpeedMultiplier(state);
+        float speed = EquipmentUtils.getMiningSpeed(stack, state);
 
         if (speed > 1.0f)
         {
-            int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
+            int effLevel = EquipmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
 
             if (effLevel > 0)
             {
@@ -886,7 +895,7 @@ public class InventoryUtils
         if (stack.isEmpty() == false &&
             (stack.isDamageable() == false ||
              stack.isDamaged() == false ||
-             getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
+            EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
         {
             Slot slot = player.currentScreenHandler.getSlot(slotNum);
             int slotRepairableItem = findRepairableItemNotInRepairableSlot(slot, player);
@@ -913,9 +922,9 @@ public class InventoryUtils
                 ItemStack stack = slot.getStack();
 
                 // Don't take items from the current hotbar slot
-                if ((slot.id - 36) != player.getInventory().selectedSlot &&
+                if ((slot.id - 36) != player.getInventory().getSelectedSlot() &&
                     stack.isDamageable() && stack.isDamaged() && targetSlot.canInsert(stack) &&
-                    getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
+                    EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
                 {
                     return slot.id;
                 }
@@ -941,11 +950,11 @@ public class InventoryUtils
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
             if (!filter.test(testedStack)) return false;
             if (!filter.test(previousBestMatch)) return true;
-            if (getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
+            if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return true;
             }
-            if (getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) < getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
+            if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) < EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return false;
             }
@@ -968,9 +977,10 @@ public class InventoryUtils
         ScreenHandler container = player.currentScreenHandler;
         ItemStack currentStack = player.getEquippedStack(EquipmentSlot.CHEST);
 
-        Predicate<ItemStack> stackFilterChestPlate = (s) -> s.getItem() instanceof ArmorItem &&
+        Predicate<ItemStack> stackFilterChestPlate = (s) -> EquipmentUtils.matchArmorSlot(s, EquipmentSlot.CHEST);
+                //s.getItem() instanceof ArmorItem &&
                 //((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
-                s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
+                //s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
 
         if (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack))
         {
@@ -991,7 +1001,7 @@ public class InventoryUtils
                 {
                     return false;
                 }
-                return getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) <= getEnchantmentLevel(testedStack, Enchantments.PROTECTION);
+                return EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) <= EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.PROTECTION);
             }, UniformIntProvider.create(9, container.slots.size() - 1));
 
             if (targetSlot >= 0)
@@ -1084,12 +1094,12 @@ public class InventoryUtils
 
             if (hand == Hand.MAIN_HAND)
             {
-                int currentHotbarSlot = inventory.selectedSlot;
+                int currentHotbarSlot = inventory.getSelectedSlot();
 
                 if (isHotbarSlot(slotNumber))
                 {
-                    inventory.selectedSlot = slotNumber - 36;
-                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                    inventory.setSelectedSlot(slotNumber - 36);
+                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.getSelectedSlot()));
                 }
                 else
                 {
@@ -1132,20 +1142,20 @@ public class InventoryUtils
 
             if (isHotbarSlot(slotNumber))
             {
-                inventory.selectedSlot = slotNumber - 36;
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                inventory.setSelectedSlot(slotNumber - 36);
+                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.getSelectedSlot()));
             }
             else
             {
-                int selectedSlot = inventory.selectedSlot;
+                int selectedSlot = inventory.getSelectedSlot();
                 int hotbarSlot = getUsableHotbarSlotForTool(selectedSlot, TOOL_SWITCHABLE_SLOTS, container);
 
                 if (PlayerInventory.isValidHotbarIndex(hotbarSlot))
                 {
                     if (hotbarSlot != selectedSlot)
                     {
-                        inventory.selectedSlot = hotbarSlot;
-                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.selectedSlot));
+                        inventory.setSelectedSlot(hotbarSlot);
+                        mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(inventory.getSelectedSlot()));
                     }
 
                     mc.interactionManager.clickSlot(container.syncId, slotNumber, hotbarSlot, SlotActionType.SWAP, mc.player);
@@ -1168,7 +1178,13 @@ public class InventoryUtils
                 return currentHotbarSlot;
             }
 
+            /*
             if ((stack.getItem() instanceof MiningToolItem) == false)
+            {
+                nonTool = currentHotbarSlot;
+            }
+             */
+            if (EquipmentUtils.isRegularTool(stack) == false)
             {
                 nonTool = currentHotbarSlot;
             }
@@ -1183,7 +1199,8 @@ public class InventoryUtils
                 return hotbarSlot;
             }
 
-            if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
+            //if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
+            if (nonTool == -1 && EquipmentUtils.isRegularTool(stack) == false)
             {
                 nonTool = hotbarSlot;
             }
@@ -1219,18 +1236,18 @@ public class InventoryUtils
 
     private static boolean hasSameIshEnchantments(ItemStack stackReference, ItemStack stack)
     {
-        int level = getEnchantmentLevel(stackReference, Enchantments.SILK_TOUCH);
+        int level = EquipmentUtils.getEnchantmentLevel(stackReference, Enchantments.SILK_TOUCH);
 
         if (level > 0)
         {
-            return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) >= level;
+            return EquipmentUtils.getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) >= level;
         }
 
-        level = getEnchantmentLevel(stackReference, Enchantments.FORTUNE);
+        level = EquipmentUtils.getEnchantmentLevel(stackReference, Enchantments.FORTUNE);
 
         if (level > 0)
         {
-            return getEnchantmentLevel(stack, Enchantments.FORTUNE) >= level;
+            return EquipmentUtils.getEnchantmentLevel(stack, Enchantments.FORTUNE) >= level;
         }
 
         return true;
@@ -1257,7 +1274,7 @@ public class InventoryUtils
 
                 if (speed > 1.0f)
                 {
-                    int effLevel = getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
+                    int effLevel = EquipmentUtils.getEnchantmentLevel(stack, Enchantments.EFFICIENCY);
 
                     if (effLevel > 0)
                     {
@@ -1314,7 +1331,7 @@ public class InventoryUtils
                     mc.interactionManager.clickSlot(container.syncId, slot2.id, 0, SlotActionType.PICKUP, player);
 
                     // If the items didn't all fit, return the rest
-                    if (player.getInventory().getMainHandStack().isEmpty() == false)
+                    if (player.getInventory().getSelectedStack().isEmpty() == false)
                     {
                         mc.interactionManager.clickSlot(container.syncId, slot1.id, 0, SlotActionType.PICKUP, player);
                     }
@@ -1364,7 +1381,7 @@ public class InventoryUtils
 
         double reach = mc.player.getBlockInteractionRange();
         boolean isCreative = player.isCreative();
-        HitResult trace = player.raycast(reach, mc.getRenderTickCounter().getTickDelta(false), false);
+        HitResult trace = player.raycast(reach, mc.getRenderTickCounter().getTickProgress(false), false);
 
         if (trace != null && trace.getType() == HitResult.Type.BLOCK)
         {
@@ -1392,7 +1409,7 @@ public class InventoryUtils
                 if (isCreative)
                 {
                     inventory.swapStackWithHotbar(stack);
-                    mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.selectedSlot);
+                    mc.interactionManager.clickCreativeStack(player.getStackInHand(Hand.MAIN_HAND), 36 + inventory.getSelectedSlot());
                 }
                 else
                 {

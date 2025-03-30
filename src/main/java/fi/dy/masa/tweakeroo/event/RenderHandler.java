@@ -3,9 +3,10 @@ package fi.dy.masa.tweakeroo.event;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.Frustum;
@@ -26,9 +27,9 @@ import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.util.ActiveMode;
-import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -42,10 +43,12 @@ public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final MinecraftClient mc;
+    private Pair<Entity, NbtCompound> lastEnderItems;
 
     public RenderHandler()
     {
         this.mc = MinecraftClient.getInstance();
+        this.lastEnderItems = null;
     }
 
     public static RenderHandler getInstance()
@@ -146,9 +149,19 @@ public class RenderHandler implements IRenderer
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
                     {
                         inv = InventoryUtils.getPlayerEnderItemsFromNbt(pair.getRight(), world.getRegistryManager());
+                        this.lastEnderItems = pair;
+                    }
+                    else if (pair != null && pair.getLeft() instanceof PlayerEntity pe && !pe.getEnderChestInventory().isEmpty())
+                    {
+                        inv = pe.getEnderChestInventory();
+                    }
+                    else if (this.lastEnderItems != null)
+                    {
+                        inv = InventoryUtils.getPlayerEnderItemsFromNbt(this.lastEnderItems.getRight(), world.getRegistryManager());
                     }
                     else
                     {
+                        // Last Ditch effort
                         inv = player.getEnderChestInventory();
                     }
 
@@ -171,7 +184,8 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLastAdvanced(Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, Profiler profiler)
+    //public void onRenderWorldLastAdvanced(Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, Profiler profiler)
+    public void onRenderWorldLastAdvanced(Framebuffer fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, BufferBuilderStorage buffers, Profiler profiler)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -195,14 +209,11 @@ public class RenderHandler implements IRenderer
              Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld()))
         {
             BlockHitResult hitResult = (BlockHitResult) mc.crosshairTarget;
-            RenderSystem.depthMask(false);
-            RenderSystem.disableCull();
-            RenderSystem.disableDepthTest();
+            fi.dy.masa.malilib.render.RenderUtils.depthMask(false);
+            fi.dy.masa.malilib.render.RenderUtils.culling(false);
+            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
+            fi.dy.masa.malilib.render.RenderUtils.blend(true);
 
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-
-            // todo already updated in future versions, I just don't want to break existing
-            @SuppressWarnings("deprecation")
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
             fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
@@ -210,14 +221,12 @@ public class RenderHandler implements IRenderer
                     hitResult.getBlockPos(),
                     hitResult.getSide(),
                     hitResult.getPos(),
-                    color,
-                    posMatrix,
-                    mc);
+                    color, posMatrix);
 
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
-            RenderSystem.enableCull();
-            RenderSystem.depthMask(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthTest(true);
+            fi.dy.masa.malilib.render.RenderUtils.blend(false);
+            fi.dy.masa.malilib.render.RenderUtils.culling(true);
+            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
         }
     }
 }

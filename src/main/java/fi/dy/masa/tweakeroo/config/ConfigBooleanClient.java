@@ -1,10 +1,10 @@
 package fi.dy.masa.tweakeroo.config;
 
+import java.util.Objects;
+
 import fi.dy.masa.malilib.config.options.ConfigBooleanHotkeyed;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.StringUtils;
-
-import java.util.Objects;
 
 public class ConfigBooleanClient extends ConfigBooleanHotkeyed
 {

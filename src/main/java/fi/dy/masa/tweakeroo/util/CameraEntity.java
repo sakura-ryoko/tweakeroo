@@ -107,18 +107,23 @@ public class CameraEntity extends ClientPlayerEntity
 
     private void updateLastTickPosition()
     {
+        this.setLastPositionAndAngles(new Vec3d(this.getX(), this.getY(), this.getZ()), this.getYaw(), this.getPitch());
+        this.lastHeadYaw = this.headYaw;
+
+        // TODO why did Yarn break this?
+        //  Entity *IS* an enclosing class ?
+        /*
         this.lastRenderX = this.getX();
         this.lastRenderY = this.getY();
         this.lastRenderZ = this.getZ();
 
-        this.prevX = this.getX();
-        this.prevY = this.getY();
-        this.prevZ = this.getZ();
+        this.lastX = this.getX();
+        this.lastY = this.getY();
+        this.lastZ = this.getZ();
 
-        this.prevYaw = this.getYaw();
-        this.prevPitch = this.getPitch();
-
-        this.prevHeadYaw = this.headYaw;
+        this.lastYaw = this.getYaw();
+        this.lastPitch = this.getPitch();
+         */
     }
 
     public void setCameraRotations(float yaw, float pitch)
@@ -128,10 +133,10 @@ public class CameraEntity extends ClientPlayerEntity
 
         this.headYaw = yaw;
 
-        //this.prevRotationYaw = this.rotationYaw;
-        //this.prevRotationPitch = this.rotationPitch;
+        //this.lastRotationYaw = this.rotationYaw;
+        //this.lastRotationPitch = this.rotationPitch;
 
-        //this.prevRotationYawHead = this.rotationYaw;
+        //this.lastRotationYawHead = this.rotationYaw;
         //this.setRenderYawOffset(this.rotationYaw);
     }
 

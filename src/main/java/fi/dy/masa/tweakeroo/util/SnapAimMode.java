@@ -12,7 +12,7 @@ public enum SnapAimMode implements IConfigOptionListEntry
     private final String configString;
     private final String translationKey;
 
-    private SnapAimMode(String configString, String translationKey)
+    SnapAimMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;

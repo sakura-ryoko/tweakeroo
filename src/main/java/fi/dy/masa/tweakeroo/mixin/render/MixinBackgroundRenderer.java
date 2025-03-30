@@ -78,7 +78,7 @@ public abstract class MixinBackgroundRenderer
         {
             if (thickFog == false && wasLava == false)
             {
-                float distance = Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistance());
+                float distance = Math.max(512, MinecraftClient.getInstance().gameRenderer.getViewDistanceBlocks());
                 cir.setReturnValue(
                         new Fog(distance * 1.6F, distance * 2.0F, FogShape.CYLINDER,
                         v.x, v.y, v.z, v.w));

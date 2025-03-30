@@ -39,7 +39,6 @@ import fi.dy.masa.malilib.render.InventoryOverlay;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtBlockUtils;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.Reference;
@@ -398,7 +397,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         }
         else if (entity instanceof PlayerEntity player)
         {
-            inv = new SimpleInventory(player.getInventory().main.toArray(new ItemStack[36]));
+            inv = new SimpleInventory(player.getInventory().getMainStacks().toArray(new ItemStack[36]));
         }
         else if (entity instanceof VillagerEntity)
         {
@@ -422,7 +421,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Fix for empty horse inv
             if (inv != null &&
                 nbt.contains(NbtKeys.ITEMS) &&
-                nbt.getList(NbtKeys.ITEMS, Constants.NBT.TAG_COMPOUND).size() > 1)
+                nbt.getListOrEmpty(NbtKeys.ITEMS).size() > 1)
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
@@ -437,7 +436,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             // Fix for saddled horse, no inv
             else if (inv != null &&
-                     nbt.contains(NbtKeys.SADDLE))
+                     nbt.contains(NbtKeys.EQUIPMENT) && nbt.contains(NbtKeys.EATING_HAY))
             {
                 inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
                 inv = null;
@@ -445,7 +444,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Fix for empty Villager/Piglin inv
             else if (inv != null && inv.size() == 8 &&
                      nbt.contains(NbtKeys.INVENTORY) &&
-                     !nbt.getList(NbtKeys.INVENTORY, Constants.NBT.TAG_COMPOUND).isEmpty())
+                     !nbt.getListOrEmpty(NbtKeys.INVENTORY).isEmpty())
             {
                 inv2 = InventoryUtils.getNbtInventory(nbt, 8, entity.getRegistryManager());
                 inv = null;
