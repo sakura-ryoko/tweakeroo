@@ -119,7 +119,11 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     this.servuxServer = false;
                     HANDLER.unregisterPlayReceiver();
                 }
-                return;
+
+                if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+                {
+                    return;
+                }
             }
             else if (!DataManager.getInstance().hasIntegratedServer() &&
                     !this.hasServuxServer() &&
@@ -458,7 +462,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             // Refresh at 25%
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > this.getCacheRefresh())
                 {
@@ -472,7 +476,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
         {
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 this.pendingBlockEntitiesQueue.add(pos);
             }
@@ -503,7 +507,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             // Refresh at 25%
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 if (System.currentTimeMillis() - this.entityCache.get(entityId).getLeft() > this.getCacheRefresh())
                 {
@@ -515,7 +519,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             return this.entityCache.get(entityId).getRight();
         }
         if (!DataManager.getInstance().hasIntegratedServer() &&
-            FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
         {
             this.pendingEntitiesQueue.add(entityId);
         }
@@ -606,7 +610,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
         }
 
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
         {
             this.requestBlockEntity(world, pos);
         }
@@ -658,7 +662,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
         }
 
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
         {
             this.requestEntity(world, entityId);
         }
