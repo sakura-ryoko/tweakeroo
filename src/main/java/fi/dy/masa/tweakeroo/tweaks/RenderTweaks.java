@@ -142,10 +142,10 @@ public class RenderTweaks
 
             globalStack.pushMatrix();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            fi.dy.masa.malilib.render.RenderUtils.blend(true);
-            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
-            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(true);
-            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(-1.2f, -0.2f);
+//            fi.dy.masa.malilib.render.RenderUtils.blend(true);
+//            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
+//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(true);
+//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(-1.2f, -0.2f);
 
             if (FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE.getBooleanValue())
             {
@@ -155,16 +155,16 @@ public class RenderTweaks
             {
                 if (posLookingAt != null)
                 {
-                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking);
+                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, true);
                 }
 
                 renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
             }
 
-            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(0f, 0f);
-            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(false);
+//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(0f, 0f);
+//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(false);
             globalStack.popMatrix();
-            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
+//            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
             profiler.pop();
         }
     }
@@ -340,16 +340,14 @@ public class RenderTweaks
             if (pos1.equals(pos2) == false)
             {
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
-
                 RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix);
-
                 RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
                 RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
             }
             else
             {
                 RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, posMatrix);
+                                                          colorOverlapping, posMatrix, true);
             }
         }
         else

@@ -209,10 +209,10 @@ public class RenderHandler implements IRenderer
              Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld()))
         {
             BlockHitResult hitResult = (BlockHitResult) mc.crosshairTarget;
-            fi.dy.masa.malilib.render.RenderUtils.depthMask(false);
-            fi.dy.masa.malilib.render.RenderUtils.culling(false);
-            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
-            fi.dy.masa.malilib.render.RenderUtils.blend(true);
+//            fi.dy.masa.malilib.render.RenderUtils.depthMask(false);
+//            fi.dy.masa.malilib.render.RenderUtils.culling(false);
+//            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
+//            fi.dy.masa.malilib.render.RenderUtils.blend(true);
 
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
@@ -223,10 +223,10 @@ public class RenderHandler implements IRenderer
                     hitResult.getPos(),
                     color, posMatrix);
 
-            fi.dy.masa.malilib.render.RenderUtils.depthTest(true);
-            fi.dy.masa.malilib.render.RenderUtils.blend(false);
-            fi.dy.masa.malilib.render.RenderUtils.culling(true);
-            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
+//            fi.dy.masa.malilib.render.RenderUtils.depthTest(true);
+//            fi.dy.masa.malilib.render.RenderUtils.blend(false);
+//            fi.dy.masa.malilib.render.RenderUtils.culling(true);
+//            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
         }
     }
 }

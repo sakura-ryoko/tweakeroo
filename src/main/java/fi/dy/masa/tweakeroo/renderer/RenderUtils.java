@@ -368,7 +368,7 @@ public class RenderUtils
         float pitch = camera.getPitch();
         float yaw = camera.getYaw();
 
-        fi.dy.masa.malilib.render.RenderUtils.blend(true);
+//        fi.dy.masa.malilib.render.RenderUtils.blend(true);
         Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
         matrix4fStack.pushMatrix();
         matrix4fStack.mul(drawContext.getMatrices().peek().getPositionMatrix());
@@ -381,7 +381,7 @@ public class RenderUtils
 
         matrix4fStack.popMatrix();
         //RenderSystem.applyModelViewMatrix();
-        fi.dy.masa.malilib.render.RenderUtils.blend(false);
+//        fi.dy.masa.malilib.render.RenderUtils.blend(false);
     }
 
     public static void notifyRotationChanged()
