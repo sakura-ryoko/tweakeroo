@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin.block;
 
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -9,7 +10,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(net.minecraft.block.AbstractBlock.class)
+@Mixin(AbstractBlock.class)
 public interface IMixinAbstractBlock
 {
     @Mutable

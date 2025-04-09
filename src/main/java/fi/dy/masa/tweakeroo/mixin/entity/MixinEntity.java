@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
@@ -15,7 +17,7 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
 
-@Mixin(net.minecraft.entity.Entity.class)
+@Mixin(Entity.class)
 public abstract class MixinEntity
 {
     @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
@@ -24,6 +26,7 @@ public abstract class MixinEntity
     @Shadow private float pitch;
     @Shadow public float lastYaw;
     @Shadow public float lastPitch;
+
     @Unique private double forcedPitch;
     @Unique private double forcedYaw;
 

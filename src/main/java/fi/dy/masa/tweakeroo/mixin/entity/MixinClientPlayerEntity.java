@@ -36,6 +36,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Shadow public float lastNauseaIntensity;
     @Shadow public float nauseaIntensity;
     @Shadow private boolean falling;
+
     @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
     @Unique private Input realInput;
     @Unique private float realNauseaIntensity;

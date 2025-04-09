@@ -340,7 +340,7 @@ public class RenderTweaks
             if (pos1.equals(pos2) == false)
             {
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
-                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix);
+                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix, false);
                 RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
                 RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
             }

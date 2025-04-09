@@ -29,15 +29,11 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
 @Mixin(value = WorldRenderer.class, priority = 1001)
 public abstract class MixinWorldRenderer
 {
-    @Shadow
-    private int cameraChunkX;
-    @Shadow
-    private int cameraChunkZ;
+    @Shadow private int cameraChunkX;
+    @Shadow private int cameraChunkZ;
 
-    @Unique
-    private int lastUpdatePosX;
-    @Unique
-    private int lastUpdatePosZ;
+    @Unique private int lastUpdatePosX;
+    @Unique private int lastUpdatePosZ;
 
     @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
     private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, Vec3d vec3d, float f, Fog fog, CallbackInfo ci)
