@@ -81,8 +81,7 @@
     "world.MixinBuiltChunk",
     "world.MixinChunkBuilder_BuiltChunk",
     "world.MixinClientWorld",
-    "world.MixinClientWorld_Properties",
-    "world.MixinDimensionEffects_Nether"
+    "world.MixinClientWorld_Properties"
   ],
   "server": [],
   "mixinPriority": 990,

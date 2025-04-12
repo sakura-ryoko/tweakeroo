@@ -854,11 +854,11 @@ public class RenderTweaks
         public BlockPos pos2 = null;
     }
 
-    public static boolean onOpenScreen(Text name, ScreenHandlerType<?> screenHandlerType, int syncId)
-    {
-        LAST_CHECK = System.currentTimeMillis();
-        return true;
-    }
+//    public static boolean onOpenScreen(Text name, ScreenHandlerType<?> screenHandlerType, int syncId)
+//    {
+//        LAST_CHECK = System.currentTimeMillis();
+//        return true;
+//    }
 
     public static void loadFakeChunk(int x, int z)
     {
