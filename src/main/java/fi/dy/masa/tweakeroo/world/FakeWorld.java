@@ -59,7 +59,7 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 public class FakeWorld extends World
 {
     private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(Reference.MOD_ID, "selective_world"));
-    private static final ClientWorld.Properties LEVEL_INFO = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true, false);
+    private static final ClientWorld.Properties LEVEL_INFO = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
     private static final RegistryEntry<DimensionType> DIMENSION_TYPE = RenderTweaks.getDynamicRegistryManager().getEntryOrThrow(DimensionTypes.OVERWORLD);
 
     private final MinecraftClient mc;

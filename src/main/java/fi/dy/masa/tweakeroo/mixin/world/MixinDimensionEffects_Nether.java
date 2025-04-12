@@ -7,22 +7,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.render.DimensionEffects;
 import fi.dy.masa.tweakeroo.config.Configs;
 
-// TODO --> doesn't exist in Craftmine
-//@Mixin(DimensionEffects.Nether.class)
-public abstract class MixinDimensionEffects_Nether// extends DimensionEffects
+@Mixin(DimensionEffects.Nether.class)
+public abstract class MixinDimensionEffects_Nether extends DimensionEffects
 {
-//    private MixinDimensionEffects_Nether(float cloudsHeight, boolean alternateSkyColor,
-//                                         SkyType skyType, boolean shouldRenderSky, boolean darkened)
-//    {
-//        super(cloudsHeight, alternateSkyColor, skyType, shouldRenderSky, darkened);
-//    }
-//
-//    @Inject(method = "useThickFog", at = @At("HEAD"), cancellable = true)
-//    private void disableNetherFog(int x, int z, CallbackInfoReturnable<Boolean> cir)
-//    {
-//        if (Configs.Disable.DISABLE_NETHER_FOG.getBooleanValue())
-//        {
-//            cir.setReturnValue(false);
-//        }
-//    }
+    private MixinDimensionEffects_Nether(float cloudsHeight, boolean alternateSkyColor,
+                                         SkyType skyType, boolean shouldRenderSky, boolean darkened)
+    {
+        super(cloudsHeight, alternateSkyColor, skyType, shouldRenderSky, darkened);
+    }
+
+    @Inject(method = "useThickFog", at = @At("HEAD"), cancellable = true)
+    private void disableNetherFog(int x, int z, CallbackInfoReturnable<Boolean> cir)
+    {
+        if (Configs.Disable.DISABLE_NETHER_FOG.getBooleanValue())
+        {
+            cir.setReturnValue(false);
+        }
+    }
 }
