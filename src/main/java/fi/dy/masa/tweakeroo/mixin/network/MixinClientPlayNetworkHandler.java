@@ -44,14 +44,14 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
     /**
      * Copied From Tweak Fork by Andrew54757
      */
-    @Inject(method = "onOpenScreen", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_onOpenScreenListener(OpenScreenS2CPacket packet, CallbackInfo ci)
-    {
-        if (!RenderTweaks.onOpenScreen(packet.getName(), packet.getScreenHandlerType(), packet.getSyncId()))
-        {
-            ci.cancel();
-        }
-    }
+//    @Inject(method = "onOpenScreen", at = @At("HEAD"), cancellable = true)
+//    private void tweakeroo_onOpenScreenListener(OpenScreenS2CPacket packet, CallbackInfo ci)
+//    {
+//        if (!RenderTweaks.onOpenScreen(packet.getName(), packet.getScreenHandlerType(), packet.getSyncId()))
+//        {
+//            ci.cancel();
+//        }
+//    }
 
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At(
             value = "INVOKE",
