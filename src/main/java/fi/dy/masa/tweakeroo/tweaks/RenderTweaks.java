@@ -178,11 +178,11 @@ public class RenderTweaks
         profiler.push("lists");
         for (ListMapEntry entry : SELECTIVE_BLACKLIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist);
+            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist, false);
         }
         for (ListMapEntry entry : SELECTIVE_WHITELIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist);
+            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist, false);
         }
         profiler.pop();
     }
@@ -341,8 +341,8 @@ public class RenderTweaks
             {
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
                 RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix, false);
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
             }
             else
             {
@@ -354,12 +354,12 @@ public class RenderTweaks
         {
             if (pos1 != null)
             {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
             }
 
             if (pos2 != null)
             {
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
             }
         }
 
