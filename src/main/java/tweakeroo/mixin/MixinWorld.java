@@ -13,14 +13,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
 import malilib.util.game.wrap.GameWrap;
 import tweakeroo.config.Configs;
 import tweakeroo.config.DisableToggle;
@@ -42,8 +39,7 @@ public abstract class MixinWorld
 
             if (world.provider.hasSkyLight() && world.isRaining() == false)
             {
-                Minecraft mc = GameWrap.getClient();
-                cir.setReturnValue(world.getSkyColor(mc.getRenderViewEntity(), mc.getRenderPartialTicks()));
+                cir.setReturnValue(world.getSkyColor(GameWrap.getCameraEntity(), GameWrap.getRenderPartialTicks()));
             }
         }
     }

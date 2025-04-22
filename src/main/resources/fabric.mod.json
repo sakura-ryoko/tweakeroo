@@ -34,7 +34,7 @@
 
 	"depends": {
 		"minecraft": "1.12.x",
-		"malilib": ">=0.55.0",
+		"malilib": ">=0.61.0",
 		"osl-entrypoints": "*",
 		"osl-resource-loader": "*"
 	}

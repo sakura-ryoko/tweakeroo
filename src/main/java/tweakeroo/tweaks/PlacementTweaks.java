@@ -198,7 +198,7 @@ public class PlacementTweaks
             {
                 InventoryUtils.trySwapCurrentToolIfNearlyBroken(EnumHand.MAIN_HAND);
                 isEmulatedClick = true;
-                mc.entityRenderer.getMouseOver(mc.getRenderPartialTicks()); // Update the ray trace
+                mc.entityRenderer.getMouseOver(GameWrap.getRenderPartialTicks()); // Update the ray trace
 
                 HitResult trace = GameWrap.getHitResult();
 
@@ -317,7 +317,7 @@ public class PlacementTweaks
             final double reach = mc.playerController.getBlockReachDistance();
             final int maxCount = Configs.Generic.FAST_BLOCK_PLACEMENT_COUNT.getIntegerValue();
 
-            mc.objectMouseOver = player.rayTrace(reach, mc.getRenderPartialTicks());
+            mc.objectMouseOver = player.rayTrace(reach, GameWrap.getRenderPartialTicks());
 
             for (int i = 0; i < maxCount; ++i)
             {
@@ -359,7 +359,7 @@ public class PlacementTweaks
                     if (result == EnumActionResult.SUCCESS)
                     {
                         posLast = posNew;
-                        mc.objectMouseOver = player.rayTrace(reach, mc.getRenderPartialTicks());
+                        mc.objectMouseOver = player.rayTrace(reach, GameWrap.getRenderPartialTicks());
                     }
                     else
                     {

@@ -629,10 +629,9 @@ public class InventoryUtils
 
     public static void switchToPickedBlock()
     {
-        Minecraft mc  = GameWrap.getClient();
         EntityPlayer player = GameWrap.getClientPlayer();
-        double reach = GameWrap.getInteractionManager().getBlockReachDistance();
-        RayTraceResult trace = player.rayTrace(reach, mc.getRenderPartialTicks());
+        double reach = GameWrap.getPlayerReachDistance();
+        RayTraceResult trace = player.rayTrace(reach, GameWrap.getRenderPartialTicks());
 
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
