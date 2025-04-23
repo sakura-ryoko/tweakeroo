@@ -37,20 +37,20 @@ public class CameraEntity extends ClientPlayerEntity
         return true;
     }
 
-    /**
-     * Apparently, some mods complain about us not returning an entityId
-     * @return (id)
-     */
-    @Override
-    public int getId()
-    {
-        if (originalCameraEntity != null)
-        {
-            return originalCameraEntity.getId();
-        }
-
-        return super.getId();
-    }
+//    /**
+//     * Apparently, some mods complain about us not returning an entityId
+//     * @return (id)
+//     */
+//    @Override
+//    public int getId()
+//    {
+//        if (originalCameraEntity != null)
+//        {
+//            return originalCameraEntity.getId();
+//        }
+//
+//        return super.getId();
+//    }
 
     public static void movementTick()
     {
@@ -107,12 +107,7 @@ public class CameraEntity extends ClientPlayerEntity
 
     private void updateLastTickPosition()
     {
-        this.setLastPositionAndAngles(new Vec3d(this.getX(), this.getY(), this.getZ()), this.getYaw(), this.getPitch());
-        this.lastHeadYaw = this.headYaw;
-
-        // TODO why did Yarn break this?
-        //  Entity *IS* an enclosing class ?
-        /*
+//        this.setLastPositionAndAngles(new Vec3d(this.getX(), this.getY(), this.getZ()), this.getYaw(), this.getPitch());
         this.lastRenderX = this.getX();
         this.lastRenderY = this.getY();
         this.lastRenderZ = this.getZ();
@@ -123,7 +118,8 @@ public class CameraEntity extends ClientPlayerEntity
 
         this.lastYaw = this.getYaw();
         this.lastPitch = this.getPitch();
-         */
+
+        this.lastHeadYaw = this.headYaw;
     }
 
     public void setCameraRotations(float yaw, float pitch)
