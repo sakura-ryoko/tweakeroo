@@ -23,6 +23,7 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
 public abstract class MixinPlayerEntity extends LivingEntity
 {
     @Shadow protected abstract boolean clipAtLedge();
+    @Shadow public abstract boolean isPlayer();
 
     protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType_1, World world_1)
     {
@@ -30,7 +31,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
     }
 
     @Inject(method = "method_30263", at = @At("HEAD"), cancellable = true)
-    private void restore_1_15_2_sneaking(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_restore_1_15_2_sneaking(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_SNEAK_1_15_2.getBooleanValue())
         {
@@ -40,7 +41,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
 
     @Redirect(method = "adjustMovementForSneaking", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/entity/player/PlayerEntity;clipAtLedge()Z", ordinal = 0))
-    private boolean fakeSneaking(PlayerEntity entity)
+    private boolean tweakeroo_fakeSneaking(PlayerEntity entity)
     {
         if (FeatureToggle.TWEAK_FAKE_SNEAKING.getBooleanValue() && ((Object) this) instanceof ClientPlayerEntity)
         {
@@ -51,7 +52,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
     }
 
     @Inject(method = "getBlockInteractionRange", at = @At("RETURN"), cancellable = true)
-    private void overrideBlockReachDistance(CallbackInfoReturnable<Double> cir)
+    private void tweakeroo_overrideBlockReachDistance(CallbackInfoReturnable<Double> cir)
     {
         if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue())
         {
@@ -77,7 +78,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
     }
 
     @Inject(method = "getEntityInteractionRange", at = @At("RETURN"), cancellable = true)
-    private void overrideEntityReachDistance(CallbackInfoReturnable<Double> cir)
+    private void tweakeroo_overrideEntityReachDistance(CallbackInfoReturnable<Double> cir)
     {
         if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue())
         {
@@ -95,9 +96,11 @@ public abstract class MixinPlayerEntity extends LivingEntity
     }
 
     @Inject(method = "isSpectator", at = @At("HEAD"), cancellable = true)
-    private void overrideIsSpectator(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_overrideIsSpectator(CallbackInfoReturnable<Boolean> cir)
     {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && CameraUtils.getFreeCameraSpectator())
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+            CameraUtils.getFreeCameraSpectator() &&
+            (PlayerEntity) (Object) this instanceof ClientPlayerEntity)
         {
             cir.setReturnValue(true);
         }

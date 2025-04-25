@@ -1,21 +1,20 @@
 package fi.dy.masa.tweakeroo.mixin.hud;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.hud.PlayerListHud;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
+import net.minecraft.scoreboard.ScoreboardObjective;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.hud.PlayerListHud;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardDisplaySlot;
-import net.minecraft.scoreboard.ScoreboardObjective;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
@@ -26,15 +25,16 @@ public abstract class MixinInGameHud
     @Shadow @Final private PlayerListHud playerListHud;
     @Shadow @Final private MinecraftClient client;
 
-    @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
-    private void overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
-    {
-        // Fix the hotbar rendering in the Free Camera mode by using the actual player
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null)
-        {
-            cir.setReturnValue(this.client.player);
-        }
-    }
+//    @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
+//    private void overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
+//    {
+//        // Fix the hotbar rendering in the Free Camera mode by using the actual player
+//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null
+//            && GuiBase.isAltDown())
+//        {
+//            cir.setReturnValue(this.client.player);
+//        }
+//    }
 
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z", ordinal = 0), cancellable = true)

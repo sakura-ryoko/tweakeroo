@@ -1,5 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -7,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -20,13 +23,16 @@ import fi.dy.masa.tweakeroo.util.SnapAimMode;
 @Mixin(Entity.class)
 public abstract class MixinEntity
 {
-    @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
-    @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
+    @Shadow public abstract Vec3d getVelocity();
+    @Shadow public abstract void setVelocity(Vec3d velocity);
     @Shadow private float yaw;
     @Shadow private float pitch;
     @Shadow public float lastYaw;
     @Shadow public float lastPitch;
 
+    @Shadow protected abstract void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition);
+
+    @Shadow public boolean noClip;
     @Unique private double forcedPitch;
     @Unique private double forcedYaw;
 
@@ -53,7 +59,7 @@ public abstract class MixinEntity
                    motion = (speed > 1.0D ? motion.normalize() : motion).multiply((double) float_1);
                    double xFactor = Math.sin(this.yaw * Math.PI / 180D);
                    double zFactor = Math.cos(this.yaw * Math.PI / 180D);
-                   net.minecraft.util.math.Vec3d change = new net.minecraft.util.math.Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
+                   Vec3d change = new Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
 
                    this.setVelocity(this.getVelocity().add(change));
                 }
@@ -150,4 +156,42 @@ public abstract class MixinEntity
             this.forcedPitch = net.minecraft.util.math.MathHelper.clamp(this.forcedPitch + pitchChange * 0.15D, -pitchLimit, pitchLimit);
         }
     }
+
+//    @Inject(method = "isSpectator", at = @At("HEAD"), cancellable = true)
+//    private void tweakeroo_checkSpectator(CallbackInfoReturnable<Boolean> cir)
+//    {
+//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+//        {
+//            cir.setReturnValue(true);
+//        }
+//    }
+//
+//    @Inject(method = "isPushable", at = @At("HEAD"), cancellable = true)
+//    private void tweakeroo_checkEntityPushable1(CallbackInfoReturnable<Boolean> cir)
+//    {
+//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+//        {
+//            cir.setReturnValue(false);
+//        }
+//    }
+//
+//    @Inject(method = "isPushedByFluids", at = @At("HEAD"), cancellable = true)
+//    private void tweakeroo_checkEntityPushable2(CallbackInfoReturnable<Boolean> cir)
+//    {
+//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+//        {
+//            cir.setReturnValue(false);
+//        }
+//    }
+//
+//    @Inject(method = "pushAwayFrom", at = @At("HEAD"), cancellable = true)
+//    private void tweakeroo_checkEntityPush(Entity entity, CallbackInfo ci)
+//    {
+//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+//            entity instanceof ClientPlayerEntity cli)
+//        {
+//            Tweakeroo.LOGGER.warn("tweakeroo_checkEntityPush(): instanceof [{}] -- noclip [{}]", cli instanceof CameraEntity, this.noClip);
+//            ci.cancel();
+//        }
+//    }
 }

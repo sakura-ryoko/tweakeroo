@@ -440,12 +440,14 @@ public class InventoryUtils
 
     private static boolean isBetterWeapon(ItemStack testedStack, ItemStack previousWeapon, Entity entity)
     {
-        if (previousWeapon.isEmpty())
+        boolean isWeapon = EquipmentUtils.isAnyWeapon(testedStack);
+
+        if (previousWeapon.isEmpty() && isWeapon)
         {
             return true;
         }
 
-        if (testedStack.isEmpty() == false)
+        if (testedStack.isEmpty() == false && isWeapon)
         {
             if (matchesWeaponMapping(testedStack, entity))
             {
@@ -574,24 +576,29 @@ public class InventoryUtils
 
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
-        if (previousTool.isEmpty())
+        boolean isTool = EquipmentUtils.isAnyTool(testedStack);
+
+//        Tweakeroo.LOGGER.warn("isBetterTool(): test [{}], prev [{}], state [{}]", testedStack.toString(), previousTool.toString(), state.toString());
+
+        if (previousTool.isEmpty() && isTool &&
+            !state.isOf(Blocks.BAMBOO))
         {
             return true;
         }
 
         if (state.isOf(Blocks.BAMBOO))
         {
-            if (EquipmentUtils.isMeleeWeapon(testedStack))
+            if (EquipmentUtils.isSword(testedStack))
             {
                 return true;
             }
-            else if (EquipmentUtils.isMeleeWeapon(previousTool))
+            else if (EquipmentUtils.isSword(previousTool))
             {
                 return false;
             }
         }
 
-        if (testedStack.isEmpty() == false)
+        if (testedStack.isEmpty() == false && isTool)
         {
             if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() &&
                 EquipmentUtils.hasSilkTouch(testedStack) &&
