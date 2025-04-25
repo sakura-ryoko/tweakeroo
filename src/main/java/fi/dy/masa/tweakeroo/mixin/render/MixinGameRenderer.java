@@ -2,6 +2,8 @@ package fi.dy.masa.tweakeroo.mixin.render;
 
 import java.util.function.Predicate;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
