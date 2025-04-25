@@ -1,5 +1,5 @@
 {
-    "modmenu.descriptionTranslation.tweakeroo": "Adds a bunch of configurable client-side tweaks",
+    "modmenu.descriptionTranslation.tweakeroo": "添加了一些可配置的客户端开关",
     "tweakeroo.config.disable.comment.disableArmorStandRendering": "禁用所有盔甲架的渲染",
     "tweakeroo.config.disable.comment.disableAxeStripping": "禁用使用斧头剥离原木等方块",
     "tweakeroo.config.disable.comment.disableBatSpawning": "在单人游戏中禁用蝙蝠生成",

@@ -1,5 +1,5 @@
 {
-    "modmenu.descriptionTranslation.tweakeroo": "Adds a bunch of configurable client-side tweaks",
+    "modmenu.descriptionTranslation.tweakeroo": "설정 가능한 다양한 클라이언트 측 트윅을 추가합니다.",
     "tweakeroo.config.disable.comment.disableArmorStandRendering": "모든 갑옷 거치대 엔티티 렌더링을 비활성화합니다.",
     "tweakeroo.config.disable.comment.disableAxeStripping": "도끼로 원목 벗기기 기능을 비활성화합니다.",
     "tweakeroo.config.disable.comment.disableBatSpawning": "싱글 플레이어에서 박쥐 생성을 비활성화합니다.",
