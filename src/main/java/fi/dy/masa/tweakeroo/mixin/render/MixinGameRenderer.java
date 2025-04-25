@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import java.util.function.Predicate;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
@@ -16,13 +17,6 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
 
 import fi.dy.masa.tweakeroo.config.Callbacks;
 import fi.dy.masa.tweakeroo.config.Configs;
