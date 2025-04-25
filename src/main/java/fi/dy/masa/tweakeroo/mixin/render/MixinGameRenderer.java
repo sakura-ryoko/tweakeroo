@@ -1,9 +1,14 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import java.util.function.Predicate;
-
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.block.enums.CameraSubmersionType;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,13 +17,6 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
 
 import fi.dy.masa.tweakeroo.config.Callbacks;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -70,18 +68,18 @@ public abstract class MixinGameRenderer
         return !FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && value;
     }
 
-    @ModifyExpressionValue(
-            method = "getFov",  at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/render/Camera;getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;"))
-    private CameraSubmersionType ignoreSubmersionTypeOnFreeCamera(CameraSubmersionType original)
-    {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
-        {
-            return CameraSubmersionType.NONE;
-        }
-
-        return original;
-    }
+//    @ModifyExpressionValue(
+//            method = "getFov",  at = @At(value = "INVOKE",
+//            target = "Lnet/minecraft/client/render/Camera;getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;"))
+//    private CameraSubmersionType ignoreSubmersionTypeOnFreeCamera(CameraSubmersionType original)
+//    {
+//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+//        {
+//            return CameraSubmersionType.NONE;
+//        }
+//
+//        return original;
+//    }
 
     @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
@@ -162,6 +160,7 @@ public abstract class MixinGameRenderer
     @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
     private void removeHandRendering(CallbackInfo ci)
     {
+        // todo -- add feature
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
             ci.cancel();
