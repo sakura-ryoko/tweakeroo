@@ -58,7 +58,6 @@ public class InventoryUtils
     private static final HashSet<Item> UNSTACKING_ITEMS = new HashSet<>();
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
-    //private static final List<String> PREFER_SILK_TOUCH = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
 
     public static void setToolSwitchableSlots(String configStr)
@@ -70,14 +69,6 @@ public class InventoryUtils
     {
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
     }
-
-    /*
-    public static void setPreferSilkTouchList(List<String> names)
-    {
-        PREFER_SILK_TOUCH.clear();
-        PREFER_SILK_TOUCH.addAll(names);
-    }
-     */
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
     {
@@ -421,6 +412,12 @@ public class InventoryUtils
             ScreenHandler container = player.playerScreenHandler;
             ItemPickerTest test;
 
+            // Ignore the MACE weapon when equipped.  Do not swap.
+            if (player.getMainHandStack().isOf(Items.MACE))
+            {
+                return;
+            }
+
             if (FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue())
             {
                 test = (currentStack, previous) -> InventoryUtils.isBetterWeaponAndHasDurability(currentStack, previous, entity);
@@ -451,24 +448,35 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false && isWeapon)
         {
-            if (matchesWeaponMapping(testedStack, entity))
-            {
-                if (!matchesWeaponMapping(previousWeapon, entity))
-                {
-                    return true;
-                }
-                if (getBaseAttackDamage(testedStack) > getBaseAttackDamage(previousWeapon))
-                {
-                    return true;
-                }
+            final boolean mapping = matchesWeaponMapping(testedStack, entity);
 
-                if (getBaseAttackDamage(testedStack) == getBaseAttackDamage(previousWeapon))
-                {
-                    if (Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue())
-                    {
-                        return hasTheSameOrBetterRarity(testedStack, previousWeapon) && hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon);
-                    }
-                }
+            if (!matchesWeaponMapping(previousWeapon, entity))
+            {
+                return true;
+            }
+
+            // Ignore the Mace by default
+            if (!mapping || testedStack.isOf(Items.MACE))
+            {
+                return false;
+            }
+
+            final boolean isRanged = EquipmentUtils.isRangedWeapon(testedStack);
+            final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon) : true;
+            final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousWeapon);
+            final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousWeapon);
+
+            final double tested = getBaseAttackDamage(testedStack);
+            final double prev = getBaseAttackDamage(previousWeapon);
+
+            if (tested > prev)
+            {
+                return rarity || mats;
+            }
+
+            if (tested == prev)
+            {
+                return (rarity || mats) && enchants;
             }
         }
 
@@ -564,8 +572,8 @@ public class InventoryUtils
     private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
         boolean isTool = EquipmentUtils.isAnyTool(testedStack);
-
-//        Tweakeroo.LOGGER.warn("isBetterTool(): test [{}], prev [{}], state [{}]", testedStack.toString(), previousTool.toString(), state.toString());
+        boolean isMisc = EquipmentUtils.isMiscTool(testedStack);
+//        Tweakeroo.LOGGER.error("isBetterTool(): test [{}], prev [{}], state [{}]", testedStack.toString(), previousTool.toString(), state.toString());
 
         if (previousTool.isEmpty() && isTool &&
             !state.isOf(Blocks.BAMBOO))
@@ -587,19 +595,36 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false && isTool)
         {
-            if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() &&
-                EquipmentUtils.hasSilkTouch(testedStack) &&
-                state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH))
+            if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH))
             {
-                return hasTheSameOrBetterMaterial(testedStack, previousTool);
+                final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
+
+                if (EquipmentUtils.hasSilkTouch(testedStack))
+                {
+                    final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+                    final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
+                    final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+                    final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+
+//                    System.out.print ("   (SilkTouchFirst)");
+//                    System.out.printf("   Mats result: %s", mats);
+//                    System.out.printf("   Rarity result: %s", rarity);
+//                    System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
+
+                    if (testSpeed > prevSpeed)
+                    {
+                        return true;
+                    }
+                    else if (testSpeed == prevSpeed)
+                    {
+                        return isMisc ? !prevSilk : (rarity && mats);
+                    }
+                }
+                else if (prevSilk && !EquipmentUtils.hasSilkTouch(testedStack))
+                {
+                    return false;
+                }
             }
-            /*
-            else if (testedStack.getItem() instanceof ShearsItem &&
-                    state.isIn(MaLiLibTag.Blocks.NEEDS_SHEARS))
-            {
-                return getBaseBlockBreakingSpeed(testedStack, state) >= getBaseBlockBreakingSpeed(previousTool, state);
-            }
-             */
 
             return isBetterToolEach(testedStack, previousTool, state);
         }
@@ -609,18 +634,33 @@ public class InventoryUtils
 
     private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
-        if (getBaseBlockBreakingSpeed(testedStack, state) > getBaseBlockBreakingSpeed(previousTool, state))
+        final boolean correct = EquipmentUtils.isCorrectTool(testedStack, state);
+
+        if (!correct)
         {
-            return EquipmentUtils.isCorrectTool(testedStack, state);
+            return false;
         }
-        else if (getBaseBlockBreakingSpeed(testedStack, state) == getBaseBlockBreakingSpeed(previousTool, state))
+
+        final boolean isMisc = EquipmentUtils.isMiscTool(testedStack);
+        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
+        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+        final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+
+//        System.out.printf("   Enchant result: %s", enchants);
+//        System.out.printf("   Mats result: %s", mats);
+//        System.out.printf("   Rarity result: %s", rarity);
+//        System.out.printf("   CorrectTool result: %s", correct);
+//        System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
+
+        if (testSpeed > prevSpeed)
         {
-            if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
-            {
-                return hasTheSameOrBetterRarity(testedStack, previousTool) &&
-                       hasSameOrBetterToolEnchantments(testedStack, previousTool) &&
-                       EquipmentUtils.isCorrectTool(testedStack, state);
-            }
+            return (rarity || mats) && correct;
+        }
+        else if (testSpeed == prevSpeed)
+        {
+            return isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
         }
 
         return false;
@@ -633,12 +673,26 @@ public class InventoryUtils
 
     private static boolean hasTheSameOrBetterRarity(ItemStack testedStack, ItemStack previousTool)
     {
-        return testedStack.getRarity().compareTo(previousTool.getRarity()) >= 0;
+        return Integer.compare(getRarityWeight(testedStack), getRarityWeight(previousTool)) >= 0;
+    }
+
+    private static int getRarityWeight(ItemStack stack)
+    {
+        // Because using the Vanilla methods, doesn't seem to work right.
+        switch (stack.getRarity())
+        {
+            case EPIC -> { return 4; }
+            case RARE -> { return 3; }
+            case UNCOMMON -> { return 2; }
+            case COMMON -> { return 1; }
+            case null -> { return -1; }
+            default -> { return 0; }
+        }
     }
 
     private static boolean hasTheSameOrBetterMaterial(ItemStack testedStack, ItemStack previousTool)
     {
-        return Integer.compare(getMaterialWeight(testedStack), getMaterialWeight(previousTool)) > 0;
+        return Integer.compare(getMaterialWeight(testedStack), getMaterialWeight(previousTool)) >= 0;
     }
 
     private static int getMaterialWeight(ItemStack stack)
