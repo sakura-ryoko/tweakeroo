@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.entity;
+package fi.dy.masa.tweakeroo.mixin.network;
 
 import net.minecraft.client.network.DataQueryHandler;
 import net.minecraft.nbt.NbtCompound;

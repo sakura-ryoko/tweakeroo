@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -25,20 +27,19 @@ public abstract class MixinInGameHud
     @Shadow @Final private PlayerListHud playerListHud;
     @Shadow @Final private MinecraftClient client;
 
-//    @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
-//    private void overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
-//    {
-//        // Fix the hotbar rendering in the Free Camera mode by using the actual player
-//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null
-//            && GuiBase.isAltDown())
-//        {
-//            cir.setReturnValue(this.client.player);
-//        }
-//    }
+    @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
+    {
+        // Fix the hotbar rendering in the Free Camera mode by using the actual player
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null)
+        {
+            cir.setReturnValue(this.client.player);
+        }
+    }
 
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z", ordinal = 0), cancellable = true)
-    private void overrideCursorRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void tweakeroo_overrideCursorRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
         {
@@ -51,7 +52,7 @@ public abstract class MixinInGameHud
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
                      ordinal = 1, shift = At.Shift.AFTER))
-    private void alwaysRenderPlayerList(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void tweakeroo_alwaysRenderPlayerList(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue())
         {
@@ -65,7 +66,7 @@ public abstract class MixinInGameHud
 
     @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
             at = @At("HEAD"), cancellable = true)
-    private void disableScoreboardRendering(CallbackInfo ci)
+    private void tweakeroo_disableScoreboardRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_SCOREBOARD_RENDERING.getBooleanValue())
         {
@@ -74,7 +75,7 @@ public abstract class MixinInGameHud
     }
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
-    private void disableStatusEffectHudRendering(CallbackInfo ci)
+    private void tweakeroo_disableStatusEffectHudRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_STATUS_EFFECT_HUD.getBooleanValue())
         {

@@ -32,7 +32,7 @@ public abstract class MixinEntity
 
     @Shadow protected abstract void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition);
 
-    @Shadow public boolean noClip;
+//    @Shadow public boolean noClip;
     @Unique private double forcedPitch;
     @Unique private double forcedYaw;
 
@@ -157,15 +157,7 @@ public abstract class MixinEntity
         }
     }
 
-//    @Inject(method = "isSpectator", at = @At("HEAD"), cancellable = true)
-//    private void tweakeroo_checkSpectator(CallbackInfoReturnable<Boolean> cir)
-//    {
-//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
-//        {
-//            cir.setReturnValue(true);
-//        }
-//    }
-//
+    // fixme, doesn't work --> Tries to make player immovable.
 //    @Inject(method = "isPushable", at = @At("HEAD"), cancellable = true)
 //    private void tweakeroo_checkEntityPushable1(CallbackInfoReturnable<Boolean> cir)
 //    {

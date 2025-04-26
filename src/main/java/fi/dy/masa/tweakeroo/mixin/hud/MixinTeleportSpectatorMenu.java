@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.hud;
 
 import java.util.Collection;
 import java.util.Comparator;

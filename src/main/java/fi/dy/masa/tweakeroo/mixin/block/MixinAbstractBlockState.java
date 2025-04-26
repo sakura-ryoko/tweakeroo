@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public class MixinAbstractBlockState
 {
+    // todo this has the same effect as noClip; and causes your player to fall through the world.
 //    @Inject(method = "getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",
 //            at = @At("HEAD"), cancellable = true)
 //    private void tweakeroo_checkCollisionState(BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
