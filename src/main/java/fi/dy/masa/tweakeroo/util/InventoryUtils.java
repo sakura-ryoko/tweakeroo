@@ -566,21 +566,49 @@ public class InventoryUtils
         {
             if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH))
             {
+//                if (EquipmentUtils.hasSilkTouch(testedStack))
+//                {
+//                    if (hasTheSameOrBetterMaterial(testedStack, previousTool))
+//                    {
+//                        return true;
+//                    }
+//                    // For tools that happen to have Silk Touch on them; such as Shears.
+//                    // Not sure why you would want to use Shears on Glass for; but it
+//                    // can also be used for Leaves, etc; so we'll just put this here.
+//                    else if (isMisc)
+//                    {
+//                        return getBaseBlockBreakingSpeed(testedStack, state) >= getBaseBlockBreakingSpeed(previousTool, state);
+//                    }
+//                }
+//                else if (EquipmentUtils.hasSilkTouch(previousTool) && !EquipmentUtils.hasSilkTouch(testedStack))
+//                {
+//                    return false;
+//                }
+
+                final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
+
                 if (EquipmentUtils.hasSilkTouch(testedStack))
                 {
-                    if (hasTheSameOrBetterMaterial(testedStack, previousTool))
+                    final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+                    final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
+                    final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+                    final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+
+//                    System.out.print ("   (SilkTouchFirst)");
+//                    System.out.printf("   Mats result: %s", mats);
+//                    System.out.printf("   Rarity result: %s", rarity);
+//                    System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
+
+                    if (testSpeed > prevSpeed)
                     {
                         return true;
                     }
-                    // For tools that happen to have Silk Touch on them; such as Shears.
-                    // Not sure why you would want to use Shears on Glass for; but it
-                    // can also be used for Leaves, etc; so we'll just put this here.
-                    else if (isMisc)
+                    else if (testSpeed == prevSpeed)
                     {
-                        return getBaseBlockBreakingSpeed(testedStack, state) >= getBaseBlockBreakingSpeed(previousTool, state);
+                        return isMisc ? !prevSilk : (rarity && mats);
                     }
                 }
-                else if (EquipmentUtils.hasSilkTouch(previousTool) && !EquipmentUtils.hasSilkTouch(testedStack))
+                else if (prevSilk && !EquipmentUtils.hasSilkTouch(testedStack))
                 {
                     return false;
                 }
