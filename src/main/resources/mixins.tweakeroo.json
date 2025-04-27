@@ -3,6 +3,7 @@
     "package": "fi.dy.masa.tweakeroo.mixin",
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_21",
+    "mixins": [],
     "client": [
         "IMixinSimpleOption",
         "MixinMinecraftClient",
@@ -16,6 +17,7 @@
         "block.MixinPistonBlock",
         "block.MixinScaffoldingBlock",
         "block.MixinSculkSensor",
+        "block.MixinShulkerBoxBlock",
         "block.MixinSignBlockEntity",
         "block.MixinSlimeBlock",
         "block.MixinStructureBlockBlockEntity",
@@ -86,5 +88,5 @@
     "mixinPriority": 990,
     "injectors": {
         "defaultRequire": 0
-  }
+    }
 }
