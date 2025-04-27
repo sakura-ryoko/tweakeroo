@@ -3,6 +3,7 @@
     "package": "fi.dy.masa.tweakeroo.mixin",
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_21",
+    "mixins": [],
     "client": [
         "IMixinSimpleOption",
         "MixinMinecraftClient",
@@ -16,6 +17,7 @@
         "block.MixinPistonBlock",
         "block.MixinScaffoldingBlock",
         "block.MixinSculkSensor",
+        "block.MixinShulkerBoxBlock",
         "block.MixinSignBlockEntity",
         "block.MixinSlimeBlock",
         "block.MixinStructureBlockBlockEntity",
@@ -33,7 +35,6 @@
         "hud.MixinChatHud",
         "hud.MixinClientBossBar",
         "hud.MixinInGameHud",
-        "hud.MixinStatusEffectsDisplay",
         "hud.MixinTeleportSpectatorMenu",
         "input.MixinClientCommandSource",
         "input.MixinCloneCommand",
@@ -57,16 +58,16 @@
         "render.MixinBlockEntityRenderDispatcher",
         "render.MixinCamera",
         "render.MixinEntityRenderDispatcher",
-        "render.MixinExplosionEmitterParticle",
+        "render.MixinExplosion",
         "render.MixinGameRenderer",
         "render.MixinGameRenderer_ViewBob",
         "render.MixinHeldItemRenderer",
         "render.MixinMobSpawnerBlockEntityRenderer",
         "render.MixinParticleManager",
-        "render.MixinWeatherRendering",
         "render.MixinWindow",
         "render.MixinWorldRenderer",
         "screen.IMixinCustomizeFlatLevelScreen",
+        "screen.MixinAbstractInventoryScreen",
         "screen.MixinAbstractSignEditScreen",
         "screen.MixinChatScreen",
         "screen.MixinCommandBlockScreen",
@@ -86,5 +87,5 @@
     "mixinPriority": 990,
     "injectors": {
         "defaultRequire": 0
-  }
+    }
 }

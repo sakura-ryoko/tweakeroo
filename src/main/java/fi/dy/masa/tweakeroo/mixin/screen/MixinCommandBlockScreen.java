@@ -4,6 +4,7 @@ import java.util.Arrays;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,18 +27,15 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 @Mixin(CommandBlockScreen.class)
 public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
 {
-    @Shadow
-    @Final
-    private CommandBlockBlockEntity blockEntity;
-
+    @Shadow @Final private CommandBlockBlockEntity blockEntity;
     @Shadow private CyclingButtonWidget<CommandBlockBlockEntity.Type> modeButton;
     @Shadow private CyclingButtonWidget<Boolean> conditionalModeButton;
     @Shadow private CyclingButtonWidget<Boolean> redstoneTriggerButton;
 
-    private TextFieldWidget textFieldName;
-    private CyclingButtonWidget<Boolean> buttonUpdateExec;
-    private boolean updateExecValue;
-    private String lastName = "";
+    @Unique private TextFieldWidget textFieldName;
+    @Unique private CyclingButtonWidget<Boolean> buttonUpdateExec;
+    @Unique private boolean updateExecValue;
+    @Unique private String lastName = "";
 
     @Inject(method = "init", at = @At("RETURN"))
     private void addExtraFields(CallbackInfo ci)

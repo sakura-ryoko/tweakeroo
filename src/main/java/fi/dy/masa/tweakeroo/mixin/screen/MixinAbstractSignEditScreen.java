@@ -33,9 +33,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
 
     @Shadow @Final private SignBlockEntity blockEntity;
     @Shadow private SignText text;
-
     @Shadow @Final private boolean front;
-
     @Shadow @Final private String[] messages;
 
     @Override

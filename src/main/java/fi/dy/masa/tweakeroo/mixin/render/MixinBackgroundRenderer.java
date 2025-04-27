@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -15,7 +16,7 @@ import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 @Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer
 {
-    private static boolean wasLava;
+    @Unique private static boolean wasLava;
 
     @ModifyConstant(
             method = "applyFog",
