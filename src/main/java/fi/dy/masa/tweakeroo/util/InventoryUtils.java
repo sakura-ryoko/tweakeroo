@@ -564,7 +564,9 @@ public class InventoryUtils
 
         if (testedStack.isEmpty() == false && isTool)
         {
-            if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH))
+            if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH)) ||
+                (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && state.isIn(MaLiLibTag.Blocks.ORE_BLOCKS) &&
+                EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
             {
 //                if (EquipmentUtils.hasSilkTouch(testedStack))
 //                {
