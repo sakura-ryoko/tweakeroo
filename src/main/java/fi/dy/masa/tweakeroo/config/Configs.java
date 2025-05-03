@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 
 import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.config.options.*;
+import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -133,9 +134,10 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
         public static final ConfigString        TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
         public static final ConfigString        TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
-        public static final ConfigBoolean       TOOL_SWAP_BETTER_ENCHANTS           = new ConfigBoolean     ("toolSwapBetterEnchants",   false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       TOOL_SWAP_SILK_TOUCH_FIRST          = new ConfigBoolean     ("toolSwapSilkTouchFirst",   true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       WEAPON_SWAP_BETTER_ENCHANTS         = new ConfigBoolean     ("weaponSwapBetterEnchants", false).apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_BETTER_ENCHANTS         = new ConfigBooleanHotkeyed ("toolSwapBetterEnchants",   false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_FIRST        = new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst",   true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_ORES         = new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres",   false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed WEAPON_SWAP_BETTER_ENCHANTS       = new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", false, "").apply(GENERIC_KEY);
         public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
@@ -243,9 +245,17 @@ public class Configs implements IConfigHandler
                 TOOL_SWITCH_IGNORED_SLOTS,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_SILK_TOUCH_FIRST,
+                TOOL_SWAP_SILK_TOUCH_ORES,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
                 ZOOM_RESET_FOV_ON_ACTIVATE
+        );
+
+        public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(
+                TOOL_SWAP_BETTER_ENCHANTS,
+                TOOL_SWAP_SILK_TOUCH_FIRST,
+                TOOL_SWAP_SILK_TOUCH_ORES,
+                WEAPON_SWAP_BETTER_ENCHANTS
         );
     }
 
