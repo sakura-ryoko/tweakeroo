@@ -26,7 +26,11 @@ import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -58,6 +62,8 @@ public class InventoryUtils
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
+    private static final HashSet<RegistryEntry<Block>> SILK_TOUCH_OVERRIDE_BLOCKS = new HashSet<>();
+    private static final HashSet<RegistryEntryList<Block>> SILK_TOUCH_OVERRIDE_TAGS = new HashSet<>();
 
     public static void setToolSwitchableSlots(String configStr)
     {
@@ -67,6 +73,63 @@ public class InventoryUtils
     public static void setToolSwitchIgnoreSlots(String configStr)
     {
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
+    }
+
+    public static void parseSilkTouchOveride(List<String> configStrs)
+    {
+        if (MinecraftClient.getInstance().world == null) return;
+
+        if (!SILK_TOUCH_OVERRIDE_BLOCKS.isEmpty() || configStrs.isEmpty())
+        {
+            SILK_TOUCH_OVERRIDE_BLOCKS.clear();
+            SILK_TOUCH_OVERRIDE_TAGS.clear();
+        }
+        else if (!SILK_TOUCH_OVERRIDE_TAGS.isEmpty())
+        {
+            SILK_TOUCH_OVERRIDE_TAGS.clear();
+        }
+
+        RegistryWrapper<Block> wrapper = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(Registries.BLOCK.getKey());
+
+        for (String entry : configStrs)
+        {
+            try
+            {
+                if (entry.startsWith("#"))
+                {
+                    RegistryEntryList<Block> listEntry = wrapper.getOptional(TagKey.of(RegistryKeys.BLOCK, Identifier.tryParse(entry.substring(1)))).orElse(null);
+
+                    if (listEntry != null)
+                    {
+                        SILK_TOUCH_OVERRIDE_TAGS.add(listEntry);
+                    }
+                    else
+                    {
+                        Tweakeroo.LOGGER.warn("parseSilkTouchOveride: Invalid block tag: '{}'", entry);
+                    }
+
+                    continue;
+                }
+
+                // Should this use the Dynamic Registry?
+                Block block = Registries.BLOCK.get(Identifier.tryParse(entry));
+
+                if (block != null)
+                {
+                    RegistryEntry<Block> blockEntry = Registries.BLOCK.getEntry(block);
+
+                    if (blockEntry != null)
+                    {
+                        SILK_TOUCH_OVERRIDE_BLOCKS.add(blockEntry);
+                    }
+                }
+                else
+                {
+                    Tweakeroo.LOGGER.warn("parseSilkTouchOveride: Invalid block: '{}'", entry);
+                }
+            }
+            catch (Exception ignored) { }
+        }
     }
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
@@ -440,6 +503,11 @@ public class InventoryUtils
     {
         boolean isWeapon = EquipmentUtils.isAnyWeapon(testedStack);
 
+        if (testedStack.isOf(Items.MACE))
+        {
+            return false;
+        }
+
         if (previousWeapon.isEmpty() && isWeapon)
         {
             return true;
@@ -460,23 +528,30 @@ public class InventoryUtils
                 return false;
             }
 
-            final boolean isRanged = EquipmentUtils.isRangedWeapon(testedStack);
-            final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon) : true;
-            final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousWeapon);
-            final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousWeapon);
+            return isBetterWeaponEach(testedStack, previousWeapon);
+        }
 
-            final double tested = getBaseAttackDamage(testedStack);
-            final double prev = getBaseAttackDamage(previousWeapon);
+        return false;
+    }
 
-            if (tested > prev)
-            {
-                return rarity || mats;
-            }
+    private static boolean isBetterWeaponEach(ItemStack testedStack, ItemStack previousWeapon)
+    {
+        final boolean isRanged = EquipmentUtils.isRangedWeapon(testedStack);
+        final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousWeapon) : true;
+        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousWeapon);
+        final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousWeapon);
 
-            if (tested == prev)
-            {
-                return (rarity || mats) && enchants;
-            }
+        final double tested = getBaseAttackDamage(testedStack);
+        final double prev = getBaseAttackDamage(previousWeapon);
+
+        if (tested > prev)
+        {
+            return rarity || mats;
+        }
+
+        if (tested == prev)
+        {
+            return (rarity || mats) && enchants;
         }
 
         return false;
@@ -572,24 +647,31 @@ public class InventoryUtils
     {
         boolean isTool = EquipmentUtils.isAnyTool(testedStack);
         boolean isMisc = EquipmentUtils.isMiscTool(testedStack);
-//        Tweakeroo.LOGGER.error("isBetterTool(): test [{}], prev [{}], state [{}]", testedStack.toString(), previousTool.toString(), state.toString());
+//        Tweakeroo.LOGGER.error("isBetterTool(): test [{}], prev [{}], state [{}] // isTool [{}] // isMisc [{}]", testedStack.toString(), previousTool.toString(), state.toString(), isTool, isMisc);
 
         if (previousTool.isEmpty() && isTool &&
-            !state.isOf(Blocks.BAMBOO))
+            (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue() && !state.isOf(Blocks.BAMBOO)))
         {
             return true;
         }
 
-        if (state.isOf(Blocks.BAMBOO))
+        if (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue() && state.isOf(Blocks.BAMBOO))
         {
             if (EquipmentUtils.isSword(testedStack))
             {
-                return true;
+                return applyBambooNeedsSwordFirst(testedStack, previousTool);
             }
             else if (EquipmentUtils.isSword(previousTool))
             {
                 return false;
             }
+        }
+
+        if (testedStack.isEmpty() == false && isMisc &&
+            Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && state.isIn(MaLiLibTag.Blocks.NEEDS_SHEARS) &&
+            testedStack.isOf(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
+        {
+            return applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
         }
 
         if (testedStack.isEmpty() == false && isTool)
@@ -598,70 +680,160 @@ public class InventoryUtils
                 (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && state.isIn(MaLiLibTag.Blocks.ORE_BLOCKS) &&
                 EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
             {
-                final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
-
-                if (EquipmentUtils.hasSilkTouch(testedStack))
-                {
-                    final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-                    final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
-                    final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-                    final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-
-//                    System.out.print ("   (SilkTouchFirst)");
-//                    System.out.printf("   Mats result: %s", mats);
-//                    System.out.printf("   Rarity result: %s", rarity);
-//                    System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
-
-                    if (testSpeed > prevSpeed)
-                    {
-                        return true;
-                    }
-                    else if (testSpeed == prevSpeed)
-                    {
-                        return isMisc ? !prevSilk : (rarity && mats);
-                    }
-                }
-                else if (prevSilk && !EquipmentUtils.hasSilkTouch(testedStack))
-                {
-                    return false;
-                }
+                return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+            }
+            else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && isSilkTouchOverride(state))
+            {
+                return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
             }
 
-            return isBetterToolEach(testedStack, previousTool, state);
+            return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
         }
 
         return false;
     }
 
-    private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state)
+    // Even though an Axe is the "Correct tool" for Bamboo, a Sword is preferred
+    private static boolean applyBambooNeedsSwordFirst(ItemStack testedStack, ItemStack previousTool)
+    {
+        final boolean prevSword = EquipmentUtils.isSword(previousTool);
+        final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousTool) : true;
+        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+        final boolean result = (mats) && enchants;
+
+        //System.out.print ("   (applyBambooNeedsSwordFirst)");
+        //System.out.printf("   Mats result: %s", mats);
+        //System.out.printf("   Enchant result: %s", enchants);
+        //System.out.printf("\n   Prev Sword: %s -> %s\n", prevSword, result);
+
+        if (prevSword)
+        {
+            return result;
+        }
+
+        return true;
+    }
+
+    // Use shears if block needs shears.  Do this before needs_silk_touch, because
+    // the fact that an item needs shears doesn't pass the 'isCorrectTool()', and doesn't nessecarily need silk touch.
+    private static boolean applyNeedsShearsFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc)
+    {
+        if (!isMisc) return false;
+
+        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state, true);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state, true);
+        final boolean prevShears = previousTool.isOf(Items.SHEARS);
+        final boolean result = prevShears ? (testSpeed >= prevSpeed) && enchants : true;
+
+        //System.out.print ("   (applyNeedsShearsFirst)");
+        //System.out.printf("   Enchant result: %s", enchants);
+        //System.out.printf("   Result: %s", result);
+        //System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
+
+        return result;
+    }
+
+    // Note that this function is designed not to check the 'Correct Tool' status of a tool,
+    // but apply isBetterTool() the same as if it was, as long as it has Silk Touch.
+    private static boolean applySilkTouchFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc)
+    {
+        final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
+
+        if (EquipmentUtils.hasSilkTouch(testedStack))
+        {
+            final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+            final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
+            final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state, false);
+            final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state, false);
+
+            //System.out.print ("   (applySilkTouchFirst)");
+            //System.out.printf("   Mats result: %s", mats);
+            //System.out.printf("   Rarity result: %s", rarity);
+            //System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
+
+            if (testSpeed > prevSpeed)
+            {
+                return true;
+            }
+            else if (testSpeed == prevSpeed)
+            {
+                return isMisc ? !prevSilk : prevSilk ? (rarity && mats) : true;
+            }
+            else if (testSpeed < prevSpeed && !prevSilk)
+            {
+                return isMisc ? true : (rarity && mats);
+            }
+        }
+        else if (prevSilk && !EquipmentUtils.hasSilkTouch(testedStack))
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
     {
         final boolean correct = EquipmentUtils.isCorrectTool(testedStack, state);
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state, false);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state, false);
+        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
+        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
 
         if (!correct)
         {
             return false;
         }
 
-        final boolean isMisc = EquipmentUtils.isMiscTool(testedStack);
         final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
         final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
         final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
 
-//        System.out.printf("   Enchant result: %s", enchants);
-//        System.out.printf("   Mats result: %s", mats);
-//        System.out.printf("   Rarity result: %s", rarity);
-//        System.out.printf("   CorrectTool result: %s", correct);
-//        System.out.printf("\n   Speed test [%f] vs prev [%f]\n", testSpeed, prevSpeed);
+        //System.out.print ("   (isBetterToolEach)");
+        //System.out.printf("   Enchant result: %s", enchants);
+        //System.out.printf("   Mats result: %s", mats);
+        //System.out.printf("   Rarity result: %s", rarity);
+        //System.out.printf("   Silk Touch result: test - %s, prev - %s", testSilkTouch, prevSilkTouch);
+        //System.out.printf("\n   Speed test [%f] vs prev [%f]", testSpeed, prevSpeed);
+        //System.out.printf("\n   CorrectTool result: %s\n", correct);
 
         if (testSpeed > prevSpeed)
         {
-            return (rarity || mats) && correct;
+            return isMisc ? correct : (rarity || mats) && correct;
         }
         else if (testSpeed == prevSpeed)
         {
-            return isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
+            final boolean config = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(false);
+            final boolean result = isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
+            final boolean prevResult = loop ? isBetterToolEach(previousTool, testedStack, state, isMisc, false) : false;
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(config);
+
+            //System.out.printf("   Silk Touch Preference results: config: %s // test - %s, prev - %s", config, result, prevResult);
+
+            // Filter out matches based on config for Silk Touch over Non-Silk Touch tools
+            // when all other checks cannot determine which one should be picked.
+            if (prevResult && result)
+            {
+                if (config)
+                {
+                    return testSilkTouch && !prevSilkTouch;
+                }
+                else
+                {
+                    if (!testSilkTouch && prevSilkTouch)
+                    {
+                        return true;
+                    }
+                    else if (testSilkTouch && !prevSilkTouch)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return result;
         }
 
         return false;
@@ -723,10 +895,10 @@ public class InventoryUtils
         int count = 0;
 
         // Core Tool Enchants
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
 
         return count >= 0;
     }
@@ -736,41 +908,36 @@ public class InventoryUtils
         int count = 0;
 
         // Core Weapon Enchantments
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MENDING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.UNBREAKING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOOTING);
 
         // Damage Dealing
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SHARPNESS);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SMITE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BANE_OF_ARTHROPODS);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.POWER);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.IMPALING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.DENSITY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SHARPNESS);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SMITE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BANE_OF_ARTHROPODS);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.POWER);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.IMPALING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.DENSITY);
 
         // Support
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SWEEPING_EDGE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FIRE_ASPECT);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PUNCH);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.INFINITY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FLAME);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MULTISHOT);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.QUICK_CHARGE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PIERCING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.RIPTIDE);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOYALTY);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.CHANNELING);
-        count += hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BREACH);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.SWEEPING_EDGE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FIRE_ASPECT);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PUNCH);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.INFINITY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FLAME);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.MULTISHOT);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.QUICK_CHARGE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.PIERCING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.RIPTIDE);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.LOYALTY);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.CHANNELING);
+        count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.BREACH);
 
         return count >= 0;
     }
 
-    private static int hasSameOrBetterEnchantment(ItemStack testedStack, ItemStack previous, RegistryKey<Enchantment> enchantment)
-    {
-        return getEnchantmentLevel(testedStack, enchantment) - getEnchantmentLevel(previous, enchantment);
-    }
-
-    protected static float getBaseBlockBreakingSpeed(ItemStack stack, BlockState state)
+    protected static float getBaseBlockBreakingSpeed(ItemStack stack, BlockState state, boolean bypass)
     {
         float speed = stack.getMiningSpeedMultiplier(state);
 
@@ -784,12 +951,37 @@ public class InventoryUtils
             }
         }
 
-        if (state.isToolRequired() && stack.isSuitableFor(state) == false)
+        if (state.isToolRequired() && stack.isSuitableFor(state) == false && !bypass)
         {
             speed /= (100F / 30F);
         }
 
         return speed;
+    }
+
+    private static boolean isSilkTouchOverride(BlockState state)
+    {
+        RegistryEntry<Block> blockEntry = Registries.BLOCK.getEntry(state.getBlock());
+
+        if (blockEntry == null) return false;
+
+        for (RegistryEntryList<Block> listEntry : SILK_TOUCH_OVERRIDE_TAGS)
+        {
+            if (listEntry.contains(blockEntry))
+            {
+                return true;
+            }
+        }
+
+        for (RegistryEntry<Block> ent : SILK_TOUCH_OVERRIDE_BLOCKS)
+        {
+            if (ent == blockEntry)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected static boolean hasEnoughDurability(ItemStack stack)
