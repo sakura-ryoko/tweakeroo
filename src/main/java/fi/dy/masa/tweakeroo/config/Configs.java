@@ -134,9 +134,13 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
         public static final ConfigString        TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
         public static final ConfigString        TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_BETTER_ENCHANTS         = new ConfigBooleanHotkeyed ("toolSwapBetterEnchants",   false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_FIRST        = new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst",   true, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_ORES         = new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres",   false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_BETTER_ENCHANTS         = new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_PREFER_SILK_TOUCH       = new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_BAMBOO_USES_SWORD_FIRST = new ConfigBooleanHotkeyed ("toolSwapBambooUsesSwordFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_NEEDS_SHEARS_FIRST      = new ConfigBooleanHotkeyed ("toolSwapNeedsShearsFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_FIRST        = new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_ORES         = new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_OVERRIDE     = new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed WEAPON_SWAP_BETTER_ENCHANTS       = new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", false, "").apply(GENERIC_KEY);
         public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
@@ -244,8 +248,12 @@ public class Configs implements IConfigHandler
                 TOOL_SWITCHABLE_SLOTS,
                 TOOL_SWITCH_IGNORED_SLOTS,
                 TOOL_SWAP_BETTER_ENCHANTS,
+                TOOL_SWAP_PREFER_SILK_TOUCH,
+                TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
+                TOOL_SWAP_NEEDS_SHEARS_FIRST,
                 TOOL_SWAP_SILK_TOUCH_FIRST,
                 TOOL_SWAP_SILK_TOUCH_ORES,
+                TOOL_SWAP_SILK_TOUCH_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
                 ZOOM_RESET_FOV_ON_ACTIVATE
@@ -253,8 +261,12 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(
                 TOOL_SWAP_BETTER_ENCHANTS,
+                TOOL_SWAP_PREFER_SILK_TOUCH,
+                TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
+                TOOL_SWAP_NEEDS_SHEARS_FIRST,
                 TOOL_SWAP_SILK_TOUCH_FIRST,
                 TOOL_SWAP_SILK_TOUCH_ORES,
+                TOOL_SWAP_SILK_TOUCH_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS
         );
     }
@@ -283,7 +295,6 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList ENTITY_TYPE_ATTACK_RESTRICTION_LIST_TYPE = new ConfigOptionList("entityTypeAttackRestrictionListType", ListType.BLACKLIST).apply(LISTS_KEY);
         public static final ConfigStringList ENTITY_TYPE_ATTACK_RESTRICTION_BLACKLIST = new ConfigStringList("entityTypeAttackRestrictionBlackList", ImmutableList.of("minecraft:villager")).apply(LISTS_KEY);
         public static final ConfigStringList ENTITY_TYPE_ATTACK_RESTRICTION_WHITELIST = new ConfigStringList("entityTypeAttackRestrictionWhiteList", ImmutableList.of()).apply(LISTS_KEY);
-        //public static final ConfigStringList PREFER_SILK_TOUCH                  = new ConfigStringList("preferSilkTouch", ImmutableList.of("minecraft:ender_chest")).apply(LISTS_KEY);
         public static final ConfigStringList ENTITY_WEAPON_MAPPING              = new ConfigStringList("entityWeaponMapping", ImmutableList.of("<default> => minecraft:mace, minecraft:netherite_sword, minecraft:diamond_sword, minecraft:iron_sword, minecraft:golden_sword, minecraft:stone_sword, minecraft:wooden_sword", "minecraft:end_crystal, minecraft:item_frame, minecraft:glow_item_frame, minecraft:leash_knot => <ignore>", "minecraft:minecart, minecraft:chest_minecart, minecraft:furnace_minecart, minecraft:hopper_minecart, minecraft:hopper_minecart, minecraft:spawner_minecart, minecraft:tnt_minecart, minecraft:boat=> minecraft:mace, minecraft:netherite_axe, minecraft:diamond_axe, minecraft:iron_axe, minecraft:golden_axe, minecraft:stone_axe, minecraft:wooden_axe")).apply(LISTS_KEY);
         public static final ConfigOptionList FAST_PLACEMENT_ITEM_LIST_TYPE      = new ConfigOptionList("fastPlacementItemListType", ListType.BLACKLIST).apply(LISTS_KEY);
         public static final ConfigStringList FAST_PLACEMENT_ITEM_BLACKLIST      = new ConfigStringList("fastPlacementItemBlackList", ImmutableList.of("minecraft:ender_chest", "minecraft:white_shulker_box")).apply(LISTS_KEY);
@@ -305,6 +316,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList SELECTIVE_BLOCKS_LIST_TYPE         = new ConfigOptionList("selectiveBlocksListType", ListType.NONE).apply(LISTS_KEY);
         public static final ConfigString     SELECTIVE_BLOCKS_WHITELIST         = new ConfigString("selectiveBlocksWhitelist", "").apply(LISTS_KEY);
         public static final ConfigString     SELECTIVE_BLOCKS_BLACKLIST         = new ConfigString("selectiveBlocksBlacklist", "").apply(LISTS_KEY);
+        public static final ConfigStringList SILK_TOUCH_OVERRIDE                = new ConfigStringList("silkTouchOverride", ImmutableList.of()).apply(LISTS_KEY);
         public static final ConfigStringList UNSTACKING_ITEMS                   = new ConfigStringList("unstackingItems", ImmutableList.of("minecraft:bucket", "minecraft:glass_bottle")).apply(LISTS_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
@@ -315,7 +327,6 @@ public class Configs implements IConfigHandler
                 ENTITY_TYPE_ATTACK_RESTRICTION_LIST_TYPE,
                 ENTITY_TYPE_ATTACK_RESTRICTION_BLACKLIST,
                 ENTITY_TYPE_ATTACK_RESTRICTION_WHITELIST,
-                //PREFER_SILK_TOUCH,
                 ENTITY_WEAPON_MAPPING,
                 FAST_PLACEMENT_ITEM_LIST_TYPE,
                 FAST_RIGHT_CLICK_BLOCK_LIST_TYPE,
@@ -334,6 +345,7 @@ public class Configs implements IConfigHandler
                 POTION_WARNING_BLACKLIST,
                 POTION_WARNING_WHITELIST,
                 REPAIR_MODE_SLOTS,
+                SILK_TOUCH_OVERRIDE,
                 UNSTACKING_ITEMS,
                 SELECTIVE_BLOCKS_LIST_TYPE,
                 SELECTIVE_BLOCKS_WHITELIST,
@@ -500,6 +512,7 @@ public class Configs implements IConfigHandler
 
         InventoryUtils.setToolSwitchableSlots(Generic.TOOL_SWITCHABLE_SLOTS.getStringValue());
         InventoryUtils.setToolSwitchIgnoreSlots(Generic.TOOL_SWITCH_IGNORED_SLOTS.getStringValue());
+        InventoryUtils.parseSilkTouchOveride(Lists.SILK_TOUCH_OVERRIDE.getStrings());
         InventoryUtils.setRepairModeSlots(Lists.REPAIR_MODE_SLOTS.getStrings());
         InventoryUtils.setUnstackingItems(Lists.UNSTACKING_ITEMS.getStrings());
         InventoryUtils.setWeaponMapping(Lists.ENTITY_WEAPON_MAPPING.getStrings());
