@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -720,8 +721,8 @@ public class InventoryUtils
         if (!isMisc) return false;
 
         final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state, true);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state, true);
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
         final boolean prevShears = previousTool.isOf(Items.SHEARS);
         final boolean result = prevShears ? (testSpeed >= prevSpeed) && enchants : true;
 
@@ -743,8 +744,8 @@ public class InventoryUtils
         {
             final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
             final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
-            final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state, false);
-            final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state, false);
+            final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+            final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
 
             //System.out.print ("   (applySilkTouchFirst)");
             //System.out.printf("   Mats result: %s", mats);
@@ -775,8 +776,8 @@ public class InventoryUtils
     private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
     {
         final boolean correct = EquipmentUtils.isCorrectTool(testedStack, state);
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state, false);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state, false);
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
         final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
         final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
 
@@ -936,7 +937,7 @@ public class InventoryUtils
         return count >= 0;
     }
 
-    protected static float getBaseBlockBreakingSpeed(ItemStack stack, BlockState state, boolean bypass)
+    protected static float getBaseBlockBreakingSpeed(ItemStack stack, BlockState state)
     {
         float speed = stack.getMiningSpeedMultiplier(state);
 
@@ -950,7 +951,7 @@ public class InventoryUtils
             }
         }
 
-        if (state.isToolRequired() && stack.isSuitableFor(state) == false && !bypass)
+        if (state.isToolRequired() && stack.isSuitableFor(state) == false)
         {
             speed /= (100F / 30F);
         }
