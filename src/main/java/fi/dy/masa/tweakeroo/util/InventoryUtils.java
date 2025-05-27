@@ -90,7 +90,7 @@ public class InventoryUtils
             SILK_TOUCH_OVERRIDE_TAGS.clear();
         }
 
-        RegistryWrapper<Block> wrapper = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(Registries.BLOCK.getKey());
+        RegistryWrapper<Block> wrapper = MinecraftClient.getInstance().world.getRegistryManager().getWrapperOrThrow(Registries.BLOCK.getKey());
 
         for (String entry : configStrs)
         {
