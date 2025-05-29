@@ -8,7 +8,6 @@ import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
@@ -19,6 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.profiler.Profiler;
@@ -30,6 +30,7 @@ import fi.dy.masa.malilib.util.ActiveMode;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.nbt.NbtInventory;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -117,7 +118,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_MAP_PREVIEW.getBooleanValue() &&
                 (Configs.Generic.MAP_PREVIEW_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false, drawContext);
+                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(drawContext, stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
             }
         }
         else if (stack.getComponents().contains(DataComponentTypes.CONTAINER) && InventoryUtils.shulkerBoxHasItems(stack))
@@ -125,7 +126,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
+                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(drawContext, stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
             }
         }
         else if (stack.isOf(Items.ENDER_CHEST) && Configs.Generic.SHULKER_DISPLAY_ENDER_CHEST.getBooleanValue())
@@ -167,8 +168,13 @@ public class RenderHandler implements IRenderer
 
                     if (inv != null)
                     {
-                        nbt.put(NbtKeys.ENDER_ITEMS, inv.toNbtList(world.getRegistryManager()));
-                        fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(stack, nbt, x, y, false, drawContext);
+                        try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
+                        {
+//                            nbt.put(NbtKeys.ENDER_ITEMS, inv.toNbtList(world.getRegistryManager()));
+                            nbt.copyFrom(nbtInv.toNbt(NbtList.TYPE, NbtKeys.ENDER_ITEMS));
+                            fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(drawContext, stack, nbt, x, y, false);
+                        }
+                        catch (Exception ignored) { }
                     }
                 }
             }
@@ -178,14 +184,13 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_BUNDLE_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.BUNDLE_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(stack, x, y, Configs.Generic.BUNDLE_DISPLAY_ROW_WIDTH.getIntegerValue(), Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue(), drawContext);
+                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(drawContext, stack, x, y, Configs.Generic.BUNDLE_DISPLAY_ROW_WIDTH.getIntegerValue(), Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
             }
         }
     }
 
     @Override
-    //public void onRenderWorldLastAdvanced(Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, Profiler profiler)
-    public void onRenderWorldLastAdvanced(Framebuffer fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, Fog fog, BufferBuilderStorage buffers, Profiler profiler)
+    public void onRenderWorldLastAdvanced(Framebuffer fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, BufferBuilderStorage buffers, Profiler profiler)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 

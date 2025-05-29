@@ -10,10 +10,9 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(DimensionEffects.Nether.class)
 public abstract class MixinDimensionEffects_Nether extends DimensionEffects
 {
-    private MixinDimensionEffects_Nether(float cloudsHeight, boolean alternateSkyColor,
-                                         SkyType skyType, boolean shouldRenderSky, boolean darkened)
+    private MixinDimensionEffects_Nether(SkyType skyType, boolean shouldRenderSky, boolean darkened)
     {
-        super(cloudsHeight, alternateSkyColor, skyType, shouldRenderSky, darkened);
+        super(skyType, shouldRenderSky, darkened);
     }
 
     @Inject(method = "useThickFog", at = @At("HEAD"), cancellable = true)

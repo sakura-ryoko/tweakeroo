@@ -1230,7 +1230,7 @@ public class InventoryUtils
     {
         final double[] total = {base};
 
-        stack.applyAttributeModifier(slot, (entry, modifier) -> {
+        stack.applyAttributeModifier(slot, (entry, modifier, consumer) -> {
             if (entry.getKey().orElseThrow() == EntityAttributes.ARMOR
                 || entry.getKey().orElseThrow() == EntityAttributes.ARMOR_TOUGHNESS)
             {

@@ -141,7 +141,7 @@ public class RenderTweaks
             Matrix4fStack globalStack = RenderSystem.getModelViewStack();
 
             globalStack.pushMatrix();
-            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+//            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 //            fi.dy.masa.malilib.render.RenderUtils.blend(true);
 //            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
 //            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(true);

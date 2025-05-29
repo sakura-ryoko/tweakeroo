@@ -3,7 +3,6 @@ package fi.dy.masa.tweakeroo.renderer;
 import java.util.HashSet;
 import java.util.Set;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -88,9 +87,9 @@ public class RenderUtils
 
             Matrix4f modelViewMatrix = new Matrix4f();
             modelViewMatrix.set(RenderSystem.getModelViewMatrix());
-            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+//            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             //fi.dy.masa.malilib.render.RenderUtils.bindTexture(HandledScreen.BACKGROUND_TEXTURE);
-            fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(HandledScreen.BACKGROUND_TEXTURE, x - 1, y - 1, 7, 83, 9 * 18, 3 * 18, drawContext);
+            fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(drawContext, HandledScreen.BACKGROUND_TEXTURE, x - 1, y - 1, 7, 83, 9 * 18, 3 * 18);
 
             drawContext.drawTextWithShadow(textRenderer, "1", x - 10, y +  4, 0xFFFFFF);
             drawContext.drawTextWithShadow(textRenderer, "2", x - 10, y + 22, 0xFFFFFF);
@@ -104,7 +103,7 @@ public class RenderUtils
 
                     if (stack.isEmpty() == false)
                     {
-                        InventoryOverlay.renderStackAt(stack, x, y, 1, mc, drawContext);
+                        InventoryOverlay.renderStackAt(drawContext, stack, x, y, 1, mc);
                     }
 
                     x += 18;
@@ -207,22 +206,22 @@ public class RenderUtils
                 horseInv.setStack(0, horseArmor != null && !horseArmor.isEmpty() ? horseArmor : ItemStack.EMPTY);
                 horseInv.setStack(1, inv.getStack(0));
 
-                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc, drawContext);
-                InventoryOverlay.renderInventoryBackgroundSlots(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
-                InventoryOverlay.renderInventoryStacks(type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+                InventoryOverlay.renderInventoryBackground(drawContext, type, xInv, yInv, 1, 2, mc);
+                InventoryOverlay.renderInventoryBackgroundSlots(drawContext, type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY);
+                InventoryOverlay.renderInventoryStacks(drawContext, type, horseInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc);
                 xInv += 32 + 4;
             }
 
             if (totalSlots > 0)
             {
-                InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc, drawContext);
+                InventoryOverlay.renderInventoryBackground(drawContext, type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
               
                 if (type == InventoryOverlay.InventoryRenderType.BREWING_STAND)
                 {
-                    InventoryOverlay.renderBrewerBackgroundSlots(inv, xInv, yInv, drawContext);
+                    InventoryOverlay.renderBrewerBackgroundSlots(drawContext, inv, xInv, yInv);
                 }
               
-                InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, firstSlot, totalSlots, lockedSlots, mc, drawContext);
+                InventoryOverlay.renderInventoryStacks(drawContext, type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, firstSlot, totalSlots, lockedSlots, mc);
             }
         }
 
@@ -247,15 +246,15 @@ public class RenderUtils
             Inventory wolfInv = new SimpleInventory(2);
             ItemStack wolfArmor = ((WolfEntity) entityLivingBase).getBodyArmor();
             wolfInv.setStack(0, wolfArmor != null && !wolfArmor.isEmpty() ? wolfArmor : ItemStack.EMPTY);
-            InventoryOverlay.renderInventoryBackground(type, xInv, yInv, 1, 2, mc, drawContext);
-            InventoryOverlay.renderWolfArmorBackgroundSlots(wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, drawContext);
-            InventoryOverlay.renderInventoryStacks(type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc, drawContext);
+            InventoryOverlay.renderInventoryBackground(drawContext, type, xInv, yInv, 1, 2, mc);
+            InventoryOverlay.renderWolfArmorBackgroundSlots(drawContext, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY);
+            InventoryOverlay.renderInventoryStacks(drawContext, type, wolfInv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, 1, 0, 2, mc);
         }
 
         if (entityLivingBase != null)
         {
-            InventoryOverlay.renderEquipmentOverlayBackground(x, y, entityLivingBase, drawContext);
-            InventoryOverlay.renderEquipmentStacks(entityLivingBase, x, y, mc, drawContext);
+            InventoryOverlay.renderEquipmentOverlayBackground(drawContext, x, y, entityLivingBase);
+            InventoryOverlay.renderEquipmentStacks(drawContext, entityLivingBase, x, y, mc);
         }
     }
 
@@ -274,10 +273,10 @@ public class RenderUtils
         int slotOffsetY = 8;
         InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.GENERIC;
 
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+//        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        InventoryOverlay.renderInventoryBackground(type, x, y, 9, 27, mc, drawContext);
-        InventoryOverlay.renderInventoryStacks(type, inv, x + slotOffsetX, y + slotOffsetY, 9, 9, 27, mc, drawContext);
+        InventoryOverlay.renderInventoryBackground(drawContext, type, x, y, 9, 27, mc);
+        InventoryOverlay.renderInventoryStacks(drawContext, type, inv, x + slotOffsetX, y + slotOffsetY, 9, 9, 27, mc);
     }
 
     public static void renderHotbarScrollOverlay(MinecraftClient mc, DrawContext drawContext)
@@ -295,18 +294,18 @@ public class RenderUtils
         final int y = yCenter + 6;
         InventoryOverlay.InventoryRenderType type = InventoryOverlay.InventoryRenderType.GENERIC;
 
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+//        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        InventoryOverlay.renderInventoryBackground(type, x, y     , 9, 27, mc, drawContext);
-        InventoryOverlay.renderInventoryBackground(type, x, y + 70, 9,  9, mc, drawContext);
+        InventoryOverlay.renderInventoryBackground(drawContext, type, x, y     , 9, 27, mc);
+        InventoryOverlay.renderInventoryBackground(drawContext, type, x, y + 70, 9,  9, mc);
 
         // Main inventory
-        InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y +  8, 9, 9, 27, mc, drawContext);
+        InventoryOverlay.renderInventoryStacks(drawContext, type, inv, x + 8, y +  8, 9, 9, 27, mc);
         // Hotbar
-        InventoryOverlay.renderInventoryStacks(type, inv, x + 8, y + 78, 9, 0,  9, mc, drawContext);
+        InventoryOverlay.renderInventoryStacks(drawContext, type, inv, x + 8, y + 78, 9, 0,  9, mc);
 
         int currentRow = Configs.Internal.HOTBAR_SCROLL_CURRENT_ROW.getIntegerValue();
-        fi.dy.masa.malilib.render.RenderUtils.drawOutline(x + 5, y + currentRow * 18 + 5, 9 * 18 + 4, 22, 2, 0xFFFF2020);
+        fi.dy.masa.malilib.render.RenderUtils.drawOutline(drawContext, x + 5, y + currentRow * 18 + 5, 9 * 18 + 4, 22, 2, 0xFFFF2020);
     }
 
     public static float getLavaFogDistance(Entity entity, float originalFog)
@@ -363,25 +362,25 @@ public class RenderUtils
         MinecraftClient mc = MinecraftClient.getInstance();
 
         Camera camera = mc.gameRenderer.getCamera();
-        float width = (float) drawContext.getScaledWindowWidth() / 2;
-        float height = (float) drawContext.getScaledWindowHeight() / 2;
-        float pitch = camera.getPitch();
-        float yaw = camera.getYaw();
-
-//        fi.dy.masa.malilib.render.RenderUtils.blend(true);
-        Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-        matrix4fStack.pushMatrix();
-        matrix4fStack.mul(drawContext.getMatrices().peek().getPositionMatrix());
-        matrix4fStack.translate(width, height, 0.0F);
-        matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
-        matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
-        matrix4fStack.scale(-1.0F, -1.0F, -1.0F);
+//        float width = (float) drawContext.getScaledWindowWidth() / 2;
+//        float height = (float) drawContext.getScaledWindowHeight() / 2;
+//        float pitch = camera.getPitch();
+//        float yaw = camera.getYaw();
+//        float scale = 0.01F * mc.getWindow().getScaleFactor();
+//
+//        Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
+//        matrix4fStack.pushMatrix();
+////        matrix4fStack.mul(drawContext.getMatrices().peek().getPositionMatrix());
+//        matrix4fStack.translate(width, height, 0.0F);
+//        matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
+//        matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
+//        matrix4fStack.scale(-scale, -scale, -scale);
         //RenderSystem.renderCrosshair(10);
-        mc.getDebugHud().renderDebugCrosshair();
 
-        matrix4fStack.popMatrix();
-        //RenderSystem.applyModelViewMatrix();
-//        fi.dy.masa.malilib.render.RenderUtils.blend(false);
+        // TODO - Did Mojang fix this?
+        mc.getDebugHud().renderDebugCrosshair(camera);
+
+//        matrix4fStack.popMatrix();
     }
 
     public static void notifyRotationChanged()
@@ -402,17 +401,17 @@ public class RenderUtils
 
             if (mode != SnapAimMode.PITCH)
             {
-                renderSnapAimAngleIndicatorYaw(xCenter, yCenter, 80, 12, mc, drawContext);
+                renderSnapAimAngleIndicatorYaw(drawContext, xCenter, yCenter, 80, 12, mc);
             }
 
             if (mode != SnapAimMode.YAW)
             {
-                renderSnapAimAngleIndicatorPitch(xCenter, yCenter, 12, 50, mc, drawContext);
+                renderSnapAimAngleIndicatorPitch(drawContext, xCenter, yCenter, 12, 50, mc);
             }
         }
     }
 
-    private static void renderSnapAimAngleIndicatorYaw(int xCenter, int yCenter, int width, int height, MinecraftClient mc, DrawContext drawContext)
+    private static void renderSnapAimAngleIndicatorYaw(DrawContext drawContext, int xCenter, int yCenter, int width, int height, MinecraftClient mc)
     {
         double step = Configs.Generic.SNAP_AIM_YAW_STEP.getDoubleValue();
         double realYaw = MathHelper.floorMod(MiscUtils.getLastRealYaw(), 360.0D);
@@ -423,12 +422,12 @@ public class RenderUtils
         int lineX = x + (int) ((MathHelper.wrapDegrees(realYaw - startYaw)) / step * width);
         TextRenderer textRenderer = mc.textRenderer;
 
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+//        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
         int bgColor = Configs.Generic.SNAP_AIM_INDICATOR_COLOR.getIntegerValue();
 
         // Draw the main box
-        fi.dy.masa.malilib.render.RenderUtils.drawOutlinedBox(x, y, width, height, bgColor, 0xFFFFFFFF);
+        fi.dy.masa.malilib.render.RenderUtils.drawOutlinedBox(drawContext, x, y, width, height, bgColor, 0xFFFFFFFF);
 
         String str = MathHelper.wrapDegrees(snappedYaw) + "°";
         drawContext.drawText(textRenderer, str, xCenter - textRenderer.getWidth(str) / 2, y + height + 2, 0xFFFFFFFF, false);
@@ -445,21 +444,20 @@ public class RenderUtils
             int snapThreshOffset = (int) (width * threshold / step);
 
             // Draw the middle region
-            fi.dy.masa.malilib.render.RenderUtils.drawRect(xCenter - snapThreshOffset, y, snapThreshOffset * 2, height, 0x6050FF50);
+            fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, xCenter - snapThreshOffset, y, snapThreshOffset * 2, height, 0x6050FF50);
 
             if (threshold < (step / 2.0))
             {
-                fi.dy.masa.malilib.render.RenderUtils.drawRect(xCenter - snapThreshOffset, y, 2, height, 0xFF20FF20);
-                fi.dy.masa.malilib.render.RenderUtils.drawRect(xCenter + snapThreshOffset, y, 2, height, 0xFF20FF20);
+                fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, xCenter - snapThreshOffset, y, 2, height, 0xFF20FF20);
+                fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, xCenter + snapThreshOffset, y, 2, height, 0xFF20FF20);
             }
         }
 
         // Draw the current angle indicator
-        fi.dy.masa.malilib.render.RenderUtils.drawRect(lineX, y, 2, height, 0xFFFFFFFF);
+        fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, lineX, y, 2, height, 0xFFFFFFFF);
     }
 
-    private static void renderSnapAimAngleIndicatorPitch(int xCenter, int yCenter, int width, int height,
-            MinecraftClient mc, DrawContext drawContext)
+    private static void renderSnapAimAngleIndicatorPitch(DrawContext drawContext, int xCenter, int yCenter, int width, int height, MinecraftClient mc)
     {
         double step = Configs.Generic.SNAP_AIM_PITCH_STEP.getDoubleValue();
         int limit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
@@ -481,7 +479,7 @@ public class RenderUtils
         int x = xCenter - width / 2;
         int y = yCenter - height - 10;
 
-        renderPitchIndicator(x, y, width, height, realPitch, snappedPitch, step, true, mc, drawContext);
+        renderPitchIndicator(drawContext, x, y, width, height, realPitch, snappedPitch, step, true, mc);
     }
 
     public static void renderPitchLockIndicator(MinecraftClient mc, DrawContext drawContext)
@@ -501,12 +499,12 @@ public class RenderUtils
         double centerPitch = 0;
         double indicatorRange = 180;
 
-        renderPitchIndicator(x, y, width, height, currentPitch, centerPitch, indicatorRange, false, mc, drawContext);
+        renderPitchIndicator(drawContext, x, y, width, height, currentPitch, centerPitch, indicatorRange, false, mc);
     }
 
-    private static void renderPitchIndicator(int x, int y, int width, int height,
-            double currentPitch, double centerPitch, double indicatorRange, boolean isSnapRange,
-            MinecraftClient mc, DrawContext drawContext)
+    private static void renderPitchIndicator(DrawContext drawContext, int x, int y, int width, int height,
+                                             double currentPitch, double centerPitch,
+                                             double indicatorRange, boolean isSnapRange, MinecraftClient mc)
     {
         double startPitch = centerPitch - (indicatorRange / 2.0);
         double printedRange = isSnapRange ? indicatorRange : indicatorRange / 2;
@@ -514,7 +512,7 @@ public class RenderUtils
         double angleUp = centerPitch - printedRange;
         double angleDown = centerPitch + printedRange;
 
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
+//        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
         TextRenderer textRenderer = mc.textRenderer;
 
         if (isSnapRange)
@@ -535,7 +533,7 @@ public class RenderUtils
 
         int bgColor = Configs.Generic.SNAP_AIM_INDICATOR_COLOR.getIntegerValue();
         // Draw the main box
-        fi.dy.masa.malilib.render.RenderUtils.drawOutlinedBox(x, y, width, height, bgColor, 0xFFFFFFFF);
+        fi.dy.masa.malilib.render.RenderUtils.drawOutlinedBox(drawContext, x, y, width, height, bgColor, 0xFFFFFFFF);
 
         int yCenter = y + height / 2 - 1;
 
@@ -545,20 +543,20 @@ public class RenderUtils
             double threshold = Configs.Generic.SNAP_AIM_THRESHOLD_PITCH.getDoubleValue();
             int snapThreshOffset = (int) ((double) height * threshold / indicatorRange);
 
-            fi.dy.masa.malilib.render.RenderUtils.drawRect(x, yCenter - snapThreshOffset, width, snapThreshOffset * 2, 0x6050FF50);
+            fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, x, yCenter - snapThreshOffset, width, snapThreshOffset * 2, 0x6050FF50);
 
             if (threshold < (step / 2.0))
             {
-                fi.dy.masa.malilib.render.RenderUtils.drawRect(x, yCenter - snapThreshOffset, width, 2, 0xFF20FF20);
-                fi.dy.masa.malilib.render.RenderUtils.drawRect(x, yCenter + snapThreshOffset, width, 2, 0xFF20FF20);
+                fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, x, yCenter - snapThreshOffset, width, 2, 0xFF20FF20);
+                fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, x, yCenter + snapThreshOffset, width, 2, 0xFF20FF20);
             }
         }
         else if (isSnapRange == false)
         {
-            fi.dy.masa.malilib.render.RenderUtils.drawRect(x + 1, yCenter - 1, width - 2, 2, 0xFFC0C0C0);
+            fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, x + 1, yCenter - 1, width - 2, 2, 0xFFC0C0C0);
         }
 
         // Draw the current angle indicator
-        fi.dy.masa.malilib.render.RenderUtils.drawRect(x, lineY - 1, width, 2, 0xFFFFFFFF);
+        fi.dy.masa.malilib.render.RenderUtils.drawRect(drawContext, x, lineY - 1, width, 2, 0xFFFFFFFF);
     }
 }

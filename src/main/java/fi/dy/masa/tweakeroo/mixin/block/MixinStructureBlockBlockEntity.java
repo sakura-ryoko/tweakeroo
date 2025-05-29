@@ -31,7 +31,7 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
         super(blockEntityType, blockPos, blockState);
     }
 
-    @ModifyConstant(method = "readNbt",
+    @ModifyConstant(method = "readData",
                     slice = @Slice(from = @At(value = "FIELD",
                                               target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;metadata:Ljava/lang/String;"),
                                    to = @At(value = "FIELD",

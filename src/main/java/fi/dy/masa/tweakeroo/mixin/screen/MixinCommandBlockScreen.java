@@ -75,7 +75,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
             {
                 String name = tf.getText();
                 name = String.format("{\"CustomName\":\"{\\\"text\\\":\\\"%s\\\"}\"}", name);
-                this.client.player.networkHandler.sendCommand(String.format("data merge block %d %d %d %s", pos.getX(), pos.getY(), pos.getZ(), name));
+                this.client.player.networkHandler.sendChatCommand(String.format("data merge block %d %d %d %s", pos.getX(), pos.getY(), pos.getZ(), name));
             });
 
             builder.position(x2, y).size(widthBtn, 20);
@@ -97,7 +97,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
 
                 String cmd = String.format("data merge block %d %d %d {\"UpdateLastExecution\":%s}",
                         pos.getX(), pos.getY(), pos.getZ(), this.updateExecValue ? "1b" : "0b");
-                this.client.player.networkHandler.sendCommand(cmd);
+                this.client.player.networkHandler.sendChatCommand(cmd);
             });
 
             this.addDrawableChild(this.buttonUpdateExec);
@@ -148,7 +148,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         if (this.buttonUpdateExec != null && this.buttonUpdateExec.isHovered())
         {
             String hover = "tweakeroo.gui.button.misc.command_block.hover.update_execution";
-            RenderUtils.drawHoverText(mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)), drawContext);
+            RenderUtils.drawHoverText(drawContext, mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)));
         }
     }
 

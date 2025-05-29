@@ -38,7 +38,7 @@ public abstract class MixinInGameHud
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
-                target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z", ordinal = 0), cancellable = true)
+                target = "Lnet/minecraft/client/gui/hud/InGameHud;shouldRenderCrosshair()Z", ordinal = 0), cancellable = true)
     private void tweakeroo_overrideCursorRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())

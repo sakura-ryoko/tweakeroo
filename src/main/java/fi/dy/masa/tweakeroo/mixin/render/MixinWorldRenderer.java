@@ -1,8 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.objectweb.asm.Opcodes;
 
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.render.*;
@@ -36,7 +38,7 @@ public abstract class MixinWorldRenderer
     @Unique private int lastUpdatePosZ;
 
     @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
-    private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, Vec3d vec3d, float f, Fog fog, CallbackInfo ci)
+    private void cancelRainRender(FrameGraphBuilder frameGraphBuilder, Vec3d cameraPos, float tickProgress, GpuBufferSlice fog, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {
@@ -47,7 +49,7 @@ public abstract class MixinWorldRenderer
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
                                         target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=terrain_setup"))
     private void preSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
-                                 Camera camera, GameRenderer gameRenderer, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
+                                 Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -58,7 +60,7 @@ public abstract class MixinWorldRenderer
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
                                         target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=compile_sections"))
     private void postSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
-                                  Camera camera, GameRenderer gameRenderer, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
+                                  Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }
