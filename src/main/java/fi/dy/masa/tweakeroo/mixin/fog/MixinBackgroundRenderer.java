@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.render_fog;
+package fi.dy.masa.tweakeroo.mixin.fog;
 
 //@Mixin(BackgroundRenderer.class)
 public abstract class MixinBackgroundRenderer

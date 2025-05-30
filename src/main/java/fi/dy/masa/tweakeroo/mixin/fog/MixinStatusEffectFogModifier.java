@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.render_fog;
+package fi.dy.masa.tweakeroo.mixin.fog;
 
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.render.fog.StatusEffectFogModifier;

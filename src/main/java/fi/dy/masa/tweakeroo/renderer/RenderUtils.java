@@ -308,7 +308,7 @@ public class RenderUtils
         fi.dy.masa.malilib.render.RenderUtils.drawOutline(drawContext, x + 5, y + currentRow * 18 + 5, 9 * 18 + 4, 22, 2, 0xFFFF2020);
     }
 
-    public static float getLavaFogDistance(Entity entity, float originalFog)
+    public static float calculateLiquidFogDistance(Entity entity, float originalFog, boolean water)
     {
         if (entity instanceof LivingEntity living)
         {
@@ -317,7 +317,8 @@ public class RenderUtils
             if (head.isEmpty() == false)
             {
                 ItemEnchantmentsComponent enchants = head.getEnchantments();
-                float fog = (originalFog > 1.0f) ? 3.3f : 1.3f;
+                float lavaFog = (originalFog > 1.0f) ? 3.3f : 1.3f;
+                float fog = water ? (originalFog / 4) : lavaFog;
                 int resp = 0;
                 int aqua = 0;
 
@@ -348,8 +349,15 @@ public class RenderUtils
                     fog *= (float) resp * 1.6f;
                 }
 
-                //Tweakeroo.logger.info("getLavaFogDistance: aqua {} resp {} orig: {} adjusted {}", aqua, resp, originalFog, fog);
+                // Custom add the adjustment with some fancy math for water so it's not too
+                // overpowered, and not too underpowered either.
+                // Gets around +40-50f with max enchants, and around +10-14f with one enchant.
+                if (water)
+                {
+                    fog = Math.max((fog / 2.8f), (originalFog / 4.4f)) + originalFog;
+                }
 
+//                Tweakeroo.LOGGER.info("calculateLiquidFogDistance: aqua [{}] resp [{}] orig: [{}] -> adjusted [{}]", aqua, resp, originalFog, fog);
                 return Math.max(fog, originalFog);
             }
         }

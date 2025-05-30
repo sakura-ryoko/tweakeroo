@@ -354,6 +354,7 @@ public class Configs implements IConfigHandler
     public static class Disable
     {
         public static final ConfigBooleanHotkeyed       DISABLE_ARMOR_STAND_RENDERING   = new ConfigBooleanHotkeyed("disableArmorStandRendering",           false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_ATMOSPHERIC_FOG         = new ConfigBooleanHotkeyed("disableAtmosphericFog",                false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_AXE_STRIPPING           = new ConfigBooleanHotkeyed("disableAxeStripping",                  false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BAT_SPAWNING            = new ConfigBooleanClient  ("disableBatSpawning",                   false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BEACON_BEAM_RENDERING   = new ConfigBooleanHotkeyed("disableBeaconBeamRendering",           false, "").apply(DISABLE_KEY);
@@ -401,6 +402,7 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IHotkeyTogglable> OPTIONS = ImmutableList.of(
                 DISABLE_ARMOR_STAND_RENDERING,
+                DISABLE_ATMOSPHERIC_FOG,
                 DISABLE_AXE_STRIPPING,
                 DISABLE_BAT_SPAWNING,
                 DISABLE_BEACON_BEAM_RENDERING,
