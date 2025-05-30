@@ -107,7 +107,7 @@ public class FogTweaks
     {
         if (Configs.Disable.DISABLE_ATMOSPHERIC_FOG.getBooleanValue())
         {
-            data.environmentalStart = -160.0F;
+            data.environmentalStart = data.cloudEnd - 4.0F;
             data.environmentalEnd = data.cloudEnd;
         }
     }
