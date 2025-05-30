@@ -1,14 +1,16 @@
 package fi.dy.masa.tweakeroo.mixin.fog;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.fog.FogRenderer;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import fi.dy.masa.tweakeroo.tweaks.FogTweaks;
+import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(FogRenderer.class)
 public class MixinFogRenderer
@@ -18,14 +20,25 @@ public class MixinFogRenderer
                        target = "Lnet/minecraft/client/world/ClientWorld$Properties;getVoidDarknessRange()F"))
     private float tweakeroo_disableSkyDarkness(ClientWorld.Properties instance)
     {
-        return FogTweaks.INSTANCE.tweakSkyDarkness(instance);
+        return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : instance.getVoidDarknessRange();
     }
 
     @ModifyConstant(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
                     constant = { @Constant(intValue = 16) })
     private int tweakeroo_tweakRenderDistanceFog(int constant)
     {
-        return FogTweaks.INSTANCE.tweakRenderDistanceFog_Distance(constant);
+        if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
+        {
+            MinecraftClient mc = MinecraftClient.getInstance();
+
+            final int viewDistance = mc.options.getClampedViewDistance();
+            final float blocksDistance = Math.max(512.0F, mc.gameRenderer.getViewDistanceBlocks());
+
+            // 42 is the answer :)
+            return (int) (blocksDistance / viewDistance);
+        }
+
+        return constant;
     }
 
     @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
@@ -33,6 +46,11 @@ public class MixinFogRenderer
                      target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"))
     private float tweakeroo_tweakRenderDistanceFog(float value, float min, float max)
     {
-        return FogTweaks.INSTANCE.tweakRenderDistanceFog_Clamp(value, min, max);
+        if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
+        {
+            return min;
+        }
+
+        return MathHelper.clamp(value, min, max);
     }
 }
