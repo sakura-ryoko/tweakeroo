@@ -21,12 +21,17 @@ public class MixinDarknessEffectFogModifier
     {
         if (FeatureToggle.TWEAK_DARKNESS_VISIBILITY.getBooleanValue())
         {
-            // Trying not to make this too overpowered.
-            // To me, no more than around 3.0f should suffice; and
-            // I want to make this bound to some enchantment.
-            // Could remove it by changing the adj value higher, but
-            // that would be no fun; now would it?
-            final float adj = data.skyEnd * 2.7F;
+            // Trying not to make this overpowered...
+            // To me, this should suffice to
+            // improve a players' Quality of Life of they also
+            // change the Accessibility Setting Pulse Strength.
+            // I wanted to make this bound to some enchantment if I could;
+            // but I couldn't think of a good one to counter this effect.
+            // The actual strength value returned by Vanilla here
+            // tends to be somewhat random and unpredictable and varies.
+            // Someone could remove the fog by changing the 'adj' value higher, but
+            // that would be no fun; now would it? :)
+            final float adj = data.skyEnd * 3.0F;
 
             data.environmentalStart = adj * 0.75F;
             data.environmentalEnd = adj;

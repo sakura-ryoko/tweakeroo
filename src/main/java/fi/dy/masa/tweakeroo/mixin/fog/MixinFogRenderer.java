@@ -25,7 +25,7 @@ public class MixinFogRenderer
 
     @ModifyConstant(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
                     constant = { @Constant(intValue = 16) })
-    private int tweakeroo_tweakRenderDistanceFog(int constant)
+    private int tweakeroo_tweakRenderDistanceFog_DistanceMultiplier(int constant)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {
@@ -44,7 +44,7 @@ public class MixinFogRenderer
     @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"))
-    private float tweakeroo_tweakRenderDistanceFog(float value, float min, float max)
+    private float tweakeroo_tweakRenderDistanceFog_StartDiff(float value, float min, float max)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {

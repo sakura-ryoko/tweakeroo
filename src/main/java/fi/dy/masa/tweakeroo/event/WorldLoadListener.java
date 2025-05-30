@@ -7,6 +7,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.registry.DynamicRegistryManager;
 
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
+import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
@@ -44,6 +45,13 @@ public class WorldLoadListener implements IWorldLoadListener
             {
                 FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
                 FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(true);
+            }
+
+            // Prevents option value de-sync
+            if (FeatureToggle.TWEAK_DARKNESS_VISIBILITY.getBooleanValue() &&
+                mc.options.getDarknessEffectScale().getValue() != Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue())
+            {
+                mc.options.getDarknessEffectScale().setValue(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
             }
         }
 

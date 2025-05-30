@@ -128,7 +128,7 @@ public abstract class MixinWorldRenderer
             int x = MathHelper.floor(camera.getPos().x) >> 4;
             int z = MathHelper.floor(camera.getPos().z) >> 4;
             CameraUtils.markChunksForRebuild(x, z, this.lastUpdatePosX, this.lastUpdatePosZ);
-            // Could send this to ServuX in the future
+            // Could send this to Servux in the future
         }
     }
 }
