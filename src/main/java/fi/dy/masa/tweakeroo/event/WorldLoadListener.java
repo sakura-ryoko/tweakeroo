@@ -51,6 +51,7 @@ public class WorldLoadListener implements IWorldLoadListener
             if (FeatureToggle.TWEAK_DARKNESS_VISIBILITY.getBooleanValue() &&
                 mc.options.getDarknessEffectScale().getValue() != Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue())
             {
+                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(mc.options.getDarknessEffectScale().getValue());
                 mc.options.getDarknessEffectScale().setValue(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
             }
         }
