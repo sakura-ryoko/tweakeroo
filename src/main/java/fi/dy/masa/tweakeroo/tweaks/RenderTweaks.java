@@ -155,7 +155,7 @@ public class RenderTweaks
             {
                 if (posLookingAt != null)
                 {
-                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, true);
+                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, false);
                 }
 
                 renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
@@ -347,7 +347,7 @@ public class RenderTweaks
             else
             {
                 RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, posMatrix, true);
+                                                          colorOverlapping, posMatrix, false);
             }
         }
         else
