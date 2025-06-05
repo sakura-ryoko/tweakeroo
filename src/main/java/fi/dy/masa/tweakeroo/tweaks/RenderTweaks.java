@@ -141,11 +141,6 @@ public class RenderTweaks
             Matrix4fStack globalStack = RenderSystem.getModelViewStack();
 
             globalStack.pushMatrix();
-//            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-//            fi.dy.masa.malilib.render.RenderUtils.blend(true);
-//            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
-//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(true);
-//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(-1.2f, -0.2f);
 
             if (FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE.getBooleanValue())
             {
@@ -155,16 +150,13 @@ public class RenderTweaks
             {
                 if (posLookingAt != null)
                 {
-                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, true);
+                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, false);
                 }
 
                 renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
             }
 
-//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(0f, 0f);
-//            fi.dy.masa.malilib.render.RenderUtils.polygonOffset(false);
             globalStack.popMatrix();
-//            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
             profiler.pop();
         }
     }
@@ -347,7 +339,7 @@ public class RenderTweaks
             else
             {
                 RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, posMatrix, true);
+                                                          colorOverlapping, posMatrix, false);
             }
         }
         else
