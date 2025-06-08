@@ -165,7 +165,11 @@ public class CameraEntity extends ClientPlayerEntity
         float yaw = player.getYaw();
         float pitch = player.getPitch();
 
-        mc.player.setVelocity(Vec3d.ZERO);
+        // Don't reset velocity when flying / swimming.
+        if (mc.player.isOnGround())
+        {
+            mc.player.setVelocity(Vec3d.ZERO);
+        }
 
         CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook(), PlayerInput.DEFAULT, false);
         camera.noClip = true;
