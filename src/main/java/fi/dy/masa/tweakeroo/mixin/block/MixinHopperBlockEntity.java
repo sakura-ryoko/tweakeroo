@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 /**
@@ -25,7 +26,12 @@ public class MixinHopperBlockEntity
     )
     private int modifyShulkerMaxCount(ItemStack instance, Operation<Integer> original)
     {
-        return MiscUtils.isShulkerBox(instance) ? instance.getCount() : original.call(instance);
+        if (Configs.Fixes.STACKABLE_SHULKERS_IN_HOPPER_FIX.getBooleanValue())
+        {
+            return MiscUtils.isShulkerBox(instance) ? instance.getCount() : original.call(instance);
+        }
+
+        return original.call(instance);
     }
 
     @WrapOperation(
@@ -34,7 +40,12 @@ public class MixinHopperBlockEntity
     )
     private static int modifyShulkerMaxCountStatic(ItemStack instance, Operation<Integer> original)
     {
-        return MiscUtils.isShulkerBox(instance) ? 1 : original.call(instance);
+        if (Configs.Fixes.STACKABLE_SHULKERS_IN_HOPPER_FIX.getBooleanValue())
+        {
+            return MiscUtils.isShulkerBox(instance) ? 1 : original.call(instance);
+        }
+
+        return original.call(instance);
     }
 
     @Inject(
@@ -44,6 +55,9 @@ public class MixinHopperBlockEntity
     )
     private static void cancelItemMerging(ItemStack first, ItemStack second, CallbackInfoReturnable<Boolean> cir)
     {
-        if (MiscUtils.isShulkerBox(first) || MiscUtils.isShulkerBox(second)) cir.setReturnValue(false);
+        if (Configs.Fixes.STACKABLE_SHULKERS_IN_HOPPER_FIX.getBooleanValue())
+        {
+            if (MiscUtils.isShulkerBox(first) || MiscUtils.isShulkerBox(second)) cir.setReturnValue(false);
+        }
     }
 }

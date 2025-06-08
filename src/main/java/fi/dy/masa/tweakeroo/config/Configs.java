@@ -273,11 +273,13 @@ public class Configs implements IConfigHandler
 
     public static class Fixes
     {
+        public static final ConfigBoolean STACKABLE_SHULKERS_IN_HOPPER_FIX  = new ConfigBoolean("stackableShulkersInHopperFix", true).apply(FIXES_KEY);
         public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false).apply(FIXES_KEY);
         public static final ConfigBoolean MAC_HORIZONTAL_SCROLL             = new ConfigBoolean("macHorizontalScroll", false).apply(FIXES_KEY);
         public static final ConfigBoolean RAVAGER_CLIENT_BLOCK_BREAK_FIX    = new ConfigBoolean("ravagerClientBlockBreakFix", false).apply(FIXES_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                STACKABLE_SHULKERS_IN_HOPPER_FIX,
                 ELYTRA_FIX,
                 MAC_HORIZONTAL_SCROLL,
                 RAVAGER_CLIENT_BLOCK_BREAK_FIX
