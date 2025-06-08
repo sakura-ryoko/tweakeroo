@@ -3,6 +3,10 @@ package fi.dy.masa.tweakeroo.mixin.item;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.BlockItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,6 +20,7 @@ import net.minecraft.item.ItemStack;
 public abstract class MixinItemStack
 {
     @Shadow public abstract Item getItem();
+    @Shadow public abstract ComponentMap getComponents();
 
     @Inject(method = "getMaxCount", at = @At("RETURN"), cancellable = true)
     public void getMaxStackSizeStackSensitive(CallbackInfoReturnable<Integer> cir)
@@ -25,7 +30,10 @@ public abstract class MixinItemStack
             block.getBlock() instanceof ShulkerBoxBlock &&
             InventoryUtils.shulkerBoxHasItems((ItemStack) (Object) this) == false)
         {
-            cir.setReturnValue(64);
+            if (this.getComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1) < 64)
+            {
+                cir.setReturnValue(64);
+            }
         }
     }
 }
