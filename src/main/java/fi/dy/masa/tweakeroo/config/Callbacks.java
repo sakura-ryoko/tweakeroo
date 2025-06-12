@@ -34,6 +34,7 @@ public class Callbacks
     public static void init(MinecraftClient mc)
     {
         FeatureToggle.TWEAK_GAMMA_OVERRIDE.setValueChangeCallback(new FeatureCallbackGamma(FeatureToggle.TWEAK_GAMMA_OVERRIDE, mc));
+        FeatureToggle.TWEAK_DARKNESS_VISIBILITY.setValueChangeCallback(new FeatureCallbackDarkness(FeatureToggle.TWEAK_DARKNESS_VISIBILITY, mc));
         Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.setValueChangeCallback(new FeatureCallbackSlime(Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN));
 
         FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.getKeybind().setCallback(new KeyCallbackToggleFastMode(FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT));
@@ -198,6 +199,53 @@ public class Callbacks
             @SuppressWarnings("unchecked")
             IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getGamma();
             opt.tweakeroo_setValueWithoutCheck(gamma);
+        }
+    }
+
+    public static class FeatureCallbackDarkness implements IValueChangeCallback<IConfigBoolean>
+    {
+        private final MinecraftClient mc;
+
+        public FeatureCallbackDarkness(FeatureToggle feature, MinecraftClient mc)
+        {
+            this.mc = mc;
+            double darkness = this.mc.options.getDarknessEffectScale().getValue();
+
+            if (darkness <= 1.0F)
+            {
+                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(darkness);
+            }
+
+            // If the feature is enabled on game launch, apply it here
+            if (feature.getBooleanValue())
+            {
+                this.applyValue(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
+            }
+        }
+
+        @Override
+        public void onValueChanged(IConfigBoolean config)
+        {
+            double darkness;
+
+            if (config.getBooleanValue())
+            {
+                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(this.mc.options.getDarknessEffectScale().getValue());
+                darkness = Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue();
+            }
+            else
+            {
+                darkness = Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.getDoubleValue();
+            }
+
+            this.applyValue(darkness);
+        }
+
+        private void applyValue(double darkness)
+        {
+            @SuppressWarnings("unchecked")
+            IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getDarknessEffectScale();
+            opt.tweakeroo_setValueWithoutCheck(darkness);
         }
     }
 

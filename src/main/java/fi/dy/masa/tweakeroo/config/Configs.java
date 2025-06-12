@@ -55,6 +55,7 @@ public class Configs implements IConfigHandler
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]").apply(GENERIC_KEY);
         public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true).apply(GENERIC_KEY);
         public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10).apply(GENERIC_KEY);
+        public static final ConfigDouble        DARKNESS_SCALE_OVERRIDE_VALUE       = new ConfigDouble      ("darknessScaleOverrideValue", 0.45D, 0.0D, 1.00D).apply(GENERIC_KEY);
         public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
         public static final ConfigOptionList    ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY).apply(GENERIC_KEY);
         public static final ConfigDouble        ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64).apply(GENERIC_KEY);
@@ -201,6 +202,7 @@ public class Configs implements IConfigHandler
                 ANGEL_BLOCK_PLACEMENT_DISTANCE,
                 BREAKING_GRID_SIZE,
                 CUSTOM_INVENTORY_GUI_SCALE,
+                DARKNESS_SCALE_OVERRIDE_VALUE,
                 ENTITY_REACH_DISTANCE,
                 FAST_BLOCK_PLACEMENT_COUNT,
                 FAST_LEFT_CLICK_COUNT,
@@ -356,6 +358,7 @@ public class Configs implements IConfigHandler
     public static class Disable
     {
         public static final ConfigBooleanHotkeyed       DISABLE_ARMOR_STAND_RENDERING   = new ConfigBooleanHotkeyed("disableArmorStandRendering",           false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_ATMOSPHERIC_FOG         = new ConfigBooleanHotkeyed("disableAtmosphericFog",                false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_AXE_STRIPPING           = new ConfigBooleanHotkeyed("disableAxeStripping",                  false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BAT_SPAWNING            = new ConfigBooleanClient  ("disableBatSpawning",                   false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BEACON_BEAM_RENDERING   = new ConfigBooleanHotkeyed("disableBeaconBeamRendering",           false, "").apply(DISABLE_KEY);
@@ -403,6 +406,7 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IHotkeyTogglable> OPTIONS = ImmutableList.of(
                 DISABLE_ARMOR_STAND_RENDERING,
+                DISABLE_ATMOSPHERIC_FOG,
                 DISABLE_AXE_STRIPPING,
                 DISABLE_BAT_SPAWNING,
                 DISABLE_BEACON_BEAM_RENDERING,
@@ -452,6 +456,7 @@ public class Configs implements IConfigHandler
 
     public static class Internal
     {
+        public static final ConfigDouble        DARKNESS_SCALE_VALUE_ORIGINAL       = new ConfigDouble      ("darknessScaleValueOriginal", 0.0D, 0.0D, 1.0D).apply(INTERNAL_KEY);
         public static final ConfigInteger       FLY_SPEED_PRESET                    = new ConfigInteger     ("flySpeedPreset", 0, 0, 3).apply(INTERNAL_KEY);
         public static final ConfigDouble        GAMMA_VALUE_ORIGINAL                = new ConfigDouble      ("gammaValueOriginal", 0, 0, 1).apply(INTERNAL_KEY);
         public static final ConfigInteger       HOTBAR_SCROLL_CURRENT_ROW           = new ConfigInteger     ("hotbarScrollCurrentRow", 3, 0, 3).apply(INTERNAL_KEY);
@@ -460,6 +465,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                DARKNESS_SCALE_VALUE_ORIGINAL,
                 FLY_SPEED_PRESET,
                 GAMMA_VALUE_ORIGINAL,
                 HOTBAR_SCROLL_CURRENT_ROW,

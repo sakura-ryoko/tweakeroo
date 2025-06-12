@@ -12,6 +12,7 @@ import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
@@ -24,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -41,6 +43,7 @@ import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.nbt.NbtBlockUtils;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
+import fi.dy.masa.malilib.util.nbt.NbtView;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
@@ -121,7 +124,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
         if (!this.isEmpty())
         {
-            this.renderInventoryOverlay(this.getRenderContextNullable(), drawContext, mc,
+            this.renderInventoryOverlay(drawContext, this.getRenderContextNullable(), mc,
                                         Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(),
                                         Configs.Generic.INVENTORY_PREVIEW_VILLAGER_BG_COLOR.getBooleanValue());
         }
@@ -223,7 +226,16 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
             if (world instanceof ServerWorld)
             {
-                entity.saveSelfNbt(nbt);
+//                entity.saveSelfNbt(nbt);
+                NbtView view = NbtView.getWriter(world.getRegistryManager());
+                entity.writeData(view.getWriter());
+                nbt = view.readNbt();
+                Identifier id = EntityType.getId(entity.getType());
+
+                if (nbt != null && id != null)
+                {
+                    nbt.putString("id", id.toString());
+                }
             }
             else
             {

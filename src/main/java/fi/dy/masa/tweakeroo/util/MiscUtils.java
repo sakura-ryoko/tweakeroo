@@ -405,7 +405,7 @@ public class MiscUtils
     public static void printDeathCoordinates(MinecraftClient mc)
     {
         BlockPos pos = PositionUtils.getEntityBlockPos(mc.player);
-        String dim = mc.player.getEntityWorld().getRegistryKey().getValue().toString();
+        String dim = mc.player.getWorld().getRegistryKey().getValue().toString();
         String str = StringUtils.translate("tweakeroo.message.death_coordinates",
                                            pos.getX(), pos.getY(), pos.getZ(), dim);
         MutableText message = Text.literal(str);

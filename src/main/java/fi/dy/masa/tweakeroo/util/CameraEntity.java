@@ -11,6 +11,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.stat.StatHandler;
+import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -28,9 +29,9 @@ public class CameraEntity extends ClientPlayerEntity
 
     private CameraEntity(MinecraftClient mc, ClientWorld world,
                          ClientPlayNetworkHandler netHandler, StatHandler stats,
-                         ClientRecipeBook recipeBook)
+                         ClientRecipeBook recipeBook, PlayerInput input, boolean sprinting)
     {
-        super(mc, world, netHandler, stats, recipeBook, false, false);
+        super(mc, world, netHandler, stats, recipeBook, input, sprinting);
     }
 
     @Override
@@ -170,7 +171,7 @@ public class CameraEntity extends ClientPlayerEntity
             mc.player.setVelocity(Vec3d.ZERO);
         }
 
-        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook());
+        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook(), PlayerInput.DEFAULT, false);
         camera.noClip = true;
 //
 //        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
@@ -210,7 +211,7 @@ public class CameraEntity extends ClientPlayerEntity
                 removeCamera(mc);
             }
 
-            mc.gameRenderer.setRenderHand(! enabled);
+//            mc.gameRenderer.setRenderHand(! enabled);
         }
     }
 
