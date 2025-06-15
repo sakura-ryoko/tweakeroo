@@ -15,6 +15,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+/**
+ * Using MaLiLib's RayTraceUtils under util/game
+ */
+@Deprecated(forRemoval = true)
 public class RayTraceUtils
 {
     @Nonnull
