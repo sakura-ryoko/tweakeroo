@@ -170,7 +170,7 @@ public class RenderHandler implements IRenderer
                         try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
                         {
                             NbtCompound nbt = new NbtCompound();
-                            NbtList list = nbtInv.toNbtList();
+                            NbtList list = nbtInv.toNbtList(world.getRegistryManager());
 
                             nbt.put(NbtKeys.ENDER_ITEMS, list);
                             fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(drawContext, stack, nbt, x, y, false);
