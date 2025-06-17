@@ -142,7 +142,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         Entity cameraEntity = EntityUtils.getCameraEntity();
         this.context = null;
 
-        if (mc.player == null || world == null)
+        if (mc.player == null || world == null || mc.world == null)
         {
             return null;
         }
@@ -164,7 +164,17 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             return null;
         }
 
-        HitResult trace = RayTraceUtils.getRayTraceFromEntity(cameraEntity.getWorld(), cameraEntity, RaycastContext.FluidHandling.NONE);
+        HitResult trace;
+
+        if (cameraEntity != mc.player)
+        {
+            trace = RayTraceUtils.getRayTraceFromEntity(mc.world, cameraEntity, RaycastContext.FluidHandling.NONE);
+        }
+        else
+        {
+            trace = mc.crosshairTarget;
+        }
+
         NbtCompound nbt = new NbtCompound();
 
         if (trace == null || trace.getType() == HitResult.Type.MISS)
@@ -232,15 +242,23 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
             if (world instanceof ServerWorld)
             {
-//                entity.saveSelfNbt(nbt);
-                NbtView view = NbtView.getWriter(world.getRegistryManager());
-                entity.writeData(view.getWriter());
-                nbt = view.readNbt();
-                Identifier id = EntityType.getId(entity.getType());
+                entity = world.getEntityById(entity.getId());
 
-                if (nbt != null && id != null)
+                if (entity != null)
                 {
-                    nbt.putString("id", id.toString());
+                    NbtView view = NbtView.getWriter(world.getRegistryManager());
+                    entity.writeData(view.getWriter());
+                    nbt = view.readNbt();
+                    Identifier id = EntityType.getId(entity.getType());
+
+                    if (nbt != null && id != null)
+                    {
+                        nbt.putString("id", id.toString());
+                    }
+                }
+                else
+                {
+                    return null;
                 }
             }
             else

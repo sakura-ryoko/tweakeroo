@@ -144,7 +144,6 @@ public class RenderHandler implements IRenderer
                 if (player != null)
                 {
                     Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
-                    NbtCompound nbt = new NbtCompound();
                     EnderChestInventory inv;
 
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
@@ -170,8 +169,10 @@ public class RenderHandler implements IRenderer
                     {
                         try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
                         {
-//                            nbt.put(NbtKeys.ENDER_ITEMS, inv.toNbtList(world.getRegistryManager()));
-                            nbt.copyFrom(nbtInv.toNbt(NbtList.TYPE, NbtKeys.ENDER_ITEMS));
+                            NbtCompound nbt = new NbtCompound();
+                            NbtList list = nbtInv.toNbtList();
+
+                            nbt.put(NbtKeys.ENDER_ITEMS, list);
                             fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(drawContext, stack, nbt, x, y, false);
                         }
                         catch (Exception ignored) { }
