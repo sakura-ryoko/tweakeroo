@@ -1,10 +1,12 @@
 package fi.dy.masa.tweakeroo.mixin.hud;
 
 import java.util.UUID;
-import org.spongepowered.asm.mixin.Mixin;
+
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.Text;
+import org.spongepowered.asm.mixin.Mixin;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(ClientBossBar.class)

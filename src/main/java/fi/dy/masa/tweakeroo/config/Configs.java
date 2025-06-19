@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.util.MessageOutputType;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -38,115 +39,123 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
-        public static final ConfigOptionList    ACCURATE_PLACEMENT_PROTOCOL_MODE    = new ConfigOptionList  ("accuratePlacementProtocolMode", EasyPlacementProtocol.AUTO).apply(GENERIC_KEY);
-        public static final ConfigBoolean       ACCURATE_PLACEMENT_PROTOCOL         = new ConfigBoolean     ("accuratePlacementProtocol", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       AFTER_CLICKER_CLICK_COUNT           = new ConfigInteger     ("afterClickerClickCount",  1, 1, 32).apply(GENERIC_KEY);
-        public static final ConfigDouble        ANGEL_BLOCK_PLACEMENT_DISTANCE      = new ConfigDouble      ("angelBlockPlacementDistance",  3, 1, 5).apply(GENERIC_KEY);
-        public static final ConfigBoolean       AREA_SELECTION_USE_ALL              = new ConfigBoolean     ("areaSelectionUseAll", false).apply(GENERIC_KEY);
-        public static final ConfigDouble        BLOCK_REACH_DISTANCE                = new ConfigDouble      ("blockReachDistance", 4.5, 1, 64).apply(GENERIC_KEY);
-        public static final ConfigOptionList    BLOCK_TYPE_BREAK_RESTRICTION_WARN   = new ConfigOptionList  ("blockTypeBreakRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
-        public static final ConfigInteger       BREAKING_GRID_SIZE                  = new ConfigInteger     ("breakingGridSize", 3, 1, 1000).apply(GENERIC_KEY);
-        public static final ConfigInteger       RESTRICTION_LAYER_HEIGHT            = new ConfigInteger     ("restrictionLayerHeight", 1, -1000, 1000, "The layer height for the layer restriction mode.\nTo quickly adjust the value, scroll while\nholding down the tweak toggle keybind.");
-        public static final ConfigOptionList    BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE).apply(GENERIC_KEY);
-        public static final ConfigBoolean       BUNDLE_DISPLAY_BACKGROUND_COLOR     = new ConfigBoolean     ("bundleDisplayBgColor", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       BUNDLE_DISPLAY_REQUIRE_SHIFT        = new ConfigBoolean     ("bundleDisplayRequireShift", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       BUNDLE_DISPLAY_ROW_WIDTH            = new ConfigInteger     ("bundleDisplayRowWidth", 9, 6, 9).apply(GENERIC_KEY);
-        public static final ConfigColor         CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000").apply(GENERIC_KEY);
-        public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]").apply(GENERIC_KEY);
-        public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10).apply(GENERIC_KEY);
-        public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
-        public static final ConfigOptionList    ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY).apply(GENERIC_KEY);
-        public static final ConfigDouble        ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64).apply(GENERIC_KEY);
-        public static final ConfigOptionList    ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
-        public static final ConfigInteger       FAST_BLOCK_PLACEMENT_COUNT          = new ConfigInteger     ("fastBlockPlacementCount", 2, 1, 16).apply(GENERIC_KEY);
-        public static final ConfigBoolean       FAST_LEFT_CLICK_ALLOW_TOOLS         = new ConfigBoolean     ("fastLeftClickAllowTools", false).apply(GENERIC_KEY);
-        public static final ConfigInteger       FAST_LEFT_CLICK_COUNT               = new ConfigInteger     ("fastLeftClickCount",  10, 1, 64).apply(GENERIC_KEY);
-        public static final ConfigBoolean       FAST_PLACEMENT_REMEMBER_ALWAYS      = new ConfigBoolean     ("fastPlacementRememberOrientation", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       FAST_RIGHT_CLICK_COUNT              = new ConfigInteger     ("fastRightClickCount", 10, 1, 64).apply(GENERIC_KEY);
-        public static final ConfigInteger       FILL_CLONE_LIMIT                    = new ConfigInteger     ("fillCloneLimit", 10000000, 1, 1000000000).apply(GENERIC_KEY);
-        public static final ConfigColor         FLEXIBLE_PLACEMENT_OVERLAY_COLOR    = new ConfigColor       ("flexibleBlockPlacementOverlayColor", "#C03030F0").apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_DECELERATION_FACTOR             = new ConfigDouble      ("flyDecelerationFactor", 0.4, 0.0, 1.0).apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_SPEED_PRESET_1                  = new ConfigDouble      ("flySpeedPreset1", 0.01, 0, 4).apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_SPEED_PRESET_2                  = new ConfigDouble      ("flySpeedPreset2", 0.064, 0, 4).apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_SPEED_PRESET_3                  = new ConfigDouble      ("flySpeedPreset3", 0.128, 0, 4).apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_SPEED_PRESET_4                  = new ConfigDouble      ("flySpeedPreset4", 0.32, 0, 4).apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_SPEED_INCREMENT_1               = new ConfigDouble      ("flySpeedIncrement1", 0.128, -4, 4).apply(GENERIC_KEY);
-        public static final ConfigDouble        FLY_SPEED_INCREMENT_2               = new ConfigDouble      ("flySpeedIncrement2", -0.128, -4, 4).apply(GENERIC_KEY);
-        public static final ConfigBoolean       FREE_CAMERA_PLAYER_INPUTS           = new ConfigBoolean     ("freeCameraPlayerInputs", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       FREE_CAMERA_PLAYER_MOVEMENT         = new ConfigBoolean     ("freeCameraPlayerMovement", false).apply(GENERIC_KEY);
-        public static final ConfigDouble        GAMMA_OVERRIDE_VALUE                = new ConfigDouble      ("gammaOverrideValue", 16, 0, 32).apply(GENERIC_KEY);
-        public static final ConfigBoolean       HAND_RESTOCK_PRE                    = new ConfigBoolean     ("handRestockPre", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       HAND_RESTOCK_PRE_THRESHOLD          = new ConfigInteger     ("handRestockPreThreshold", 6, 1, 64).apply(GENERIC_KEY);
-        public static final ConfigBoolean       HANGABLE_ENTITY_BYPASS_INVERSE      = new ConfigBoolean     ("hangableEntityBypassInverse", false).apply(GENERIC_KEY);
-        public static final ConfigInteger       HOTBAR_SLOT_CYCLE_MAX               = new ConfigInteger     ("hotbarSlotCycleMax", 2, 1, 9).apply(GENERIC_KEY);
-        public static final ConfigInteger       HOTBAR_SLOT_RANDOMIZER_MAX          = new ConfigInteger     ("hotbarSlotRandomizerMax", 5, 1, 9).apply(GENERIC_KEY);
-        public static final ConfigOptionList    HOTBAR_SWAP_OVERLAY_ALIGNMENT       = new ConfigOptionList  ("hotbarSwapOverlayAlignment", HudAlignment.BOTTOM_RIGHT).apply(GENERIC_KEY);
-        public static final ConfigInteger       HOTBAR_SWAP_OVERLAY_OFFSET_X        = new ConfigInteger     ("hotbarSwapOverlayOffsetX", 4).apply(GENERIC_KEY);
-        public static final ConfigInteger       HOTBAR_SWAP_OVERLAY_OFFSET_Y        = new ConfigInteger     ("hotbarSwapOverlayOffsetY", 4).apply(GENERIC_KEY);
-        public static final ConfigBoolean       INVENTORY_PREVIEW_VILLAGER_BG_COLOR = new ConfigBoolean     ("inventoryPreviewVillagerBGColor", false).apply(GENERIC_KEY);
-        public static final ConfigInteger       ITEM_SWAP_DURABILITY_THRESHOLD      = new ConfigInteger     ("itemSwapDurabilityThreshold", 20, 5, 10000).apply(GENERIC_KEY);
-        public static final ConfigBoolean       ITEM_USE_PACKET_CHECK_BYPASS        = new ConfigBoolean     ("itemUsePacketCheckBypass", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       MAP_PREVIEW_REQUIRE_SHIFT           = new ConfigBoolean     ("mapPreviewRequireShift", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       MAP_PREVIEW_SIZE                    = new ConfigInteger     ("mapPreviewSize", 160, 16, 512).apply(GENERIC_KEY);
-        public static final ConfigInteger       PERIODIC_ATTACK_INTERVAL            = new ConfigInteger     ("periodicAttackInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
-        public static final ConfigBoolean       PERIODIC_ATTACK_RESET_ON_ACTIVATE   = new ConfigBoolean     ("periodicAttackResetIntervalOnActivate", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       PERIODIC_USE_INTERVAL               = new ConfigInteger     ("periodicUseInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
-        public static final ConfigBoolean       PERIODIC_USE_RESET_ON_ACTIVATE      = new ConfigBoolean     ("periodicUseResetIntervalOnActivate", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       PERIODIC_HOLD_ATTACK_DURATION       = new ConfigInteger     ("periodicHoldAttackDuration", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
-        public static final ConfigInteger       PERIODIC_HOLD_ATTACK_INTERVAL       = new ConfigInteger     ("periodicHoldAttackInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
-        public static final ConfigBoolean       PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE= new ConfigBoolean   ("periodicHoldAttackResetIntervalOnActivate", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       PERIODIC_HOLD_USE_DURATION          = new ConfigInteger     ("periodicHoldUseDuration", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
-        public static final ConfigInteger       PERIODIC_HOLD_USE_INTERVAL          = new ConfigInteger     ("periodicHoldUseInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
-        public static final ConfigBoolean       PERIODIC_HOLD_USE_RESET_ON_ACTIVATE = new ConfigBoolean     ("periodicHoldUseResetIntervalOnActivate", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       PERMANENT_SNEAK_ALLOW_IN_GUIS       = new ConfigBoolean     ("permanentSneakAllowInGUIs", false).apply(GENERIC_KEY);
-        public static final ConfigInteger       PLACEMENT_GRID_SIZE                 = new ConfigInteger     ("placementGridSize", 3, 1, 1000).apply(GENERIC_KEY);
-        public static final ConfigInteger       PLACEMENT_LIMIT                     = new ConfigInteger     ("placementLimit", 3, 1, 10000).apply(GENERIC_KEY);
-        public static final ConfigOptionList    PLACEMENT_RESTRICTION_MODE          = new ConfigOptionList  ("placementRestrictionMode", PlacementRestrictionMode.FACE).apply(GENERIC_KEY);
-        public static final ConfigBoolean       PLACEMENT_RESTRICTION_TIED_TO_FAST  = new ConfigBoolean     ("placementRestrictionTiedToFast", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       POTION_WARNING_BENEFICIAL_ONLY      = new ConfigBoolean     ("potionWarningBeneficialOnly", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       POTION_WARNING_THRESHOLD            = new ConfigInteger     ("potionWarningThreshold", 600, 1, 1000000).apply(GENERIC_KEY);
-        public static final ConfigBoolean       REMEMBER_FLEXIBLE                   = new ConfigBoolean     ("rememberFlexibleFromClick", true).apply(GENERIC_KEY);
-        public static final ConfigInteger       RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
-        public static final ConfigInteger       RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
-        public static final ConfigInteger       SCAFFOLD_PLACE_DISTANCE             = new ConfigInteger     ("scaffoldPlaceDistance", 5, 1, 20).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SCAFFOLD_PLACE_VANILLA              = new ConfigBoolean     ("scaffoldPlaceVanilla", false).apply(GENERIC_KEY);
-        public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SELECTIVE_BLOCKS_TRACK_PISTONS      = new ConfigBoolean     ("selectiveBlocksTrackPistons", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_PARTICLES     = new ConfigBoolean     ("selectiveBlocksHideParticles", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_ENTITIES      = new ConfigBoolean     ("selectiveBlocksHideEntities", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SELECTIVE_BLOCKS_NO_HIT             = new ConfigBoolean     ("selectiveBlocksNoHit", true).apply(GENERIC_KEY);
-        public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("serverDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
-        public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 0.75f, 0.25f, 5.0f).apply(GENERIC_KEY);
-        public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean     ("shulkerDisplayRequireShift", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SLOT_SYNC_WORKAROUND                = new ConfigBoolean     ("slotSyncWorkaround", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SLOT_SYNC_WORKAROUND_ALWAYS         = new ConfigBoolean     ("slotSyncWorkaroundAlways", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SNAP_AIM_INDICATOR                  = new ConfigBoolean     ("snapAimIndicator", true).apply(GENERIC_KEY);
-        public static final ConfigColor         SNAP_AIM_INDICATOR_COLOR            = new ConfigColor       ("snapAimIndicatorColor", "#603030FF").apply(GENERIC_KEY);
-        public static final ConfigOptionList    SNAP_AIM_MODE                       = new ConfigOptionList  ("snapAimMode", SnapAimMode.YAW).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SNAP_AIM_ONLY_CLOSE_TO_ANGLE        = new ConfigBoolean     ("snapAimOnlyCloseToAngle", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SNAP_AIM_PITCH_OVERSHOOT            = new ConfigBoolean     ("snapAimPitchOvershoot", false).apply(GENERIC_KEY);
-        public static final ConfigDouble        SNAP_AIM_PITCH_STEP                 = new ConfigDouble      ("snapAimPitchStep", 12.5, 0, 90).apply(GENERIC_KEY);
-        public static final ConfigDouble        SNAP_AIM_THRESHOLD_PITCH            = new ConfigDouble      ("snapAimThresholdPitch", 1.5).apply(GENERIC_KEY);
-        public static final ConfigDouble        SNAP_AIM_THRESHOLD_YAW              = new ConfigDouble      ("snapAimThresholdYaw", 5.0).apply(GENERIC_KEY);
-        public static final ConfigDouble        SNAP_AIM_YAW_STEP                   = new ConfigDouble      ("snapAimYawStep", 45, 0, 360).apply(GENERIC_KEY);
-        public static final ConfigInteger       STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
-        public static final ConfigString        TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
-        public static final ConfigString        TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_BETTER_ENCHANTS         = new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_PREFER_SILK_TOUCH       = new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_BAMBOO_USES_SWORD_FIRST = new ConfigBooleanHotkeyed ("toolSwapBambooUsesSwordFirst", true, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_NEEDS_SHEARS_FIRST      = new ConfigBooleanHotkeyed ("toolSwapNeedsShearsFirst", true, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_FIRST        = new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_ORES         = new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed TOOL_SWAP_SILK_TOUCH_OVERRIDE     = new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed WEAPON_SWAP_BETTER_ENCHANTS       = new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", false, "").apply(GENERIC_KEY);
-        public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
-        public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
-        public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigOptionList    	ACCURATE_PLACEMENT_PROTOCOL_MODE    = new ConfigOptionList  ("accuratePlacementProtocolMode", EasyPlacementProtocol.AUTO).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	ACCURATE_PLACEMENT_PROTOCOL         = new ConfigBoolean     ("accuratePlacementProtocol", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	AFTER_CLICKER_CLICK_COUNT           = new ConfigInteger     ("afterClickerClickCount",  1, 1, 32).apply(GENERIC_KEY);
+        public static final ConfigDouble        	ANGEL_BLOCK_PLACEMENT_DISTANCE      = new ConfigDouble      ("angelBlockPlacementDistance",  3, 1, 5).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	AREA_SELECTION_USE_ALL              = new ConfigBoolean     ("areaSelectionUseAll", false).apply(GENERIC_KEY);
+        public static final ConfigDouble        	BLOCK_REACH_DISTANCE                = new ConfigDouble      ("blockReachDistance", 4.5, 1, 64).apply(GENERIC_KEY);
+        public static final ConfigOptionList    	BLOCK_TYPE_BREAK_RESTRICTION_WARN   = new ConfigOptionList  ("blockTypeBreakRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
+        public static final ConfigInteger       	BREAKING_GRID_SIZE                  = new ConfigInteger     ("breakingGridSize", 3, 1, 1000).apply(GENERIC_KEY);
+        public static final ConfigInteger       	RESTRICTION_LAYER_HEIGHT            = new ConfigInteger     ("restrictionLayerHeight", 1, -1000, 1000, "The layer height for the layer restriction mode.\nTo quickly adjust the value, scroll while\nholding down the tweak toggle keybind.");
+        public static final ConfigOptionList    	BREAKING_RESTRICTION_MODE           = new ConfigOptionList  ("breakingRestrictionMode", PlacementRestrictionMode.LINE).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	BUNDLE_DISPLAY_BACKGROUND_COLOR     = new ConfigBoolean     ("bundleDisplayBgColor", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	BUNDLE_DISPLAY_REQUIRE_SHIFT        = new ConfigBoolean     ("bundleDisplayRequireShift", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	BUNDLE_DISPLAY_ROW_WIDTH            = new ConfigInteger     ("bundleDisplayRowWidth", 9, 6, 9).apply(GENERIC_KEY);
+        public static final ConfigColor         	CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000").apply(GENERIC_KEY);
+        public static final ConfigString        	CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]").apply(GENERIC_KEY);
+        public static final ConfigBoolean       	CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	CLIENT_PLACEMENT_VALIDATION         = new ConfigBoolean     ("clientPlacementValidation", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10).apply(GENERIC_KEY);
+//        public static final ConfigDouble        	DARKNESS_SCALE_OVERRIDE_VALUE       = new ConfigDouble      ("darknessScaleOverrideValue", 0.45D, 0.0D, 1.00D).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
+        public static final ConfigOptionList    	ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY).apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed   ENTITY_DATA_SYNC                    = new ConfigBooleanHotkeyed ("entityDataSync", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed   ENTITY_DATA_SYNC_BACKUP             = new ConfigBooleanHotkeyed ("entityDataSyncBackup", false, "").apply(GENERIC_KEY);
+        public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("entityDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
+        public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("entityDataSyncCacheTimeout", 2.75f, 1.0f, 25.0f).apply(GENERIC_KEY);
+        public static final ConfigDouble        	ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64).apply(GENERIC_KEY);
+        public static final ConfigOptionList    	ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
+        public static final ConfigInteger       	FAST_BLOCK_PLACEMENT_COUNT          = new ConfigInteger     ("fastBlockPlacementCount", 2, 1, 16).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	FAST_LEFT_CLICK_ALLOW_TOOLS         = new ConfigBoolean     ("fastLeftClickAllowTools", false).apply(GENERIC_KEY);
+        public static final ConfigInteger       	FAST_LEFT_CLICK_COUNT               = new ConfigInteger     ("fastLeftClickCount",  10, 1, 64).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	FAST_PLACEMENT_REMEMBER_ALWAYS      = new ConfigBoolean     ("fastPlacementRememberOrientation", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	FAST_RIGHT_CLICK_COUNT              = new ConfigInteger     ("fastRightClickCount", 10, 1, 64).apply(GENERIC_KEY);
+        public static final ConfigInteger       	FILL_CLONE_LIMIT                    = new ConfigInteger     ("fillCloneLimit", 10000000, 1, 1000000000).apply(GENERIC_KEY);
+        public static final ConfigColor         	FLEXIBLE_PLACEMENT_OVERLAY_COLOR    = new ConfigColor       ("flexibleBlockPlacementOverlayColor", "#C03030F0").apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_DECELERATION_FACTOR             = new ConfigDouble      ("flyDecelerationFactor", 0.4, 0.0, 1.0).apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_SPEED_PRESET_1                  = new ConfigDouble      ("flySpeedPreset1", 0.01, 0, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_SPEED_PRESET_2                  = new ConfigDouble      ("flySpeedPreset2", 0.064, 0, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_SPEED_PRESET_3                  = new ConfigDouble      ("flySpeedPreset3", 0.128, 0, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_SPEED_PRESET_4                  = new ConfigDouble      ("flySpeedPreset4", 0.32, 0, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_SPEED_INCREMENT_1               = new ConfigDouble      ("flySpeedIncrement1", 0.128, -4, 4).apply(GENERIC_KEY);
+        public static final ConfigDouble        	FLY_SPEED_INCREMENT_2               = new ConfigDouble      ("flySpeedIncrement2", -0.128, -4, 4).apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed   FREE_CAMERA_PLAYER_INPUTS           = new ConfigBooleanHotkeyed ("freeCameraPlayerInputs", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed   FREE_CAMERA_PLAYER_MOVEMENT         = new ConfigBooleanHotkeyed ("freeCameraPlayerMovement", false, "").apply(GENERIC_KEY);
+		public static final ConfigBooleanHotkeyed	FREE_CAMERA_SHOW_HANDS				= new ConfigBooleanHotkeyed ("freeCameraShowHands", false, "").apply(GENERIC_KEY);
+		public static final ConfigBooleanHotkeyed	FREE_CAMERA_SHOW_HOTBAR				= new ConfigBooleanHotkeyed ("freeCameraShowHotBar", false, "").apply(GENERIC_KEY);
+	    public static final ConfigBooleanHotkeyed	FREE_CAMERA_SHOW_STATUS_BARS    	= new ConfigBooleanHotkeyed ("freeCameraShowStatusBars", false, "").apply(GENERIC_KEY);
+        public static final ConfigDouble        	GAMMA_OVERRIDE_VALUE                = new ConfigDouble      ("gammaOverrideValue", 16, 0, 32).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	HAND_RESTOCK_PRE                    = new ConfigBoolean     ("handRestockPre", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	HAND_RESTOCK_PRE_THRESHOLD          = new ConfigInteger     ("handRestockPreThreshold", 6, 1, 64).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	HANGABLE_ENTITY_BYPASS_INVERSE      = new ConfigBoolean     ("hangableEntityBypassInverse", false).apply(GENERIC_KEY);
+        public static final ConfigInteger       	HOTBAR_SLOT_CYCLE_MAX               = new ConfigInteger     ("hotbarSlotCycleMax", 2, 1, 9).apply(GENERIC_KEY);
+        public static final ConfigInteger       	HOTBAR_SLOT_RANDOMIZER_MAX          = new ConfigInteger     ("hotbarSlotRandomizerMax", 5, 1, 9).apply(GENERIC_KEY);
+        public static final ConfigOptionList    	HOTBAR_SWAP_OVERLAY_ALIGNMENT       = new ConfigOptionList  ("hotbarSwapOverlayAlignment", HudAlignment.BOTTOM_RIGHT).apply(GENERIC_KEY);
+        public static final ConfigInteger       	HOTBAR_SWAP_OVERLAY_OFFSET_X        = new ConfigInteger     ("hotbarSwapOverlayOffsetX", 4).apply(GENERIC_KEY);
+        public static final ConfigInteger       	HOTBAR_SWAP_OVERLAY_OFFSET_Y        = new ConfigInteger     ("hotbarSwapOverlayOffsetY", 4).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	INVENTORY_PREVIEW_VILLAGER_BG_COLOR = new ConfigBoolean     ("inventoryPreviewVillagerBGColor", false).apply(GENERIC_KEY);
+        public static final ConfigInteger       	ITEM_SWAP_DURABILITY_THRESHOLD      = new ConfigInteger     ("itemSwapDurabilityThreshold", 20, 5, 10000).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	ITEM_USE_PACKET_CHECK_BYPASS        = new ConfigBoolean     ("itemUsePacketCheckBypass", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	MAP_PREVIEW_REQUIRE_SHIFT           = new ConfigBoolean     ("mapPreviewRequireShift", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	MAP_PREVIEW_SIZE                    = new ConfigInteger     ("mapPreviewSize", 160, 16, 512).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PERIODIC_ATTACK_INTERVAL            = new ConfigInteger     ("periodicAttackInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
+//        public static final ConfigBoolean       	PERIODIC_ATTACK_RESET_ON_ACTIVATE   = new ConfigBoolean     ("periodicAttackResetIntervalOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PERIODIC_USE_INTERVAL               = new ConfigInteger     ("periodicUseInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
+//        public static final ConfigBoolean       	PERIODIC_USE_RESET_ON_ACTIVATE      = new ConfigBoolean     ("periodicUseResetIntervalOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PERIODIC_HOLD_ATTACK_DURATION       = new ConfigInteger     ("periodicHoldAttackDuration", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PERIODIC_HOLD_ATTACK_INTERVAL       = new ConfigInteger     ("periodicHoldAttackInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
+//        public static final ConfigBoolean       	PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE= new ConfigBoolean   ("periodicHoldAttackResetIntervalOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PERIODIC_HOLD_USE_DURATION          = new ConfigInteger     ("periodicHoldUseDuration", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PERIODIC_HOLD_USE_INTERVAL          = new ConfigInteger     ("periodicHoldUseInterval", 20, 0, Integer.MAX_VALUE).apply(GENERIC_KEY);
+//        public static final ConfigBoolean       	PERIODIC_HOLD_USE_RESET_ON_ACTIVATE = new ConfigBoolean     ("periodicHoldUseResetIntervalOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	PERMANENT_SNEAK_ALLOW_IN_GUIS       = new ConfigBoolean     ("permanentSneakAllowInGUIs", false).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PLACEMENT_GRID_SIZE                 = new ConfigInteger     ("placementGridSize", 3, 1, 1000).apply(GENERIC_KEY);
+        public static final ConfigInteger       	PLACEMENT_LIMIT                     = new ConfigInteger     ("placementLimit", 3, 1, 10000).apply(GENERIC_KEY);
+        public static final ConfigOptionList    	PLACEMENT_RESTRICTION_MODE          = new ConfigOptionList  ("placementRestrictionMode", PlacementRestrictionMode.FACE).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	PLACEMENT_RESTRICTION_TIED_TO_FAST  = new ConfigBoolean     ("placementRestrictionTiedToFast", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	POTION_WARNING_BENEFICIAL_ONLY      = new ConfigBoolean     ("potionWarningBeneficialOnly", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	POTION_WARNING_THRESHOLD            = new ConfigInteger     ("potionWarningThreshold", 600, 1, 1000000).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	REMEMBER_FLEXIBLE                   = new ConfigBoolean     ("rememberFlexibleFromClick", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
+        public static final ConfigInteger       	RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
+        public static final ConfigInteger       	SCAFFOLD_PLACE_DISTANCE             = new ConfigInteger     ("scaffoldPlaceDistance", 5, 1, 20).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SCAFFOLD_PLACE_VANILLA              = new ConfigBoolean     ("scaffoldPlaceVanilla", false).apply(GENERIC_KEY);
+        public static final ConfigInteger       	SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SELECTIVE_BLOCKS_TRACK_PISTONS      = new ConfigBoolean     ("selectiveBlocksTrackPistons", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SELECTIVE_BLOCKS_HIDE_PARTICLES     = new ConfigBoolean     ("selectiveBlocksHideParticles", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SELECTIVE_BLOCKS_HIDE_ENTITIES      = new ConfigBoolean     ("selectiveBlocksHideEntities", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SELECTIVE_BLOCKS_NO_HIT             = new ConfigBoolean     ("selectiveBlocksNoHit", true).apply(GENERIC_KEY);
+        public static final ConfigInteger       	SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
+		public static final ConfigBoolean       	SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean     ("shulkerDisplayRequireShift", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SLOT_SYNC_WORKAROUND                = new ConfigBoolean     ("slotSyncWorkaround", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SLOT_SYNC_WORKAROUND_ALWAYS         = new ConfigBoolean     ("slotSyncWorkaroundAlways", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SNAP_AIM_INDICATOR                  = new ConfigBoolean     ("snapAimIndicator", true).apply(GENERIC_KEY);
+        public static final ConfigColor         	SNAP_AIM_INDICATOR_COLOR            = new ConfigColor       ("snapAimIndicatorColor", "#603030FF").apply(GENERIC_KEY);
+        public static final ConfigOptionList    	SNAP_AIM_MODE                       = new ConfigOptionList  ("snapAimMode", SnapAimMode.YAW).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SNAP_AIM_ONLY_CLOSE_TO_ANGLE        = new ConfigBoolean     ("snapAimOnlyCloseToAngle", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       	SNAP_AIM_PITCH_OVERSHOOT            = new ConfigBoolean     ("snapAimPitchOvershoot", false).apply(GENERIC_KEY);
+        public static final ConfigDouble        	SNAP_AIM_PITCH_STEP                 = new ConfigDouble      ("snapAimPitchStep", 12.5, 0, 90).apply(GENERIC_KEY);
+        public static final ConfigDouble        	SNAP_AIM_THRESHOLD_PITCH            = new ConfigDouble      ("snapAimThresholdPitch", 1.5).apply(GENERIC_KEY);
+        public static final ConfigDouble        	SNAP_AIM_THRESHOLD_YAW              = new ConfigDouble      ("snapAimThresholdYaw", 5.0).apply(GENERIC_KEY);
+        public static final ConfigDouble        	SNAP_AIM_YAW_STEP                   = new ConfigDouble      ("snapAimYawStep", 45, 0, 360).apply(GENERIC_KEY);
+        public static final ConfigInteger       	STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
+        public static final ConfigString        	TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
+        public static final ConfigString        	TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
+	    public static final ConfigBooleanHotkeyed	TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK= new ConfigBooleanHotkeyed ("toolSwapAllowUnenchantedToBreak", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_PREFER_SILK_TOUCH			= new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_BAMBOO_USES_SWORD_FIRST	= new ConfigBooleanHotkeyed ("toolSwapBambooUsesSwordFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_NEEDS_SHEARS_FIRST		= new ConfigBooleanHotkeyed ("toolSwapNeedsShearsFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_FIRST			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_ORES			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_OVERRIDE		= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", false, "").apply(GENERIC_KEY);
+        public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
+        public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
+        public static final ConfigBoolean			ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
@@ -155,11 +164,19 @@ public class Configs implements IConfigHandler
                 BUNDLE_DISPLAY_REQUIRE_SHIFT,
                 BUNDLE_DISPLAY_ROW_WIDTH,
                 CLIENT_PLACEMENT_ROTATION,
+                CLIENT_PLACEMENT_VALIDATION,
                 DEBUG_LOGGING,
+                ENTITY_DATA_SYNC,
+                ENTITY_DATA_SYNC_BACKUP,
+                ENTITY_DATA_SYNC_CACHE_REFRESH,
+                ENTITY_DATA_SYNC_CACHE_TIMEOUT,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
                 FAST_PLACEMENT_REMEMBER_ALWAYS,
                 FREE_CAMERA_PLAYER_INPUTS,
                 FREE_CAMERA_PLAYER_MOVEMENT,
+				FREE_CAMERA_SHOW_HANDS,
+				FREE_CAMERA_SHOW_HOTBAR,
+                FREE_CAMERA_SHOW_STATUS_BARS,
                 HAND_RESTOCK_PRE,
                 HANGABLE_ENTITY_BYPASS_INVERSE,
                 INVENTORY_PREVIEW_VILLAGER_BG_COLOR,
@@ -169,6 +186,7 @@ public class Configs implements IConfigHandler
                 PLACEMENT_RESTRICTION_TIED_TO_FAST,
                 POTION_WARNING_BENEFICIAL_ONLY,
                 REMEMBER_FLEXIBLE,
+                SERVER_NBT_REQUEST_RATE,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
                 SHULKER_DISPLAY_ENDER_CHEST,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
@@ -224,15 +242,15 @@ public class Configs implements IConfigHandler
                 ITEM_SWAP_DURABILITY_THRESHOLD,
                 MAP_PREVIEW_SIZE,
                 PERIODIC_ATTACK_INTERVAL,
-                PERIODIC_ATTACK_RESET_ON_ACTIVATE,
+//                PERIODIC_ATTACK_RESET_ON_ACTIVATE,
                 PERIODIC_USE_INTERVAL,
-                PERIODIC_USE_RESET_ON_ACTIVATE,
+//                PERIODIC_USE_RESET_ON_ACTIVATE,
                 PERIODIC_HOLD_ATTACK_DURATION,
                 PERIODIC_HOLD_ATTACK_INTERVAL,
-                PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE,
+//                PERIODIC_HOLD_ATTACK_RESET_ON_ACTIVATE,
                 PERIODIC_HOLD_USE_DURATION,
                 PERIODIC_HOLD_USE_INTERVAL,
-                PERIODIC_HOLD_USE_RESET_ON_ACTIVATE,
+//                PERIODIC_HOLD_USE_RESET_ON_ACTIVATE,
                 PLACEMENT_GRID_SIZE,
                 PLACEMENT_LIMIT,
                 POTION_WARNING_THRESHOLD,
@@ -241,15 +259,13 @@ public class Configs implements IConfigHandler
                 SCAFFOLD_PLACE_DISTANCE,
                 SCAFFOLD_PLACE_VANILLA,
                 SCULK_SENSOR_PULSE_LENGTH,
-                SERVER_DATA_SYNC_CACHE_REFRESH,
-                SERVER_DATA_SYNC_CACHE_TIMEOUT,
-                SERVER_NBT_REQUEST_RATE,
                 SNAP_AIM_PITCH_STEP,
                 SNAP_AIM_THRESHOLD_PITCH,
                 SNAP_AIM_THRESHOLD_YAW,
                 SNAP_AIM_YAW_STEP,
                 STRUCTURE_BLOCK_MAX_SIZE,
                 TOOL_SWITCHABLE_SLOTS,
+                TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK,
                 TOOL_SWITCH_IGNORED_SLOTS,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
@@ -264,6 +280,12 @@ public class Configs implements IConfigHandler
         );
 
         public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(
+                ENTITY_DATA_SYNC,
+                ENTITY_DATA_SYNC_BACKUP,
+                FREE_CAMERA_PLAYER_INPUTS,
+				FREE_CAMERA_PLAYER_MOVEMENT,
+				FREE_CAMERA_SHOW_HANDS,
+				FREE_CAMERA_SHOW_HOTBAR,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
                 TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
@@ -365,6 +387,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_BEACON_BEAM_RENDERING   = new ConfigBooleanHotkeyed("disableBeaconBeamRendering",           false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BLOCK_BREAK_PARTICLES   = new ConfigBooleanHotkeyed("disableBlockBreakingParticles",        false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BLOCK_BREAK_COOLDOWN    = new ConfigBooleanHotkeyed("disableBlockBreakCooldown",            false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_CLIENT_BLOCK_EVENTS     = new ConfigBooleanHotkeyed("disableClientBlockEvents",             false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_DOUBLE_TAP_SPRINT       = new ConfigBooleanHotkeyed("disableDoubleTapSprint",               false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BOSS_BAR                = new ConfigBooleanHotkeyed("disableBossBar",                       false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BOSS_FOG                = new ConfigBooleanHotkeyed("disableBossFog",                       false, "").apply(DISABLE_KEY);
@@ -412,6 +435,7 @@ public class Configs implements IConfigHandler
                 DISABLE_BEACON_BEAM_RENDERING,
                 DISABLE_BLOCK_BREAK_PARTICLES,
                 DISABLE_BLOCK_BREAK_COOLDOWN,
+                DISABLE_CLIENT_BLOCK_EVENTS,
                 DISABLE_DOUBLE_TAP_SPRINT,
                 DISABLE_BOSS_BAR,
                 DISABLE_BOSS_FOG,
@@ -462,12 +486,14 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        SLIME_BLOCK_SLIPPERINESS_ORIGINAL   = new ConfigDouble      ("slimeBlockSlipperinessOriginal", 0.8, 0, 1).apply(INTERNAL_KEY);
 //        public static final ConfigDouble        SNAP_AIM_LAST_PITCH                 = new ConfigDouble      ("snapAimLastPitch", 0, -135, 135).apply(INTERNAL_KEY);
 //        public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
+        public static final ConfigInteger       SHULKER_MAX_STACK_SIZE              = new ConfigInteger     ("shulkerMaxStackSize", 64, 1, 99).apply(INTERNAL_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 FLY_SPEED_PRESET,
                 GAMMA_VALUE_ORIGINAL,
                 HOTBAR_SCROLL_CURRENT_ROW,
-                SLIME_BLOCK_SLIPPERINESS_ORIGINAL
+                SLIME_BLOCK_SLIPPERINESS_ORIGINAL,
+                SHULKER_MAX_STACK_SIZE
         );
     }
 
@@ -515,11 +541,10 @@ public class Configs implements IConfigHandler
 
         InventoryUtils.setToolSwitchableSlots(Generic.TOOL_SWITCHABLE_SLOTS.getStringValue());
         InventoryUtils.setToolSwitchIgnoreSlots(Generic.TOOL_SWITCH_IGNORED_SLOTS.getStringValue());
-        InventoryUtils.parseSilkTouchOveride(Lists.SILK_TOUCH_OVERRIDE.getStrings());
+        CachedTagManager.parseSilkTouchOverride(Lists.SILK_TOUCH_OVERRIDE.getStrings());
         InventoryUtils.setRepairModeSlots(Lists.REPAIR_MODE_SLOTS.getStrings());
         InventoryUtils.setUnstackingItems(Lists.UNSTACKING_ITEMS.getStrings());
         InventoryUtils.setWeaponMapping(Lists.ENTITY_WEAPON_MAPPING.getStrings());
-        //InventoryUtils.setPreferSilkTouchList(Lists.PREFER_SILK_TOUCH.getStrings());
 
         PlacementTweaks.BLOCK_TYPE_BREAK_RESTRICTION.setListType((ListType) Lists.BLOCK_TYPE_BREAK_RESTRICTION_LIST_TYPE.getOptionListValue());
         PlacementTweaks.BLOCK_TYPE_BREAK_RESTRICTION.setListContents(

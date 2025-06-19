@@ -1,6 +1,8 @@
 package fi.dy.masa.tweakeroo.data;
 
 import javax.annotation.Nullable;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.Identifier;
@@ -90,4 +92,13 @@ public class DataManager implements IServerListener
         return this.registryManager;
     }
      */
+
+	public JsonElement toJson()
+	{
+		return new JsonObject();
+	}
+
+	public void fromJson(JsonElement ele)
+	{
+	}
 }

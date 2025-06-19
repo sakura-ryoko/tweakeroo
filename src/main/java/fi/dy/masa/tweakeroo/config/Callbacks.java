@@ -7,10 +7,13 @@ import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
@@ -20,9 +23,14 @@ import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.render.InventoryOverlayScreen;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.tweakeroo.Reference;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
+import fi.dy.masa.tweakeroo.data.CameraPresetManager;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
+import fi.dy.masa.tweakeroo.gui.GuiCameraPresetEditor;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
-import fi.dy.masa.tweakeroo.mixin.IMixinSimpleOption;
+import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.*;
@@ -44,12 +52,14 @@ public class Callbacks
                                                                                 FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.setBooleanValue(cfg.getBooleanValue());
                                                                             }
                                                                         });
-        FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> CameraEntity.setCameraState(cfg.getBooleanValue()));
+        FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> CameraEntity.setCameraState(cfg.getBooleanValue(), null));
         FeatureToggle.TWEAK_HOLD_ATTACK.setValueChangeCallback(new FeatureCallbackHold(mc.options.attackKey));
         FeatureToggle.TWEAK_HOLD_USE.setValueChangeCallback(new FeatureCallbackHold(mc.options.useKey));
+        Configs.Generic.ENTITY_DATA_SYNC.setValueChangeCallback((config) -> EntityDataManager.getInstance().onEntityDataSyncToggled(config));
 
         IHotkeyCallback callbackGeneric = new KeyCallbackHotkeysGeneric(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackHotkeyWithMessage(mc);
+		IHotkeyCallback callbackFreeCamPresets = new KeyCallbackFreeCameraPresets(mc);
 
         Hotkeys.BREAKING_RESTRICTION_MODE_COLUMN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.BREAKING_RESTRICTION_MODE_DIAGONAL.getKeybind().setCallback(callbackGeneric);
@@ -78,12 +88,17 @@ public class Callbacks
                                                                          InfoUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
                                                                          return true;
                                                                      });
+		Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind().setCallback(callbackFreeCamPresets);
+	    Hotkeys.FREE_CAMERA_PRESET_CYCLE.getKeybind().setCallback(callbackFreeCamPresets);
+	    Hotkeys.FREE_CAMERA_PRESET_DELETE.getKeybind().setCallback(callbackFreeCamPresets);
+	    Hotkeys.FREE_CAMERA_PRESET_DELETE_ALL.getKeybind().setCallback(callbackFreeCamPresets);
         Hotkeys.HOTBAR_SWAP_1.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_3.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SCROLL.getKeybind().setCallback(callbackGeneric);
         Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.OPEN_CONFIG_GUI.getKeybind().setCallback(callbackGeneric);
+	    Hotkeys.OPEN_CAMERA_PRESET_EDITOR_GUI.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_COLUMN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_DIAGONAL.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_FACE.getKeybind().setCallback(callbackGeneric);
@@ -130,7 +145,7 @@ public class Callbacks
         Configs.Disable.DISABLE_RENDERING_SCAFFOLDING.setValueChangeCallback((cfg) -> mc.worldRenderer.reload());
         Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.setValueChangeCallback(
                 (cfg) ->
-                        InventoryUtils.parseSilkTouchOveride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
+                        CachedTagManager.parseSilkTouchOverride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
         );
     }
 
@@ -272,6 +287,102 @@ public class Callbacks
         }
     }
 
+	private static class KeyCallbackFreeCameraPresets implements IHotkeyCallback
+	{
+		private final String PREFIX = Reference.MOD_ID+".message.free_cam.preset";
+		private final MinecraftClient mc;
+
+		public KeyCallbackFreeCameraPresets(MinecraftClient mc)
+		{
+			this.mc = mc;
+		}
+
+		@Override
+		public boolean onKeyAction(KeyAction action, IKeybind key)
+		{
+			if (this.mc.player == null || this.mc.world == null || this.mc.getCameraEntity() == null)
+			{
+				return false;
+			}
+
+			RegistryKey<World> dimKey = this.mc.world.getRegistryKey();
+			Entity camera = this.mc.getCameraEntity();
+
+			if (key == Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind())
+			{
+				final int id = CameraPresetManager.getInstance().getNextId(-1);
+				String name = "Preset "+id;
+				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getPos(), camera.getYaw(), camera.getPitch());
+
+				if (CameraUtils.addPreset(newPreset))
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_added", newPreset.toShortString()));
+				}
+				else
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_already_in_use"));
+				}
+
+				return true;
+			}
+			else if (key == Hotkeys.FREE_CAMERA_PRESET_DELETE.getKeybind())
+			{
+				CameraPreset preset = CameraPresetManager.getInstance().getAtPosition(camera);
+
+				if (CameraUtils.deletePreset(preset))
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted", preset.toShortString()));
+				}
+				else
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_not_found", String.format("%02d", 0)));
+				}
+
+				return true;
+			}
+			else if (key == Hotkeys.FREE_CAMERA_PRESET_DELETE_ALL.getKeybind())
+			{
+				if (CameraUtils.deleteAllPresets(dimKey))
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.getValue().toString()));
+				}
+
+				return true;
+			}
+			else if (key == Hotkeys.FREE_CAMERA_PRESET_CYCLE.getKeybind())
+			{
+				CameraPreset preset = CameraPresetManager.getInstance().cycle(dimKey);
+
+				if (preset != null && this.mc.world != null)
+				{
+					if (this.mc.world.getRegistryKey().getValue().equals(preset.getDim()))
+					{
+						if (CameraUtils.recallPreset(preset, this.mc))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						}
+						else
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
+						}
+					}
+					else
+					{
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
+					}
+				}
+				else
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_cycle_not_found"));
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+	}
+
     private static class KeyCallbackHotkeysGeneric implements IHotkeyCallback
     {
         private final MinecraftClient mc;
@@ -306,7 +417,8 @@ public class Callbacks
             {
                 HitResult trace = this.mc.crosshairTarget;
 
-                if (trace != null && trace.getType() == HitResult.Type.BLOCK && this.mc.world != null)
+                if (trace != null && trace.getType() == HitResult.Type.BLOCK &&
+                    this.mc.world != null)
                 {
                     BlockPos pos = ((BlockHitResult) trace).getBlockPos();
                     BlockEntity te = this.mc.world.getBlockEntity(pos);
@@ -390,7 +502,7 @@ public class Callbacks
                 if (FeatureToggle.TWEAK_HOTBAR_SCROLL.getBooleanValue() && this.mc.player != null)
                 {
                     int currentRow = Configs.Internal.HOTBAR_SCROLL_CURRENT_ROW.getIntegerValue();
-                    InventoryUtils.swapHotbarWithInventoryRow(mc.player, currentRow);
+                    InventoryUtils.swapHotbarWithInventoryRow(this.mc.player, currentRow);
                     return true;
                 }
             }
@@ -458,6 +570,11 @@ public class Callbacks
             {
                 GuiBase.openGui(new GuiConfigs());
                 return true;
+            }
+            else if (key == Hotkeys.OPEN_CAMERA_PRESET_EDITOR_GUI.getKeybind())
+            {
+	            GuiBase.openGui(new GuiCameraPresetEditor());
+	            return true;
             }
             else if (key == Hotkeys.SWAP_ELYTRA_CHESTPLATE.getKeybind())
             {

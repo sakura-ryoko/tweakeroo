@@ -1,11 +1,12 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.world.HeightLimitView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.world.HeightLimitView;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(ClientWorld.Properties.class)

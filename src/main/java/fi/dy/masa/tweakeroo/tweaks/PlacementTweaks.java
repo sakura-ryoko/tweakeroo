@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
@@ -43,6 +44,7 @@ import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.util.*;
 
 public class PlacementTweaks
@@ -643,7 +645,24 @@ public class PlacementTweaks
 
                 if (handleAccurate && BlockUtils.isFacingValidForDirection(stack, facing))
                 {
-                    x = posNew.getX() + relX + 2 + (facing.getId() * 2);
+                    int protocolValue = 0;
+                    int shiftBy = 1;
+                    final int facingAdj = (facing.getId() * 2);
+
+                    protocolValue |= facing.getId() << shiftBy;
+                    shiftBy += 3;
+
+                    if (stack.isIn(ItemTags.TRAPDOORS) || stack.isIn(ItemTags.STAIRS))
+                    {
+                        // add BLOCK_HALF handling --> (BOTTOM)
+                        int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
+                        protocolValue |= (1 << shiftBy);
+                        shiftBy += requiredBits;
+                    }
+
+                    //System.out.printf("prot value (Facing) orig 0x%08X vs 0x%08X\n", facingAdj, protocolValue);
+
+                    x = posNew.getX() + relX + 2 + (protocolValue);
                 }
                 else if (handleAccurate && BlockUtils.isFacingValidForOrientation(stack, facing))
                 {
@@ -869,7 +888,24 @@ public class PlacementTweaks
             facing = facing.getOpposite(); // go from block face to click on to the requested facing
             //double relX = hitVecIn.x - posIn.getX();
             //double x = posIn.getX() + relX + 2 + (facing.getId() * 2);
-            double x = posIn.getX() + 2 + (facing.getId() * 2);
+            int protocolValue = 0;
+            int shiftBy = 1;
+            final int facingAdj = (facing.getId() * 2);
+
+            protocolValue |= facing.getId() << shiftBy;
+            shiftBy += 3;
+
+            if (stackOriginal.isIn(ItemTags.TRAPDOORS) || stackOriginal.isIn(ItemTags.STAIRS))
+            {
+                // add BLOCK_HALF handling --> (BOTTOM)
+                int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
+                protocolValue |= (1 << shiftBy);
+                shiftBy += requiredBits;
+            }
+
+            //System.out.printf("prot value (Facing) orig 0x%08X vs 0x%08X\n", facingAdj, protocolValue);
+//           double x = posIn.getX() + 2 + (facing.getIndex() * 2);
+            double x = posIn.getX() + 2 + (protocolValue);
 
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
             {

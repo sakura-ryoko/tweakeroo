@@ -36,6 +36,10 @@ public class Hotkeys
     public static final ConfigHotkey FLY_INCREMENT_2                    = new ConfigHotkey("flyIncrement2",                     "").apply(HOTKEY_KEY);
     public static final ConfigHotkey FREE_CAMERA_PLAYER_INPUTS          = new ConfigHotkey("freeCameraPlayerInputs",            "").apply(HOTKEY_KEY);
     public static final ConfigHotkey FREE_CAMERA_PLAYER_MOVEMENT        = new ConfigHotkey("freeCameraPlayerMovement",          "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_ADD             = new ConfigHotkey("freeCameraPresetAdd",               "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_CYCLE           = new ConfigHotkey("freeCameraPresetCycle",             "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_DELETE          = new ConfigHotkey("freeCameraPresetDelete",            "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_DELETE_ALL      = new ConfigHotkey("freeCameraPresetDeleteAll",         "").apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SCROLL                      = new ConfigHotkey("hotbarScroll",                      "", KeybindSettings.RELEASE_ALLOW_EXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SWAP_BASE                   = new ConfigHotkey("hotbarSwapBase",                    "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SWAP_1                      = new ConfigHotkey("hotbarSwap1",                       "").apply(HOTKEY_KEY);
@@ -44,6 +48,7 @@ public class Hotkeys
     public static final ConfigHotkey INVENTORY_PREVIEW                  = new ConfigHotkey("inventoryPreview",                  "LEFT_ALT", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey INVENTORY_PREVIEW_TOGGLE_SCREEN    = new ConfigHotkey("inventoryPreviewToggleScreen",      "", KeybindSettings.create(KeybindSettings.Context.ANY, KeyAction.PRESS, true, true, false, true)).apply(HOTKEY_KEY);
     public static final ConfigHotkey OPEN_CONFIG_GUI                    = new ConfigHotkey("openConfigGui",                     "X,C").apply(HOTKEY_KEY);
+	public static final ConfigHotkey OPEN_CAMERA_PRESET_EDITOR_GUI      = new ConfigHotkey("openCameraPresetEditorGui",         "X,P").apply(HOTKEY_KEY);
     public static final ConfigHotkey PLACEMENT_Y_MIRROR                 = new ConfigHotkey("placementYMirror",                  "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey PLAYER_INVENTORY_PEEK              = new ConfigHotkey("playerInventoryPeek",               "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey PLACEMENT_RESTRICTION_MODE_COLUMN  = new ConfigHotkey("placementRestrictionModeColumn",    "Z,3").apply(HOTKEY_KEY);
@@ -85,6 +90,10 @@ public class Hotkeys
             FLY_INCREMENT_2,
             FREE_CAMERA_PLAYER_INPUTS,
             FREE_CAMERA_PLAYER_MOVEMENT,
+            FREE_CAMERA_PRESET_ADD,
+            FREE_CAMERA_PRESET_CYCLE,
+            FREE_CAMERA_PRESET_DELETE,
+            FREE_CAMERA_PRESET_DELETE_ALL,
             HOTBAR_SCROLL,
             HOTBAR_SWAP_BASE,
             HOTBAR_SWAP_1,
@@ -93,6 +102,7 @@ public class Hotkeys
             INVENTORY_PREVIEW,
             INVENTORY_PREVIEW_TOGGLE_SCREEN,
             OPEN_CONFIG_GUI,
+            OPEN_CAMERA_PRESET_EDITOR_GUI,
             PLACEMENT_Y_MIRROR,
             PLAYER_INVENTORY_PEEK,
             PLACEMENT_RESTRICTION_MODE_COLUMN,
