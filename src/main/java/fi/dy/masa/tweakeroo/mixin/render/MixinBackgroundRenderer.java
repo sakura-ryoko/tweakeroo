@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import org.joml.Vector4f;
+import org.objectweb.asm.Opcodes;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BackgroundRenderer;
@@ -8,6 +9,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.FogShape;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.ColorHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
@@ -25,8 +27,10 @@ public abstract class MixinBackgroundRenderer
     @ModifyConstant(
             method = "applyFog",
             slice = @Slice(
-                            from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
-                            to   = @At(value = "FIELD", target = "Lnet/minecraft/block/enums/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/block/enums/CameraSubmersionType;")),
+                            from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;",
+                                       opcode = Opcodes.GETSTATIC),
+                            to   = @At(value = "FIELD", target = "Lnet/minecraft/block/enums/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/block/enums/CameraSubmersionType;",
+                                       opcode = Opcodes.GETSTATIC)),
             constant = @Constant(floatValue = 0.25f),
             require = 0)
     private static float reduceLavaFogStart(float original)
@@ -44,8 +48,10 @@ public abstract class MixinBackgroundRenderer
     @ModifyConstant(
             method = "applyFog",
             slice = @Slice(
-                    from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;"),
-                    to   = @At(value = "FIELD", target = "Lnet/minecraft/block/enums/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/block/enums/CameraSubmersionType;")),
+                    from = @At(value = "FIELD", target = "Lnet/minecraft/entity/effect/StatusEffects;FIRE_RESISTANCE:Lnet/minecraft/registry/entry/RegistryEntry;",
+                               opcode = Opcodes.GETSTATIC),
+                    to   = @At(value = "FIELD", target = "Lnet/minecraft/block/enums/CameraSubmersionType;POWDER_SNOW:Lnet/minecraft/block/enums/CameraSubmersionType;",
+                               opcode = Opcodes.GETSTATIC)),
             constant = { @Constant(floatValue = 1.0f), @Constant(floatValue = 5.0f)},
             require = 0)
     private static float reduceLavaFogEnd(float original)
@@ -58,6 +64,25 @@ public abstract class MixinBackgroundRenderer
         }
 
         return original;
+    }
+
+    @Inject(method = "getFogColor", at = @At("HEAD"), cancellable = true)
+    private static void tweakeroo_adjustFogColor(Camera camera, float tickProgress, ClientWorld world, int clampedViewDistance, float skyDarkness, CallbackInfoReturnable<Vector4f> cir)
+    {
+        if (FeatureToggle.TWEAK_MATCHING_SKY_FOG.getBooleanValue())
+        {
+            if (world.getDimension().hasSkyLight())
+            {
+                int color = world.getSkyColor(camera.getPos(), skyDarkness);
+
+                cir.setReturnValue(new Vector4f(
+                        ColorHelper.getRed(color),
+                        ColorHelper.getGreen(color),
+                        ColorHelper.getBlue(color),
+                        ColorHelper.getAlpha(color))
+                );
+            }
+        }
     }
 
     @Redirect(method = "getFogColor",

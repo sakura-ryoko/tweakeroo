@@ -29,8 +29,9 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -38,7 +39,6 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinPistonBlock;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.world.FakeChunk;
 import fi.dy.masa.tweakeroo.world.FakeWorld;
 
@@ -47,9 +47,9 @@ import fi.dy.masa.tweakeroo.world.FakeWorld;
  */
 public class RenderTweaks
 {
-    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_BLACKLIST = new ConcurrentHashMap<Long, ListMapEntry>();
-    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_WHITELIST = new ConcurrentHashMap<Long, ListMapEntry>();
-    private static final ConcurrentHashMap<Long, ListMapEntry> CACHED_LIST = new ConcurrentHashMap<Long, ListMapEntry>();
+    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_BLACKLIST = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_WHITELIST = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, ListMapEntry> CACHED_LIST = new ConcurrentHashMap<>();
 
     public static final int PASSTHROUGH = 1024;
 

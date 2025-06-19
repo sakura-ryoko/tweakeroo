@@ -1,11 +1,15 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
 import java.util.function.BooleanSupplier;
+
+import org.objectweb.asm.Opcodes;
+
+import net.minecraft.server.world.ServerChunkLoadingManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.server.world.ServerChunkLoadingManager;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 
 /**
@@ -15,7 +19,8 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinServerChunkLoadingManager
 {
     @Inject(method = "saveChunks", cancellable = true, at = @At(value = "FIELD",
-            target = "Lnet/minecraft/server/world/ServerChunkLoadingManager;chunkHolders:Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;"))
+                                                                target = "Lnet/minecraft/server/world/ServerChunkLoadingManager;chunkHolders:Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;",
+                                                                opcode = Opcodes.GETFIELD))
     private void tweakeroo_disableSaving20ChunksEveryTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CONSTANT_CHUNK_SAVING.getBooleanValue())

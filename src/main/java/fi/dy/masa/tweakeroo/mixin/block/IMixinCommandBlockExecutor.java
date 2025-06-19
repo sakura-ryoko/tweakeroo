@@ -1,8 +1,8 @@
 package fi.dy.masa.tweakeroo.mixin.block;
 
+import net.minecraft.world.CommandBlockExecutor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import net.minecraft.world.CommandBlockExecutor;
 
 @Mixin(CommandBlockExecutor.class)
 public interface IMixinCommandBlockExecutor

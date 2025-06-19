@@ -1,6 +1,9 @@
 package fi.dy.masa.tweakeroo.util;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -9,9 +12,14 @@ import net.minecraft.client.recipebook.ClientRecipeBook;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.stat.StatHandler;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
@@ -133,17 +141,85 @@ public class CameraEntity extends ClientPlayerEntity
 
     private static CameraEntity createCameraEntity(MinecraftClient mc)
     {
-        ClientPlayerEntity player = mc.player;
-        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook());
-        camera.noClip = true;
+	    if (mc.player == null || mc.world == null)
+	    {
+		    throw new RuntimeException("Cannot create CameraEntity from null!");
+	    }
+
+		ClientPlayerEntity player = mc.player;
+
+        Vec3d entityPos = player.getPos();
         float yaw = player.getYaw();
         float pitch = player.getPitch();
 
-        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
-        camera.setRotation(yaw, pitch);
+        // Don't reset velocity when flying / swimming.
+        if (mc.player.isOnGround())
+        {
+            mc.player.setVelocity(Vec3d.ZERO);
+        }
+
+        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook());
+        camera.noClip = true;
+
+//        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
+//        camera.setRotation(yaw, pitch);
+
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
+
+        camera.setPos(entityPos.getX(), entityPos.getY() + 0.125f, entityPos.getZ());
+        camera.setYaw(yaw);
+        camera.setPitch(pitch);
+        camera.setVelocity(Vec3d.ZERO);
+
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [AFTER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", mc.player.getEyePos().toString(), mc.player.getPos().toString(), mc.player.getBlockPos().toShortString(), mc.player.getVelocity().toString());
 
         return camera;
     }
+
+	public static void updatePositionAtPreset(@Nonnull CameraPreset preset)
+	{
+		if (camera != null && isValidDim(camera.getEntityWorld(), preset.getDim()))
+		{
+//			Tweakeroo.LOGGER.error("CameraEntity#updatePositionAtPreset(): oldPos [{}], newPos [{}] // yaw [{}], pitch [{}]", camera.getEyePos().toString(), preset.getPos().toString(), preset.getYaw(), preset.getPitch());
+			camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());
+			camera.setYaw(preset.getYaw());
+			camera.setPitch(preset.getPitch());
+			camera.setVelocity(Vec3d.ZERO);
+		}
+	}
+
+	@ApiStatus.Experimental
+	private static CameraEntity createCameraAtPreset(MinecraftClient mc, @Nonnull CameraPreset preset)
+	{
+		if (mc.player == null || mc.world == null)
+		{
+			throw new RuntimeException("Cannot create CameraEntity from null!");
+		}
+
+		ClientPlayerEntity player = mc.player;
+
+		// Don't reset velocity when flying / swimming.
+		if (mc.player.isOnGround())
+		{
+			mc.player.setVelocity(Vec3d.ZERO);
+		}
+
+		CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook());
+		camera.noClip = true;
+
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
+
+		camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());
+		camera.setYaw(preset.getYaw());
+		camera.setPitch(preset.getPitch());
+		camera.setVelocity(Vec3d.ZERO);
+
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
+//        Tweakeroo.LOGGER.error("CameraEntity::new() [AFTER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", mc.player.getEyePos().toString(), mc.player.getPos().toString(), mc.player.getBlockPos().toShortString(), mc.player.getVelocity().toString());
+
+		return camera;
+	}
 
     @Nullable
     public static CameraEntity getCamera()
@@ -151,16 +227,30 @@ public class CameraEntity extends ClientPlayerEntity
         return camera;
     }
 
-    public static void setCameraState(boolean enabled)
+    public static void setCameraState(boolean enabled, @Nullable CameraPreset preset)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc.world != null && mc.player != null)
         {
-            if (enabled)
+	        RegistryKey<World> dim = mc.world.getRegistryKey();
+
+            if (enabled && preset != null &&
+	            preset.getId() > -1)
             {
-                createAndSetCamera(mc);
+				if (preset.getDim().equals(dim.getValue()))
+				{
+					createAndSetCameraAtPreset(mc, preset);
+				}
+				else
+				{
+					Tweakeroo.LOGGER.error("freeCam: Recalled preset is in a different Dimension: [{}]", preset.getDim().toString());
+				}
             }
+	        else if (enabled)
+	        {
+		        createAndSetCamera(mc);
+	        }
             else
             {
                 removeCamera(mc);
@@ -178,18 +268,33 @@ public class CameraEntity extends ClientPlayerEntity
     private static void createAndSetCamera(MinecraftClient mc)
     {
         camera = createCameraEntity(mc);
-        originalCameraEntity = mc.getCameraEntity();
-        originalCameraWasPlayer = originalCameraEntity == mc.player;
-        cullChunksOriginal = mc.chunkCullingEnabled;
-
-        mc.setCameraEntity(camera);
-        mc.chunkCullingEnabled = false; // Disable chunk culling
-
-        // Disable the motion option when entering camera mode
-        Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.setBooleanValue(false);
+	    setCamera(mc);
     }
 
-    private static void removeCamera(MinecraftClient mc)
+	@ApiStatus.Experimental
+	private static void createAndSetCameraAtPreset(MinecraftClient mc, CameraPreset preset)
+	{
+		if (isValidDim(mc.world, preset.getDim()))
+		{
+			camera = createCameraAtPreset(mc, preset);
+			setCamera(mc);
+		}
+	}
+
+	private static void setCamera(MinecraftClient mc)
+	{
+		originalCameraEntity = mc.getCameraEntity();
+		originalCameraWasPlayer = originalCameraEntity == mc.player;
+		cullChunksOriginal = mc.chunkCullingEnabled;
+
+		mc.setCameraEntity(camera);
+		mc.chunkCullingEnabled = false; // Disable chunk culling
+
+		// Disable the motion option when entering camera mode
+		Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.setBooleanValue(false);
+	}
+
+	private static void removeCamera(MinecraftClient mc)
     {
         if (mc.world != null && camera != null)
         {
@@ -205,4 +310,14 @@ public class CameraEntity extends ClientPlayerEntity
         originalCameraEntity = null;
         camera = null;
     }
+
+	private static boolean isValidDim(World world, Identifier dim)
+	{
+		if (world == null)
+		{
+			return false;
+		}
+
+		return world.getRegistryKey().getValue().equals(dim);
+	}
 }

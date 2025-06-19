@@ -1,16 +1,18 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.light.ChunkLightProvider;
+import net.minecraft.world.chunk.light.LightingProvider;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.light.ChunkLightProvider;
-import net.minecraft.world.chunk.light.LightingProvider;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(LightingProvider.class)

@@ -1,12 +1,13 @@
 package fi.dy.masa.tweakeroo.mixin.block;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(NetherPortalBlock.class)

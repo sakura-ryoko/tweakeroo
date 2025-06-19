@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(ItemStack.class)
@@ -29,9 +30,9 @@ public abstract class MixinItemStack
             block.getBlock() instanceof ShulkerBoxBlock &&
             InventoryUtils.shulkerBoxHasItems((ItemStack) (Object) this) == false)
         {
-            if (this.getComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1) < 64)
+            if (this.getComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1) < Configs.Internal.SHULKER_MAX_STACK_SIZE.getIntegerValue())
             {
-                cir.setReturnValue(64);
+                cir.setReturnValue(Configs.Internal.SHULKER_MAX_STACK_SIZE.getIntegerValue());
             }
         }
     }

@@ -1,10 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
+import net.minecraft.client.render.chunk.ChunkBuilder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 

@@ -1,9 +1,10 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -16,6 +17,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
+
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigInteger;
 import fi.dy.masa.malilib.gui.Message;

@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(StatusEffectsDisplay.class)
+@Mixin(value = StatusEffectsDisplay.class, priority = 1001)
 public abstract class MixinStatusEffectsDisplay
 {
     private MixinStatusEffectsDisplay()

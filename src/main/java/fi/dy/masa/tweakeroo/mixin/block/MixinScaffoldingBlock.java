@@ -1,13 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.block;
 
+import net.minecraft.block.*;
 import org.spongepowered.asm.mixin.Mixin;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ScaffoldingBlock;
-import fi.dy.masa.tweakeroo.config.Configs;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(ScaffoldingBlock.class)
 public abstract class MixinScaffoldingBlock extends Block
