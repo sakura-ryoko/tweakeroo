@@ -64,7 +64,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     }
     
     private final static ServuxTweaksHandler<ServuxTweaksPacket.Payload> HANDLER = ServuxTweaksHandler.getInstance();
-    private final static MinecraftClient mc = MinecraftClient.getInstance();
+    private final MinecraftClient mc;
     //private int uptimeTicks = 0;
     private boolean servuxServer = false;
     private boolean hasInValidServux = false;
@@ -96,13 +96,16 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     {
         if (this.clientWorld == null)
         {
-            clientWorld = mc.world;
+            this.clientWorld = this.mc.world;
         }
 
-        return clientWorld;
+        return this.clientWorld;
     }
 
-    public ServerDataSyncer() { }
+    public ServerDataSyncer()
+    {
+        this.mc = MinecraftClient.getInstance();
+    }
 
     @Override
     public void onClientTick(MinecraftClient mc)
@@ -487,8 +490,10 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 this.pendingBlockEntitiesQueue.add(pos);
             }
-
-            return this.refreshBlockEntityFromWorld(world, pos);
+            else
+            {
+                return this.refreshBlockEntityFromWorld(world, pos);
+            }
         }
 
         return null;
@@ -546,8 +551,12 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             this.pendingEntitiesQueue.add(entityId);
         }
+        else
+        {
+            return this.refreshEntityFromWorld(world, entityId);
+        }
 
-        return this.refreshEntityFromWorld(world, entityId);
+        return null;
     }
 
     private @Nullable Pair<Entity, NbtCompound> refreshEntityFromWorld(World world, int entityId)
