@@ -35,7 +35,7 @@ import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -143,7 +143,7 @@ public class RenderHandler implements IRenderer
 
                 if (player != null)
                 {
-                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
+                    Pair<Entity, NbtCompound> pair = EntityDataManager.getInstance().requestEntity(world, player.getId());
                     EnderChestInventory inv;
 
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
@@ -212,11 +212,6 @@ public class RenderHandler implements IRenderer
              Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld()))
         {
             BlockHitResult hitResult = (BlockHitResult) mc.crosshairTarget;
-//            fi.dy.masa.malilib.render.RenderUtils.depthMask(false);
-//            fi.dy.masa.malilib.render.RenderUtils.culling(false);
-//            fi.dy.masa.malilib.render.RenderUtils.depthTest(false);
-//            fi.dy.masa.malilib.render.RenderUtils.blend(true);
-
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
             fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
@@ -225,11 +220,6 @@ public class RenderHandler implements IRenderer
                     hitResult.getSide(),
                     hitResult.getPos(),
                     color, posMatrix);
-
-//            fi.dy.masa.malilib.render.RenderUtils.depthTest(true);
-//            fi.dy.masa.malilib.render.RenderUtils.blend(false);
-//            fi.dy.masa.malilib.render.RenderUtils.culling(true);
-//            fi.dy.masa.malilib.render.RenderUtils.depthMask(true);
         }
     }
 }

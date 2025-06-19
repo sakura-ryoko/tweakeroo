@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -25,12 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -44,7 +38,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
 
-import fi.dy.masa.malilib.data.MaLiLibTag;
+import fi.dy.masa.malilib.data.CachedBlockTags;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -52,7 +46,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.data.CachedBlockTags;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
@@ -64,12 +58,6 @@ public class InventoryUtils
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
-//    private static final HashSet<RegistryEntry<Block>> SILK_TOUCH_OVERRIDE_BLOCKS = new HashSet<>();
-//    private static final HashSet<RegistryEntryList<Block>> SILK_TOUCH_OVERRIDE_TAGS = new HashSet<>();
-    private static final String SILK_TOUCH_OVERRIDE_KEY = "silk_touch_overide";
-    private static final String NEEDS_SHEARS_KEY = "needs_shears";
-    private static final String NEEDS_SILK_TOUCH_KEY = "needs_silk_touch";
-    private static final String ORE_BLOCKS_KEY = "ore_blocks";
     private static boolean needsCache = false;
 
     public static void setToolSwitchableSlots(String configStr)
@@ -80,142 +68,6 @@ public class InventoryUtils
     public static void setToolSwitchIgnoreSlots(String configStr)
     {
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
-    }
-
-    public static void parseSilkTouchOveride(List<String> configStrs)
-    {
-        if (MinecraftClient.getInstance().world == null)
-        {
-            return;
-        }
-
-        if (configStrs.isEmpty())
-        {
-            if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue())
-            {
-                Tweakeroo.LOGGER.error("parseSilkTouchOveride: Config List '{}' is empty.", Configs.Lists.SILK_TOUCH_OVERRIDE.getName());
-            }
-
-            return;
-        }
-
-        CachedBlockTags.getInstance().build(SILK_TOUCH_OVERRIDE_KEY, configStrs);
-    }
-
-    public static void startCache()
-    {
-        needsCache = !MinecraftClient.getInstance().isIntegratedServerRunning();
-
-        clearCache();
-
-        // Fallback for MaLiLib Block Tags when on a server.
-        CachedBlockTags.getInstance().build(NEEDS_SHEARS_KEY, buildNeedsShearsCache());
-        CachedBlockTags.getInstance().build(NEEDS_SILK_TOUCH_KEY, buildNeedsSilkTouchCache());
-        CachedBlockTags.getInstance().build(ORE_BLOCKS_KEY, buildOreBlocksCache());
-    }
-
-    private static List<String> buildNeedsShearsCache()
-    {
-        List<String> list = new ArrayList<>();
-
-        list.add("#"+BlockTags.LEAVES.id().toString());
-        list.add("#"+BlockTags.WOOL.id().toString());
-        list.add(Registries.BLOCK.getId(Blocks.CAVE_VINES).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CAVE_VINES_PLANT).toString());
-        list.add(Registries.BLOCK.getId(Blocks.COBWEB).toString());
-        list.add(Registries.BLOCK.getId(Blocks.DEAD_BUSH).toString());
-        list.add(Registries.BLOCK.getId(Blocks.FERN).toString());
-        list.add(Registries.BLOCK.getId(Blocks.GLOW_LICHEN).toString());
-        list.add(Registries.BLOCK.getId(Blocks.HANGING_ROOTS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LARGE_FERN).toString());
-        list.add(Registries.BLOCK.getId(Blocks.NETHER_SPROUTS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PALE_HANGING_MOSS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SHORT_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SHORT_DRY_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SEAGRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_DRY_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_SEAGRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TRIPWIRE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TWISTING_VINES).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TWISTING_VINES_PLANT).toString());
-        list.add(Registries.BLOCK.getId(Blocks.WEEPING_VINES).toString());
-        list.add(Registries.BLOCK.getId(Blocks.WEEPING_VINES_PLANT).toString());
-        list.add(Registries.BLOCK.getId(Blocks.VINE).toString());
-
-        return list;
-    }
-
-    private static List<String> buildNeedsSilkTouchCache()
-    {
-        List<String> list = new ArrayList<>();
-
-        list.add("#"+BlockTags.IMPERMEABLE.id().toString());        // Glass Blocks
-        list.add("#"+BlockTags.LEAVES.id().toString());             // All Leaves
-        list.add("#"+BlockTags.CORALS.id().toString());             // Fans + Plants
-        list.add("#"+BlockTags.WALL_CORALS.id().toString());        // Wall Coral Fans
-        // No Glass Pane block tag in Vanilla
-        list.add(Registries.BLOCK.getId(Blocks.GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BLACK_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BLUE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BROWN_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CYAN_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.GRAY_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.GREEN_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LIGHT_GRAY_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LIME_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.MAGENTA_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.ORANGE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PINK_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PURPLE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.RED_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.YELLOW_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.WHITE_STAINED_GLASS_PANE).toString());
-        // No Sculk Block Tags in Vanilla
-        list.add(Registries.BLOCK.getId(Blocks.CALIBRATED_SCULK_SENSOR).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_CATALYST).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_SENSOR).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_SHRIEKER).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_VEIN).toString());
-        // Other Blocks
-        list.add(Registries.BLOCK.getId(Blocks.BEEHIVE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BEE_NEST).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BOOKSHELF).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BLUE_ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BUSH).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CAMPFIRE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CHISELED_BOOKSHELF).toString());
-        list.add(Registries.BLOCK.getId(Blocks.ENDER_CHEST).toString());
-        list.add(Registries.BLOCK.getId(Blocks.ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PACKED_ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SOUL_CAMPFIRE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TURTLE_EGG).toString());
-
-        return list;
-    }
-
-    private static List<String> buildOreBlocksCache()
-    {
-        List<String> list = new ArrayList<>();
-
-        list.add("#" + BlockTags.COAL_ORES.id().toString());
-        list.add("#" + BlockTags.COPPER_ORES.id().toString());
-        list.add("#" + BlockTags.DIAMOND_ORES.id().toString());
-        list.add("#" + BlockTags.EMERALD_ORES.id().toString());
-        list.add("#" + BlockTags.GOLD_ORES.id().toString());
-        list.add("#" + BlockTags.IRON_ORES.id().toString());
-        list.add("#" + BlockTags.LAPIS_ORES.id().toString());
-        list.add("#" + BlockTags.REDSTONE_ORES.id().toString());
-        list.add(Registries.BLOCK.getId(Blocks.NETHER_QUARTZ_ORE).toString());
-
-        return list;
-    }
-
-    public static void clearCache()
-    {
-        CachedBlockTags.getInstance().clear();
     }
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
@@ -301,19 +153,18 @@ public class InventoryUtils
 
         for (String name : names)
         {
-            EquipmentSlot type = null;
+            EquipmentSlot type = switch (name)
+			{
+				case "mainhand" -> EquipmentSlot.MAINHAND;
+				case "offhand" -> EquipmentSlot.OFFHAND;
+				case "head" -> EquipmentSlot.HEAD;
+				case "chest" -> EquipmentSlot.CHEST;
+				case "legs" -> EquipmentSlot.LEGS;
+				case "feet" -> EquipmentSlot.FEET;
+				default -> null;
+			};
 
-            switch (name)
-            {
-                case "mainhand":    type = EquipmentSlot.MAINHAND; break;
-                case "offhand":     type = EquipmentSlot.OFFHAND; break;
-                case "head":        type = EquipmentSlot.HEAD; break;
-                case "chest":       type = EquipmentSlot.CHEST; break;
-                case "legs":        type = EquipmentSlot.LEGS; break;
-                case "feet":        type = EquipmentSlot.FEET; break;
-            }
-
-            if (type != null)
+			if (type != null)
             {
                 REPAIR_MODE_SLOTS.add(type);
 
@@ -415,17 +266,16 @@ public class InventoryUtils
             return EquipmentSlot.MAINHAND;
         }
 
-        switch (slotNum)
-        {
-            case 45: return EquipmentSlot.OFFHAND;
-            case  5: return EquipmentSlot.HEAD;
-            case  6: return EquipmentSlot.CHEST;
-            case  7: return EquipmentSlot.LEGS;
-            case  8: return EquipmentSlot.FEET;
-        }
-
-        return null;
-    }
+		return switch (slotNum)
+		{
+			case 45 -> EquipmentSlot.OFFHAND;
+			case 5 -> EquipmentSlot.HEAD;
+			case 6 -> EquipmentSlot.CHEST;
+			case 7 -> EquipmentSlot.LEGS;
+			case 8 -> EquipmentSlot.FEET;
+			default -> null;
+		};
+	}
 
     /**
      * Returns the slot number for the given equipment type
@@ -433,18 +283,17 @@ public class InventoryUtils
      */
     private static int getSlotNumberForEquipmentType(EquipmentSlot type, @Nullable PlayerEntity player)
     {
-        switch (type)
-        {
-            case MAINHAND:  return player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
-            case OFFHAND:   return 45;
-            case HEAD:      return 5;
-            case CHEST:     return 6;
-            case LEGS:      return 7;
-            case FEET:      return 8;
-        }
-
-        return -1;
-    }
+		return switch (type)
+		{
+			case MAINHAND -> player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
+			case OFFHAND -> 45;
+			case HEAD -> 5;
+			case CHEST -> 6;
+			case LEGS -> 7;
+			case FEET -> 8;
+			default -> -1;
+		};
+	}
 
     public static void swapHotbarWithInventoryRow(PlayerEntity player, int row)
     {
@@ -538,7 +387,7 @@ public class InventoryUtils
     {
         ItemStack stack = player.getStackInHand(hand);
 
-        if (stack.isEmpty() == false)
+        if (!stack.isEmpty())
         {
             int minDurability = getMinDurability(stack);
 
@@ -555,7 +404,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
+			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             ScreenHandler container = player.playerScreenHandler;
             ItemPickerTest test;
@@ -599,7 +448,7 @@ public class InventoryUtils
             return true;
         }
 
-        if (testedStack.isEmpty() == false && isWeapon)
+        if (!testedStack.isEmpty() && isWeapon)
         {
             final boolean mapping = matchesWeaponMapping(testedStack, entity);
 
@@ -675,7 +524,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
+			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             BlockState state = mc.world.getBlockState(pos);
             ScreenHandler container = player.playerScreenHandler;
@@ -708,6 +557,7 @@ public class InventoryUtils
         if (previousTool.isEmpty() && isTool &&
             (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue() && !state.isOf(Blocks.BAMBOO)))
         {
+			//System.out.print("isBetterTool: (applyBambooNeedsSwordFirst) = TRUE\n");
             return true;
         }
 
@@ -715,38 +565,45 @@ public class InventoryUtils
         {
             if (EquipmentUtils.isSword(testedStack))
             {
+				//System.out.print("isBetterTool: (applyBambooNeedsSwordFirst) -> test\n");
                 return applyBambooNeedsSwordFirst(testedStack, previousTool);
             }
             else if (EquipmentUtils.isSword(previousTool))
             {
+				//System.out.print("isBetterTool: (applyBambooNeedsSwordFirst) = FALSE\n");
                 return false;
             }
         }
 
-        if (testedStack.isEmpty() == false && isMisc &&
-            Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && isNeedsShears(state) &&
+        if (!testedStack.isEmpty() && isMisc &&
+            Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && CachedTagManager.isNeedsShears(state) &&
             testedStack.isOf(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
         {
-            return applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
+			//System.out.printf("applyNeedsShearsFirst: result: %s\n", test);
+			return applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
         }
 
-        if (testedStack.isEmpty() == false && isTool)
+        if (!testedStack.isEmpty() && isTool)
         {
-            if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && isNeedsSilkTouch(state)) ||
-                (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && isOreBlock(state) &&
-                EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
-            {
-                return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+			if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && CachedTagManager.isNeedsSilkTouch(state)) ||
+				(Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && CachedTagManager.isOreBlock(state) &&
+				EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
+			{
+				//System.out.printf("applySilkTouchFirst:B: result: %s\n", test);
+				return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
             }
-            else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && isSilkTouchOverride(state))
+            else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && CachedTagManager.isSilkTouchOverride(state))
             {
-                return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+				//System.out.printf("applySilkTouchFirst:C: result: %s\n", test);
+				return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
             }
 
-            return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
+			//System.out.printf("isBetterToolEach: result: %s\n", test);
+			return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
         }
 
-        return false;
+		//System.out.printf("isBetterTool: (Default-Correct?) result: %s\n", test);
+        return EquipmentUtils.isCorrectTool(testedStack, state);
     }
 
     // Even though an Axe is the "Correct tool" for Bamboo, a Sword is preferred
@@ -826,7 +683,9 @@ public class InventoryUtils
             return false;
         }
 
-        return false;
+		// Should default to original behavior.
+		//System.out.printf("applySilkTouchFirst: (Default-Correct?) result: %s\n", test);
+		return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
     }
 
     private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
@@ -860,19 +719,19 @@ public class InventoryUtils
         }
         else if (testSpeed == prevSpeed)
         {
-            final boolean config = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
+            final boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
             Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(false);
             final boolean result = isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
             final boolean prevResult = loop ? isBetterToolEach(previousTool, testedStack, state, isMisc, false) : false;
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(config);
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
 
-            //System.out.printf("   Silk Touch Preference results: config: %s // test - %s, prev - %s", config, result, prevResult);
+            //System.out.printf("   Silk Touch Preference results: config: %s // test - %s, prev - %s", preferSilk, result, prevResult);
 
             // Filter out matches based on config for Silk Touch over Non-Silk Touch tools
             // when all other checks cannot determine which one should be picked.
             if (prevResult && result)
             {
-                if (config)
+                if (preferSilk)
                 {
                     return testSilkTouch && !prevSilkTouch;
                 }
@@ -928,9 +787,10 @@ public class InventoryUtils
     {
         String itemType = Registries.ITEM.getId(stack.getItem()).getPath();
 
-        if (itemType.contains("netherite")) return 5;
-        if (itemType.contains("diamond")) return 4;
-        if (itemType.contains("iron")) return 3;
+        if (itemType.contains("netherite")) return 6;
+        if (itemType.contains("diamond")) return 5;
+        if (itemType.contains("iron")) return 4;
+        if (itemType.contains("copper")) return 3;
         if (itemType.contains("stone")) return 2;
         if (itemType.contains("gold")) return 1;
         if (itemType.contains("wood")) return 0;
@@ -1007,47 +867,12 @@ public class InventoryUtils
             }
         }
 
-        if (state.isToolRequired() && stack.isSuitableFor(state) == false)
+        if (state.isToolRequired() && !stack.isSuitableFor(state))
         {
             speed /= (100F / 30F);
         }
 
         return speed;
-    }
-
-    private static boolean isNeedsShears(BlockState state)
-    {
-        if (needsCache)
-        {
-            return CachedBlockTags.getInstance().match(NEEDS_SHEARS_KEY, state);
-        }
-
-        return state.isIn(MaLiLibTag.Blocks.NEEDS_SHEARS);
-    }
-
-    private static boolean isNeedsSilkTouch(BlockState state)
-    {
-        if (needsCache)
-        {
-            return CachedBlockTags.getInstance().match(NEEDS_SILK_TOUCH_KEY, state);
-        }
-
-        return state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH);
-    }
-
-    private static boolean isOreBlock(BlockState state)
-    {
-        if (needsCache)
-        {
-            return CachedBlockTags.getInstance().match(ORE_BLOCKS_KEY, state);
-        }
-
-        return state.isIn(MaLiLibTag.Blocks.ORE_BLOCKS);
-    }
-
-    private static boolean isSilkTouchOverride(BlockState state)
-    {
-        return CachedBlockTags.getInstance().match(SILK_TOUCH_OVERRIDE_KEY, state);
     }
 
     protected static boolean hasEnoughDurability(ItemStack stack)
@@ -1112,7 +937,7 @@ public class InventoryUtils
         for (int slotNumber : slotNumbers)
         {
             if (slotNumber >= 0 && slotNumber <= maxSlot &&
-                container.getSlot(slotNumber).hasStack() == false)
+				!container.getSlot(slotNumber).hasStack())
             {
                 return slotNumber;
             }
@@ -1133,7 +958,8 @@ public class InventoryUtils
 
     private static int getMinDurability(ItemStack stack)
     {
-        if (FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() == false)
+        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() ||
+	        (Configs.Generic.TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK.getBooleanValue() && !stack.hasEnchantments()))
         {
             return 0;
         }

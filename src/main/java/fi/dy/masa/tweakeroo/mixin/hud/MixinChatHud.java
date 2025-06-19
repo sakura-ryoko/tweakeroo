@@ -1,16 +1,15 @@
 package fi.dy.masa.tweakeroo.mixin.hud;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
@@ -33,7 +32,7 @@ public abstract class MixinChatHud
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE",
-                target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
+                                          target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
     private void overrideChatBackgroundColor(DrawContext drawableHelper, int left, int top, int right, int bottom, int color)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())

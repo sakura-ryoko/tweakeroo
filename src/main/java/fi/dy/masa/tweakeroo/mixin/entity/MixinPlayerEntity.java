@@ -1,6 +1,11 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
-import fi.dy.masa.tweakeroo.data.DataManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -8,16 +13,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
-
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.CameraUtils;
+import fi.dy.masa.tweakeroo.data.DataManager;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity
@@ -92,17 +90,6 @@ public abstract class MixinPlayerEntity extends LivingEntity
                 double rangeRealMax = cir.getReturnValue() + 1.0;
                 cir.setReturnValue(Math.min(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), rangeRealMax));
             }
-        }
-    }
-
-    @Inject(method = "isSpectator", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_overrideIsSpectator(CallbackInfoReturnable<Boolean> cir)
-    {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-            CameraUtils.getFreeCameraSpectator() &&
-            (PlayerEntity) (Object) this instanceof ClientPlayerEntity)
-        {
-            cir.setReturnValue(true);
         }
     }
 }

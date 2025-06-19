@@ -56,7 +56,6 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.gen.feature.PlacedFeature;
 
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -741,6 +740,22 @@ public class MiscUtils
 
         return false;
     }
+
+	public static void toggleGammaOverrideWithMessage()
+	{
+		boolean orig = FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue();
+
+		if (!orig)
+		{
+			FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(true);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_GAMMA_OVERRIDE.getPrettyName(), true);
+		}
+		else
+		{
+			FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_GAMMA_OVERRIDE.getPrettyName(), false);
+		}
+	}
 
     public static class PostKeyAction
     {

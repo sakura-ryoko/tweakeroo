@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.client;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -31,28 +31,15 @@ import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
 @Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
 {
-    @Shadow
-    @Nullable
-    public ClientPlayerEntity player;
-    @Shadow
-    @Nullable
-    public ClientWorld world;
-    @Shadow
-    @Nullable
-    public Screen currentScreen;
-    @Shadow
-    @Final
-    public GameOptions options;
-    @Shadow
-    private int itemUseCooldown;
-    @Shadow
-    protected int attackCooldown;
+    @Shadow @Nullable public ClientPlayerEntity player;
+    @Shadow @Nullable public ClientWorld world;
+    @Shadow @Nullable public Screen currentScreen;
+    @Shadow @Final public GameOptions options;
+    @Shadow private int itemUseCooldown;
+    @Shadow protected int attackCooldown;
 
-    @Shadow
-    private boolean doAttack() {return false;}
-
-    @Shadow
-    private void doItemUse() {}
+    @Shadow private boolean doAttack() {return false;}
+    @Shadow private void doItemUse() {}
 
     @Override
     public void tweakeroo_setItemUseCooldown(int value)

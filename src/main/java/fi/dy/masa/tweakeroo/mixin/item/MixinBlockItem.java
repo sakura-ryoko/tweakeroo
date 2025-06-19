@@ -26,17 +26,20 @@ public abstract class MixinBlockItem extends Item
     @Shadow public abstract Block getBlock();
 
     @Inject(method = "getPlacementState", at = @At("HEAD"), cancellable = true)
-    private void modifyPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir)
+    private void tweakeroo_modifyPlacementState(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir)
     {
         if (Configs.Generic.CLIENT_PLACEMENT_ROTATION.getBooleanValue())
         {
             BlockState stateOrig = this.getBlock().getPlacementState(ctx);
 
-            if (stateOrig != null && this.canPlace(ctx, stateOrig))
-            {
-                UseContext context = UseContext.from(ctx, ctx.getHand());
-                cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, context));
-            }
+			if (stateOrig != null)
+			{
+				if (!Configs.Generic.CLIENT_PLACEMENT_VALIDATION.getBooleanValue() || this.canPlace(ctx, stateOrig))
+				{
+					UseContext context = UseContext.from(ctx, ctx.getHand());
+					cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, context));
+				}
+			}
         }
     }
 }
