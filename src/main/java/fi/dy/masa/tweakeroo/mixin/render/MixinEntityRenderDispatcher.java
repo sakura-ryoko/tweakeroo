@@ -1,19 +1,15 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
+import net.minecraft.client.render.Frustum;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.entity.*;
+import net.minecraft.entity.decoration.AbstractDecorationEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
 
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;

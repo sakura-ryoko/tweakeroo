@@ -34,7 +34,7 @@ import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -43,10 +43,12 @@ public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final MinecraftClient mc;
+    private Pair<Entity, NbtCompound> lastEnderItems;
 
     public RenderHandler()
     {
         this.mc = MinecraftClient.getInstance();
+        this.lastEnderItems = null;
     }
 
     public static RenderHandler getInstance()
@@ -140,15 +142,25 @@ public class RenderHandler implements IRenderer
 
                 if (player != null)
                 {
-                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
+                    Pair<Entity, NbtCompound> pair = EntityDataManager.getInstance().requestEntity(world, player.getId());
                     EnderChestInventory inv;
 
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
                     {
                         inv = InventoryUtils.getPlayerEnderItemsFromNbt(pair.getRight(), world.getRegistryManager());
+                        this.lastEnderItems = pair;
+                    }
+                    else if (pair != null && pair.getLeft() instanceof PlayerEntity pe && !pe.getEnderChestInventory().isEmpty())
+                    {
+                        inv = pe.getEnderChestInventory();
+                    }
+                    else if (this.lastEnderItems != null)
+                    {
+                        inv = InventoryUtils.getPlayerEnderItemsFromNbt(this.lastEnderItems.getRight(), world.getRegistryManager());
                     }
                     else
                     {
+                        // Last Ditch effort
                         inv = player.getEnderChestInventory();
                     }
 

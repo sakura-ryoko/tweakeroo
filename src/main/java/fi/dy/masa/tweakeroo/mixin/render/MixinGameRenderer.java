@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import java.util.function.Predicate;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
@@ -13,8 +12,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -34,7 +35,7 @@ public abstract class MixinGameRenderer
     @Unique private float realPitch;
 
     @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
-    private void onRenderWorld(CallbackInfo ci)
+    private void tweakeroo_onRenderWorld(CallbackInfo ci)
     {
         if (Callbacks.skipWorldRendering)
         {
@@ -43,61 +44,12 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "getFov", at = @At("HEAD"), cancellable = true)
-    private void applyZoom(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Float> cir)
+    private void tweakeroo_applyZoom(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Float> cir)
     {
         if (MiscUtils.isZoomActive())
         {
             cir.setReturnValue((float) Configs.Generic.ZOOM_FOV.getDoubleValue());
         }
-    }
-
-    @ModifyExpressionValue(method = "getFov", at = @At(value = "CONSTANT", args = "floatValue=70.0"))
-    private float applyFreeCameraFov(float original)
-    {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
-        {
-            return ((float) this.client.options.getFov().getValue());
-        }
-
-        return original;
-    }
-
-    @ModifyVariable(method = "getFov", at = @At(value = "LOAD", ordinal = 0), argsOnly = true)
-    private boolean freezeFovOnFreeCamera(boolean value)
-    {
-        return !FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && value;
-    }
-
-//    @ModifyExpressionValue(
-//            method = "getFov",  at = @At(value = "INVOKE",
-//            target = "Lnet/minecraft/client/render/Camera;getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;"))
-//    private CameraSubmersionType ignoreSubmersionTypeOnFreeCamera(CameraSubmersionType original)
-//    {
-//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
-//        {
-//            return CameraSubmersionType.NONE;
-//        }
-//
-//        return original;
-//    }
-
-    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
-              target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
-    private Entity overrideCameraEntityForRayTrace(MinecraftClient mc)
-    {
-        // Return the real player for the hit target ray tracing if the
-        // player inputs option is enabled in Free Camera mode.
-        // Normally in Free Camera mode the Tweakeroo CameraEntity is set as the
-        // render view/camera entity, which would then also ray trace from the camera point of view.
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-            Configs.Generic.FREE_CAMERA_PLAYER_INPUTS.getBooleanValue()  &&
-            !FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() &&
-            mc.player != null)
-        {
-            return mc.player;
-        }
-
-        return mc.getCameraEntity();
     }
 
     @ModifyArg(method = "findCrosshairTarget",
@@ -109,7 +61,7 @@ public abstract class MixinGameRenderer
                                  "Lnet/minecraft/util/math/Box;" +
                                  "Ljava/util/function/Predicate;D)" +
                                  "Lnet/minecraft/util/hit/EntityHitResult;"))
-    private Predicate<Entity> overrideTargetedEntityCheck(Predicate<Entity> predicate)
+    private Predicate<Entity> tweakeroo_overrideTargetedEntityCheck(Predicate<Entity> predicate)
     {
         if (Configs.Disable.DISABLE_DEAD_MOB_TARGETING.getBooleanValue())
         {
@@ -128,7 +80,7 @@ public abstract class MixinGameRenderer
     @Inject(method = "renderWorld", at = @At(
                 value = "INVOKE", shift = Shift.AFTER,
                 target = "Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"))
-    private void overrideRenderViewEntityPre(CallbackInfo ci)
+    private void tweakeroo_overrideRenderViewEntityPre(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -144,7 +96,7 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "renderWorld", at = @At("RETURN"))
-    private void overrideRenderViewEntityPost(CallbackInfo ci)
+    private void tweakeroo_overrideRenderViewEntityPost(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -154,16 +106,6 @@ public abstract class MixinGameRenderer
             {
                 MiscUtils.setEntityRotations(entity, this.realYaw, this.realPitch);
             }
-        }
-    }
-
-    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void removeHandRendering(CallbackInfo ci)
-    {
-        // todo
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
-        {
-            ci.cancel();
         }
     }
 }

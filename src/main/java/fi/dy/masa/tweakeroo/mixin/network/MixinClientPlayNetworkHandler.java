@@ -23,9 +23,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
@@ -77,6 +78,18 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         }
     }
 
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "onBlockEvent", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_onBlockEvent(BlockEventS2CPacket packet, CallbackInfo ci)
+    {
+        if (Configs.Disable.DISABLE_CLIENT_BLOCK_EVENTS.getBooleanValue())
+        {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "onCustomPayload", at = @At("HEAD"))
     private void tweakeroo_onCustomPayload(CustomPayload payload, CallbackInfo ci)
     {
@@ -84,7 +97,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
         {
             DataManager.getInstance().setHasCarpetServer(true);
         }
-        else if (payload.getId().id().equals(DataManager.SERVUX_ENTITY_DATA))
+        else if (payload.getId().id().getNamespace().equals("servux"))
         {
             DataManager.getInstance().setHasServuxServer(true);
         }
@@ -93,10 +106,10 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
     @Inject(method = "onCommandTree", at = @At("RETURN"))
     private void tweakeroo_onCommandTree(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        if (Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
             // when the player becomes OP, the server sends the command tree to the client
-            ServerDataSyncer.getInstance().resetOpCheck();
+            EntityDataManager.getInstance().resetOpCheck();
         }
     }
 

@@ -2,6 +2,12 @@ package fi.dy.masa.tweakeroo.mixin.world;
 
 import java.util.function.Consumer;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,12 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -22,9 +22,7 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 @Mixin(World.class)
 public abstract class MixinWorld
 {
-    @Shadow
-    @Final
-    public boolean isClient;
+    @Shadow @Final public boolean isClient;
 
     @Inject(method = "tickBlockEntities", at = @At("HEAD"), cancellable = true)
     private void disableBlockEntityTicking(CallbackInfo ci)

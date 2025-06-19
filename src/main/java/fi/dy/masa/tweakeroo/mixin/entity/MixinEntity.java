@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -7,9 +9,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -21,8 +20,6 @@ import fi.dy.masa.tweakeroo.util.SnapAimUtils;
 @Mixin(net.minecraft.entity.Entity.class)
 public abstract class MixinEntity
 {
-    @Shadow public abstract net.minecraft.util.math.Vec3d getVelocity();
-    @Shadow public abstract void setVelocity(net.minecraft.util.math.Vec3d velocity);
     @Shadow private float yaw;
     @Shadow private float pitch;
     @Shadow public float prevYaw;
@@ -99,7 +96,7 @@ public abstract class MixinEntity
 
                 return;
             }
-
+            
             if (FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue())
             {
                 int pitchLimit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;

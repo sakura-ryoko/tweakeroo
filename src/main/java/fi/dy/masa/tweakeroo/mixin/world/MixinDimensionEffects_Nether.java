@@ -1,10 +1,11 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
+import net.minecraft.client.render.DimensionEffects;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.render.DimensionEffects;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(DimensionEffects.Nether.class)

@@ -1,18 +1,7 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
 import java.util.Optional;
-
-import fi.dy.masa.malilib.gui.Message;
-import fi.dy.masa.malilib.util.*;
-import fi.dy.masa.malilib.util.PositionUtils.HitPart;
-import fi.dy.masa.malilib.util.restrictions.BlockRestriction;
-import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
-import fi.dy.masa.tweakeroo.util.*;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
+import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -25,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -36,7 +26,19 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
+import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.MessageOutputType;
+import fi.dy.masa.malilib.util.PositionUtils;
+import fi.dy.masa.malilib.util.PositionUtils.HitPart;
+import fi.dy.masa.malilib.util.restrictions.BlockRestriction;
+import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.util.*;
 
 public class PlacementTweaks
 {
@@ -602,7 +604,7 @@ public class PlacementTweaks
                     }
 
                     Optional<Direction> facingTmp = fi.dy.masa.malilib.util.game.BlockUtils.getFirstPropertyFacingValue(state);
-                    ////System.out.printf("accurate - sideIn: %s, state: %s, hit: %s, f: %s, posNew: %s\n", sideIn, state, hitVec, EnumFacing.getDirectionFromEntityLiving(posIn, player), posNew);
+                    //System.out.printf("accurate - sideIn: %s, state: %s, hit: %s, f: %s, posNew: %s\n", sideIn, state, hitVec, player.getHorizontalFacing(), posNew);
 
                     if (facingTmp.isPresent())
                     {
@@ -636,7 +638,24 @@ public class PlacementTweaks
 
                 if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForDirection(stack, facing))
                 {
-                    x = posNew.getX() + relX + 2 + (facing.getId() * 2);
+                    int protocolValue = 0;
+                    int shiftBy = 1;
+                    final int facingAdj = (facing.getId() * 2);
+
+                    protocolValue |= facing.getId() << shiftBy;
+                    shiftBy += 3;
+
+                    if (stack.isIn(ItemTags.TRAPDOORS) || stack.isIn(ItemTags.STAIRS))
+                    {
+                        // add BLOCK_HALF handling --> (BOTTOM)
+                        int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
+                        protocolValue |= (1 << shiftBy);
+                        shiftBy += requiredBits;
+                    }
+
+                    //System.out.printf("prot value (Facing) orig 0x%08X vs 0x%08X\n", facingAdj, protocolValue);
+
+                    x = posNew.getX() + relX + 2 + (protocolValue);
                 }
                 else if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForOrientation(stack, facing))
                 {
@@ -859,7 +878,24 @@ public class PlacementTweaks
             facing = facing.getOpposite(); // go from block face to click on to the requested facing
             //double relX = hitVecIn.x - posIn.getX();
             //double x = posIn.getX() + relX + 2 + (facing.getId() * 2);
-            double x = posIn.getX() + 2 + (facing.getId() * 2);
+            int protocolValue = 0;
+            int shiftBy = 1;
+            final int facingAdj = (facing.getId() * 2);
+
+            protocolValue |= facing.getId() << shiftBy;
+            shiftBy += 3;
+
+            if (stackOriginal.isIn(ItemTags.TRAPDOORS) || stackOriginal.isIn(ItemTags.STAIRS))
+            {
+                // add BLOCK_HALF handling --> (BOTTOM)
+                int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
+                protocolValue |= (1 << shiftBy);
+                shiftBy += requiredBits;
+            }
+
+            //System.out.printf("prot value (Facing) orig 0x%08X vs 0x%08X\n", facingAdj, protocolValue);
+//           double x = posIn.getX() + 2 + (facing.getIndex() * 2);
+            double x = posIn.getX() + 2 + (protocolValue);
 
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
             {
