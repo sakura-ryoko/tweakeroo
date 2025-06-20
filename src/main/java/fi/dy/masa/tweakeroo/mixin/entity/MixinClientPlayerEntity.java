@@ -1,15 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
-import net.minecraft.entity.data.TrackedData;
 import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.input.Input;
@@ -17,18 +9,23 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.CameraEntity;
-import fi.dy.masa.tweakeroo.util.CameraUtils;
-import fi.dy.masa.tweakeroo.util.DummyMovementInput;
 import fi.dy.masa.tweakeroo.util.InventoryUtils;
 
-@Mixin(ClientPlayerEntity.class)
+@Mixin(value = ClientPlayerEntity.class, priority = 1001)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 {
     @Shadow public Input input;
@@ -37,8 +34,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Shadow public float nauseaIntensity;
     @Shadow private boolean falling;
 
-    @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
-    @Unique private Input realInput;
     @Unique private float realNauseaIntensity;
     @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
 
@@ -50,7 +45,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Redirect(method = "tickNausea",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/gui/screen/Screen;shouldPause()Z"))
-    private boolean onDoesGuiPauseGame(Screen gui)
+    private boolean tweakeroo_onDoesGuiPauseGame(Screen gui)
     {
         // Spoof the return value to prevent entering the if block
         if (Configs.Disable.DISABLE_PORTAL_GUI_CLOSING.getBooleanValue())
@@ -62,7 +57,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "tickNausea", at = @At("HEAD"))
-    private void disableNauseaEffectPre(CallbackInfo ci)
+    private void tweakeroo_disableNauseaEffectPre(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_NAUSEA_EFFECT.getBooleanValue())
         {
@@ -71,7 +66,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "tickNausea", at = @At(value = "TAIL"))
-    private void disableNauseaEffectPost(CallbackInfo ci)
+    private void tweakeroo_disableNauseaEffectPost(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_NAUSEA_EFFECT.getBooleanValue())
         {
@@ -86,7 +81,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "tickMovement",
             at = @At(value = "FIELD",
                      target = "Lnet/minecraft/client/network/ClientPlayerEntity;falling:Z"))
-    private void overrideSprint(CallbackInfo ci)
+    private void tweakeroo_overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
             ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardMovement() &&
@@ -99,7 +94,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Redirect(method = "shouldStopSprinting", at = @At(value = "FIELD",
                 target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z"))
-    private boolean overrideCollidedHorizontally(ClientPlayerEntity player)
+    private boolean tweakeroo_overrideCollidedHorizontally(ClientPlayerEntity player)
     {
         if (Configs.Disable.DISABLE_WALL_UNSPRINT.getBooleanValue())
         {
@@ -116,7 +111,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
              */
             at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, ordinal = 2, shift = At.Shift.AFTER,
                      target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksLeftToDoubleTapSprint:I"))
-    private void disableDoubleTapSprint(CallbackInfo ci)
+    private void tweakeroo_disableDoubleTapSprint(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_DOUBLE_TAP_SPRINT.getBooleanValue())
         {
@@ -127,7 +122,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;checkGliding()Z"))
-    private void onFallFlyingCheckChestSlot(CallbackInfo ci)
+    private void tweakeroo_onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
@@ -149,7 +144,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "onTrackedDataSet", at = @At("RETURN"))
-    private void onStopFlying(TrackedData<?> data, CallbackInfo ci)
+    private void tweakeroo_onStopFlying(TrackedData<?> data, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
@@ -177,44 +172,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
                     }
                 }
             }
-        }
-    }
-
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void disableMovementInputsPre(CallbackInfo ci)
-    {
-        if (CameraUtils.shouldPreventPlayerMovement())
-        {
-            this.realInput = this.input;
-            this.input = this.dummyMovementInput;
-        }
-    }
-
-    @Inject(method = "tick", at = @At("RETURN"))
-    private void disableMovementInputsPost(CallbackInfo ci)
-    {
-        if (this.realInput != null)
-        {
-            this.input = this.realInput;
-            this.realInput = null;
-        }
-    }
-
-    @Inject(method = "isCamera", at = @At("HEAD"), cancellable = true)
-    private void allowPlayerMovementInFreeCameraMode(CallbackInfoReturnable<Boolean> cir)
-    {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && CameraEntity.originalCameraWasPlayer())
-        {
-            cir.setReturnValue(true);
-        }
-    }
-
-    @Inject(method = "swingHand", at = @At("HEAD"), cancellable = true)
-    private void preventHandSwing(Hand hand, CallbackInfo ci)
-    {
-        if (CameraUtils.shouldPreventPlayerInputs())
-        {
-            ci.cancel();
         }
     }
 }

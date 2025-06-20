@@ -18,9 +18,6 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(HeldItemRenderer.class)
 public abstract class MixinHeldItemRenderer
 {
-//    @Shadow @Final private MinecraftClient client;
-//    @Unique float tickProg = 0f;
-
     @Redirect(method = "updateHeldItems()V", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;getAttackCooldownProgress(F)F"))
@@ -40,40 +37,4 @@ public abstract class MixinHeldItemRenderer
             ci.cancel();
         }
     }
-
-    // fixme, doesn't work
-//    @Inject(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V",
-//                at = @At("HEAD"))
-//    private void tweakeroo_onRenderHandItem1(float tickProgress, MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, ClientPlayerEntity player, int light, CallbackInfo ci)
-//    {
-//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-//            Configs.Generic.FREE_CAMERA_PLAYER_RENDER_HANDS.getBooleanValue())
-//        {
-//            this.tickProg = tickProgress;
-//        }
-//    }
-//
-//    @ModifyVariable(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At("HEAD"), argsOnly = true)
-//    private ClientPlayerEntity tweakeroo_modifyPlayerForHandRendering(ClientPlayerEntity player)
-//    {
-//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-//            Configs.Generic.FREE_CAMERA_PLAYER_RENDER_HANDS.getBooleanValue())
-//        {
-//            return CameraEntity.getCamera();
-//        }
-//
-//        return player;
-//    }
-//
-//    @ModifyVariable(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At("HEAD"), argsOnly = true)
-//    private int tweakeroo_modifyLightForHandRendering(int light)
-//    {
-//        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-//            Configs.Generic.FREE_CAMERA_PLAYER_RENDER_HANDS.getBooleanValue())
-//        {
-//            return this.client.getEntityRenderDispatcher().getLight(CameraEntity.getCamera(), this.tickProg);
-//        }
-//
-//        return light;
-//    }
 }

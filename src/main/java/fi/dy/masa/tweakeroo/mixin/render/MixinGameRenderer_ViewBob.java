@@ -18,9 +18,9 @@ public abstract class MixinGameRenderer_ViewBob
 
     @Redirect(method = "renderWorld", require = 0, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/GameRenderer;bobView(Lnet/minecraft/client/util/math/MatrixStack;F)V"))
-    private void disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
+    private void tweakeroo_disableWorldViewBob(GameRenderer renderer, MatrixStack matrices, float tickDelta)
     {
-        if (Configs.Disable.DISABLE_WORLD_VIEW_BOB.getBooleanValue() == false)
+        if (!Configs.Disable.DISABLE_WORLD_VIEW_BOB.getBooleanValue())
         {
             this.bobView(matrices, tickDelta);
         }
