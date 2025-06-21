@@ -12,6 +12,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+import fi.dy.masa.tweakeroo.util.InventoryUtils;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -54,12 +55,15 @@ public class WorldLoadListener implements IWorldLoadListener
                 Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(mc.options.getDarknessEffectScale().getValue());
                 mc.options.getDarknessEffectScale().setValue(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
             }
+
+            InventoryUtils.clearCache();
         }
 
         // Logging in to a world or changing dimensions or respawning
         if (worldAfter != null)
         {
             ServerDataSyncer.getInstance().onWorldJoin();
+            InventoryUtils.startCache();
         }
     }
 }
