@@ -128,6 +128,10 @@ public class Callbacks
         Configs.Lists.SELECTIVE_BLOCKS_LIST_TYPE.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
         FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
         Configs.Disable.DISABLE_RENDERING_SCAFFOLDING.setValueChangeCallback((cfg) -> mc.worldRenderer.reload());
+        Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.setValueChangeCallback(
+                (cfg) ->
+                        InventoryUtils.parseSilkTouchOveride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
+        );
     }
 
     public static class FeatureCallbackHold implements IValueChangeCallback<IConfigBoolean>

@@ -11,6 +11,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+import fi.dy.masa.tweakeroo.util.InventoryUtils;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -45,12 +46,15 @@ public class WorldLoadListener implements IWorldLoadListener
                 FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
                 FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(true);
             }
+
+            InventoryUtils.clearCache();
         }
 
         // Logging in to a world or changing dimensions or respawning
         if (worldAfter != null)
         {
             ServerDataSyncer.getInstance().onWorldJoin();
+            InventoryUtils.startCache();
         }
     }
 }
