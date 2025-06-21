@@ -30,6 +30,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -471,6 +472,11 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                 }
             }
 
+            if (world instanceof ServerWorld)
+            {
+                return this.refreshBlockEntityFromWorld(world, pos);
+            }
+
             return this.blockEntityCache.get(pos).getRight();
         }
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
@@ -481,6 +487,16 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                 this.pendingBlockEntitiesQueue.add(pos);
             }
 
+            return this.refreshBlockEntityFromWorld(world, pos);
+        }
+
+        return null;
+    }
+
+    private @Nullable Pair<BlockEntity, NbtCompound> refreshBlockEntityFromWorld(World world, BlockPos pos)
+    {
+        if (world != null && world.getBlockState(pos).hasBlockEntity())
+        {
             BlockEntity be = world.getWorldChunk(pos).getBlockEntity(pos);
 
             if (be != null)
@@ -516,6 +532,12 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                 }
             }
 
+            // Refresh from Server World
+            if (world instanceof ServerWorld)
+            {
+                return this.refreshEntityFromWorld(world, entityId);
+            }
+
             return this.entityCache.get(entityId).getRight();
         }
         if (!DataManager.getInstance().hasIntegratedServer() &&
@@ -524,9 +546,14 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             this.pendingEntitiesQueue.add(entityId);
         }
 
-        if (this.getWorld() != null)
+        return this.refreshEntityFromWorld(world, entityId);
+    }
+
+    private @Nullable Pair<Entity, NbtCompound> refreshEntityFromWorld(World world, int entityId)
+    {
+        if (world != null)
         {
-            Entity entity = this.getWorld().getEntityById(entityId);
+            Entity entity = world.getEntityById(entityId);
             NbtCompound nbt = new NbtCompound();
 
             if (entity != null && entity.saveSelfNbt(nbt))
