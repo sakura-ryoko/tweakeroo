@@ -487,10 +487,8 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             {
                 this.pendingBlockEntitiesQueue.add(pos);
             }
-            else
-            {
-                return this.refreshBlockEntityFromWorld(world, pos);
-            }
+
+            return this.refreshBlockEntityFromWorld(world, pos);
         }
 
         return null;
@@ -548,12 +546,8 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             this.pendingEntitiesQueue.add(entityId);
         }
-        else
-        {
-            return this.refreshEntityFromWorld(world, entityId);
-        }
 
-        return null;
+        return this.refreshEntityFromWorld(world, entityId);
     }
 
     private @Nullable Pair<Entity, NbtCompound> refreshEntityFromWorld(World world, int entityId)
