@@ -197,7 +197,7 @@ public class CachedBlockTags
         {
             if (MinecraftClient.getInstance().world != null)
             {
-                RegistryWrapper<Block> wrapper = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(Registries.BLOCK.getKey());
+                RegistryWrapper<Block> wrapper = MinecraftClient.getInstance().world.getRegistryManager().getWrapperOrThrow(Registries.BLOCK.getKey());
                 wrapper.getOptional(tag).ifPresent(this.tags::add);
             }
         }

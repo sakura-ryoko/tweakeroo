@@ -131,12 +131,12 @@ public class InventoryUtils
         list.add(Registries.BLOCK.getId(Blocks.HANGING_ROOTS).toString());
         list.add(Registries.BLOCK.getId(Blocks.LARGE_FERN).toString());
         list.add(Registries.BLOCK.getId(Blocks.NETHER_SPROUTS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PALE_HANGING_MOSS).toString());
+//        list.add(Registries.BLOCK.getId(Blocks.PALE_HANGING_MOSS).toString());
         list.add(Registries.BLOCK.getId(Blocks.SHORT_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SHORT_DRY_GRASS).toString());
+//        list.add(Registries.BLOCK.getId(Blocks.SHORT_DRY_GRASS).toString());
         list.add(Registries.BLOCK.getId(Blocks.SEAGRASS).toString());
         list.add(Registries.BLOCK.getId(Blocks.TALL_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_DRY_GRASS).toString());
+//        list.add(Registries.BLOCK.getId(Blocks.TALL_DRY_GRASS).toString());
         list.add(Registries.BLOCK.getId(Blocks.TALL_SEAGRASS).toString());
         list.add(Registries.BLOCK.getId(Blocks.TRIPWIRE).toString());
         list.add(Registries.BLOCK.getId(Blocks.TWISTING_VINES).toString());
@@ -186,7 +186,7 @@ public class InventoryUtils
         list.add(Registries.BLOCK.getId(Blocks.BEE_NEST).toString());
         list.add(Registries.BLOCK.getId(Blocks.BOOKSHELF).toString());
         list.add(Registries.BLOCK.getId(Blocks.BLUE_ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BUSH).toString());
+//        list.add(Registries.BLOCK.getId(Blocks.BUSH).toString());
         list.add(Registries.BLOCK.getId(Blocks.CAMPFIRE).toString());
         list.add(Registries.BLOCK.getId(Blocks.CHISELED_BOOKSHELF).toString());
         list.add(Registries.BLOCK.getId(Blocks.ENDER_CHEST).toString());

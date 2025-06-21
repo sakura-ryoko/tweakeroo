@@ -16,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
@@ -139,7 +140,6 @@ public class RenderHandler implements IRenderer
                 if (player != null)
                 {
                     Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
-                    NbtCompound nbt = new NbtCompound();
                     EnderChestInventory inv;
 
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
@@ -153,7 +153,10 @@ public class RenderHandler implements IRenderer
 
                     if (inv != null)
                     {
-                        nbt.put(NbtKeys.ENDER_ITEMS, inv.toNbtList(world.getRegistryManager()));
+                        NbtList list = inv.toNbtList(world.getRegistryManager());
+                        NbtCompound nbt = new NbtCompound();
+
+                        nbt.put(NbtKeys.ENDER_ITEMS, list);
                         fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(stack, nbt, x, y, false, drawContext);
                     }
                 }
