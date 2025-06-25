@@ -54,6 +54,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor         CHAT_BACKGROUND_COLOR               = new ConfigColor       ("chatBackgroundColor", "#80000000").apply(GENERIC_KEY);
         public static final ConfigString        CHAT_TIME_FORMAT                    = new ConfigString      ("chatTimeFormat", "[HH:mm:ss]").apply(GENERIC_KEY);
         public static final ConfigBoolean       CLIENT_PLACEMENT_ROTATION           = new ConfigBoolean     ("clientPlacementRotation", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       CLIENT_PLACEMENT_VALIDATION         = new ConfigBoolean     ("clientPlacementValidation", true).apply(GENERIC_KEY);
         public static final ConfigInteger       CUSTOM_INVENTORY_GUI_SCALE          = new ConfigInteger     ("customInventoryGuiScale", 2, 1, 10).apply(GENERIC_KEY);
         public static final ConfigDouble        DARKNESS_SCALE_OVERRIDE_VALUE       = new ConfigDouble      ("darknessScaleOverrideValue", 0.45D, 0.0D, 1.00D).apply(GENERIC_KEY);
         public static final ConfigBoolean       DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
@@ -154,6 +155,7 @@ public class Configs implements IConfigHandler
                 BUNDLE_DISPLAY_REQUIRE_SHIFT,
                 BUNDLE_DISPLAY_ROW_WIDTH,
                 CLIENT_PLACEMENT_ROTATION,
+                CLIENT_PLACEMENT_VALIDATION,
                 DEBUG_LOGGING,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
                 FAST_PLACEMENT_REMEMBER_ALWAYS,

@@ -315,16 +315,21 @@ public class PlacementHandler
             state = state.with(Properties.WATERLOGGED, true);
         }
 
-        if (state.canPlaceAt(context.getWorld(), context.getPos()))
+        if (Configs.Generic.CLIENT_PLACEMENT_VALIDATION.getBooleanValue())
         {
-            //System.out.printf("validator passed for \"%s\"\n", state);
-            return state;
+            if (state.canPlaceAt(context.getWorld(), context.getPos()))
+            {
+                //System.out.printf("validator passed for \"%s\"\n", state);
+                return state;
+            }
+            else
+            {
+                //System.out.printf("validator failed for \"%s\"\n", state);
+                return null;
+            }
         }
-        else
-        {
-            //System.out.printf("validator failed for \"%s\"\n", state);
-            return null;
-        }
+
+        return state;
     }
 
     private static BlockState applyDirectionProperty(BlockState state, UseContext context,
