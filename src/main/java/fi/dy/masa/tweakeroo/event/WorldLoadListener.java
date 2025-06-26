@@ -65,5 +65,9 @@ public class WorldLoadListener implements IWorldLoadListener
             ServerDataSyncer.getInstance().onWorldJoin();
             InventoryUtils.startCache();
         }
+        else
+        {
+            Configs.Internal.SHULKER_MAX_STACK_SIZE.resetToDefault();
+        }
     }
 }

@@ -526,7 +526,6 @@ public class Configs implements IConfigHandler
         InventoryUtils.setRepairModeSlots(Lists.REPAIR_MODE_SLOTS.getStrings());
         InventoryUtils.setUnstackingItems(Lists.UNSTACKING_ITEMS.getStrings());
         InventoryUtils.setWeaponMapping(Lists.ENTITY_WEAPON_MAPPING.getStrings());
-        //InventoryUtils.setPreferSilkTouchList(Lists.PREFER_SILK_TOUCH.getStrings());
 
         PlacementTweaks.BLOCK_TYPE_BREAK_RESTRICTION.setListType((ListType) Lists.BLOCK_TYPE_BREAK_RESTRICTION_LIST_TYPE.getOptionListValue());
         PlacementTweaks.BLOCK_TYPE_BREAK_RESTRICTION.setListContents(
