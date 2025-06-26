@@ -37,9 +37,9 @@ public abstract class MixinItemStack
             block.getBlock() instanceof ShulkerBoxBlock &&
             InventoryUtils.shulkerBoxHasItems((ItemStack) (Object) this) == false)
         {
-            if (this.getComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1) < 64)
+            if (this.getComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1) < Configs.Internal.SHULKER_MAX_STACK_SIZE.getIntegerValue())
             {
-                cir.setReturnValue(64);
+                cir.setReturnValue(Configs.Internal.SHULKER_MAX_STACK_SIZE.getIntegerValue());
             }
         }
     }

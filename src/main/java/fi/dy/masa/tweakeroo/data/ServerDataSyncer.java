@@ -429,28 +429,46 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         }
     }
 
-    public boolean receiveServuxMetadata(NbtCompound data)
+    public boolean receiveServuxMetadata(NbtCompound nbt)
     {
         if (!DataManager.getInstance().hasIntegratedServer())
         {
             Tweakeroo.debugLog("tweaksDataChannel: received METADATA from Servux");
+            this.checkTweaksConfigs(nbt);
 
             if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
             {
-                if (data.getInt("version", -1) != ServuxTweaksPacket.PROTOCOL_VERSION)
+                if (nbt.getInt("version", -1) != ServuxTweaksPacket.PROTOCOL_VERSION)
                 {
                     Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version!");
                 }
 
                 DataManager.getInstance().setHasServuxServer(true);
-                this.setServuxVersion(data.getString("servux", ""));
+                this.setServuxVersion(nbt.getString("servux", ""));
                 this.setIsServuxServer();
-
+                
                 return true;
             }
         }
 
         return false;
+    }
+    
+    // This is only meant to keep some Tweaks in sync with the Server, such as Stackable Shulkers.
+    private void checkTweaksConfigs(NbtCompound nbt)
+    {
+        if (nbt.contains("stackingShulkers"))
+        {
+            boolean newValue =nbt.getBoolean("stackingShulkers", FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue());
+            Tweakeroo.debugLog("checkTweaksConfigs: stackingShulkers: [{}]", newValue);
+            FeatureToggle.TWEAK_SHULKERBOX_STACKING.setBooleanValue(newValue);
+        }
+        if (nbt.contains("stackingShulkersMax"))
+        {
+            int newValue = Math.clamp(nbt.getInt("stackingShulkersMax", 64), 1, 99);
+            Tweakeroo.debugLog("checkTweaksConfigs: stackingShulkersMax: [{}]", newValue);
+            Configs.Internal.SHULKER_MAX_STACK_SIZE.setIntegerValue(newValue);
+        }
     }
 
     public void onPacketFailure()

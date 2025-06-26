@@ -465,6 +465,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        SLIME_BLOCK_SLIPPERINESS_ORIGINAL   = new ConfigDouble      ("slimeBlockSlipperinessOriginal", 0.8, 0, 1).apply(INTERNAL_KEY);
         public static final ConfigDouble        SNAP_AIM_LAST_PITCH                 = new ConfigDouble      ("snapAimLastPitch", 0, -135, 135).apply(INTERNAL_KEY);
         public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
+        public static final ConfigInteger       SHULKER_MAX_STACK_SIZE              = new ConfigInteger     ("shulkerMaxStackSize", 64, 1, 99).apply(INTERNAL_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 DARKNESS_SCALE_VALUE_ORIGINAL,
@@ -472,7 +473,8 @@ public class Configs implements IConfigHandler
                 GAMMA_VALUE_ORIGINAL,
                 HOTBAR_SCROLL_CURRENT_ROW,
                 SLIME_BLOCK_SLIPPERINESS_ORIGINAL,
-                SNAP_AIM_LAST_YAW
+                SNAP_AIM_LAST_YAW,
+                SHULKER_MAX_STACK_SIZE
         );
     }
 
