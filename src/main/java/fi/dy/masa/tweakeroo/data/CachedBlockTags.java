@@ -75,6 +75,23 @@ public class CachedBlockTags
         );
     }
 
+    public List<String> matchAny(RegistryEntry<Block> block)
+    {
+        List<String> list = new ArrayList<>();
+
+        this.entries.forEach(
+                (name, entry) ->
+                {
+                    if (entry.contains(block))
+                    {
+                        list.add(name);
+                    }
+                }
+        );
+
+        return list;
+    }
+
     public List<String> matchAny(Block block)
     {
         List<String> list = new ArrayList<>();
@@ -107,6 +124,22 @@ public class CachedBlockTags
         );
 
         return list;
+    }
+
+    public boolean match(String name, RegistryEntry<Block> block)
+    {
+        Entry entry = this.get(name);
+
+        if (entry != null)
+        {
+            return entry.contains(block);
+        }
+        else
+        {
+            Tweakeroo.LOGGER.warn("CachedBlockTags#match(BlockEntry): Invalid tag list '{}'", name);
+        }
+
+        return false;
     }
 
     public boolean match(String name, Block block)
@@ -188,9 +221,14 @@ public class CachedBlockTags
             this.insertFromList(list);
         }
 
+        public void insertBlock(RegistryEntry<Block> block)
+        {
+            this.blocks.add(block);
+        }
+
         public void insertBlock(Block block)
         {
-            this.blocks.add(Registries.BLOCK.getEntry(block));
+            this.insertBlock(Registries.BLOCK.getEntry(block));
         }
 
         public void insertTag(TagKey<Block> tag)
@@ -264,10 +302,8 @@ public class CachedBlockTags
             }
         }
 
-        public boolean contains(Block block)
+        public boolean contains(RegistryEntry<Block> entry)
         {
-            RegistryEntry<Block> entry = Registries.BLOCK.getEntry(block);
-
             for (RegistryEntryList<Block> listEntry : this.tags)
             {
                 if (listEntry.contains(entry))
@@ -277,6 +313,11 @@ public class CachedBlockTags
             }
 
             return this.blocks.contains(entry);
+        }
+
+        public boolean contains(Block block)
+        {
+            return this.contains(Registries.BLOCK.getEntry(block));
         }
 
         public boolean contains(BlockState state)
