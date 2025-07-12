@@ -55,6 +55,7 @@
         "freecam.MixinCamera_freeCam",
         "freecam.MixinClientPlayerEntity_freeCam",
         "freecam.MixinGameRenderer_freeCam",
+        "freecam.MixinHeldItemRenderer_freeCam",
         "freecam.MixinInGameHud_freeCam",
         "freecam.MixinWorldRenderer_freeCam",
         "hud.MixinBossBarHud",
