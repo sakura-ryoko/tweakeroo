@@ -16,7 +16,7 @@ public class MixinWeatherRendering
 {
     @Inject(method = "renderPrecipitation(Lnet/minecraft/world/World;Lnet/minecraft/client/render/VertexConsumerProvider;IFLnet/minecraft/util/math/Vec3d;)V",
             at = @At("HEAD"), cancellable = true)
-    private void cancelWeatherRender(World world, VertexConsumerProvider vertexConsumerProvider, int ticks, float delta, Vec3d pos, CallbackInfo ci)
+    private void tweakeroo_cancelWeatherRender(World world, VertexConsumerProvider vertexConsumerProvider, int ticks, float delta, Vec3d pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {
