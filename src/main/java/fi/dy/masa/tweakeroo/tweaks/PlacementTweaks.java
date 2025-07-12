@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -14,6 +15,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -314,15 +316,15 @@ public class PlacementTweaks
         BlockPos posIn = hitResult.getBlockPos();
 
         if (Configs.Disable.DISABLE_AXE_STRIPPING.getBooleanValue() &&
-                stackPre.getItem() instanceof AxeItem &&
-                MiscUtils.isStrippableLog(world, posIn))
+            stackPre.getItem() instanceof AxeItem &&
+            MiscUtils.isStrippableLog(world, posIn))
         {
             return ActionResult.PASS;
         }
 
         if (Configs.Disable.DISABLE_SHOVEL_PATHING.getBooleanValue() &&
-                stackPre.getItem() instanceof ShovelItem &&
-                MiscUtils.isShovelPathConvertableBlock(world, posIn))
+            stackPre.getItem() instanceof ShovelItem &&
+            MiscUtils.isShovelPathConvertableBlock(world, posIn))
         {
             return ActionResult.PASS;
         }
@@ -445,8 +447,8 @@ public class PlacementTweaks
         boolean simpleOffset = false;
 
         if (handleFlexible == false &&
-                FeatureToggle.TWEAK_FAKE_SNEAK_PLACEMENT.getBooleanValue() &&
-                stack.getItem() instanceof BlockItem)
+            FeatureToggle.TWEAK_FAKE_SNEAK_PLACEMENT.getBooleanValue() &&
+            stack.getItem() instanceof BlockItem)
         {
             BlockHitResult hitResult = new BlockHitResult(hitVec, sideIn, posIn, false);
             ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
@@ -515,7 +517,7 @@ public class PlacementTweaks
                     }
 
                     Optional<Direction> facingTmp = fi.dy.masa.malilib.util.game.BlockUtils.getFirstPropertyFacingValue(state);
-                    ////System.out.printf("accurate - sideIn: %s, state: %s, hit: %s, f: %s, posNew: %s\n", sideIn, state, hitVec, EnumFacing.getDirectionFromEntityLiving(posIn, player), posNew);
+                    //System.out.printf("accurate - sideIn: %s, state: %s, hit: %s, f: %s, posNew: %s\n", sideIn, state, hitVec, player.getHorizontalFacing(), posNew);
 
                     if (facingTmp.isPresent())
                     {
@@ -549,7 +551,24 @@ public class PlacementTweaks
 
                 if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForDirection(stack, facing))
                 {
-                    x = posNew.getX() + relX + 2 + (facing.getIndex() * 2);
+                    int protocolValue = 0;
+                    int shiftBy = 1;
+                    final int facingAdj = (facing.getIndex() * 2);
+
+                    protocolValue |= facing.getIndex() << shiftBy;
+                    shiftBy += 3;
+
+                    if (stack.isIn(ItemTags.TRAPDOORS) || stack.isIn(ItemTags.STAIRS))
+                    {
+                        // add BLOCK_HALF handling --> (BOTTOM)
+                        int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
+                        protocolValue |= (1 << shiftBy);
+                        shiftBy += requiredBits;
+                    }
+
+                    //System.out.printf("prot value (Facing) orig 0x%08X vs 0x%08X\n", facingAdj, protocolValue);
+
+                    x = posNew.getX() + relX + 2 + (protocolValue);
                 }
                 else if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForOrientation(stack, facing))
                 {
@@ -679,12 +698,12 @@ public class PlacementTweaks
     public static void tryRestockHand(PlayerEntity player, Hand hand, ItemStack stackOriginal)
     {
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-                canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
+            canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             ItemStack stackCurrent = player.getStackInHand(hand);
 
             if (stackOriginal.isEmpty() == false && player.getInventory().getSelectedSlot() == hotbarSlot &&
-                    (stackCurrent.isEmpty() || ItemStack.areItemsEqual(stackCurrent, stackOriginal) == false))
+                (stackCurrent.isEmpty() || ItemStack.areItemsEqual(stackCurrent, stackOriginal) == false))
             {
                 // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
                 boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
@@ -706,7 +725,7 @@ public class PlacementTweaks
     {
         //System.out.printf("processRightClickBlockWrapper() start @ %s, side: %s, hand: %s\n", posIn, sideIn, hand);
         if (FeatureToggle.TWEAK_PLACEMENT_LIMIT.getBooleanValue() &&
-                placementCount >= Configs.Generic.PLACEMENT_LIMIT.getIntegerValue())
+            placementCount >= Configs.Generic.PLACEMENT_LIMIT.getIntegerValue())
         {
             return ActionResult.PASS;
         }
@@ -727,8 +746,8 @@ public class PlacementTweaks
         ItemStack stackOriginal;
 
         if (stackBeforeUse[hand.ordinal()].isEmpty() == false &&
-                FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
-                FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false)
+            FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
+            FeatureToggle.TWEAK_HOTBAR_SLOT_RANDOMIZER.getBooleanValue() == false)
         {
             stackOriginal = stackBeforeUse[hand.ordinal()];
         }
@@ -738,7 +757,7 @@ public class PlacementTweaks
         }
 
         if (FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.getBooleanValue() &&
-                state.canReplace(ctx) == false && state.isReplaceable())
+            state.canReplace(ctx) == false && state.isReplaceable())
         {
             // If the block itself says it's not replaceable, but the material is (fluids),
             // then we need to offset the position back, otherwise the check in ItemBlock
@@ -766,13 +785,30 @@ public class PlacementTweaks
 
         // Carpet-Extra mod accurate block placement protocol support
         if (flexible && rotation && accurate == false &&
-                Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() &&
-                fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForDirection(stackOriginal, facing))
+            Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() &&
+            fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForDirection(stackOriginal, facing))
         {
             facing = facing.getOpposite(); // go from block face to click on to the requested facing
             //double relX = hitVecIn.x - posIn.getX();
             //double x = posIn.getX() + relX + 2 + (facing.getId() * 2);
-            double x = posIn.getX() + 2 + (facing.getIndex() * 2);
+            int protocolValue = 0;
+            int shiftBy = 1;
+            final int facingAdj = (facing.getIndex() * 2);
+
+            protocolValue |= facing.getIndex() << shiftBy;
+            shiftBy += 3;
+
+            if (stackOriginal.isIn(ItemTags.TRAPDOORS) || stackOriginal.isIn(ItemTags.STAIRS))
+            {
+                // add BLOCK_HALF handling --> (BOTTOM)
+                int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
+                protocolValue |= (1 << shiftBy);
+                shiftBy += requiredBits;
+            }
+
+            //System.out.printf("prot value (Facing) orig 0x%08X vs 0x%08X\n", facingAdj, protocolValue);
+//           double x = posIn.getX() + 2 + (facing.getIndex() * 2);
+            double x = posIn.getX() + 2 + (protocolValue);
 
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
             {
@@ -854,8 +890,8 @@ public class PlacementTweaks
         tryRestockHand(player, hand, stackOriginal);
 
         if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue() &&
-                Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() == false &&
-                world.getBlockState(posPlacement) != stateBefore)
+            Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() == false &&
+            world.getBlockState(posPlacement) != stateBefore)
         {
             // TODO --> Add EasyPlacement handling?
             for (int i = 0; i < afterClickerClickCount; i++)
@@ -1041,8 +1077,8 @@ public class PlacementTweaks
         if (gridEnabled)
         {
             if ((Math.abs(pos.getX() - posFirst.getX()) % gridSize) != 0 ||
-                    (Math.abs(pos.getY() - posFirst.getY()) % gridSize) != 0 ||
-                    (Math.abs(pos.getZ() - posFirst.getZ()) % gridSize) != 0)
+                (Math.abs(pos.getY() - posFirst.getY()) % gridSize) != 0 ||
+                (Math.abs(pos.getZ() - posFirst.getZ()) % gridSize) != 0)
             {
                 return false;
             }
