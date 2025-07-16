@@ -44,7 +44,6 @@
         "world.MixinWorld"
     ],
     "client": [
-        "IMixinSimpleOption",
         "MixinMinecraftClient",
         "entity.MixinClientPlayerEntity",
         "fog.MixinAtmosphericFogModifier",
@@ -71,6 +70,8 @@
         "network.MixinClientPlayerInteractionManager",
         "network.MixinClientPlayNetworkHandler",
         "network.MixinDataQueryHandler",
+        "option.IMixinSimpleOption",
+        "option.MixinGameOptions",
         "render.MixinBeaconBlockEntityRenderer",
         "render.MixinBlockEntityRenderDispatcher",
         "render.MixinEntityRenderDispatcher",

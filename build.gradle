@@ -46,6 +46,8 @@ loom {
 //			ideConfigGenerated false
 //		}
 //	}
+
+	accessWidenerPath = file("src/main/resources/tweakeroo.accesswidener")
 }
 
 processResources {
