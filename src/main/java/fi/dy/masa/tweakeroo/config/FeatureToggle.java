@@ -70,6 +70,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_ITEM_UNSTACKING_PROTECTION("tweakItemUnstackingProtection",       false, ""),
     TWEAK_LAVA_VISIBILITY           ("tweakLavaVisibility",                 false, ""),
     TWEAK_MAP_PREVIEW               ("tweakMapPreview",                     false, ""),
+    TWEAK_MATCHING_SKY_FOG          ("tweakMatchingSkyFog",                 false, ""),
     TWEAK_MOVEMENT_KEYS             ("tweakMovementKeysLast",               false, ""),
     TWEAK_PERIODIC_ATTACK           ("tweakPeriodicAttack",                 false, ""),
     TWEAK_PERIODIC_USE              ("tweakPeriodicUse",                    false, ""),
