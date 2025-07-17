@@ -48,7 +48,7 @@
     "tweakeroo.config.disable.comment.disableTickRatePlayerSlowdown": "Lets you move freely no matter what you set the tick rate to\n§6NOTE: this will not speed up things like pressure plates\n§6being activated or levers being activated)",
     "tweakeroo.config.disable.comment.disableTileEntityRendering": "Prevents all TileEntity renderers from rendering",
     "tweakeroo.config.disable.comment.disableTileEntityTicking": "Prevent all TileEntities from getting ticked",
-    "tweakeroo.config.disable.comment.disableVillagerTradeLocking": "Prevents villager trades from ever locking, by always incrementing\nthe max uses as well when the recipe uses is incremented",
+    "tweakeroo.config.disable.comment.disableVillagerTradeLocking": "Prevents villager trades from ever locking, by not incrementing uses.",
     "tweakeroo.config.disable.comment.disableWallUnsprint": "Touching a wall doesn't drop you out from sprint mode",
     "tweakeroo.config.disable.comment.disableWorldViewBob": "Disables the view bob wobble effect of the world, but not the hand\n§cThis setting will be disabled if you have Iris installed",
     "tweakeroo.config.disable.name.disableAllTerrainFog": "disableAllTerrainFog",
