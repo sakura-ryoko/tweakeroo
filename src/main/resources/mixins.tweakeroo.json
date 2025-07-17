@@ -50,6 +50,7 @@
         "fog.MixinDarknessEffectFogModifier",
         "fog.MixinFogRenderer",
         "fog.MixinLavaFogModifier",
+        "fog.MixinStandardFogModifier",
         "fog.MixinWaterFogModifier",
         "freecam.MixinCamera_freeCam",
         "freecam.MixinClientPlayerEntity_freeCam",
