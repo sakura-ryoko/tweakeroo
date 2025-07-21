@@ -45,6 +45,7 @@ import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.nbt.NbtEntityUtils;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.malilib.util.nbt.NbtView;
 import fi.dy.masa.tweakeroo.Reference;
@@ -599,17 +600,19 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
             if (entity != null)
             {
-                Identifier id = EntityType.getId(entity.getType());
-                NbtView view = NbtView.getWriter(world.getRegistryManager());
-                NbtCompound nbt;
+//                Identifier id = EntityType.getId(entity.getType());
+//                NbtView view = NbtView.getWriter(world.getRegistryManager());
+//                NbtCompound nbt;
+//
+//                entity.writeData(view.getWriter());
+//                nbt = view.readNbt();
+                NbtCompound nbt = NbtEntityUtils.invokeEntityNbtDataNoPassengers(entity, entityId);
 
-                entity.writeData(view.getWriter());
-                nbt = view.readNbt();
-
-                if (nbt != null && id != null)
+//                if (nbt != null && id != null)
+                if (!nbt.isEmpty())
                 {
-                    nbt.putString("id", id.toString());
-                    Pair<Entity, NbtCompound> pair = Pair.of(entity, nbt.copy());
+//                    nbt.putString("id", id.toString());
+                    Pair<Entity, NbtCompound> pair = Pair.of(entity, nbt);
 
                     synchronized (this.entityCache)
                     {

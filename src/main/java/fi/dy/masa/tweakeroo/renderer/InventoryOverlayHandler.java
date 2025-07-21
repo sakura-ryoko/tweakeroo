@@ -12,7 +12,6 @@ import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
@@ -25,7 +24,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -44,8 +42,8 @@ import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import fi.dy.masa.malilib.util.game.RayTraceUtils;
 import fi.dy.masa.malilib.util.nbt.NbtBlockUtils;
+import fi.dy.masa.malilib.util.nbt.NbtEntityUtils;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
-import fi.dy.masa.malilib.util.nbt.NbtView;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
@@ -246,15 +244,17 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
                 if (entity != null)
                 {
-                    NbtView view = NbtView.getWriter(world.getRegistryManager());
-                    entity.writeData(view.getWriter());
-                    nbt = view.readNbt();
-                    Identifier id = EntityType.getId(entity.getType());
+//                    NbtView view = NbtView.getWriter(world.getRegistryManager());
+//                    entity.writeData(view.getWriter());
+//                    nbt = view.readNbt() != null ? view.readNbt() : nbt;
+//                    Identifier id = EntityType.getId(entity.getType());
 
-                    if (nbt != null && id != null)
-                    {
-                        nbt.putString("id", id.toString());
-                    }
+//                    if (nbt != null && id != null)
+//                    {
+//                        nbt.putString("id", id.toString());
+//                    }
+
+                    nbt = NbtEntityUtils.invokeEntityNbtDataNoPassengers(entity, entity.getId());
                 }
                 else
                 {
