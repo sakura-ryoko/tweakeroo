@@ -38,6 +38,8 @@ public abstract class MixinEntity
 
     @Unique private double lastFreePitch;
     @Unique private double lastFreeYaw;
+    @Unique private double cameraPitch;
+    @Unique private double cameraYaw;
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     private void overrideIsInvisibleToPlayer(net.minecraft.entity.player.PlayerEntity player, CallbackInfoReturnable<Boolean> cir)
@@ -67,6 +69,23 @@ public abstract class MixinEntity
             if (CameraUtils.shouldPreventPlayerMovement())
             {
                 CameraUtils.updateCameraRotations((float) yawChange, (float) pitchChange);
+            }
+
+            if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
+            {
+                int pitchLimit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
+
+                this.cameraYaw += yawChange * 0.15D;
+                this.cameraPitch = net.minecraft.util.math.MathHelper.clamp(this.cameraPitch + pitchChange * 0.15D, -pitchLimit, pitchLimit);
+
+                CameraUtils.setCameraYaw((float) this.cameraYaw);
+                CameraUtils.setCameraPitch((float) this.cameraPitch);
+
+                this.yaw = this.prevYaw;
+                this.pitch = this.prevPitch;
+                ci.cancel();
+
+                return;
             }
 
             if (FeatureToggle.TWEAK_AIM_LOCK.getBooleanValue())
@@ -117,26 +136,12 @@ public abstract class MixinEntity
                 return;
             }
 
-            if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
-            {
-                int pitchLimit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
-
-                this.updateCustomPlayerRotations(yawChange, pitchChange, true, true, pitchLimit);
-
-                CameraUtils.setCameraYaw((float) this.lastFreeYaw);
-                CameraUtils.setCameraPitch((float) this.lastFreePitch);
-
-                this.yaw = this.prevYaw;
-                this.pitch = this.prevPitch;
-                ci.cancel();
-
-                return;
-            }
-
             // Update the internal rotations while no locking features are enabled
             // They will then be used as the forced rotations when some of the locking features are activated.
             this.lastFreeYaw = this.yaw;
             this.lastFreePitch = this.pitch;
+            this.cameraYaw = this.yaw;
+            this.cameraPitch = this.pitch;
         }
     }
 
