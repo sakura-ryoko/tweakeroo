@@ -1,7 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WeatherRendering;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.ParticlesMode;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +20,15 @@ public class MixinWeatherRendering
     @Inject(method = "renderPrecipitation(Lnet/minecraft/world/World;Lnet/minecraft/client/render/VertexConsumerProvider;IFLnet/minecraft/util/math/Vec3d;)V",
             at = @At("HEAD"), cancellable = true)
     private void tweakeroo_cancelWeatherRender(World world, VertexConsumerProvider vertexConsumerProvider, int ticks, float delta, Vec3d pos, CallbackInfo ci)
+    {
+        if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "addParticlesAndSound", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_cancelParticlesAndSounds(ClientWorld world, Camera camera, int ticks, ParticlesMode particlesMode, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {

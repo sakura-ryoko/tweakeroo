@@ -98,7 +98,7 @@
         "world.MixinClientWorld_Properties",
         "world.MixinDimensionEffects_Nether"
     ],
-    "server": [],
+    "server": [ ],
     "mixinPriority": 990,
     "injectors": {
         "defaultRequire": 0
