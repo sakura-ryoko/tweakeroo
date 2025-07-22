@@ -41,8 +41,10 @@ import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.game.BlockUtils;
 import fi.dy.masa.malilib.util.nbt.NbtBlockUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.util.MiscUtils;
+import fi.dy.masa.tweakeroo.mixin.IMixinAbstractHorseEntity;
+import fi.dy.masa.tweakeroo.util.RayTraceUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
+import fi.dy.masa.tweakeroo.util.SnapAimUtils;
 
 public class RenderUtils
 {
@@ -50,13 +52,9 @@ public class RenderUtils
 
     public static void renderHotbarSwapOverlay(MinecraftClient mc, DrawContext drawContext)
     {
-        if (mc.player == null)
-        {
-            return;
-        }
         PlayerEntity player = mc.player;
 
-        if (mc.currentScreen == null)
+        if (player != null && mc.currentScreen == null)
         {
             final int scaledWidth = GuiUtils.getScaledWindowWidth();
             final int scaledHeight = GuiUtils.getScaledWindowHeight();
@@ -418,8 +416,8 @@ public class RenderUtils
     private static void renderSnapAimAngleIndicatorYaw(int xCenter, int yCenter, int width, int height, MinecraftClient mc, DrawContext drawContext)
     {
         double step = Configs.Generic.SNAP_AIM_YAW_STEP.getDoubleValue();
-        double realYaw = MathHelper.floorMod(MiscUtils.getLastRealYaw(), 360.0D);
-        double snappedYaw = MiscUtils.calculateSnappedAngle(realYaw, step);
+        double realYaw = MathHelper.floorMod(SnapAimUtils.getLastRealYaw(), 360.0D);
+        double snappedYaw = SnapAimUtils.calculateSnappedAngle(realYaw, step);
         double startYaw = snappedYaw - (step / 2.0);
         final int x = xCenter - width / 2;
         final int y = yCenter + 10;
@@ -467,16 +465,16 @@ public class RenderUtils
         double step = Configs.Generic.SNAP_AIM_PITCH_STEP.getDoubleValue();
         int limit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
         //double realPitch = MathHelper.clamp(MathHelper.wrapDegrees(MiscUtils.getLastRealPitch()), -limit, limit);
-        double realPitch = MathHelper.wrapDegrees(MiscUtils.getLastRealPitch());
+        double realPitch = MathHelper.wrapDegrees(SnapAimUtils.getLastRealPitch());
         double snappedPitch;
 
         if (realPitch < 0)
         {
-            snappedPitch = -MiscUtils.calculateSnappedAngle(-realPitch, step);
+            snappedPitch = -SnapAimUtils.calculateSnappedAngle(-realPitch, step);
         }
         else
         {
-            snappedPitch = MiscUtils.calculateSnappedAngle(realPitch, step);
+            snappedPitch = SnapAimUtils.calculateSnappedAngle(realPitch, step);
         }
 
         snappedPitch = MathHelper.clamp(MathHelper.wrapDegrees(snappedPitch), -limit, limit);

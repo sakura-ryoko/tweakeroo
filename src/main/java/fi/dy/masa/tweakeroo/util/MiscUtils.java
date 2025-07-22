@@ -54,7 +54,6 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.gen.feature.PlacedFeature;
 
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -66,6 +65,10 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.mixin.IMixinAxeItem;
+import fi.dy.masa.tweakeroo.mixin.IMixinClientWorld;
+import fi.dy.masa.tweakeroo.mixin.IMixinCommandBlockExecutor;
+import fi.dy.masa.tweakeroo.mixin.IMixinShovelItem;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinCommandBlockExecutor;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
@@ -82,8 +85,6 @@ public class MiscUtils
     private static SignText previousSignText;
     private static String previousChatText = "";
     private static final Date DATE = new Date();
-    private static double lastRealPitch;
-    private static double lastRealYaw;
     private static double mouseSensitivity = -1.0F;
     private static boolean zoomActive;
 
@@ -512,16 +513,6 @@ public class MiscUtils
                 player.swingHand(hand);
             }
         }
-    }
-
-    public static double getLastRealPitch()
-    {
-        return lastRealPitch;
-    }
-
-    public static double getLastRealYaw()
-    {
-        return lastRealYaw;
     }
 
     public static void setEntityRotations(Entity entity, float yaw, float pitch)
