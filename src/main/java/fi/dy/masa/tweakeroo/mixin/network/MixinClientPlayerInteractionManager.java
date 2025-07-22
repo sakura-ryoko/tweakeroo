@@ -153,11 +153,28 @@ public abstract class MixinClientPlayerInteractionManager
                      target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;" +
                               "sendSequencedPacket(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V"
             ))
-    private void handleBreakReplaceInAttack(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir)
+    private void handleBreakReplaceInAttack(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue())
         {
-            handleBreakReplace(pos, direction);
+            if (this.client.world.getBlockState(targetPos).isAir()) {
+                BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
+                for (Hand hand : Hand.values())
+                {
+                    ItemStack stack = this.client.player.getStackInHand(hand);
+                    if (stack != null && stack.getItem() instanceof BlockItem
+                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted()
+                    )
+                    {
+                        // set a cooldown of 1 tick for survival mode instant mining
+                        if (!this.client.player.getAbilities().creativeMode)
+                        {
+                            this.blockBreakingCooldown = 1;
+                        }
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -166,34 +183,24 @@ public abstract class MixinClientPlayerInteractionManager
                      target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;" +
                               "sendSequencedPacket(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V"
             ))
-    private void handleBreakReplaceInUpdate(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir)
+    private void handleBreakReplaceInUpdate(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue())
         {
-            handleBreakReplace(pos, direction);
-        }
-    }
-
-
-    @Unique
-    private void handleBreakReplace(BlockPos targetPos, Direction side)
-    {
-        if (this.client.world.getBlockState(targetPos).isAir()) {
-            BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
-            for (Hand hand : Hand.values())
-            {
-                ItemStack stack = this.client.player.getStackInHand(hand);
-                if (stack != null
-                        && stack.getItem() instanceof BlockItem
-                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted())
+            if (this.client.world.getBlockState(targetPos).isAir()) {
+                BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
+                for (Hand hand : Hand.values())
                 {
-                    this.blockBreakingCooldown = 1;
-                    return;
+                    ItemStack stack = this.client.player.getStackInHand(hand);
+                    if (stack != null && stack.getItem() instanceof BlockItem
+                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted())
+                    {
+                        return;
+                    }
                 }
             }
         }
     }
-
 
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
     private void handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
