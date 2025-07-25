@@ -8,7 +8,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.server.world.ServerChunkLoadingManager;
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(ServerChunkLoadingManager.class)
+/**
+ * The "Moonrise" mod breaks this mixin.
+ */
+@Mixin(value = ServerChunkLoadingManager.class, priority = 990)
 public abstract class MixinServerChunkLoadingManager
 {
     @Inject(method = "unloadChunks", cancellable = true, at = @At(value = "FIELD",
