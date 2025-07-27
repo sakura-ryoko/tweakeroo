@@ -29,7 +29,7 @@ public abstract class MixinInGameHud
                 target = "Lnet/minecraft/client/gui/hud/InGameHud;shouldRenderCrosshair()Z", ordinal = 0), cancellable = true)
     private void tweakeroo_overrideCursorRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
+        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue() && this.client.currentScreen == null)
         {
             RenderUtils.renderDirectionsCursor(context);
             ci.cancel();
@@ -42,7 +42,7 @@ public abstract class MixinInGameHud
                      ordinal = 1, shift = At.Shift.AFTER))
     private void tweakeroo_alwaysRenderPlayerList(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue())
+        if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue() && this.client.world != null)
         {
             Scoreboard scoreboard = this.client.world.getScoreboard();
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
