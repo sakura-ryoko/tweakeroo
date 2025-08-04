@@ -1,8 +1,13 @@
 package fi.dy.masa.tweakeroo.mixin.network;
 
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.hit.BlockHitResult;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -31,6 +36,8 @@ public abstract class MixinClientPlayerInteractionManager
 {
     @Shadow @Final private MinecraftClient client;
     @Shadow private int blockBreakingCooldown;
+
+    @Shadow public abstract ActionResult interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult);
 
     @Inject(method = "interactItem", at = @At(
             value = "INVOKE",
@@ -140,6 +147,61 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
+    // can't just inject into breakBlock's RETURN directly anymore since it's now synced by sendSequencedPacket
+    @Inject(method = "attackBlock",
+            at = @At(value = "INVOKE", shift = At.Shift.AFTER,
+                     target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;" +
+                              "sendSequencedPacket(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V"
+            ))
+    private void handleBreakReplaceInAttack(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    {
+        if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue())
+        {
+            if (this.client.world.getBlockState(targetPos).isAir()) {
+                BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
+                for (Hand hand : Hand.values())
+                {
+                    ItemStack stack = this.client.player.getStackInHand(hand);
+                    if (stack != null && stack.getItem() instanceof BlockItem
+                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted()
+                    )
+                    {
+                        // set a cooldown of 1 tick for survival mode instant mining
+                        if (!this.client.player.getAbilities().creativeMode)
+                        {
+                            this.blockBreakingCooldown = 1;
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    @Inject(method = "updateBlockBreakingProgress",
+            at = @At(value = "INVOKE", shift = At.Shift.AFTER,
+                     target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;" +
+                              "sendSequencedPacket(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V"
+            ))
+    private void handleBreakReplaceInUpdate(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    {
+        if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue())
+        {
+            if (this.client.world.getBlockState(targetPos).isAir()) {
+                BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
+                for (Hand hand : Hand.values())
+                {
+                    ItemStack stack = this.client.player.getStackInHand(hand);
+                    if (stack != null && stack.getItem() instanceof BlockItem
+                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted())
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
     private void handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
@@ -149,8 +211,8 @@ public abstract class MixinClientPlayerInteractionManager
             this.blockBreakingCooldown = 0;
         }
 
-        if (CameraUtils.shouldPreventPlayerInputs() ||
-            PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
+        if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() || CameraUtils.shouldPreventPlayerInputs() ||
+                PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
         {
             cir.setReturnValue(true);
         }
