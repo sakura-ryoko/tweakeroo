@@ -211,8 +211,8 @@ public abstract class MixinClientPlayerInteractionManager
             this.blockBreakingCooldown = 0;
         }
 
-        if (CameraUtils.shouldPreventPlayerInputs() ||
-            PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
+        if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() || CameraUtils.shouldPreventPlayerInputs() ||
+                PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
         {
             cir.setReturnValue(true);
         }
