@@ -118,10 +118,10 @@ public class Callbacks
         FeatureToggle.TWEAK_SNAP_AIM.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_SNAP_AIM));
         FeatureToggle.TWEAK_ZOOM.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_ZOOM));
 
-        FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_ATTACK));
-        FeatureToggle.TWEAK_PERIODIC_USE.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_USE));
-        FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK));
-        FeatureToggle.TWEAK_PERIODIC_HOLD_USE.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_HOLD_USE));
+//        FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_ATTACK));
+//        FeatureToggle.TWEAK_PERIODIC_USE.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_USE));
+//        FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK));
+//        FeatureToggle.TWEAK_PERIODIC_HOLD_USE.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_HOLD_USE));
 
         Configs.Lists.SELECTIVE_BLOCKS_BLACKLIST.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
         Configs.Lists.SELECTIVE_BLOCKS_WHITELIST.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
@@ -201,7 +201,11 @@ public class Callbacks
         {
             @SuppressWarnings("unchecked")
             IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getGamma();
-            opt.tweakeroo_setValueWithoutCheck(gamma);
+
+            if (opt != null)
+            {
+                opt.tweakeroo_setValueWithoutCheck(gamma);
+            }
         }
     }
 
@@ -302,7 +306,7 @@ public class Callbacks
             {
                 HitResult trace = this.mc.crosshairTarget;
 
-                if (trace != null && trace.getType() == HitResult.Type.BLOCK)
+                if (trace != null && trace.getType() == HitResult.Type.BLOCK && this.mc.world != null)
                 {
                     BlockPos pos = ((BlockHitResult) trace).getBlockPos();
                     BlockEntity te = this.mc.world.getBlockEntity(pos);
@@ -317,7 +321,7 @@ public class Callbacks
             }
             else if (key == Hotkeys.HOTBAR_SWAP_1.getKeybind())
             {
-                if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue())
+                if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() && this.mc.player != null)
                 {
                     InventoryUtils.swapHotbarWithInventoryRow(this.mc.player, 0);
                     return true;
@@ -325,7 +329,7 @@ public class Callbacks
             }
             else if (key == Hotkeys.HOTBAR_SWAP_2.getKeybind())
             {
-                if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue())
+                if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() && this.mc.player != null)
                 {
                     InventoryUtils.swapHotbarWithInventoryRow(this.mc.player, 1);
                     return true;
@@ -333,7 +337,7 @@ public class Callbacks
             }
             else if (key == Hotkeys.HOTBAR_SWAP_3.getKeybind())
             {
-                if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue())
+                if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() && this.mc.player != null)
                 {
                     InventoryUtils.swapHotbarWithInventoryRow(this.mc.player, 2);
                     return true;
@@ -383,7 +387,7 @@ public class Callbacks
             }
             else if (key == Hotkeys.HOTBAR_SCROLL.getKeybind())
             {
-                if (FeatureToggle.TWEAK_HOTBAR_SCROLL.getBooleanValue())
+                if (FeatureToggle.TWEAK_HOTBAR_SCROLL.getBooleanValue() && this.mc.player != null)
                 {
                     int currentRow = Configs.Internal.HOTBAR_SCROLL_CURRENT_ROW.getIntegerValue();
                     InventoryUtils.swapHotbarWithInventoryRow(mc.player, currentRow);
@@ -730,62 +734,62 @@ public class Callbacks
                     InfoUtils.printActionbarMessage("tweakeroo.message.toggled", prettyName, strStatus);
                 }
             }
-            else if (key == FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind())
-            {
-                if (enabled)
-                {
-                    MiscUtils.onPeriodicAttackActivated();
-                }
-                else
-                {
-                    MiscUtils.onPeriodicAttackDeactivated();
-                }
-
-                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue(), rst);
-                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
-            }
-            else if (key == FeatureToggle.TWEAK_PERIODIC_USE.getKeybind())
-            {
-                if (enabled)
-                {
-                    MiscUtils.onPeriodicUseActivated();
-                }
-                else
-                {
-                    MiscUtils.onPeriodicUseDeactivated();
-                }
-
-                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue(), rst);
-                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
-            }
-            else if (key == FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK.getKeybind())
-            {
-                if (enabled)
-                {
-                    MiscUtils.onPeriodicHoldAttackActivated();
-                }
-                else
-                {
-                    MiscUtils.onPeriodicHoldAttackDeactivated();
-                }
-
-                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue(), rst);
-                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
-            }
-            else if (key == FeatureToggle.TWEAK_PERIODIC_HOLD_USE.getKeybind())
-            {
-                if (enabled)
-                {
-                    MiscUtils.onPeriodicHoldUseActivated();
-                }
-                else
-                {
-                    MiscUtils.onPeriodicHoldUseDeactivated();
-                }
-
-                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue(), rst);
-                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
-            }
+//            else if (key == FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind())
+//            {
+//                if (enabled)
+//                {
+//                    MiscUtils.onPeriodicAttackActivated();
+//                }
+//                else
+//                {
+//                    MiscUtils.onPeriodicAttackDeactivated();
+//                }
+//
+//                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue(), rst);
+//                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
+//            }
+//            else if (key == FeatureToggle.TWEAK_PERIODIC_USE.getKeybind())
+//            {
+//                if (enabled)
+//                {
+//                    MiscUtils.onPeriodicUseActivated();
+//                }
+//                else
+//                {
+//                    MiscUtils.onPeriodicUseDeactivated();
+//                }
+//
+//                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_USE_INTERVAL.getIntegerValue(), rst);
+//                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
+//            }
+//            else if (key == FeatureToggle.TWEAK_PERIODIC_HOLD_ATTACK.getKeybind())
+//            {
+//                if (enabled)
+//                {
+//                    MiscUtils.onPeriodicHoldAttackActivated();
+//                }
+//                else
+//                {
+//                    MiscUtils.onPeriodicHoldAttackDeactivated();
+//                }
+//
+//                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_HOLD_ATTACK_INTERVAL.getIntegerValue(), rst);
+//                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
+//            }
+//            else if (key == FeatureToggle.TWEAK_PERIODIC_HOLD_USE.getKeybind())
+//            {
+//                if (enabled)
+//                {
+//                    MiscUtils.onPeriodicHoldUseActivated();
+//                }
+//                else
+//                {
+//                    MiscUtils.onPeriodicHoldUseDeactivated();
+//                }
+//
+//                String strValue = String.format("%s%01d%s", preGreen, Configs.Generic.PERIODIC_HOLD_USE_INTERVAL.getIntegerValue(), rst);
+//                InfoUtils.printActionbarMessage("tweakeroo.message.toggled_periodic", prettyName, strStatus, strValue);
+//            }
 
             return true;
         }
