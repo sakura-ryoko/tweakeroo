@@ -456,15 +456,14 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        GAMMA_VALUE_ORIGINAL                = new ConfigDouble      ("gammaValueOriginal", 0, 0, 1).apply(INTERNAL_KEY);
         public static final ConfigInteger       HOTBAR_SCROLL_CURRENT_ROW           = new ConfigInteger     ("hotbarScrollCurrentRow", 3, 0, 3).apply(INTERNAL_KEY);
         public static final ConfigDouble        SLIME_BLOCK_SLIPPERINESS_ORIGINAL   = new ConfigDouble      ("slimeBlockSlipperinessOriginal", 0.8, 0, 1).apply(INTERNAL_KEY);
-        public static final ConfigDouble        SNAP_AIM_LAST_PITCH                 = new ConfigDouble      ("snapAimLastPitch", 0, -135, 135).apply(INTERNAL_KEY);
-        public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
+//        public static final ConfigDouble        SNAP_AIM_LAST_PITCH                 = new ConfigDouble      ("snapAimLastPitch", 0, -135, 135).apply(INTERNAL_KEY);
+//        public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 FLY_SPEED_PRESET,
                 GAMMA_VALUE_ORIGINAL,
                 HOTBAR_SCROLL_CURRENT_ROW,
-                SLIME_BLOCK_SLIPPERINESS_ORIGINAL,
-                SNAP_AIM_LAST_YAW
+                SLIME_BLOCK_SLIPPERINESS_ORIGINAL
         );
     }
 

@@ -124,6 +124,19 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
                 if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
                 {
+                    // Expire cached NBT and clear pending Queue if both are disabled
+                    if (!this.pendingBlockEntitiesQueue.isEmpty())
+                    {
+                        this.pendingBlockEntitiesQueue.clear();
+                    }
+
+                    if (!this.pendingEntitiesQueue.isEmpty())
+                    {
+                        this.pendingEntitiesQueue.clear();
+                    }
+
+//                    this.tickCache(now);
+
                     return;
                 }
             }
@@ -263,7 +276,9 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     private long getCacheTimeout()
     {
-        return (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue(), 0.25f, 15.0f) * 1000L);
+        // Increase cache timeout when in Backup Mode.
+        int modifier = FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue() ? 5 : 1;
+        return (long) (MathHelper.clamp((Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue() * modifier), 0.25f, 15.0f) * 1000L);
     }
 
     private void tickCache(long nowTime)
@@ -352,6 +367,11 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     public boolean hasServuxServer()
     {
         return this.servuxServer;
+    }
+
+    public boolean hasBackupStatus()
+    {
+        return FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue() && this.hasOpStatus;
     }
 
     public void setServuxVersion(String ver)
@@ -488,7 +508,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                 this.pendingBlockEntitiesQueue.add(pos);
             }
 
-            return this.refreshBlockEntityFromWorld(world, pos);
+            return this.refreshBlockEntityFromWorld(this.getClientWorld(), pos);
         }
 
         return null;
@@ -547,7 +567,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             this.pendingEntitiesQueue.add(entityId);
         }
 
-        return this.refreshEntityFromWorld(world, entityId);
+        return this.refreshEntityFromWorld(this.getClientWorld(), entityId);
     }
 
     private @Nullable Pair<Entity, NbtCompound> refreshEntityFromWorld(World world, int entityId)
