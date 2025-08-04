@@ -13,9 +13,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
@@ -33,8 +30,8 @@ public abstract class MixinEntity
 //    @Shadow public boolean noClip;
     @Shadow private float yaw;
     @Shadow private float pitch;
-    @Shadow public float prevYaw;
-    @Shadow public float prevPitch;
+    @Shadow public float lastYaw;
+    @Shadow public float lastPitch;
 
     @Unique private double lastFreePitch;
     @Unique private double lastFreeYaw;
@@ -81,8 +78,8 @@ public abstract class MixinEntity
                 CameraUtils.setCameraYaw((float) this.cameraYaw);
                 CameraUtils.setCameraPitch((float) this.cameraPitch);
 
-                this.yaw = this.prevYaw;
-                this.pitch = this.prevPitch;
+                this.yaw = this.lastYaw;
+                this.pitch = this.lastPitch;
                 ci.cancel();
 
                 return;
@@ -101,8 +98,8 @@ public abstract class MixinEntity
                     this.pitch = (float) this.lastFreePitch;
                 }
 
-                this.prevYaw = this.yaw;
-                this.prevPitch = this.pitch;
+                this.lastYaw = this.yaw;
+                this.lastPitch = this.pitch;
                 ci.cancel();
 
                 return;
@@ -123,8 +120,8 @@ public abstract class MixinEntity
 
                 this.yaw = SnapAimUtils.getSnappedYaw(this.lastFreeYaw);
                 this.pitch = SnapAimUtils.getSnappedPitch(this.lastFreePitch);
-                this.prevYaw = this.yaw;
-                this.prevPitch = this.pitch;
+                this.lastYaw = this.yaw;
+                this.lastPitch = this.pitch;
                 ci.cancel();
 
                 return;
