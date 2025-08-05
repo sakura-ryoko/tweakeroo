@@ -112,6 +112,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_WEAPON_SWITCH             ("tweakWeaponSwitch",                   false, ""),
     TWEAK_Y_MIRROR                  ("tweakYMirror",                        false, ""),
     TWEAK_ZOOM                      ("tweakZoom",                           false, "",    KeybindSettings.INGAME_BOTH),
+    TWEAK_SCAFFOLD_PLACE            ("tweakScaffoldPlace",                  false, "",    "Place blocks as if they were scaffolding"),
     ;
 
     public static final ImmutableList<FeatureToggle> VALUES = ImmutableList.copyOf(values());
