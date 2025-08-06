@@ -236,6 +236,7 @@ public class PlacementTweaks
                 BlockPos pos = blockHitResult.getBlockPos();
                 Vec3d hitVec = blockHitResult.getPos();
 
+                // Written by Andrew54757 under TweakFork
                 if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue()) {
                     side = getScaffoldPlaceDirection(side, hitPartFirst, player);
                     ItemStack stack = player.getStackInHand(hand);
@@ -366,6 +367,7 @@ public class PlacementTweaks
         boolean offset = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_OFFSET.getKeybind().isKeybindHeld();
         boolean adjacent = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld();
 
+        // Written by Andrew54757 under TweakFork
         if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue() && (!flexible || (!rotation && !offset && !adjacent))) {
             ItemStack stack = player.getStackInHand(hand);
             Direction extendDirection = getScaffoldPlaceDirection(sideIn, hitPart, player);
@@ -409,40 +411,51 @@ public class PlacementTweaks
         return result;
     }
 
-    private static Direction getScaffoldPlaceDirection(Direction side, PositionUtils.HitPart hitPart, PlayerEntity player) {
+    // Written by Andrew54757 under TweakFork
+    private static Direction getScaffoldPlaceDirection(Direction side, PositionUtils.HitPart hitPart, PlayerEntity player)
+    {
         Direction offsetIn = getRotatedFacing(side, player.getHorizontalFacing(), hitPart).getOpposite();
-
         Direction extendDirection;
-        if (side == Direction.UP || side == Direction.DOWN) {
+
+        if (side == Direction.UP || side == Direction.DOWN)
+        {
             extendDirection = (hitPart == PositionUtils.HitPart.CENTER || Configs.Generic.SCAFFOLD_PLACE_VANILLA.getBooleanValue()) ? player.getHorizontalFacing() : offsetIn;
-        } else {
+        }
+        else
+        {
             extendDirection = (hitPart == PositionUtils.HitPart.CENTER || Configs.Generic.SCAFFOLD_PLACE_VANILLA.getBooleanValue()) ? Direction.UP : offsetIn;
         }
 
         return extendDirection;
     }
 
-    private static BlockPos getScaffoldPlacePosition(BlockPos pos, Direction extendDirection, World world, ItemStack stack, PlayerEntity player) {
-
-        if (!(stack.getItem() instanceof BlockItem) || extendDirection == null) {
+    private static BlockPos getScaffoldPlacePosition(BlockPos pos, Direction extendDirection, World world, ItemStack stack, PlayerEntity player)
+    {
+        if (!(stack.getItem() instanceof BlockItem) || extendDirection == null)
+        {
             return null;
         }
 
         Block itemBlock = ((BlockItem)stack.getItem()).getBlock();
         MinecraftClient mc = MinecraftClient.getInstance();
         double reach = mc.player.getBlockInteractionRange();
-
         BlockPos.Mutable tempPos = new BlockPos.Mutable(pos.getX(),pos.getY(),pos.getZ());
-        for (int i = 0; i < Configs.Generic.SCAFFOLD_PLACE_DISTANCE.getIntegerValue(); i++) {
+
+        for (int i = 0; i < Configs.Generic.SCAFFOLD_PLACE_DISTANCE.getIntegerValue(); i++)
+        {
             tempPos.move(extendDirection);
 
-            if (!MiscUtils.isInReach(tempPos, player, reach)) {
+            if (!MiscUtils.isInReach(tempPos, player, reach))
+            {
                 return null;
             }
 
             BlockState state = world.getBlockState(tempPos);
-            if (state.getBlock() != itemBlock) {
-                if (state.isAir() || state.isReplaceable()) {
+
+            if (state.getBlock() != itemBlock)
+            {
+                if (state.isAir() || state.isReplaceable())
+                {
                     return tempPos.toImmutable();
                 }
 
