@@ -90,6 +90,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     TWEAK_RENDER_INVISIBLE_ENTITIES ("tweakRenderInvisibleEntities",        false, ""),
     TWEAK_RENDER_LIMIT_ENTITIES     ("tweakRenderLimitEntities",            false, ""),
     TWEAK_REPAIR_MODE               ("tweakRepairMode",                     false, ""),
+	TWEAK_SCAFFOLD_PLACE            ("tweakScaffoldPlace",                  false, ""),
     TWEAK_SCULK_PULSE_LENGTH        ("tweakSculkPulseLength",               false, true, ""),
     TWEAK_SELECTIVE_BLOCKS_RENDERING        ("tweakSelectiveBlocksRendering",      false, ""),
     TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE   ("tweakSelectiveBlocksRenderOutline",  false, ""),

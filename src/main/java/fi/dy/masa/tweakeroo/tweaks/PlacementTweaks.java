@@ -233,6 +233,19 @@ public class PlacementTweaks
                 Direction side = blockHitResult.getSide();
                 BlockPos pos = blockHitResult.getBlockPos();
                 Vec3d hitVec = blockHitResult.getPos();
+
+                // Written by Andrew54757 under TweakFork
+                if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue())
+                {
+                    ItemStack stack = player.getStackInHand(hand);
+
+                    side = getScaffoldPlaceDirection(side, hitPartFirst, player);
+                    pos = getScaffoldPlacePosition(pos, side, world, stack, player);
+                    if (pos == null) return;
+
+                    pos = pos.offset(side.getOpposite());
+                }
+
                 BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
                 ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
                 BlockPos posNew = getPlacementPositionForTargetedPosition(world, pos, side, ctx);
@@ -350,16 +363,36 @@ public class PlacementTweaks
             return ActionResult.PASS;
         }
 
+        boolean flexible = FeatureToggle.TWEAK_FLEXIBLE_BLOCK_PLACEMENT.getBooleanValue();
+        boolean rotation = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ROTATION.getKeybind().isKeybindHeld();
+        boolean offset = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_OFFSET.getKeybind().isKeybindHeld();
+        boolean adjacent = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld();
+
+        // Written by Andrew54757 under TweakFork
+        if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue() && (!flexible || (!rotation && !offset && !adjacent)))
+        {
+            ItemStack stack = player.getStackInHand(hand);
+            Direction extendDirection = getScaffoldPlaceDirection(sideIn, hitPart, player);
+            BlockPos newPos = getScaffoldPlacePosition(posIn, extendDirection, world, stack, player);
+
+            if (newPos == null)
+            {
+                return ActionResult.PASS;
+            }
+
+            newPos = newPos.offset(extendDirection.getOpposite());
+            sideIn = extendDirection;
+            hitVec = hitVec.subtract(posIn.getX(), posIn.getY(), posIn.getZ()).add(newPos.getX(),newPos.getY(),newPos.getZ());
+            posIn = newPos;
+        }
+
         //System.out.printf("onProcessRightClickBlock() pos: %s, side: %s, part: %s, hitVec: %s\n", posIn, sideIn, hitPart, hitVec);
         ActionResult result = tryPlaceBlock(controller, player, world, posIn, sideIn, sideRotated, yaw, hitVec, hand, hitPart, true);
 
         // Store the initial click data for the fast placement mode
         if (posFirst == null && result == ActionResult.SUCCESS && restricted)
         {
-            boolean flexible = FeatureToggle.TWEAK_FLEXIBLE_BLOCK_PLACEMENT.getBooleanValue();
             boolean accurate = FeatureToggle.TWEAK_ACCURATE_BLOCK_PLACEMENT.getBooleanValue();
-            boolean rotation = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ROTATION.getKeybind().isKeybindHeld();
-            boolean offset = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_OFFSET.getKeybind().isKeybindHeld();
             boolean accurateIn = Hotkeys.ACCURATE_BLOCK_PLACEMENT_IN.getKeybind().isKeybindHeld();
             boolean accurateReverse = Hotkeys.ACCURATE_BLOCK_PLACEMENT_REVERSE.getKeybind().isKeybindHeld();
 
@@ -380,6 +413,61 @@ public class PlacementTweaks
         }
 
         return result;
+    }
+
+    // Written by Andrew54757 under TweakFork
+    private static Direction getScaffoldPlaceDirection(Direction side, PositionUtils.HitPart hitPart, PlayerEntity player)
+    {
+        Direction offsetIn = getRotatedFacing(side, player.getHorizontalFacing(), hitPart).getOpposite();
+        Direction extendDirection;
+
+        if (side == Direction.UP || side == Direction.DOWN)
+        {
+            extendDirection = (hitPart == PositionUtils.HitPart.CENTER || Configs.Generic.SCAFFOLD_PLACE_VANILLA.getBooleanValue()) ? player.getHorizontalFacing() : offsetIn;
+        }
+        else
+        {
+            extendDirection = (hitPart == PositionUtils.HitPart.CENTER || Configs.Generic.SCAFFOLD_PLACE_VANILLA.getBooleanValue()) ? Direction.UP : offsetIn;
+        }
+
+        return extendDirection;
+    }
+
+    private static BlockPos getScaffoldPlacePosition(BlockPos pos, Direction extendDirection, World world, ItemStack stack, PlayerEntity player)
+    {
+        if (!(stack.getItem() instanceof BlockItem) || extendDirection == null)
+        {
+            return null;
+        }
+
+        Block itemBlock = ((BlockItem)stack.getItem()).getBlock();
+        MinecraftClient mc = MinecraftClient.getInstance();
+        double reach = mc.player.getBlockInteractionRange();
+        BlockPos.Mutable tempPos = new BlockPos.Mutable(pos.getX(),pos.getY(),pos.getZ());
+
+        for (int i = 0; i < Configs.Generic.SCAFFOLD_PLACE_DISTANCE.getIntegerValue(); i++)
+        {
+            tempPos.move(extendDirection);
+
+            if (!MiscUtils.isInReach(tempPos, player, reach))
+            {
+                return null;
+            }
+
+            BlockState state = world.getBlockState(tempPos);
+
+            if (state.getBlock() != itemBlock)
+            {
+                if (state.isAir() || state.isReplaceable())
+                {
+                    return tempPos.toImmutable();
+                }
+
+                return null;
+            }
+        }
+
+        return null;
     }
 
     private static ActionResult tryPlaceBlock(
