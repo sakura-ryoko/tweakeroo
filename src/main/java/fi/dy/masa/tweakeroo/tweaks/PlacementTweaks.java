@@ -237,11 +237,14 @@ public class PlacementTweaks
                 Vec3d hitVec = blockHitResult.getPos();
 
                 // Written by Andrew54757 under TweakFork
-                if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue()) {
-                    side = getScaffoldPlaceDirection(side, hitPartFirst, player);
+                if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue())
+                {
                     ItemStack stack = player.getStackInHand(hand);
+
+                    side = getScaffoldPlaceDirection(side, hitPartFirst, player);
                     pos = getScaffoldPlacePosition(pos, side, world, stack, player);
                     if (pos == null) return;
+
                     pos = pos.offset(side.getOpposite());
                 }
 
@@ -368,11 +371,14 @@ public class PlacementTweaks
         boolean adjacent = Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld();
 
         // Written by Andrew54757 under TweakFork
-        if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue() && (!flexible || (!rotation && !offset && !adjacent))) {
+        if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue() && (!flexible || (!rotation && !offset && !adjacent)))
+        {
             ItemStack stack = player.getStackInHand(hand);
             Direction extendDirection = getScaffoldPlaceDirection(sideIn, hitPart, player);
             BlockPos newPos = getScaffoldPlacePosition(posIn, extendDirection, world, stack, player);
-            if (newPos == null) {
+
+            if (newPos == null)
+            {
                 return ActionResult.PASS;
             }
 
