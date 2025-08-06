@@ -109,6 +109,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       REMEMBER_FLEXIBLE                   = new ConfigBoolean     ("rememberFlexibleFromClick", true).apply(GENERIC_KEY);
         public static final ConfigInteger       RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
+        public static final ConfigInteger       SCAFFOLD_PLACE_DISTANCE             = new ConfigInteger     ("scaffoldPlaceDistance", 5, 1, 20).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SCAFFOLD_PLACE_VANILLA              = new ConfigBoolean     ("scaffoldPlaceVanilla", false).apply(GENERIC_KEY);
         public static final ConfigInteger       SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
         public static final ConfigBoolean       SELECTIVE_BLOCKS_TRACK_PISTONS      = new ConfigBoolean     ("selectiveBlocksTrackPistons", false).apply(GENERIC_KEY);
         public static final ConfigBoolean       SELECTIVE_BLOCKS_HIDE_PARTICLES     = new ConfigBoolean     ("selectiveBlocksHideParticles", true).apply(GENERIC_KEY);
@@ -236,6 +238,8 @@ public class Configs implements IConfigHandler
                 POTION_WARNING_THRESHOLD,
                 RENDER_LIMIT_ITEM,
                 RENDER_LIMIT_XP_ORB,
+                SCAFFOLD_PLACE_DISTANCE,
+                SCAFFOLD_PLACE_VANILLA,
                 SCULK_SENSOR_PULSE_LENGTH,
                 SERVER_DATA_SYNC_CACHE_REFRESH,
                 SERVER_DATA_SYNC_CACHE_TIMEOUT,
