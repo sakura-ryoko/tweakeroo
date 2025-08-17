@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
@@ -21,7 +22,7 @@ public abstract class MixinHeldItemRenderer_freeCam
             at = @At("HEAD"), cancellable = true)
     private void tweakeroo_cancelHandRendering1(float tickProgress, MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, ClientPlayerEntity player, int light, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && !Configs.Generic.SHOW_HAND_IN_FREECAM.getBooleanValue())
         {
             ci.cancel();
         }
@@ -31,7 +32,7 @@ public abstract class MixinHeldItemRenderer_freeCam
             at = @At("HEAD"), cancellable = true)
     private void tweakeroo_cancelHandRendering2(LivingEntity entity, ItemStack stack, ItemDisplayContext renderMode, MatrixStack matrices, VertexConsumerProvider vertexConsumer, int light, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && !Configs.Generic.SHOW_HAND_IN_FREECAM.getBooleanValue())
         {
             ci.cancel();
         }
