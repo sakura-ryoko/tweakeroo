@@ -149,7 +149,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHOW_HAND_IN_FREECAM                = new ConfigBoolean("showHandInFreecam", false);
+        public static final ConfigBoolean       SHOW_HAND_IN_FREECAM                = new ConfigBoolean("showHandInFreecam", false).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SHOW_HOTBAR_IN_FREECAM              = new ConfigBoolean("showHotBarFreeCam", true).apply(GENERIC_KEY);
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
                 ACCURATE_PLACEMENT_PROTOCOL,
@@ -265,7 +266,8 @@ public class Configs implements IConfigHandler
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
                 ZOOM_RESET_FOV_ON_ACTIVATE,
-                SHOW_HAND_IN_FREECAM
+                SHOW_HAND_IN_FREECAM,
+                SHOW_HOTBAR_IN_FREECAM
         );
 
         public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(

@@ -1,13 +1,17 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -24,6 +28,12 @@ public abstract class MixinInGameHud_freeCam
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null)
         {
             cir.setReturnValue(this.client.player);
+        }
+    }
+    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
+    public void tweakeroo_overrideHotbarRendering(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (!Configs.Generic.SHOW_HOTBAR_IN_FREECAM.getBooleanValue() && FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue()) {
+            ci.cancel();
         }
     }
 }
