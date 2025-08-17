@@ -150,7 +150,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHOW_HAND_IN_FREECAM                = new ConfigBoolean("showHandInFreecam", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHOW_HOTBAR_IN_FREECAM              = new ConfigBoolean("showHotBarFreeCam", true).apply(GENERIC_KEY);
+        public static final ConfigBoolean       SHOW_HOTBAR_IN_FREECAM              = new ConfigBoolean("showHotBarInFreeCam", true).apply(GENERIC_KEY);
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
                 ACCURATE_PLACEMENT_PROTOCOL,
