@@ -25,14 +25,19 @@ public abstract class MixinInGameHud_freeCam
     private void tweakeroo_overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
     {
         // Fix the hotbar rendering in the Free Camera mode by using the actual player
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && this.client.player != null)
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+			this.client.player != null)
         {
             cir.setReturnValue(this.client.player);
         }
     }
+
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    public void tweakeroo_overrideHotbarRendering(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (!Configs.Generic.SHOW_HOTBAR_IN_FREECAM.getBooleanValue() && FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue()) {
+    public void tweakeroo_overrideHotbarRendering(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+	{
+        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+			!Configs.Generic.SHOW_HOTBAR_IN_FREECAM.getBooleanValue())
+		{
             ci.cancel();
         }
     }

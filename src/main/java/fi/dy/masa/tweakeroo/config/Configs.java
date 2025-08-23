@@ -121,7 +121,9 @@ public class Configs implements IConfigHandler
         public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("serverDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
         public static final ConfigFloat         SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 0.75f, 0.25f, 5.0f).apply(GENERIC_KEY);
         public static final ConfigInteger       SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
+		public static final ConfigBoolean       SHOW_HAND_IN_FREECAM                = new ConfigBoolean		("showHandInFreeCam", false).apply(GENERIC_KEY);
+		public static final ConfigBoolean       SHOW_HOTBAR_IN_FREECAM              = new ConfigBoolean		("showHotBarInFreeCam", false).apply(GENERIC_KEY);
+		public static final ConfigBoolean       SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
         public static final ConfigBoolean       SHULKER_DISPLAY_REQUIRE_SHIFT       = new ConfigBoolean     ("shulkerDisplayRequireShift", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       SLOT_SYNC_WORKAROUND                = new ConfigBoolean     ("slotSyncWorkaround", true).apply(GENERIC_KEY);
@@ -149,8 +151,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble        ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean       ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHOW_HAND_IN_FREECAM                = new ConfigBoolean("showHandInFreecam", false).apply(GENERIC_KEY);
-        public static final ConfigBoolean       SHOW_HOTBAR_IN_FREECAM              = new ConfigBoolean("showHotBarInFreeCam", true).apply(GENERIC_KEY);
+
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
                 ACCURATE_PLACEMENT_PROTOCOL,
@@ -249,6 +250,8 @@ public class Configs implements IConfigHandler
                 SERVER_DATA_SYNC_CACHE_REFRESH,
                 SERVER_DATA_SYNC_CACHE_TIMEOUT,
                 SERVER_NBT_REQUEST_RATE,
+				SHOW_HAND_IN_FREECAM,
+				SHOW_HOTBAR_IN_FREECAM,
                 SNAP_AIM_PITCH_STEP,
                 SNAP_AIM_THRESHOLD_PITCH,
                 SNAP_AIM_THRESHOLD_YAW,
@@ -265,9 +268,7 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_SILK_TOUCH_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
-                ZOOM_RESET_FOV_ON_ACTIVATE,
-                SHOW_HAND_IN_FREECAM,
-                SHOW_HOTBAR_IN_FREECAM
+                ZOOM_RESET_FOV_ON_ACTIVATE
         );
 
         public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(
