@@ -23,7 +23,7 @@ public abstract class MixinHeldItemRenderer_freeCam
     private void tweakeroo_cancelHandRendering1(float tickProgress, MatrixStack matrices, VertexConsumerProvider.Immediate vertexConsumers, ClientPlayerEntity player, int light, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-			!Configs.Generic.SHOW_HAND_IN_FREECAM.getBooleanValue())
+			!Configs.Generic.FREE_CAMERA_SHOW_HANDS.getBooleanValue())
         {
             ci.cancel();
         }
@@ -34,7 +34,7 @@ public abstract class MixinHeldItemRenderer_freeCam
     private void tweakeroo_cancelHandRendering2(LivingEntity entity, ItemStack stack, ItemDisplayContext renderMode, MatrixStack matrices, VertexConsumerProvider vertexConsumer, int light, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-			!Configs.Generic.SHOW_HAND_IN_FREECAM.getBooleanValue())
+			!Configs.Generic.FREE_CAMERA_SHOW_HANDS.getBooleanValue())
         {
             ci.cancel();
         }

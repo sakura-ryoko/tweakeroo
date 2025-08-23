@@ -62,7 +62,7 @@ public abstract class MixinGameRenderer_freeCam
     private void tweakeroo_removeHandRendering(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-			!Configs.Generic.SHOW_HAND_IN_FREECAM.getBooleanValue())
+			!Configs.Generic.FREE_CAMERA_SHOW_HANDS.getBooleanValue())
         {
             ci.cancel();
         }

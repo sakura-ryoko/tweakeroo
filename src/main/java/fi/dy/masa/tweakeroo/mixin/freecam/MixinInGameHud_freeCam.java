@@ -36,7 +36,7 @@ public abstract class MixinInGameHud_freeCam
     public void tweakeroo_overrideHotbarRendering(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
 	{
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-			!Configs.Generic.SHOW_HOTBAR_IN_FREECAM.getBooleanValue())
+			!Configs.Generic.FREE_CAMERA_SHOW_HOTBAR.getBooleanValue())
 		{
             ci.cancel();
         }
