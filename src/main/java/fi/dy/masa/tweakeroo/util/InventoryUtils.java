@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -25,12 +24,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -64,8 +59,6 @@ public class InventoryUtils
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
-//    private static final HashSet<RegistryEntry<Block>> SILK_TOUCH_OVERRIDE_BLOCKS = new HashSet<>();
-//    private static final HashSet<RegistryEntryList<Block>> SILK_TOUCH_OVERRIDE_TAGS = new HashSet<>();
     private static final String SILK_TOUCH_OVERRIDE_KEY = "silk_touch_overide";
     private static final String NEEDS_SHEARS_KEY = "needs_shears";
     private static final String NEEDS_SILK_TOUCH_KEY = "needs_silk_touch";
@@ -301,19 +294,18 @@ public class InventoryUtils
 
         for (String name : names)
         {
-            EquipmentSlot type = null;
+            EquipmentSlot type = switch (name)
+			{
+				case "mainhand" -> EquipmentSlot.MAINHAND;
+				case "offhand" -> EquipmentSlot.OFFHAND;
+				case "head" -> EquipmentSlot.HEAD;
+				case "chest" -> EquipmentSlot.CHEST;
+				case "legs" -> EquipmentSlot.LEGS;
+				case "feet" -> EquipmentSlot.FEET;
+				default -> null;
+			};
 
-            switch (name)
-            {
-                case "mainhand":    type = EquipmentSlot.MAINHAND; break;
-                case "offhand":     type = EquipmentSlot.OFFHAND; break;
-                case "head":        type = EquipmentSlot.HEAD; break;
-                case "chest":       type = EquipmentSlot.CHEST; break;
-                case "legs":        type = EquipmentSlot.LEGS; break;
-                case "feet":        type = EquipmentSlot.FEET; break;
-            }
-
-            if (type != null)
+			if (type != null)
             {
                 REPAIR_MODE_SLOTS.add(type);
 
@@ -415,17 +407,16 @@ public class InventoryUtils
             return EquipmentSlot.MAINHAND;
         }
 
-        switch (slotNum)
-        {
-            case 45: return EquipmentSlot.OFFHAND;
-            case  5: return EquipmentSlot.HEAD;
-            case  6: return EquipmentSlot.CHEST;
-            case  7: return EquipmentSlot.LEGS;
-            case  8: return EquipmentSlot.FEET;
-        }
-
-        return null;
-    }
+		return switch (slotNum)
+		{
+			case 45 -> EquipmentSlot.OFFHAND;
+			case 5 -> EquipmentSlot.HEAD;
+			case 6 -> EquipmentSlot.CHEST;
+			case 7 -> EquipmentSlot.LEGS;
+			case 8 -> EquipmentSlot.FEET;
+			default -> null;
+		};
+	}
 
     /**
      * Returns the slot number for the given equipment type
@@ -433,18 +424,17 @@ public class InventoryUtils
      */
     private static int getSlotNumberForEquipmentType(EquipmentSlot type, @Nullable PlayerEntity player)
     {
-        switch (type)
-        {
-            case MAINHAND:  return player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
-            case OFFHAND:   return 45;
-            case HEAD:      return 5;
-            case CHEST:     return 6;
-            case LEGS:      return 7;
-            case FEET:      return 8;
-        }
-
-        return -1;
-    }
+		return switch (type)
+		{
+			case MAINHAND -> player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
+			case OFFHAND -> 45;
+			case HEAD -> 5;
+			case CHEST -> 6;
+			case LEGS -> 7;
+			case FEET -> 8;
+			default -> -1;
+		};
+	}
 
     public static void swapHotbarWithInventoryRow(PlayerEntity player, int row)
     {
@@ -538,7 +528,7 @@ public class InventoryUtils
     {
         ItemStack stack = player.getStackInHand(hand);
 
-        if (stack.isEmpty() == false)
+        if (!stack.isEmpty())
         {
             int minDurability = getMinDurability(stack);
 
@@ -555,7 +545,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
+			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             ScreenHandler container = player.playerScreenHandler;
             ItemPickerTest test;
@@ -599,7 +589,7 @@ public class InventoryUtils
             return true;
         }
 
-        if (testedStack.isEmpty() == false && isWeapon)
+        if (!testedStack.isEmpty() && isWeapon)
         {
             final boolean mapping = matchesWeaponMapping(testedStack, entity);
 
@@ -675,7 +665,7 @@ public class InventoryUtils
         PlayerEntity player = mc.player;
 
         if (player != null && mc.world != null &&
-            TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()) == false)
+			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             BlockState state = mc.world.getBlockState(pos);
             ScreenHandler container = player.playerScreenHandler;
@@ -708,6 +698,7 @@ public class InventoryUtils
         if (previousTool.isEmpty() && isTool &&
             (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue() && !state.isOf(Blocks.BAMBOO)))
         {
+			//System.out.print("isBetterTool: (applyBambooNeedsSwordFirst) = TRUE\n");
             return true;
         }
 
@@ -715,38 +706,45 @@ public class InventoryUtils
         {
             if (EquipmentUtils.isSword(testedStack))
             {
+				//System.out.print("isBetterTool: (applyBambooNeedsSwordFirst) -> test\n");
                 return applyBambooNeedsSwordFirst(testedStack, previousTool);
             }
             else if (EquipmentUtils.isSword(previousTool))
             {
+				//System.out.print("isBetterTool: (applyBambooNeedsSwordFirst) = FALSE\n");
                 return false;
             }
         }
 
-        if (testedStack.isEmpty() == false && isMisc &&
+        if (!testedStack.isEmpty() && isMisc &&
             Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && isNeedsShears(state) &&
             testedStack.isOf(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
         {
-            return applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
+			//System.out.printf("applyNeedsShearsFirst: result: %s\n", test);
+			return applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
         }
 
-        if (testedStack.isEmpty() == false && isTool)
+        if (!testedStack.isEmpty() && isTool)
         {
-            if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && isNeedsSilkTouch(state)) ||
-                (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && isOreBlock(state) &&
-                EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
-            {
-                return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+			if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && isNeedsSilkTouch(state)) ||
+				(Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && isOreBlock(state) &&
+				EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
+			{
+				//System.out.printf("applySilkTouchFirst:B: result: %s\n", test);
+				return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
             }
             else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && isSilkTouchOverride(state))
             {
-                return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+				//System.out.printf("applySilkTouchFirst:C: result: %s\n", test);
+				return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
             }
 
-            return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
+			//System.out.printf("isBetterToolEach: result: %s\n", test);
+			return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
         }
 
-        return false;
+		//System.out.printf("isBetterTool: (Default-Correct?) result: %s\n", test);
+        return EquipmentUtils.isCorrectTool(testedStack, state);
     }
 
     // Even though an Axe is the "Correct tool" for Bamboo, a Sword is preferred
@@ -826,7 +824,9 @@ public class InventoryUtils
             return false;
         }
 
-        return false;
+		// Should default to original behavior.
+		//System.out.printf("applySilkTouchFirst: (Default-Correct?) result: %s\n", test);
+		return isBetterToolEach(testedStack, previousTool, state, isMisc, true);
     }
 
     private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
@@ -860,19 +860,19 @@ public class InventoryUtils
         }
         else if (testSpeed == prevSpeed)
         {
-            final boolean config = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
+            final boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
             Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(false);
             final boolean result = isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
             final boolean prevResult = loop ? isBetterToolEach(previousTool, testedStack, state, isMisc, false) : false;
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(config);
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
 
-            //System.out.printf("   Silk Touch Preference results: config: %s // test - %s, prev - %s", config, result, prevResult);
+            //System.out.printf("   Silk Touch Preference results: config: %s // test - %s, prev - %s", preferSilk, result, prevResult);
 
             // Filter out matches based on config for Silk Touch over Non-Silk Touch tools
             // when all other checks cannot determine which one should be picked.
             if (prevResult && result)
             {
-                if (config)
+                if (preferSilk)
                 {
                     return testSilkTouch && !prevSilkTouch;
                 }
@@ -1007,7 +1007,7 @@ public class InventoryUtils
             }
         }
 
-        if (state.isToolRequired() && stack.isSuitableFor(state) == false)
+        if (state.isToolRequired() && !stack.isSuitableFor(state))
         {
             speed /= (100F / 30F);
         }
@@ -1112,7 +1112,7 @@ public class InventoryUtils
         for (int slotNumber : slotNumbers)
         {
             if (slotNumber >= 0 && slotNumber <= maxSlot &&
-                container.getSlot(slotNumber).hasStack() == false)
+				!container.getSlot(slotNumber).hasStack())
             {
                 return slotNumber;
             }
@@ -1133,7 +1133,7 @@ public class InventoryUtils
 
     private static int getMinDurability(ItemStack stack)
     {
-        if (FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() == false)
+        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue())
         {
             return 0;
         }
