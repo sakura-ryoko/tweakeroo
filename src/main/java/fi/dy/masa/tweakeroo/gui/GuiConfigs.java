@@ -3,6 +3,7 @@ package fi.dy.masa.tweakeroo.gui;
 import java.util.Collections;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IHotkeyTogglable;
 import fi.dy.masa.malilib.config.options.BooleanHotkeyGuiWrapper;
@@ -62,7 +63,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         if (tab == ConfigGuiTab.GENERIC)
         {
-            return 120;
+            return 170;
         }
         else if (tab == ConfigGuiTab.FIXES)
         {
