@@ -28,7 +28,7 @@ public abstract class MixinTeleportSpectatorMenu
         if (FeatureToggle.TWEAK_SPECTATOR_TELEPORT.getBooleanValue())
         {
             this.elements = profiles.stream().sorted(ORDERING).map(
-                    entry -> (SpectatorMenuCommand) new TeleportToSpecificPlayerSpectatorCommand(entry.getProfile())).toList();
+                    entry -> (SpectatorMenuCommand) new TeleportToSpecificPlayerSpectatorCommand(entry)).toList();
         }
     }
 }

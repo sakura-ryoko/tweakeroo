@@ -32,11 +32,11 @@
 		"mixins.tweakeroo.json"
 	],
 	"accessWidener": "tweakeroo.accesswidener",
-	"depends": {
-		"minecraft": ">=1.21.6 <=1.21.8",
-		"malilib": ">=0.25.5- <0.26.0-"
-	},
-	"breaks": {
-		"malilib": "<0.25.5-"
-	}
+    "depends": {
+        "minecraft": ">1.21.8 <1.21.9",
+        "malilib": ">=0.26.0- <0.27.0-"
+    },
+    "breaks": {
+        "malilib": "<0.26.0-"
+    }
 }

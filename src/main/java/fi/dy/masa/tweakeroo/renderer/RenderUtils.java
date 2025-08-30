@@ -12,7 +12,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.Camera;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -359,32 +358,6 @@ public class RenderUtils
         }
 
         return originalFog;
-    }
-
-    public static void renderDirectionsCursor(DrawContext drawContext)
-    {
-        MinecraftClient mc = MinecraftClient.getInstance();
-
-        Camera camera = mc.gameRenderer.getCamera();
-//        float width = (float) drawContext.getScaledWindowWidth() / 2;
-//        float height = (float) drawContext.getScaledWindowHeight() / 2;
-//        float pitch = camera.getPitch();
-//        float yaw = camera.getYaw();
-//        float scale = 0.01F * mc.getWindow().getScaleFactor();
-//
-//        Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-//        matrix4fStack.pushMatrix();
-////        matrix4fStack.mul(drawContext.getMatrices().peek().getPositionMatrix());
-//        matrix4fStack.translate(width, height, 0.0F);
-//        matrix4fStack.rotateX(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(-pitch));
-//        matrix4fStack.rotateY(fi.dy.masa.malilib.render.RenderUtils.matrix4fRotateFix(yaw));
-//        matrix4fStack.scale(-scale, -scale, -scale);
-        //RenderSystem.renderCrosshair(10);
-
-        // TODO - Did Mojang fix this?
-        mc.getDebugHud().renderDebugCrosshair(camera);
-
-//        matrix4fStack.popMatrix();
     }
 
     public static void notifyRotationChanged()

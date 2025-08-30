@@ -215,7 +215,7 @@ public class PlacementTweaks
                 canUseItemWithRestriction(FAST_PLACEMENT_ITEM_RESTRICTION, mc.player))
         {
             ClientPlayerEntity player = mc.player;
-            World world = player.getWorld();
+            World world = player.getEntityWorld();
             final double reach = mc.player.getBlockInteractionRange();
             final int maxCount = Configs.Generic.FAST_BLOCK_PLACEMENT_COUNT.getIntegerValue();
 
@@ -778,7 +778,7 @@ public class PlacementTweaks
             return FAST_RIGHT_CLICK_BLOCK_RESTRICTION.isAllowed(Blocks.AIR);
         }
 
-        Block block = player.getWorld().getBlockState(((BlockHitResult) trace).getBlockPos()).getBlock();
+        Block block = player.getEntityWorld().getBlockState(((BlockHitResult) trace).getBlockPos()).getBlock();
 
         return FAST_RIGHT_CLICK_BLOCK_RESTRICTION.isAllowed(block);
     }

@@ -5,6 +5,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
+import net.minecraft.client.gui.hud.debug.DebugHudEntryVisibility;
+import net.minecraft.client.gui.hud.debug.DebugHudProfile;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,6 +36,7 @@ public class Callbacks
 
     public static void init(MinecraftClient mc)
     {
+		FeatureToggle.TWEAK_F3_CURSOR.setValueChangeCallback(new FeatureCallbackF3Toggle(FeatureToggle.TWEAK_F3_CURSOR, mc));
         FeatureToggle.TWEAK_GAMMA_OVERRIDE.setValueChangeCallback(new FeatureCallbackGamma(FeatureToggle.TWEAK_GAMMA_OVERRIDE, mc));
         FeatureToggle.TWEAK_DARKNESS_VISIBILITY.setValueChangeCallback(new FeatureCallbackDarkness(FeatureToggle.TWEAK_DARKNESS_VISIBILITY, mc));
         Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.setValueChangeCallback(new FeatureCallbackSlime(Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN));
@@ -134,6 +138,37 @@ public class Callbacks
                         InventoryUtils.parseSilkTouchOveride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
         );
     }
+
+	public static class FeatureCallbackF3Toggle implements IValueChangeCallback<IConfigBoolean>
+	{
+		private final MinecraftClient mc;
+
+		public FeatureCallbackF3Toggle(FeatureToggle feature, MinecraftClient mc)
+		{
+			this.mc = mc;
+			this.applyValue(mc.debugHudEntryList, feature.getBooleanValue());
+		}
+
+		@Override
+		public void onValueChanged(IConfigBoolean config)
+		{
+			this.applyValue(this.mc.debugHudEntryList, config.getBooleanValue());
+		}
+
+		private void applyValue(DebugHudProfile profile, boolean enable)
+		{
+			if (enable &&
+					profile.getVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugHudEntryVisibility.ALWAYS_ON)
+			{
+				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.ALWAYS_ON);
+			}
+			else if (!enable &&
+					profile.getVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugHudEntryVisibility.IN_F3)
+			{
+				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.IN_F3);
+			}
+		}
+	}
 
     public static class FeatureCallbackHold implements IValueChangeCallback<IConfigBoolean>
     {

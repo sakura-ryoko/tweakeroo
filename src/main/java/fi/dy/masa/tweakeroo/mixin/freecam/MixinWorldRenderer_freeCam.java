@@ -50,7 +50,7 @@ public abstract class MixinWorldRenderer_freeCam
     }
 
     // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
-    @Redirect(method = "getEntitiesToRender", require = 0, at = @At(value = "INVOKE",
+    @Redirect(method = "fillEntityRenderStates", require = 0, at = @At(value = "INVOKE",
                                                                     target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;", ordinal = 3))
     private Entity allowRenderingClientPlayerInFreeCameraMode(Camera camera)
     {

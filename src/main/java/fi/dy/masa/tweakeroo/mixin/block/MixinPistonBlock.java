@@ -23,7 +23,7 @@ public class MixinPistonBlock
     @Inject(method = "onSyncedBlockEvent", at = @At("HEAD"))
     private void onSyncedBlockEventInject(BlockState state, World world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> ci)
     {
-        if (!world.isClient)
+        if (!world.isClient())
         {
             return;
         }

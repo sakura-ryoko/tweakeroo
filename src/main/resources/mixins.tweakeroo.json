@@ -74,8 +74,8 @@
         "option.IMixinSimpleOption",
         "option.MixinGameOptions",
         "render.MixinBeaconBlockEntityRenderer",
-        "render.MixinBlockEntityRenderDispatcher",
-        "render.MixinEntityRenderDispatcher",
+        "render.MixinBlockEntityRenderManager",
+        "render.MixinEntityRenderManager",
         "render.MixinExplosionEmitterParticle",
         "render.MixinGameRenderer",
         "render.MixinGameRenderer_ViewBob",
@@ -91,6 +91,7 @@
         "screen.MixinCommandBlockScreen",
         "screen.MixinCreativeInventoryScreen",
         "screen.MixinPresetsScreen",
+        "screen.MixinScreen",
         "world.IMixinClientWorld",
         "world.MixinBuiltChunk",
         "world.MixinChunkBuilder_BuiltChunk",
@@ -98,7 +99,7 @@
         "world.MixinClientWorld_Properties",
         "world.MixinDimensionEffects_Nether"
     ],
-    "server": [ ],
+    "server": [],
     "mixinPriority": 990,
     "injectors": {
         "defaultRequire": 0

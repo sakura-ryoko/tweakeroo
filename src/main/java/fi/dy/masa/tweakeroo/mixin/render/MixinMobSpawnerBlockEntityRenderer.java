@@ -10,7 +10,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(MobSpawnerBlockEntityRenderer.class)
 public abstract class MixinMobSpawnerBlockEntityRenderer
 {
-    @Inject(method = "render(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/EntityRenderDispatcher;DD)V",
+    @Inject(method = "render(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/EntityRenderManager;DDI)V",
             at = @At("HEAD"), cancellable = true)
     private static void cancelRender(CallbackInfo ci)
     {

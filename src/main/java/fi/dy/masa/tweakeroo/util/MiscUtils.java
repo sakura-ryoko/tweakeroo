@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
-import fi.dy.masa.tweakeroo.mixin.screen.IMixinCustomizeFlatLevelScreen;
-import fi.dy.masa.tweakeroo.mixin.world.IMixinClientWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.MapColor;
@@ -70,7 +68,8 @@ import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinCommandBlockExecutor;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.mixin.screen.IMixinCustomizeFlatLevelScreen;
+import fi.dy.masa.tweakeroo.mixin.world.IMixinClientWorld;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 
 public class MiscUtils
@@ -402,7 +401,7 @@ public class MiscUtils
     public static void printDeathCoordinates(MinecraftClient mc)
     {
         BlockPos pos = PositionUtils.getEntityBlockPos(mc.player);
-        String dim = mc.player.getWorld().getRegistryKey().getValue().toString();
+        String dim = mc.player.getEntityWorld().getRegistryKey().getValue().toString();
         String str = StringUtils.translate("tweakeroo.message.death_coordinates",
                                            pos.getX(), pos.getY(), pos.getZ(), dim);
         MutableText message = Text.literal(str);

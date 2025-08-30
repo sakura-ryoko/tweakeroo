@@ -36,7 +36,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
     private void tweakeroo_restoreCopiedText(ReadView view, CallbackInfo ci)
     {
         // Restore the copied/pasted text after the TileEntity sync overrides it with empty lines
-        if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue() && this.getWorld() != null && this.getWorld().isClient)
+        if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue() && this.getWorld() != null && this.getWorld().isClient())
         {
             MinecraftClient mc = MinecraftClient.getInstance();
 

@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 
 @Mixin(value = InGameHud.class, priority = 1001)
 public abstract class MixinInGameHud
@@ -25,16 +24,16 @@ public abstract class MixinInGameHud
     @Shadow @Final private PlayerListHud playerListHud;
     @Shadow @Final private MinecraftClient client;
 
-    @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
-                target = "Lnet/minecraft/client/gui/hud/InGameHud;shouldRenderCrosshair()Z", ordinal = 0), cancellable = true)
-    private void tweakeroo_overrideCursorRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue() && this.client.currentScreen == null)
-        {
-            RenderUtils.renderDirectionsCursor(context);
-            ci.cancel();
-        }
-    }
+//    @Inject(method = "renderCrosshair", at = @At(value = "INVOKE",
+//                target = "Lnet/minecraft/client/gui/hud/InGameHud;shouldRenderCrosshair()Z", ordinal = 0), cancellable = true)
+//    private void tweakeroo_overrideCursorRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+//    {
+//        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue() && this.client.currentScreen == null)
+//        {
+//            RenderUtils.renderDirectionsCursor(context);
+//            ci.cancel();
+//        }
+//    }
 
     @Inject(method = "renderPlayerList",
             at = @At(value = "INVOKE",

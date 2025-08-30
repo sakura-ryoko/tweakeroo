@@ -18,7 +18,7 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 public abstract class MixinChatScreen
 {
     @Shadow protected TextFieldWidget chatField;
-    @Mutable @Shadow private String originalChatText;
+    @Mutable @Shadow protected String originalChatText;
 
     @Inject(method = "removed", at = @At("HEAD"))
     private void tweakeroo_storeChatText(CallbackInfo ci)
@@ -29,10 +29,11 @@ public abstract class MixinChatScreen
         }
     }
 
-    @Inject(method = "<init>(Ljava/lang/String;)V", at = @At("RETURN"))
-    private void tweakeroo_restoreText(String defaultText, CallbackInfo ci)
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void tweakeroo_restoreText(String text, boolean draft, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue() && MiscUtils.getLastChatText().isEmpty() == false)
+        if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue() &&
+			MiscUtils.getLastChatText().isEmpty() == false)
         {
             this.originalChatText = MiscUtils.getLastChatText();
         }

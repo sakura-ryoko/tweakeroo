@@ -3,7 +3,6 @@ package fi.dy.masa.tweakeroo.mixin.entity;
 import org.objectweb.asm.Opcodes;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -40,20 +39,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private MixinClientPlayerEntity(ClientWorld world, GameProfile profile)
     {
         super(world, profile);
-    }
-
-    @Redirect(method = "tickNausea",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/gui/screen/Screen;shouldPause()Z"))
-    private boolean tweakeroo_onDoesGuiPauseGame(Screen gui)
-    {
-        // Spoof the return value to prevent entering the if block
-        if (Configs.Disable.DISABLE_PORTAL_GUI_CLOSING.getBooleanValue())
-        {
-            return true;
-        }
-
-        return gui.shouldPause();
     }
 
     @Inject(method = "tickNausea", at = @At("HEAD"))
