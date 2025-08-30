@@ -272,6 +272,10 @@ public class Configs implements IConfigHandler
         );
 
         public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(
+				FREE_CAMERA_PLAYER_INPUTS,
+				FREE_CAMERA_PLAYER_MOVEMENT,
+				FREE_CAMERA_SHOW_HANDS,
+				FREE_CAMERA_SHOW_HOTBAR,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
                 TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
