@@ -1,10 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
-import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,12 +14,10 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(BlockEntityRenderManager.class)
 public abstract class MixinBlockEntityRenderManager
 {
-    @Inject(method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;)V",
+    @Inject(method = "render(Lnet/minecraft/client/render/block/entity/state/BlockEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;)V",
 			at = @At("HEAD"), cancellable = true)
-    private <E extends BlockEntity> void tweakeroo_preventTileEntityRendering(
-			E blockEntity, float tickProgress, MatrixStack matrices,
-			@Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand,
-			OrderedRenderCommandQueue queue, CallbackInfo ci)
+    private <S extends BlockEntityRenderState> void tweakeroo_preventTileEntityRendering(
+			S renderState, MatrixStack matrices, OrderedRenderCommandQueue queue, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_TILE_ENTITY_RENDERING.getBooleanValue())
         {

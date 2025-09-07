@@ -40,6 +40,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
@@ -394,4 +395,10 @@ public class FakeWorld extends World
         // TODO Auto-generated method stub
         return null;
     }
+
+	@Override
+	public WorldBorder getWorldBorder()
+	{
+		return WorldBorder.Properties.DEFAULT.toWorldBorder();
+	}
 }

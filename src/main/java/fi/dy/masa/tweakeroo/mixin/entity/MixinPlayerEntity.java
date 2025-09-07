@@ -28,7 +28,7 @@ public abstract class MixinPlayerEntity extends LivingEntity
         super(entityType_1, world_1);
     }
 
-    @Inject(method = "method_30263", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isStandingOnSurface", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_restore_1_15_2_sneaking(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_SNEAK_1_15_2.getBooleanValue())

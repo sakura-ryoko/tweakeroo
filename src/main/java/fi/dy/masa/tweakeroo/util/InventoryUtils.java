@@ -25,7 +25,6 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -39,7 +38,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
 
-import fi.dy.masa.malilib.data.MaLiLibTag;
+import fi.dy.masa.malilib.data.CachedBlockTags;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -47,7 +46,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.data.CachedBlockTags;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
@@ -59,10 +58,6 @@ public class InventoryUtils
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
-    private static final String SILK_TOUCH_OVERRIDE_KEY = "silk_touch_overide";
-    private static final String NEEDS_SHEARS_KEY = "needs_shears";
-    private static final String NEEDS_SILK_TOUCH_KEY = "needs_silk_touch";
-    private static final String ORE_BLOCKS_KEY = "ore_blocks";
     private static boolean needsCache = false;
 
     public static void setToolSwitchableSlots(String configStr)
@@ -73,142 +68,6 @@ public class InventoryUtils
     public static void setToolSwitchIgnoreSlots(String configStr)
     {
         parseSlotsFromString(configStr, TOOL_SWITCH_IGNORED_SLOTS);
-    }
-
-    public static void parseSilkTouchOveride(List<String> configStrs)
-    {
-        if (MinecraftClient.getInstance().world == null)
-        {
-            return;
-        }
-
-        if (configStrs.isEmpty())
-        {
-            if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue())
-            {
-                Tweakeroo.LOGGER.error("parseSilkTouchOveride: Config List '{}' is empty.", Configs.Lists.SILK_TOUCH_OVERRIDE.getName());
-            }
-
-            return;
-        }
-
-        CachedBlockTags.getInstance().build(SILK_TOUCH_OVERRIDE_KEY, configStrs);
-    }
-
-    public static void startCache()
-    {
-        needsCache = !MinecraftClient.getInstance().isIntegratedServerRunning();
-
-        clearCache();
-
-        // Fallback for MaLiLib Block Tags when on a server.
-        CachedBlockTags.getInstance().build(NEEDS_SHEARS_KEY, buildNeedsShearsCache());
-        CachedBlockTags.getInstance().build(NEEDS_SILK_TOUCH_KEY, buildNeedsSilkTouchCache());
-        CachedBlockTags.getInstance().build(ORE_BLOCKS_KEY, buildOreBlocksCache());
-    }
-
-    private static List<String> buildNeedsShearsCache()
-    {
-        List<String> list = new ArrayList<>();
-
-        list.add("#"+BlockTags.LEAVES.id().toString());
-        list.add("#"+BlockTags.WOOL.id().toString());
-        list.add(Registries.BLOCK.getId(Blocks.CAVE_VINES).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CAVE_VINES_PLANT).toString());
-        list.add(Registries.BLOCK.getId(Blocks.COBWEB).toString());
-        list.add(Registries.BLOCK.getId(Blocks.DEAD_BUSH).toString());
-        list.add(Registries.BLOCK.getId(Blocks.FERN).toString());
-        list.add(Registries.BLOCK.getId(Blocks.GLOW_LICHEN).toString());
-        list.add(Registries.BLOCK.getId(Blocks.HANGING_ROOTS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LARGE_FERN).toString());
-        list.add(Registries.BLOCK.getId(Blocks.NETHER_SPROUTS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PALE_HANGING_MOSS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SHORT_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SHORT_DRY_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SEAGRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_DRY_GRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TALL_SEAGRASS).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TRIPWIRE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TWISTING_VINES).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TWISTING_VINES_PLANT).toString());
-        list.add(Registries.BLOCK.getId(Blocks.WEEPING_VINES).toString());
-        list.add(Registries.BLOCK.getId(Blocks.WEEPING_VINES_PLANT).toString());
-        list.add(Registries.BLOCK.getId(Blocks.VINE).toString());
-
-        return list;
-    }
-
-    private static List<String> buildNeedsSilkTouchCache()
-    {
-        List<String> list = new ArrayList<>();
-
-        list.add("#"+BlockTags.IMPERMEABLE.id().toString());        // Glass Blocks
-        list.add("#"+BlockTags.LEAVES.id().toString());             // All Leaves
-        list.add("#"+BlockTags.CORALS.id().toString());             // Fans + Plants
-        list.add("#"+BlockTags.WALL_CORALS.id().toString());        // Wall Coral Fans
-        // No Glass Pane block tag in Vanilla
-        list.add(Registries.BLOCK.getId(Blocks.GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BLACK_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BLUE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BROWN_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CYAN_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.GRAY_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.GREEN_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LIGHT_GRAY_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.LIME_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.MAGENTA_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.ORANGE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PINK_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PURPLE_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.RED_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.YELLOW_STAINED_GLASS_PANE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.WHITE_STAINED_GLASS_PANE).toString());
-        // No Sculk Block Tags in Vanilla
-        list.add(Registries.BLOCK.getId(Blocks.CALIBRATED_SCULK_SENSOR).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_CATALYST).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_SENSOR).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_SHRIEKER).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SCULK_VEIN).toString());
-        // Other Blocks
-        list.add(Registries.BLOCK.getId(Blocks.BEEHIVE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BEE_NEST).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BOOKSHELF).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BLUE_ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.BUSH).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CAMPFIRE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.CHISELED_BOOKSHELF).toString());
-        list.add(Registries.BLOCK.getId(Blocks.ENDER_CHEST).toString());
-        list.add(Registries.BLOCK.getId(Blocks.ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.PACKED_ICE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.SOUL_CAMPFIRE).toString());
-        list.add(Registries.BLOCK.getId(Blocks.TURTLE_EGG).toString());
-
-        return list;
-    }
-
-    private static List<String> buildOreBlocksCache()
-    {
-        List<String> list = new ArrayList<>();
-
-        list.add("#" + BlockTags.COAL_ORES.id().toString());
-        list.add("#" + BlockTags.COPPER_ORES.id().toString());
-        list.add("#" + BlockTags.DIAMOND_ORES.id().toString());
-        list.add("#" + BlockTags.EMERALD_ORES.id().toString());
-        list.add("#" + BlockTags.GOLD_ORES.id().toString());
-        list.add("#" + BlockTags.IRON_ORES.id().toString());
-        list.add("#" + BlockTags.LAPIS_ORES.id().toString());
-        list.add("#" + BlockTags.REDSTONE_ORES.id().toString());
-        list.add(Registries.BLOCK.getId(Blocks.NETHER_QUARTZ_ORE).toString());
-
-        return list;
-    }
-
-    public static void clearCache()
-    {
-        CachedBlockTags.getInstance().clear();
     }
 
     public static void parseSlotsFromString(String configStr, Collection<Integer> output)
@@ -717,7 +576,7 @@ public class InventoryUtils
         }
 
         if (!testedStack.isEmpty() && isMisc &&
-            Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && isNeedsShears(state) &&
+            Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && CachedTagManager.isNeedsShears(state) &&
             testedStack.isOf(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
         {
 			//System.out.printf("applyNeedsShearsFirst: result: %s\n", test);
@@ -726,14 +585,14 @@ public class InventoryUtils
 
         if (!testedStack.isEmpty() && isTool)
         {
-			if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && isNeedsSilkTouch(state)) ||
-				(Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && isOreBlock(state) &&
+			if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && CachedTagManager.isNeedsSilkTouch(state)) ||
+				(Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && CachedTagManager.isOreBlock(state) &&
 				EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
 			{
 				//System.out.printf("applySilkTouchFirst:B: result: %s\n", test);
 				return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
             }
-            else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && isSilkTouchOverride(state))
+            else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && CachedTagManager.isSilkTouchOverride(state))
             {
 				//System.out.printf("applySilkTouchFirst:C: result: %s\n", test);
 				return applySilkTouchFirst(testedStack, previousTool, state, isMisc);
@@ -1013,41 +872,6 @@ public class InventoryUtils
         }
 
         return speed;
-    }
-
-    private static boolean isNeedsShears(BlockState state)
-    {
-        if (needsCache)
-        {
-            return CachedBlockTags.getInstance().match(NEEDS_SHEARS_KEY, state);
-        }
-
-        return state.isIn(MaLiLibTag.Blocks.NEEDS_SHEARS);
-    }
-
-    private static boolean isNeedsSilkTouch(BlockState state)
-    {
-        if (needsCache)
-        {
-            return CachedBlockTags.getInstance().match(NEEDS_SILK_TOUCH_KEY, state);
-        }
-
-        return state.isIn(MaLiLibTag.Blocks.NEEDS_SILK_TOUCH);
-    }
-
-    private static boolean isOreBlock(BlockState state)
-    {
-        if (needsCache)
-        {
-            return CachedBlockTags.getInstance().match(ORE_BLOCKS_KEY, state);
-        }
-
-        return state.isIn(MaLiLibTag.Blocks.ORE_BLOCKS);
-    }
-
-    private static boolean isSilkTouchOverride(BlockState state)
-    {
-        return CachedBlockTags.getInstance().match(SILK_TOUCH_OVERRIDE_KEY, state);
     }
 
     protected static boolean hasEnoughDurability(ItemStack stack)

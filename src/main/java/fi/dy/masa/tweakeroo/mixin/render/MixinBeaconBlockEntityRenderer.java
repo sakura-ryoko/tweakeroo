@@ -14,12 +14,11 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(BeaconBlockEntityRenderer.class)
 public abstract class MixinBeaconBlockEntityRenderer
 {
-    @Inject(method = "renderBeam(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/util/Identifier;FFJIIIFF)V",
+    @Inject(method = "renderBeam(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/util/Identifier;FFIIIFF)V",
             at = @At("HEAD"), cancellable = true)
-    private static void tweakeroo_disableBeamRendering(MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue,
-													   Identifier textureId, float tickProgress, float heightScale,
-													   long worldTime, int yOffset, int maxY, int color,
-													   float innerRadius, float outerRadius, CallbackInfo ci)
+    private static void tweakeroo_disableBeamRendering(MatrixStack matrices, OrderedRenderCommandQueue queue, Identifier textureId,
+													   float beamHeight, float beamRotationDegrees, int minHeight, int maxHeight,
+													   int color, float innerScale, float outerScale, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_BEACON_BEAM_RENDERING.getBooleanValue())
         {

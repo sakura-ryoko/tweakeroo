@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.util.MessageOutputType;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -533,7 +534,7 @@ public class Configs implements IConfigHandler
 
         InventoryUtils.setToolSwitchableSlots(Generic.TOOL_SWITCHABLE_SLOTS.getStringValue());
         InventoryUtils.setToolSwitchIgnoreSlots(Generic.TOOL_SWITCH_IGNORED_SLOTS.getStringValue());
-        InventoryUtils.parseSilkTouchOveride(Lists.SILK_TOUCH_OVERRIDE.getStrings());
+        CachedTagManager.parseSilkTouchOverride(Lists.SILK_TOUCH_OVERRIDE.getStrings());
         InventoryUtils.setRepairModeSlots(Lists.REPAIR_MODE_SLOTS.getStrings());
         InventoryUtils.setUnstackingItems(Lists.UNSTACKING_ITEMS.getStrings());
         InventoryUtils.setWeaponMapping(Lists.ENTITY_WEAPON_MAPPING.getStrings());

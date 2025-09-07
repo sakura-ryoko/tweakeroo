@@ -3,7 +3,9 @@ package fi.dy.masa.tweakeroo.event;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.input.Input;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -76,14 +78,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onKeyInput(int keyCode, int scanCode, int modifiers, boolean eventKeyState)
+    public boolean onKeyInput(KeyInput input, boolean eventKeyState)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && eventKeyState)
         {
-            this.storeLastMovementDirection(keyCode, scanCode, mc);
+            this.storeLastMovementDirection(input, mc);
         }
 
         MiscUtils.checkZoomStatus();
@@ -92,7 +94,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onMouseClick(int mouseX, int mouseY, int eventButton, boolean eventButtonState)
+    public boolean onMouseClick(Click click, boolean eventButtonState)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -103,7 +105,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
 
         if (mc.player.isCreative() && FeatureToggle.TWEAK_ANGEL_BLOCK.getBooleanValue() && eventButtonState &&
-            mc.options.useKey.matchesMouse(eventButton) && mc.crosshairTarget.getType() == HitResult.Type.MISS)
+            mc.options.useKey.matchesMouse(click) && mc.crosshairTarget.getType() == HitResult.Type.MISS)
         {
             Vec3d eyePos = mc.player.getEyePos();
             Vec3d rotVec = mc.player.getRotationVec(1.0f);
@@ -127,7 +129,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onMouseScroll(int mouseX, int mouseY, double dWheel)
+    public boolean onMouseScroll(double mouseX, double mouseY, double dWheel)
     {
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && dWheel != 0)
@@ -320,21 +322,21 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return this.lastForwardInput;
     }
 
-    private void storeLastMovementDirection(int eventKey, int scanCode, MinecraftClient mc)
+    private void storeLastMovementDirection(KeyInput input, MinecraftClient mc)
     {
-        if (mc.options.forwardKey.matchesKey(eventKey, scanCode))
+        if (mc.options.forwardKey.matchesKey(input))
         {
             this.lastForwardInput = ForwardBack.FORWARD;
         }
-        else if (mc.options.backKey.matchesKey(eventKey, scanCode))
+        else if (mc.options.backKey.matchesKey(input))
         {
             this.lastForwardInput = ForwardBack.BACK;
         }
-        else if (mc.options.leftKey.matchesKey(eventKey, scanCode))
+        else if (mc.options.leftKey.matchesKey(input))
         {
             this.lastSidewaysInput = LeftRight.LEFT;
         }
-        else if (mc.options.rightKey.matchesKey(eventKey, scanCode))
+        else if (mc.options.rightKey.matchesKey(input))
         {
             this.lastSidewaysInput = LeftRight.RIGHT;
         }

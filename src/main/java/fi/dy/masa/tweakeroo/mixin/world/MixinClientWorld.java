@@ -86,4 +86,14 @@ public abstract class MixinClientWorld extends World
             ci.cancel();
         }
     }
+
+	@Inject(method = "addBlockBreakParticles(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V",
+			at = @At("HEAD"), cancellable = true)
+	private void tweakeroo_onAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci)
+	{
+		if (Configs.Disable.DISABLE_BLOCK_BREAK_PARTICLES.getBooleanValue())
+		{
+			ci.cancel();
+		}
+	}
 }

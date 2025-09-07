@@ -1,28 +1,26 @@
 package fi.dy.masa.tweakeroo.mixin.network;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -155,7 +153,8 @@ public abstract class MixinClientPlayerInteractionManager
             ))
     private void handleBreakReplaceInAttack(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
-        if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue())
+        if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue() &&
+			this.client.world != null && this.client.player != null)
         {
             if (this.client.world.getBlockState(targetPos).isAir()) {
                 BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
@@ -185,7 +184,8 @@ public abstract class MixinClientPlayerInteractionManager
             ))
     private void handleBreakReplaceInUpdate(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
-        if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue())
+        if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue() &&
+			this.client.world != null && this.client.player != null)
         {
             if (this.client.world.getBlockState(targetPos).isAir()) {
                 BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);

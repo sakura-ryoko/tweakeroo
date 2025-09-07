@@ -22,7 +22,7 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 @Mixin(World.class)
 public abstract class MixinWorld
 {
-    @Shadow @Final public boolean isClient;
+    @Shadow @Final private boolean isClient;
 
     @Inject(method = "tickBlockEntities", at = @At("HEAD"), cancellable = true)
     private void disableBlockEntityTicking(CallbackInfo ci)
