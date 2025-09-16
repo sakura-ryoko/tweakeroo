@@ -551,7 +551,7 @@
     "tweakeroo.config.generic.name.clientPlacementValidation": "클라이언트 설치 검정",
     "tweakeroo.config.generic.name.customInventoryGuiScale": "사용자 지정 보관함 GUI 크기",
     "tweakeroo.config.generic.name.darknessScaleOverrideValue": "어둠 강도 오버라이드 값",
-    "tweakeroo.config.generic.name.debugLogging": "디버그 로깅",
+    "tweakeroo.config.generic.name.debugLogging": "디버그 로그 기록",
     "tweakeroo.config.generic.name.elytraCameraIndicator": "겉날개 카메라 표시기",
     "tweakeroo.config.generic.name.entityReachDistance": "엔티티 도달 거리",
     "tweakeroo.config.generic.name.entityTypeAttackRestrictionWarn": "엔티티 타입 공격 제한 경고",
