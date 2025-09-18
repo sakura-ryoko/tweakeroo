@@ -128,6 +128,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     private final boolean singlePlayer;
     private boolean valueBoolean;
     private IValueChangeCallback<IConfigBoolean> callback;
+    private boolean dirty = false;
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey)
     {
@@ -322,6 +323,34 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this.comment = s;
     }
 
+    @Override
+    public boolean isDirty()
+    {
+        return this.dirty;
+    }
+
+    @Override
+    public void markDirty()
+    {
+        this.dirty = true;
+    }
+
+    @Override
+    public void markClean()
+    {
+        this.dirty = false;
+    }
+
+    @Override
+    public void checkIfClean()
+    {
+        if (this.isDirty())
+        {
+            this.markClean();
+            this.onValueChanged();
+        }
+    }
+
     private static String buildTranslateName(String name, String type)
     {
         return FEATURE_KEY + "." + type + "." + name;
@@ -404,7 +433,13 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public void resetToDefault()
     {
+        boolean oldValue = this.valueBoolean;
         this.valueBoolean = this.defaultValueBoolean;
+
+        if (oldValue != this.valueBoolean)
+        {
+            this.onValueChanged();
+        }
     }
 
     @Override
@@ -420,7 +455,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         {
             if (element.isJsonPrimitive())
             {
-                this.valueBoolean = element.getAsBoolean();
+                this.setBooleanValue(element.getAsBoolean());
             }
             else
             {

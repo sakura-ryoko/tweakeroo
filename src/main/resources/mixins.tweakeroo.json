@@ -84,7 +84,6 @@
         "render.MixinParticleManager",
         "render.MixinWeatherRendering",
         "render.MixinWindow",
-        "render.MixinWorldRenderer",
         "screen.IMixinCustomizeFlatLevelScreen",
         "screen.MixinAbstractSignEditScreen",
         "screen.MixinChatScreen",

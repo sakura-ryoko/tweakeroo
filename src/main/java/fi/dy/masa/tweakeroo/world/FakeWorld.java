@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
@@ -248,6 +249,18 @@ public class FakeWorld extends World
     public String asString()
     {
         return "Chunks[FAKE] W: " + this.getChunkManager().getDebugString();
+    }
+
+    @Override
+    public void setSpawnPos(WorldProperties.class_12064 arg)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public WorldProperties.class_12064 method_74854()
+    {
+        return new WorldProperties.class_12064(new GlobalPos(World.OVERWORLD, BlockPos.ORIGIN), 0.0f, 0.0f);
     }
 
     @Override

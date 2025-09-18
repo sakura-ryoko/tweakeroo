@@ -1,31 +1,28 @@
 package fi.dy.masa.tweakeroo.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.block.Block;
+import fi.dy.masa.malilib.data.CachedBlockTags;
+import fi.dy.masa.malilib.data.CachedTagKey;
+import fi.dy.masa.tweakeroo.Reference;
+import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
 
-import fi.dy.masa.malilib.data.CachedBlockTags;
-import fi.dy.masa.malilib.data.CachedItemTags;
-import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.config.Configs;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Caches Block/Item Tags as if they are real Vanilla Block/Item tags.
  */
 public class CachedTagManager
 {
-	public static final String SILK_TOUCH_OVERRIDE_KEY = "silk_touch_override";
-	public static final String NEEDS_SHEARS_KEY = "needs_shears";
-	public static final String NEEDS_SILK_TOUCH_KEY = "needs_silk_touch";
-	public static final String ORE_BLOCKS_KEY = "ore_blocks";
+	public static final CachedTagKey SILK_TOUCH_OVERRIDE_KEY    = new CachedTagKey(Reference.MOD_ID, "silk_touch_override");
+	public static final CachedTagKey NEEDS_SHEARS_KEY           = new CachedTagKey(Reference.MOD_ID, "needs_shears");
+	public static final CachedTagKey NEEDS_SILK_TOUCH_KEY       = new CachedTagKey(Reference.MOD_ID, "needs_silk_touch");
+	public static final CachedTagKey ORE_BLOCKS_KEY             = new CachedTagKey(Reference.MOD_ID, "ore_blocks");
 
     public static void startCache()
     {
@@ -162,61 +159,6 @@ public class CachedTagManager
 		CachedBlockTags.getInstance().clearEntry(NEEDS_SILK_TOUCH_KEY);
 		CachedBlockTags.getInstance().clearEntry(ORE_BLOCKS_KEY);
     }
-
-	/**
-	 * Match Cached Block Tags
-	 * @param key (Tag List Key)
-	 * @param block (Block Entry)
-	 * @return ()
-	 */
-	public static boolean matchBlockTag(String key, RegistryEntry<Block> block)
-	{
-		return CachedBlockTags.getInstance().match(key, block);
-	}
-
-	/**
-	 * Match Cached Block Tags
-	 * @param key (Tag List Key)
-	 * @param block (Block)
-	 * @return ()
-	 */
-	public static boolean matchBlockTag(String key, Block block)
-	{
-		return CachedBlockTags.getInstance().match(key, block);
-	}
-
-	/**
-	 * Match Cached Block Tags
-	 * @param key (Tag List Key)
-	 * @param state (Block State)
-	 * @return ()
-	 */
-	public static boolean matchBlockTag(String key, BlockState state)
-	{
-		return CachedBlockTags.getInstance().match(key, state);
-	}
-
-	/**
-	 * Match Cached Block Tags
-	 * @param key (Tag List Key)
-	 * @param item (Item Entry)
-	 * @return ()
-	 */
-	public static boolean matchItemTag(String key, RegistryEntry<Item> item)
-	{
-		return CachedItemTags.getInstance().match(key, item);
-	}
-
-	/**
-	 * Match Cached Block Tags
-	 * @param key (Tag List Key)
-	 * @param item (Item)
-	 * @return ()
-	 */
-	public static boolean matchItemTag(String key, Item item)
-	{
-		return CachedItemTags.getInstance().match(key, item);
-	}
 
 	public static boolean isNeedsShears(BlockState state)
 	{
