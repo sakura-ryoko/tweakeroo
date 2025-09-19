@@ -251,16 +251,16 @@ public class FakeWorld extends World
         return "Chunks[FAKE] W: " + this.getChunkManager().getDebugString();
     }
 
-    @Override
-    public void setSpawnPos(WorldProperties.class_12064 arg)
-    {
-        // NO-OP
-    }
+	@Override
+	public void setSpawnPoint(WorldProperties.SpawnPoint spawnPoint)
+	{
+		// NO-OP
+	}
 
     @Override
-    public WorldProperties.class_12064 method_74854()
+    public WorldProperties.SpawnPoint getSpawnPoint()
     {
-        return new WorldProperties.class_12064(new GlobalPos(World.OVERWORLD, BlockPos.ORIGIN), 0.0f, 0.0f);
+        return new WorldProperties.SpawnPoint(new GlobalPos(World.OVERWORLD, BlockPos.ORIGIN), 0.0f, 0.0f);
     }
 
     @Override
