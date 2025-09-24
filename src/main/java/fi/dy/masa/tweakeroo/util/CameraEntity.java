@@ -160,7 +160,7 @@ public class CameraEntity extends ClientPlayerEntity
         }
 
 //        Vec3d eyePos = player.getEyePos();
-        Vec3d entityPos = player.getPos();
+        Vec3d entityPos = player.getEntityPos();
 //        BlockPos blockPos = player.getBlockPos();
         float yaw = player.getYaw();
         float pitch = player.getPitch();
