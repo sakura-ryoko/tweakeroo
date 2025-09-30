@@ -31,8 +31,9 @@ public abstract class MixinBlockItem extends Item
         if (Configs.Generic.CLIENT_PLACEMENT_ROTATION.getBooleanValue())
         {
             BlockState stateOrig = this.getBlock().getPlacementState(ctx);
+            final boolean validated = !Configs.Generic.CLIENT_PLACEMENT_VALIDATION.getBooleanValue() || this.canPlace(ctx, stateOrig);
 
-            if (stateOrig != null && this.canPlace(ctx, stateOrig))
+            if (stateOrig != null && validated)
             {
                 UseContext context = UseContext.from(ctx, ctx.getHand());
                 cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, context));
