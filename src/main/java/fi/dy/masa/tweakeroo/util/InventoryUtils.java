@@ -787,9 +787,10 @@ public class InventoryUtils
     {
         String itemType = Registries.ITEM.getId(stack.getItem()).getPath();
 
-        if (itemType.contains("netherite")) return 5;
-        if (itemType.contains("diamond")) return 4;
-        if (itemType.contains("iron")) return 3;
+        if (itemType.contains("netherite")) return 6;
+        if (itemType.contains("diamond")) return 5;
+        if (itemType.contains("iron")) return 4;
+	    if (itemType.contains("copper")) return 3;
         if (itemType.contains("stone")) return 2;
         if (itemType.contains("gold")) return 1;
         if (itemType.contains("wood")) return 0;
