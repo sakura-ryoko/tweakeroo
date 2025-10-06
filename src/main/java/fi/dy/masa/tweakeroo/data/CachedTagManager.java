@@ -149,6 +149,7 @@ public class CachedTagManager
 			return;
 		}
 
+		CachedBlockTags.getInstance().clearEntry(SILK_TOUCH_OVERRIDE_KEY);
 		CachedBlockTags.getInstance().build(SILK_TOUCH_OVERRIDE_KEY, configStrs);
 	}
 
