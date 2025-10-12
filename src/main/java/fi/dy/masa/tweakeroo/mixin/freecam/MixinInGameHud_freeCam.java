@@ -35,10 +35,56 @@ public abstract class MixinInGameHud_freeCam
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void tweakeroo_overrideHotbarRendering(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
 	{
+		// This turns off rendering of the hotbar
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
 			!Configs.Generic.FREE_CAMERA_SHOW_HOTBAR.getBooleanValue())
 		{
             ci.cancel();
         }
     }
+
+	@Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideHeldItemTooltipRendering(DrawContext context, CallbackInfo ci)
+	{
+		// This turns off rendering of the item "tooltips" when selecting hotbar items
+		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+			!Configs.Generic.FREE_CAMERA_SHOW_HOTBAR.getBooleanValue() &&
+			!Configs.Generic.FREE_CAMERA_SHOW_HANDS.getBooleanValue())
+		{
+			ci.cancel();
+		}
+	}
+
+	@Inject(method = "renderStatusBars", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideStatusBarRendering1(DrawContext context, CallbackInfo ci)
+	{
+		// This turns off all status bars
+		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+			!Configs.Generic.FREE_CAMERA_SHOW_STATUS_BARS.getBooleanValue())
+		{
+			ci.cancel();
+		}
+	}
+
+	@Inject(method = "renderMountHealth", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideStatusBarRendering2(DrawContext context, CallbackInfo ci)
+	{
+		// This turns off the "mount health" status bar
+		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+			!Configs.Generic.FREE_CAMERA_SHOW_STATUS_BARS.getBooleanValue())
+		{
+			ci.cancel();
+		}
+	}
+
+	@Inject(method = "getCurrentBarType", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideExpBarRendering(CallbackInfoReturnable<InGameHud.BarType> cir)
+	{
+		// This turns off all status bars
+		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
+			!Configs.Generic.FREE_CAMERA_SHOW_STATUS_BARS.getBooleanValue())
+		{
+			cir.setReturnValue(InGameHud.BarType.EMPTY);
+		}
+	}
 }
