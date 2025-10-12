@@ -80,6 +80,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed   FREE_CAMERA_PLAYER_MOVEMENT         = new ConfigBooleanHotkeyed ("freeCameraPlayerMovement", false, "").apply(GENERIC_KEY);
 		public static final ConfigBooleanHotkeyed	FREE_CAMERA_SHOW_HANDS				= new ConfigBooleanHotkeyed ("freeCameraShowHands", false, "").apply(GENERIC_KEY);
 		public static final ConfigBooleanHotkeyed	FREE_CAMERA_SHOW_HOTBAR				= new ConfigBooleanHotkeyed ("freeCameraShowHotBar", false, "").apply(GENERIC_KEY);
+	    public static final ConfigBooleanHotkeyed	FREE_CAMERA_SHOW_STATUS_BARS    	= new ConfigBooleanHotkeyed ("freeCameraShowStatusBars", false, "").apply(GENERIC_KEY);
         public static final ConfigDouble        	GAMMA_OVERRIDE_VALUE                = new ConfigDouble      ("gammaOverrideValue", 16, 0, 32).apply(GENERIC_KEY);
         public static final ConfigBoolean       	HAND_RESTOCK_PRE                    = new ConfigBoolean     ("handRestockPre", true).apply(GENERIC_KEY);
         public static final ConfigInteger       	HAND_RESTOCK_PRE_THRESHOLD          = new ConfigInteger     ("handRestockPreThreshold", 6, 1, 64).apply(GENERIC_KEY);
@@ -168,6 +169,7 @@ public class Configs implements IConfigHandler
                 FREE_CAMERA_PLAYER_MOVEMENT,
 				FREE_CAMERA_SHOW_HANDS,
 				FREE_CAMERA_SHOW_HOTBAR,
+                FREE_CAMERA_SHOW_STATUS_BARS,
                 HAND_RESTOCK_PRE,
                 HANGABLE_ENTITY_BYPASS_INVERSE,
                 INVENTORY_PREVIEW_VILLAGER_BG_COLOR,
