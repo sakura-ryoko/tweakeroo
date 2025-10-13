@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo;
 
 import net.minecraft.client.MinecraftClient;
+
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.*;
 import fi.dy.masa.malilib.interfaces.IInitializationHandler;
@@ -47,6 +48,7 @@ public class InitHandler implements IInitializationHandler
         TickHandler.getInstance().registerClientTickHandler(new ClientTickHandler());
         TickHandler.getInstance().registerClientTickHandler(ServerDataSyncer.getInstance());
 
+//	    ClientCommandHandler.INSTANCE.registerCommand(new FcCommand());
         Callbacks.init(MinecraftClient.getInstance());
     }
 }
