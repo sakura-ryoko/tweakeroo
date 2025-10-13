@@ -870,7 +870,7 @@
     "tweakeroo.message.free_cam.preset_added": "Preset added: §a%s§r",
     "tweakeroo.message.free_cam.preset_already_in_use": "§cPreset is already saved; you cannot save it twice.§r",
     "tweakeroo.message.free_cam.preset_deleted": "Preset deleted: §c%s§r",
-    "tweakeroo.message.free_cam.preset_help": "#fc (FreeCam Presets) Help --\n  add [Name] -- Adds a new preset at your location, in this dimension.\n  set [id] -- Set/Update an existing preset with your current location.\n  del [id] -- Delete a preset.\n  list -- List all saved presets in your dimension.\n  recall [id] -- Recall a preset, and activate Free Cam there.\n  cycle -- Cycle through all of the saved presets, activating Free Cam at each.",
+    "tweakeroo.message.free_cam.preset_help": "#fc (FreeCam Presets) Help --\n  add [Name] -- Adds a new preset at your location, in this dimension.\n  set [id] -- Set/Update an existing preset with your current location.\n  del [id] -- Delete a preset.\n  list -- List all saved presets in your dimension.\n  rename [id] [Name] -- Rename a preset with a new name.\n  recall [id] -- Recall a preset, and activate Free Cam there.\n  cycle -- Cycle through all of the saved presets, activating Free Cam at each.",
     "tweakeroo.message.free_cam.preset_invalid": "§cPreset '§a%s§c' is not a valid number.§r",
     "tweakeroo.message.free_cam.preset_invalid_operation": "§cInvalid preset operation given.  Try using '§b§l#fc help§r§c'.§r",
     "tweakeroo.message.free_cam.preset_list": "§b%s§r",
