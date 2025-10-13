@@ -50,6 +50,7 @@ public class FcCommand implements IClientCommandListener
 				case "set" -> this.executeSet(list, mc);
 				case "del" -> this.executeDel(list, mc);
 				case "list" -> this.executeList(list, mc);
+				case "rename" -> this.executeRename(list, mc);
 				case "recall" -> this.executeRecall(list, mc);
 				case "cycle" -> this.executeCycle(list, mc);
 				case "help" -> this.executeHelp(list, mc);
@@ -183,6 +184,12 @@ public class FcCommand implements IClientCommandListener
 		return true;
 	}
 
+	private boolean executeRename(List<String> args, MinecraftClient mc)
+	{
+		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_implemented", args.getFirst()));
+		return false;
+	}
+
 	private boolean executeRecall(List<String> args, MinecraftClient mc)
 	{
 		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_implemented", args.getFirst()));
@@ -207,6 +214,7 @@ public class FcCommand implements IClientCommandListener
 		SET     ("set",     true,  List.of("s", "update", "upd")),
 		DEL     ("del",     true,  List.of("d", "delete")),
 		LIST    ("list",    false, List.of("l", "lst")),
+		RENAME  ("rename",  true,  List.of("n", "ren")),
 		RECALL  ("recall",  true,  List.of("r", "rec")),
 		CYCLE   ("cycle",   false, List.of("c", "cyc")),
 		HELP    ("help",    false, List.of("h", "hlp"));
