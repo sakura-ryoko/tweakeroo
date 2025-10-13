@@ -46,7 +46,19 @@ public class CameraPresetCache
 	 */
 	public boolean hasId(final int id)
 	{
-		return this.presets.containsKey(id);
+		AtomicBoolean bool = new AtomicBoolean(false);
+
+		this.presets.forEach(
+				(index, entry) ->
+				{
+					if (entry.id() == id || index == id)
+					{
+						bool.set(true);
+					}
+				}
+		);
+
+		return bool.get();
 	}
 
 	/**
