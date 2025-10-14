@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.util;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -14,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.stat.StatHandler;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -157,12 +159,12 @@ public class CameraEntity extends ClientPlayerEntity
 
     private static CameraEntity createCameraEntity(MinecraftClient mc)
     {
-        ClientPlayerEntity player = mc.player;
+	    if (mc.player == null || mc.world == null)
+	    {
+		    throw new RuntimeException("Cannot create CameraEntity from null!");
+	    }
 
-        if (player == null)
-        {
-            throw new RuntimeException("Cannot create CameraEntity from null!");
-        }
+	    ClientPlayerEntity player = mc.player;
 
 //        Vec3d eyePos = player.getEyePos();
         Vec3d entityPos = player.getEntityPos();
@@ -195,20 +197,27 @@ public class CameraEntity extends ClientPlayerEntity
         return camera;
     }
 
-	@ApiStatus.Experimental
-	private static CameraEntity createCameraAtPreset(MinecraftClient mc, CameraPreset preset)
+	public static void updatePositionAtPreset(@Nonnull CameraPreset preset)
 	{
-		ClientPlayerEntity player = mc.player;
+		if (camera != null && isValidDim(camera.getEntityWorld(), preset.dim()))
+		{
+			Tweakeroo.LOGGER.error("CameraEntity#updatePositionAtPreset(): oldPos [{}], newPos [{}] // yaw [{}], pitch [{}]", camera.getEyePos().toString(), preset.pos().toString(), preset.yaw(), preset.pitch());
+			camera.setPos(preset.pos().getX(), preset.pos().getY(), preset.pos().getZ());
+			camera.setYaw(preset.yaw());
+			camera.setPitch(preset.pitch());
+			camera.setVelocity(Vec3d.ZERO);
+		}
+	}
 
-		if (player == null)
+	@ApiStatus.Experimental
+	private static CameraEntity createCameraAtPreset(MinecraftClient mc, @Nonnull CameraPreset preset)
+	{
+		if (mc.player == null || mc.world == null)
 		{
 			throw new RuntimeException("Cannot create CameraEntity from null!");
 		}
 
-//        Vec3d eyePos = player.getEyePos();
-//        BlockPos blockPos = player.getBlockPos();
-		float yaw = player.getYaw();
-		float pitch = player.getPitch();
+		ClientPlayerEntity player = mc.player;
 
 		// Don't reset velocity when flying / swimming.
 		if (mc.player.isOnGround())
@@ -218,9 +227,6 @@ public class CameraEntity extends ClientPlayerEntity
 
 		CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook(), PlayerInput.DEFAULT, false);
 		camera.noClip = true;
-//
-//        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
-//        camera.setRotation(yaw, pitch);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
 
@@ -288,8 +294,11 @@ public class CameraEntity extends ClientPlayerEntity
 	@ApiStatus.Experimental
 	private static void createAndSetCameraAtPreset(MinecraftClient mc, CameraPreset preset)
 	{
-		camera = createCameraAtPreset(mc, preset);
-		setCamera(mc);
+		if (isValidDim(mc.world, preset.dim()))
+		{
+			camera = createCameraAtPreset(mc, preset);
+			setCamera(mc);
+		}
 	}
 
 	private static void setCamera(MinecraftClient mc)
@@ -321,4 +330,14 @@ public class CameraEntity extends ClientPlayerEntity
         originalCameraEntity = null;
         camera = null;
     }
+
+	private static boolean isValidDim(World world, Identifier dim)
+	{
+		if (world == null)
+		{
+			return false;
+		}
+
+		return world.getRegistryKey().getValue().equals(dim);
+	}
 }

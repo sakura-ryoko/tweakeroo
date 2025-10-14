@@ -2,9 +2,7 @@ package fi.dy.masa.tweakeroo.command;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.MinecraftClient;
@@ -16,13 +14,18 @@ import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.interfaces.IClientCommandListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.CameraPresetCache;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
+import fi.dy.masa.tweakeroo.util.CameraUtils;
 
 @ApiStatus.Experimental
 public class FcCommand implements IClientCommandListener
 {
+	private final String PREFIX = Reference.MOD_ID+".message.free_cam.preset";
+
 	@Override
 	public String getCommand()
 	{
@@ -40,7 +43,7 @@ public class FcCommand implements IClientCommandListener
 		{
 			if (sub.needsArgs() && list.isEmpty())
 			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_enough_args_given"));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(  PREFIX+"_not_enough_args_given"));
 				return true;
 			}
 
@@ -58,7 +61,7 @@ public class FcCommand implements IClientCommandListener
 			};
 		}
 
-		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_invalid_operation"));
+		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
 		return true;
 	}
 
@@ -69,18 +72,16 @@ public class FcCommand implements IClientCommandListener
 			RegistryKey<World> dimKey = mc.world.getRegistryKey();
 			Entity camera = mc.getCameraEntity();
 			final int id = CameraPresetCache.getInstance().size() + 1;
-			String name = !args.isEmpty() ? args.toString() : "Preset " + id;
+			String name = !args.isEmpty() ? CameraUtils.fixPresetName(args.toString()) : "Preset "+id;
 			CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
 
-			if (!CameraPresetCache.getInstance().hasPosition(newPreset))
+			if (CameraUtils.addPreset(newPreset))
 			{
-				CameraPresetCache.getInstance().add(newPreset);
-				Tweakeroo.debugLog("FcCommand#add(): Added new preset: {}", newPreset.toShortString());
-				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, "tweakeroo.message.free_cam.preset_added", newPreset.toShortString());
+				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_added", newPreset.toShortString());
 			}
 			else
 			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_already_in_use"));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_already_in_use"));
 			}
 		}
 
@@ -107,21 +108,19 @@ public class FcCommand implements IClientCommandListener
 					{
 						CameraPreset newPreset = new CameraPreset(id, oldPreset.name(), dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
 
-						CameraPresetCache.getInstance().remove(id, false);
-						CameraPresetCache.getInstance().add(newPreset, false);
-						Tweakeroo.debugLog("FcCommand#set(): Updated preset: {}", newPreset.toShortString());
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, "tweakeroo.message.free_cam.preset_updated", newPreset.toShortString());
+						CameraUtils.updatePreset(newPreset);
+						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_updated", newPreset.toShortString());
 					}
 				}
 				else
 				{
-					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_found", String.format("%02d", id)));
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
 				}
 			}
 			catch (Exception err)
 			{
 				Tweakeroo.LOGGER.error("FcCommand#set(): Exception; {}", err.getLocalizedMessage());
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_invalid", args.getFirst()));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 			}
 		}
 
@@ -140,22 +139,20 @@ public class FcCommand implements IClientCommandListener
 			{
 				CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
 
-				if (oldPreset != null)
+				if (CameraUtils.deletePreset(oldPreset))
 				{
-					CameraPresetCache.getInstance().remove(id, false);
-					Tweakeroo.debugLog("FcCommand#del(): Deleted preset: {}", oldPreset.toShortString());
-					InfoUtils.showInGameMessage(Message.MessageType.INFO, "tweakeroo.message.free_cam.preset_deleted", oldPreset.toShortString());
+					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted", oldPreset.toShortString());
 				}
 			}
 			else
 			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_found", String.format("%02d", id)));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
 			}
 		}
 		catch (Exception err)
 		{
 			Tweakeroo.LOGGER.error("FcCommand#del(): Exception; {}", err.getLocalizedMessage());
-			mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_invalid", args.getFirst()));
+			mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 		}
 
 		return true;
@@ -170,13 +167,13 @@ public class FcCommand implements IClientCommandListener
 
 			if (list.isEmpty())
 			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_list_empty"));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_list_empty"));
 			}
 			else
 			{
 				for (CameraPreset entry : list)
 				{
-					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_list", entry.toShortString()));
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_list", entry.toShortString()));
 				}
 			}
 		}
@@ -186,25 +183,182 @@ public class FcCommand implements IClientCommandListener
 
 	private boolean executeRename(List<String> args, MinecraftClient mc)
 	{
-		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_implemented", args.getFirst()));
-		return false;
+		int id;
+
+		try
+		{
+			id = Integer.parseInt(args.getFirst());
+
+			if (CameraPresetCache.getInstance().hasId(id))
+			{
+				args.removeFirst();
+
+				if (!args.isEmpty())
+				{
+					CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
+					final String newName = CameraUtils.fixPresetName(args.toString());
+
+					if (CameraUtils.renamePreset(oldPreset, newName))
+					{
+						InfoUtils.showInGameMessage(Message.MessageType.INFO, PREFIX+"_renamed", String.format("%02d", id), oldPreset.name(), newName);
+					}
+				}
+				else
+				{
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_enough_args_given"));
+				}
+			}
+			else
+			{
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
+			}
+		}
+		catch (Exception err)
+		{
+			Tweakeroo.LOGGER.error("FcCommand#rename(): Exception; {}", err.getLocalizedMessage());
+			mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+		}
+
+		return true;
 	}
 
 	private boolean executeRecall(List<String> args, MinecraftClient mc)
 	{
-		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_implemented", args.getFirst()));
-		return false;
+		int id;
+
+		try
+		{
+			id = Integer.parseInt(args.getFirst());
+
+			if (CameraPresetCache.getInstance().hasId(id))
+			{
+				CameraPreset preset = CameraPresetCache.getInstance().get(id);
+
+				if (preset != null)
+				{
+					if (CameraUtils.recallPreset(preset, mc))
+					{
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.id()), preset.name()));
+					}
+					else
+					{
+						mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+					}
+				}
+			}
+			else
+			{
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
+			}
+		}
+		catch (Exception err)
+		{
+			Tweakeroo.LOGGER.error("FcCommand#recall(): Exception; {}", err.getLocalizedMessage());
+			mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+		}
+
+		return true;
 	}
 
 	private boolean executeCycle(List<String> args, MinecraftClient mc)
 	{
-		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_not_implemented", args.getFirst()));
-		return false;
+//		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_implemented", args.getFirst()));
+
+		if (mc.world != null)
+		{
+			RegistryKey<World> dimKey = mc.world.getRegistryKey();
+			CameraPreset preset = null;
+			boolean exception = false;
+			int id;
+
+			if (args.isEmpty())
+			{
+				preset = CameraPresetCache.getInstance().cycle(dimKey);
+			}
+			else
+			{
+				try
+				{
+					id = Integer.parseInt(args.getFirst());
+
+					if (CameraPresetCache.getInstance().hasId(id))
+					{
+						preset = CameraPresetCache.getInstance().get(id);
+						CameraPresetCache.getInstance().setLastPreset(id);
+					}
+				}
+				catch (Exception err)
+				{
+					Tweakeroo.LOGGER.error("FcCommand#cycle(): Exception; {}", err.getLocalizedMessage());
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+					exception = true;
+				}
+			}
+
+			if (preset != null)
+			{
+				if (CameraUtils.recallPreset(preset, mc))
+				{
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.id()), preset.name()));
+				}
+				else
+				{
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+				}
+			}
+			else if (!exception)
+			{
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_cycle_not_found"));
+			}
+		}
+
+		return true;
 	}
 
 	private boolean executeHelp(List<String> args, MinecraftClient mc)
 	{
-		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText("tweakeroo.message.free_cam.preset_help"));
+		final String prefix = PREFIX+"_help";
+
+		if (!args.isEmpty())
+		{
+			Sub sub = Sub.fromString(args.getFirst());
+
+			if (sub != null)
+			{
+				String key = sub.getName();
+				String name = sub.getDisplayName();
+
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"."+key, name));
+
+				if (!sub.getAlias().isEmpty())
+				{
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"_alias", sub.getAlias().toString()));
+				}
+			}
+			else
+			{
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
+			}
+		}
+		else
+		{
+			mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix));
+
+			for (Sub entry : Sub.values())
+			{
+				String key = entry.getName();
+				String name = entry.getDisplayName();
+
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"."+key, name));
+
+				if (!entry.getAlias().isEmpty())
+				{
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"_alias", entry.getAlias().toString()));
+				}
+			}
+		}
+
 		return true;
 	}
 
@@ -215,17 +369,19 @@ public class FcCommand implements IClientCommandListener
 		DEL     ("del",     true,  List.of("d", "delete")),
 		LIST    ("list",    false, List.of("l", "lst")),
 		RENAME  ("rename",  true,  List.of("n", "ren")),
-		RECALL  ("recall",  true,  List.of("r", "rec")),
+		RECALL  ("recall",  true,  List.of("r", "rec", "goto", "go")),
 		CYCLE   ("cycle",   false, List.of("c", "cyc")),
 		HELP    ("help",    false, List.of("h", "hlp"));
 
 		private final String name;
+		private final String translationKey;
 		private final boolean needsArgs;
 		private final List<String> alias;
 
 		Sub(String name, boolean needsArgs, List<String> alias)
 		{
 			this.name = name;
+			this.translationKey = Reference.MOD_ID+".label.free_cam.preset_sub."+name;
 			this.needsArgs = needsArgs;
 			this.alias = alias;
 		}
@@ -233,6 +389,11 @@ public class FcCommand implements IClientCommandListener
 		public String getName()
 		{
 			return this.name;
+		}
+
+		public String getDisplayName()
+		{
+			return StringUtils.getTranslatedOrFallback(this.translationKey, this.name);
 		}
 
 		public boolean needsArgs()
@@ -250,6 +411,11 @@ public class FcCommand implements IClientCommandListener
 			for (Sub entry : values())
 			{
 				if (entry.getName().equalsIgnoreCase(s))
+				{
+					return entry;
+				}
+
+				if (entry.getDisplayName().equalsIgnoreCase(s))
 				{
 					return entry;
 				}

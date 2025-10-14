@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.mojang.serialization.JsonOps;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -146,6 +147,24 @@ public class CameraPresetCache
 	}
 
 	/**
+	 * Gets any Presets located at the Camera position.
+	 * @param camera ()
+	 * @return ()
+	 */
+	public @Nullable CameraPreset getAtPosition(@Nonnull Entity camera)
+	{
+		for (CameraPreset entry : this.presets.values())
+		{
+			if (entry.equals(camera))
+			{
+				return entry;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Remove a preset by ID.  Return if one was removed.
 	 *
 	 * @param id ()
@@ -178,6 +197,28 @@ public class CameraPresetCache
 		}
 
 		return false;
+	}
+
+	/**
+	 * Update a preset by removing one by ID, and replacing it.
+	 * @param preset ()
+	 * @return (True|False)
+	 */
+	public boolean update(@Nonnull CameraPreset preset)
+	{
+		return this.update(preset, true);
+	}
+
+	/**
+	 * Update a preset by removing one by ID, and replacing it.
+	 * @param preset ()
+	 * @param message (True|False)
+	 * @return (True|False)
+	 */
+	public boolean update(@Nonnull CameraPreset preset, boolean message)
+	{
+		this.remove(preset.id(), message);
+		return this.add(preset, message);
 	}
 
 	/**
@@ -267,7 +308,20 @@ public class CameraPresetCache
 	 *
 	 * @return (id)
 	 */
-	public int getLastPreset() {return this.lastPreset;}
+	public int getLastPreset()
+	{
+		return this.lastPreset;
+	}
+
+	/**
+	 * Set the lastPreset Value manually.
+	 *
+	 * @param id ()
+	 */
+	public void setLastPreset(final int id)
+	{
+		this.lastPreset = id;
+	}
 
 	/**
 	 * Cycle the Camera Presets; starting with the first entry in the same Dimension; and then any subsequent entries
@@ -286,6 +340,23 @@ public class CameraPresetCache
 			{
 				if (getNext)
 				{
+					if (entry.id() == this.lastPreset)
+					{
+						// Stop recursion to the same preset.
+						CameraPreset first = this.getFirst(worldKey);
+
+						if (first != null)
+						{
+							if (first.equals(entry))
+							{
+								return null;
+							}
+
+							this.lastPreset = first.id();
+							return first;
+						}
+					}
+
 					this.lastPreset = entry.id();
 					return entry;
 				}
@@ -298,7 +369,19 @@ public class CameraPresetCache
 
 		if (this.lastPreset != -1)
 		{
-			return this.getLast(worldKey);
+			CameraPreset last = this.getLast(worldKey);
+
+			if (last != null)
+			{
+				if (last.id() == this.lastPreset)
+				{
+					this.lastPreset = -1;
+					return this.getFirst(worldKey);
+				}
+
+				this.lastPreset = last.id();
+				return last;
+			}
 		}
 
 		return null;

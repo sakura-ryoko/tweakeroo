@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -26,6 +27,10 @@ public record CameraPreset(int id, String name, Identifier dim, Vec3d pos, float
 	);
 	public static final CameraPreset EMPTY = new CameraPreset(-1, "EMPTY", World.OVERWORLD.getValue(), Vec3d.ZERO, 0.0f, 0.0f);
 
+	/**
+	 * Format this as a String.
+	 * @return ()
+	 */
 	@Override
 	public @NotNull String toString()
 	{
@@ -39,18 +44,40 @@ public record CameraPreset(int id, String name, Identifier dim, Vec3d pos, float
 				"]";
 	}
 
-	// The "equals" doesn't need to check the id or name; only that the positions are equal.
-	public boolean equals(CameraPreset other)
+	/**
+	 * Standard 'equals' that ignores a presets' name and id
+	 *
+	 * @param o (Preset|Camera Entity)
+	 * @return (True|False)
+	 */
+	@Override
+	public boolean equals(Object o)
 	{
-		return  this.dim.equals(other.dim) &&
-				this.pos.equals(other.pos) &&
-				this.yaw == other.yaw &&
-				this.pitch == other.pitch;
+		if (o instanceof CameraPreset other)
+		{
+			return  this.dim.equals(other.dim) &&
+					this.pos.equals(other.pos) &&
+					this.yaw == other.yaw &&
+					this.pitch == other.pitch;
+		}
+		else if (o instanceof Entity camera)
+		{
+			return  this.dim.equals(camera.getEntityWorld().getRegistryKey().getValue()) &&
+					(this.pos.equals(camera.getEyePos()) || this.pos.equals(camera.getEntityPos())) &&
+					this.yaw == camera.getYaw() &&
+					this.pitch == camera.getPitch();
+		}
+
+		return false;
 	}
 
+	/**
+	 * Format this in a less complex format.
+	 * @return ()
+	 */
 	public String toShortString()
 	{
-		return "["+this.id+", "+this.name+"]"+
+		return "[#"+String.format("%02d", this.id)+", "+this.name+"]"+
 				" "+this.dim.getPath()+":"+
 				" ("+BlockPos.ofFloored(this.pos.x, this.pos.y, this.pos.z).toShortString()+")";
 	}
