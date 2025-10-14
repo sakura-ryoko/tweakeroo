@@ -55,6 +55,7 @@ public record CameraPreset(int id, String name, Identifier dim, Vec3d pos, float
 	{
 		if (o instanceof CameraPreset other)
 		{
+			// Should match the exact position.
 			return  this.dim.equals(other.dim) &&
 					this.pos.equals(other.pos) &&
 					this.yaw == other.yaw &&
@@ -62,10 +63,12 @@ public record CameraPreset(int id, String name, Identifier dim, Vec3d pos, float
 		}
 		else if (o instanceof Entity camera)
 		{
-			return  this.dim.equals(camera.getEntityWorld().getRegistryKey().getValue()) &&
-					(this.pos.equals(camera.getEyePos()) || this.pos.equals(camera.getEntityPos())) &&
-					this.yaw == camera.getYaw() &&
-					this.pitch == camera.getPitch();
+			// Should match a relative position.  Need to dial this in.
+			return   this.dim.equals(camera.getEntityWorld().getRegistryKey().getValue()) &&
+					(this.pos.isWithinRangeOf(camera.getEyePos(), 0.75d, 0.75d) ||        // 3/4-block offset ?
+					 this.pos.isWithinRangeOf(camera.getEntityPos(), 0.75d, 0.75d)) &&
+					 Math.abs(this.yaw - camera.getYaw()) < 35.0f &&        // 35 deg offset ?
+					 Math.abs(this.pitch - camera.getPitch()) < 35.0f;
 		}
 
 		return false;
