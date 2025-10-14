@@ -389,6 +389,17 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         }
     }
 
+	/**
+	 * Toggle ON without triggering a callback (Free Cam Preset Recall)
+	 */
+	public void setEnabledNoCallback()
+	{
+		if (!this.valueBoolean)
+		{
+			this.valueBoolean = true;
+		}
+	}
+
     @Override
     public boolean isModified()
     {

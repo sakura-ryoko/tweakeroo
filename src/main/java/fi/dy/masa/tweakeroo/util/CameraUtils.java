@@ -1,14 +1,22 @@
 package fi.dy.masa.tweakeroo.util;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
+
 import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.data.CameraPresetCache;
 
 public class CameraUtils
 {
@@ -173,4 +181,109 @@ public class CameraUtils
     {
         return world.getChunkManager().getChunk(chunkX, chunkZ, ChunkStatus.FULL, false) != null;
     }
+
+	public static String fixPresetName(String in)
+	{
+		return in.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "");
+	}
+
+	public static boolean addPreset(@Nonnull CameraPreset preset)
+	{
+		if (!CameraPresetCache.getInstance().hasPosition(preset))
+		{
+			CameraPresetCache.getInstance().add(preset);
+			Tweakeroo.debugLog("CameraUtils#addPreset(): Added new preset: {}", preset.toShortString());
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean updatePreset(@Nonnull CameraPreset preset)
+	{
+		CameraPresetCache.getInstance().update(preset, false);
+		Tweakeroo.debugLog("CameraUtils#updatePreset(): Updated preset: {}", preset.toShortString());
+		return true;
+	}
+
+	public static boolean deletePreset(@Nullable CameraPreset oldPreset)
+	{
+		if (oldPreset != null)
+		{
+			CameraPresetCache.getInstance().remove(oldPreset.id(), false);
+			Tweakeroo.debugLog("CameraUtils#deletePreset(): Deleted preset: {}", oldPreset.toShortString());
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean deletePresetAtPosition(MinecraftClient mc)
+	{
+		if (mc.getCameraEntity() != null)
+		{
+			CameraPreset preset = CameraPresetCache.getInstance().getAtPosition(mc.getCameraEntity());
+
+			if (preset != null)
+			{
+				CameraPresetCache.getInstance().remove(preset.id(), false);
+				Tweakeroo.debugLog("CameraUtils#deletePresetAtPosition(): Deleted preset: {}", preset.toShortString());
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean renamePreset(@Nullable CameraPreset oldPreset, final String newName)
+	{
+		if (oldPreset != null)
+		{
+			CameraPreset newPreset = new CameraPreset(oldPreset.id(), CameraUtils.fixPresetName(newName), oldPreset.dim(), oldPreset.pos(), oldPreset.yaw(), oldPreset.pitch());
+			CameraPresetCache.getInstance().update(newPreset, false);
+			Tweakeroo.debugLog("CameraUtils#renamePreset(): Renamed preset: [{}] / '{}' -> '{}'", oldPreset.id(), oldPreset.name(), newPreset.name());
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean recallPreset(@Nonnull CameraPreset preset, MinecraftClient mc)
+	{
+		if (!preset.equals(mc.getCameraEntity()))
+		{
+			CameraPresetCache.getInstance().setLastPreset(preset.id());
+
+			if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+			{
+				CameraEntity.updatePositionAtPreset(preset);
+			}
+			else
+			{
+				FeatureToggle.TWEAK_FREE_CAMERA.setEnabledNoCallback();
+				CameraEntity.setCameraState(true, preset);
+			}
+
+			Tweakeroo.debugLog("CameraUtils#recallPreset(): Recall preset: {}", preset.toShortString());
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean cyclePreset(MinecraftClient mc)
+	{
+		if (mc.world != null)
+		{
+			RegistryKey<World> dimKey = mc.world.getRegistryKey();
+			CameraPreset preset = CameraPresetCache.getInstance().cycle(dimKey);
+
+			if (preset != null)
+			{
+				return recallPreset(preset, mc);
+			}
+		}
+
+		return false;
+	}
 }
