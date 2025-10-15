@@ -1,14 +1,12 @@
 package fi.dy.masa.tweakeroo.data;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.ApiStatus;
 
 import com.mojang.serialization.JsonOps;
@@ -17,6 +15,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
 
@@ -242,17 +241,12 @@ public class CameraPresetCache
 	 */
 	public List<CameraPreset> toList()
 	{
-		List<CameraPreset> list = new ArrayList<>(this.presets.size());
+		List<CameraPreset> list = new ArrayList<>(this.presets.values());
 
-		for (int i = 0; i < this.presets.size(); i++)
+		if (!list.isEmpty())
 		{
-			if (this.hasId(i))
-			{
-				list.set(i, this.presets.get(i));
-			}
+			list.sort(Comparator.comparingInt(CameraPreset::id));
 		}
-
-		list.sort(Comparator.comparingInt(CameraPreset::id));
 
 		return list;
 	}
@@ -495,6 +489,8 @@ public class CameraPresetCache
 	 */
 	public @Nullable JsonElement toJson()
 	{
+		JsonObject obj = new JsonObject();
+
 		List<CameraPreset> sorted = this.toList();
 
 		if (sorted.isEmpty())
@@ -509,7 +505,12 @@ public class CameraPresetCache
 			CameraPreset.CODEC.encodeStart(JsonOps.INSTANCE, entry).resultOrPartial().ifPresent(arr::add);
 		}
 
-		return arr;
+		if (arr.size() > 0)
+		{
+			obj.add("list", arr);
+		}
+
+		return obj;
 	}
 
 	/**
@@ -521,20 +522,30 @@ public class CameraPresetCache
 	{
 		try
 		{
-			if (ele.isJsonArray())
+			if (ele.isJsonObject())
 			{
-				JsonArray arr = ele.getAsJsonArray();
+				JsonObject obj = ele.getAsJsonObject();
 
-				this.presets.clear();
-
-				for (int i = 0; i < arr.size(); i++)
+				if (JsonUtils.hasArray(obj, "list"))
 				{
-					this.add(CameraPreset.CODEC.decode(JsonOps.INSTANCE, arr.get(i)).getOrThrow().getFirst(), false);
+					JsonArray arr = obj.get("list").getAsJsonArray();
+
+					this.presets.clear();
+
+					for (int i = 0; i < arr.size(); i++)
+					{
+						CameraPreset entry = CameraPreset.CODEC.parse(JsonOps.INSTANCE, arr.get(i)).getOrThrow();
+
+						if (entry != null)
+						{
+							this.add(entry, false);
+						}
+					}
 				}
+				// Empty / Invalid
 			}
-			// Empty / Invalid
 		}
-		catch (Exception err)
+		catch(Exception err)
 		{
 			Tweakeroo.LOGGER.error("CameraPresetCache#fromJson(): Exception deserializing Camera Presets; {}", err.getLocalizedMessage());
 		}
