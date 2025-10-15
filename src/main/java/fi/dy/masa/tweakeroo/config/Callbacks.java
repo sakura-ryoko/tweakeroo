@@ -396,7 +396,7 @@ public class Callbacks
 			{
 				final int id = CameraPresetCache.getInstance().getNextId(-1);
 				String name = "Preset "+id;
-				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
+				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
 
 				if (CameraUtils.addPreset(newPreset))
 				{
