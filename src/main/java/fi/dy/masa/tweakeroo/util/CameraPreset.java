@@ -22,7 +22,7 @@ public record CameraPreset(int id, String name, Identifier dim, Vec3d pos, float
 					Identifier.CODEC.fieldOf("dim").forGetter(CameraPreset::dim),
 					Vec3d.CODEC.fieldOf("pos").forGetter(CameraPreset::pos),
 					PrimitiveCodec.FLOAT.fieldOf("yaw").forGetter(CameraPreset::yaw),
-					PrimitiveCodec.FLOAT.fieldOf("pitch").forGetter(CameraPreset::yaw)
+					PrimitiveCodec.FLOAT.fieldOf("pitch").forGetter(CameraPreset::pitch)
 			).apply(inst, CameraPreset::new)
 	);
 	public static final CameraPreset EMPTY = new CameraPreset(-1, "EMPTY", World.OVERWORLD.getValue(), Vec3d.ZERO, 0.0f, 0.0f);

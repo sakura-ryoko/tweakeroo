@@ -10,20 +10,26 @@ import net.minecraft.client.gui.hud.debug.DebugHudEntryVisibility;
 import net.minecraft.client.gui.hud.debug.DebugHudProfile;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.hotkeys.*;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.render.InventoryOverlayScreen;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
+import fi.dy.masa.tweakeroo.data.CameraPresetCache;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
@@ -56,6 +62,7 @@ public class Callbacks
 
         IHotkeyCallback callbackGeneric = new KeyCallbackHotkeysGeneric(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackHotkeyWithMessage(mc);
+		IHotkeyCallback callbackFreeCamPresets = new KeyCallbackFreeCameraPresets(mc);
 
         Hotkeys.BREAKING_RESTRICTION_MODE_COLUMN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.BREAKING_RESTRICTION_MODE_DIAGONAL.getKeybind().setCallback(callbackGeneric);
@@ -84,6 +91,10 @@ public class Callbacks
                                                                          InfoUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
                                                                          return true;
                                                                      });
+		Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind().setCallback(callbackFreeCamPresets);
+	    Hotkeys.FREE_CAMERA_PRESET_CYCLE.getKeybind().setCallback(callbackFreeCamPresets);
+	    Hotkeys.FREE_CAMERA_PRESET_DELETE.getKeybind().setCallback(callbackFreeCamPresets);
+	    Hotkeys.FREE_CAMERA_PRESET_DELETE_ALL.getKeybind().setCallback(callbackFreeCamPresets);
         Hotkeys.HOTBAR_SWAP_1.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_2.getKeybind().setCallback(callbackGeneric);
         Hotkeys.HOTBAR_SWAP_3.getKeybind().setCallback(callbackGeneric);
@@ -359,6 +370,95 @@ public class Callbacks
             return true;
         }
     }
+
+	private static class KeyCallbackFreeCameraPresets implements IHotkeyCallback
+	{
+		private final String PREFIX = Reference.MOD_ID+".message.free_cam.preset";
+		private final MinecraftClient mc;
+
+		public KeyCallbackFreeCameraPresets(MinecraftClient mc)
+		{
+			this.mc = mc;
+		}
+
+		@Override
+		public boolean onKeyAction(KeyAction action, IKeybind key)
+		{
+			if (this.mc.player == null || this.mc.world == null || this.mc.getCameraEntity() == null)
+			{
+				return false;
+			}
+
+			RegistryKey<World> dimKey = this.mc.world.getRegistryKey();
+			Entity camera = this.mc.getCameraEntity();
+
+			if (key == Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind())
+			{
+				final int id = CameraPresetCache.getInstance().size() + 1;
+				String name = "Preset "+id;
+				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
+
+				if (CameraUtils.addPreset(newPreset))
+				{
+					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_added", newPreset.toShortString());
+				}
+				else
+				{
+					InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_already_in_use"));
+				}
+
+				return true;
+			}
+			else if (key == Hotkeys.FREE_CAMERA_PRESET_DELETE.getKeybind())
+			{
+				CameraPreset preset = CameraPresetCache.getInstance().getAtPosition(camera);
+
+				if (CameraUtils.deletePreset(preset))
+				{
+					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted", preset.toShortString());
+				}
+				else
+				{
+					InfoUtils.showInGameMessage(Message.MessageType.WARNING, PREFIX+"_not_found", String.format("%02d", 0));
+				}
+
+				return true;
+			}
+			else if (key == Hotkeys.FREE_CAMERA_PRESET_DELETE_ALL.getKeybind())
+			{
+				if (CameraUtils.deleteAllPresets(dimKey))
+				{
+					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim");
+				}
+
+				return true;
+			}
+			else if (key == Hotkeys.FREE_CAMERA_PRESET_CYCLE.getKeybind())
+			{
+				CameraPreset preset = CameraPresetCache.getInstance().cycle(dimKey);
+
+				if (preset != null)
+				{
+					if (CameraUtils.recallPreset(preset, mc))
+					{
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.id()), preset.name()));
+					}
+					else
+					{
+						InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+					}
+				}
+				else
+				{
+					InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_cycle_not_found"));
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+	}
 
     private static class KeyCallbackHotkeysGeneric implements IHotkeyCallback
     {

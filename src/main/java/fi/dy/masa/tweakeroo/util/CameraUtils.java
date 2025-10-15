@@ -235,6 +235,18 @@ public class CameraUtils
 		return false;
 	}
 
+	public static boolean deleteAllPresets(RegistryKey<World> dimKey)
+	{
+		if (dimKey != null)
+		{
+			CameraPresetCache.getInstance().clear(dimKey, false);
+			Tweakeroo.debugLog("CameraUtils#deletePresetAtPosition(): Deleted all presets for dimension '{}'", dimKey.getValue().toString());
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean renamePreset(@Nullable CameraPreset oldPreset, final String newName)
 	{
 		if (oldPreset != null)

@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.data;
 
 import javax.annotation.Nullable;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -9,7 +8,6 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.Identifier;
 
 import fi.dy.masa.malilib.interfaces.IServerListener;
-import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 
 public class DataManager implements IServerListener
@@ -98,33 +96,10 @@ public class DataManager implements IServerListener
 
 	public JsonElement toJson()
 	{
-		JsonObject obj = new JsonObject();
-
-		if (!CameraPresetCache.getInstance().isEmpty())
-		{
-			obj.add("camera_presets", CameraPresetCache.getInstance().toJson());
-		}
-
-		return obj;
+		return new JsonObject();
 	}
 
 	public void fromJson(JsonElement ele)
 	{
-		try
-		{
-			if (ele.isJsonObject())
-			{
-				JsonObject obj = ele.getAsJsonObject();
-
-				if (JsonUtils.hasArray(obj, "camera_presets"))
-				{
-					CameraPresetCache.getInstance().fromJson(obj.getAsJsonArray("camera_presets"));
-				}
-			}
-		}
-		catch (Exception err)
-		{
-			Tweakeroo.LOGGER.error("DataManager#fromJson(): Exception reading data; {}", err.getLocalizedMessage());
-		}
 	}
 }

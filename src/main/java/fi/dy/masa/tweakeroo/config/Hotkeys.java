@@ -36,6 +36,10 @@ public class Hotkeys
     public static final ConfigHotkey FLY_INCREMENT_2                    = new ConfigHotkey("flyIncrement2",                     "").apply(HOTKEY_KEY);
     public static final ConfigHotkey FREE_CAMERA_PLAYER_INPUTS          = new ConfigHotkey("freeCameraPlayerInputs",            "").apply(HOTKEY_KEY);
     public static final ConfigHotkey FREE_CAMERA_PLAYER_MOVEMENT        = new ConfigHotkey("freeCameraPlayerMovement",          "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_ADD             = new ConfigHotkey("freeCameraPresetAdd",               "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_CYCLE           = new ConfigHotkey("freeCameraPresetCycle",             "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_DELETE          = new ConfigHotkey("freeCameraPresetDelete",            "").apply(HOTKEY_KEY);
+	public static final ConfigHotkey FREE_CAMERA_PRESET_DELETE_ALL      = new ConfigHotkey("freeCameraPresetDeleteAll",         "").apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SCROLL                      = new ConfigHotkey("hotbarScroll",                      "", KeybindSettings.RELEASE_ALLOW_EXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SWAP_BASE                   = new ConfigHotkey("hotbarSwapBase",                    "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey HOTBAR_SWAP_1                      = new ConfigHotkey("hotbarSwap1",                       "").apply(HOTKEY_KEY);
@@ -85,6 +89,10 @@ public class Hotkeys
             FLY_INCREMENT_2,
             FREE_CAMERA_PLAYER_INPUTS,
             FREE_CAMERA_PLAYER_MOVEMENT,
+            FREE_CAMERA_PRESET_ADD,
+            FREE_CAMERA_PRESET_CYCLE,
+            FREE_CAMERA_PRESET_DELETE,
+            FREE_CAMERA_PRESET_DELETE_ALL,
             HOTBAR_SCROLL,
             HOTBAR_SWAP_BASE,
             HOTBAR_SWAP_1,
