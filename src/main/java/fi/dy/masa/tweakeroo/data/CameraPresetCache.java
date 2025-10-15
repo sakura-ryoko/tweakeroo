@@ -29,12 +29,12 @@ public class CameraPresetCache
 
 	public static CameraPresetCache getInstance() {return INSTANCE;}
 
-	private final HashMap<Integer, CameraPreset> presets;
+	private final List<CameraPreset> presets;
 	private int lastPreset;
 
 	private CameraPresetCache()
 	{
-		this.presets = new HashMap<>();
+		this.presets = new ArrayList<>();
 		this.lastPreset = -1;
 	}
 
@@ -49,9 +49,9 @@ public class CameraPresetCache
 		AtomicBoolean bool = new AtomicBoolean(false);
 
 		this.presets.forEach(
-				(index, entry) ->
+				(entry) ->
 				{
-					if (entry.id() == id || index == id)
+					if (entry.id() == id)
 					{
 						bool.set(true);
 					}
@@ -59,6 +59,36 @@ public class CameraPresetCache
 		);
 
 		return bool.get();
+	}
+
+	/**
+	 * Gets the next available Preset ID
+	 * @param start (Starting ID to check)
+	 * @return (The Next Free ID)
+	 */
+	public int getNextId(int start)
+	{
+		if (this.presets.isEmpty())
+		{
+			return 1;
+		}
+
+		int index = Math.max(start, 1);
+
+		for (CameraPreset entry : this.presets)
+		{
+			if (entry.id() == index)
+			{
+				index++;
+			}
+		}
+
+		if (this.hasId(index))
+		{
+			return this.getNextId(index);
+		}
+
+		return index;
 	}
 
 	/**
@@ -72,7 +102,7 @@ public class CameraPresetCache
 		AtomicBoolean bool = new AtomicBoolean(false);
 
 		this.presets.forEach(
-				(id, ent) ->
+				(ent) ->
 				{
 					if (ent.equals(other))
 					{
@@ -116,7 +146,8 @@ public class CameraPresetCache
 				return false;
 			}
 
-			this.presets.put(preset.id(), preset);
+			this.presets.add(preset);
+			this.presets.sort(Comparator.comparingInt(CameraPreset::id));
 
 			if (message)
 			{
@@ -137,9 +168,12 @@ public class CameraPresetCache
 	 */
 	public @Nullable CameraPreset get(final int id)
 	{
-		if (this.hasId(id))
+		for (CameraPreset entry : this.presets)
 		{
-			return this.presets.get(id);
+			if (entry.id() == id)
+			{
+				return entry;
+			}
 		}
 
 		return null;
@@ -152,7 +186,7 @@ public class CameraPresetCache
 	 */
 	public @Nullable CameraPreset getAtPosition(@Nonnull Entity camera)
 	{
-		for (CameraPreset entry : this.presets.values())
+		for (CameraPreset entry : this.presets)
 		{
 			if (entry.equals(camera))
 			{
@@ -183,10 +217,12 @@ public class CameraPresetCache
 	 */
 	public boolean remove(final int id, boolean message)
 	{
-		CameraPreset oldPreset = this.presets.remove(id);
+		CameraPreset oldPreset = this.get(id);
 
 		if (oldPreset != null)
 		{
+			this.presets.remove(oldPreset);
+
 			if (message)
 			{
 				Tweakeroo.LOGGER.info("CameraPresetCache: Removed preset [{}/{}]", oldPreset.id(), oldPreset.name());
@@ -241,7 +277,7 @@ public class CameraPresetCache
 	 */
 	public List<CameraPreset> toList()
 	{
-		List<CameraPreset> list = new ArrayList<>(this.presets.values());
+		List<CameraPreset> list = new ArrayList<>(this.presets);
 
 		if (!list.isEmpty())
 		{
@@ -284,7 +320,7 @@ public class CameraPresetCache
 		Identifier dim = worldKey.getValue();
 		List<CameraPreset> list = new ArrayList<>();
 
-		for (CameraPreset entry : this.presets.values())
+		for (CameraPreset entry : this.presets)
 		{
 			if (entry != null && entry.dim().equals(dim))
 			{
@@ -328,7 +364,7 @@ public class CameraPresetCache
 		Identifier dim = worldKey.getValue();
 		boolean getNext = this.lastPreset == -1;
 
-		for (CameraPreset entry : this.presets.values())
+		for (CameraPreset entry : this.presets)
 		{
 			if (entry != null && entry.dim().equals(dim))
 			{
@@ -391,7 +427,7 @@ public class CameraPresetCache
 	{
 		Identifier dim = worldKey.getValue();
 
-		for (CameraPreset entry : this.presets.values())
+		for (CameraPreset entry : this.presets)
 		{
 			if (entry != null && entry.dim().equals(dim))
 			{
@@ -414,7 +450,7 @@ public class CameraPresetCache
 		Identifier dim = worldKey.getValue();
 		CameraPreset last = null;
 
-		for (CameraPreset entry : this.presets.values())
+		for (CameraPreset entry : this.presets)
 		{
 			if (entry != null && entry.dim().equals(dim))
 			{
@@ -449,12 +485,18 @@ public class CameraPresetCache
 	public void clear(@Nonnull RegistryKey<World> worldKey, boolean message)
 	{
 		Identifier dim = worldKey.getValue();
+		List<CameraPreset> list = new ArrayList<>(this.presets);
 
-		for (CameraPreset entry : this.presets.values())
+		for (CameraPreset entry : list)
 		{
 			if (entry != null && entry.dim().equals(dim))
 			{
-				this.remove(entry.id(), message);
+				this.presets.remove(entry);
+
+				if (message)
+				{
+					Tweakeroo.LOGGER.info("CameraPresetCache: Clear preset [{}/{}]", entry.id(), entry.name());
+				}
 			}
 		}
 	}

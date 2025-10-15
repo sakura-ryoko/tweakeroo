@@ -52,6 +52,7 @@ public class FcCommand implements IClientCommandListener
 				case "add" -> this.executeAdd(list, mc);
 				case "set" -> this.executeSet(list, mc);
 				case "del" -> this.executeDel(list, mc);
+				case "del_all" -> this.executeDelAll(list, mc);
 				case "list" -> this.executeList(list, mc);
 				case "rename" -> this.executeRename(list, mc);
 				case "recall" -> this.executeRecall(list, mc);
@@ -71,7 +72,7 @@ public class FcCommand implements IClientCommandListener
 		{
 			RegistryKey<World> dimKey = mc.world.getRegistryKey();
 			Entity camera = mc.getCameraEntity();
-			final int id = CameraPresetCache.getInstance().size() + 1;
+			final int id = CameraPresetCache.getInstance().getNextId(-1);
 			String name = !args.isEmpty() ? CameraUtils.fixPresetName(args.toString()) : "Preset "+id;
 			CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
 
@@ -133,26 +134,56 @@ public class FcCommand implements IClientCommandListener
 
 		try
 		{
-			id = Integer.parseInt(args.getFirst());
-
-			if (CameraPresetCache.getInstance().hasId(id))
+			if (!args.isEmpty())
 			{
-				CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
+				id = Integer.parseInt(args.getFirst());
 
-				if (CameraUtils.deletePreset(oldPreset))
+				if (CameraPresetCache.getInstance().hasId(id))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted", oldPreset.toShortString());
+					CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
+
+					if (CameraUtils.deletePreset(oldPreset))
+					{
+						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX + "_deleted", oldPreset.toShortString());
+					}
+				}
+				else
+				{
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_not_found", String.format("%02d", id)));
 				}
 			}
 			else
 			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
+				if (mc.world != null && mc.getCameraEntity() != null)
+				{
+					CameraPreset oldPreset = CameraPresetCache.getInstance().getAtPosition(mc.getCameraEntity());
+
+					if (CameraUtils.deletePresetAtPosition(mc) && oldPreset != null)
+					{
+						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX + "_deleted", oldPreset.toShortString());
+					}
+				}
 			}
 		}
 		catch (Exception err)
 		{
 			Tweakeroo.LOGGER.error("FcCommand#del(): Exception; {}", err.getLocalizedMessage());
 			mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+		}
+
+		return true;
+	}
+
+	private boolean executeDelAll(List<String> args, MinecraftClient mc)
+	{
+		if (mc.world != null)
+		{
+			RegistryKey<World> dimKey = mc.world.getRegistryKey();
+
+			if (CameraUtils.deleteAllPresets(dimKey))
+			{
+				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim", dimKey.getValue().toString());
+			}
 		}
 
 		return true;
@@ -200,17 +231,17 @@ public class FcCommand implements IClientCommandListener
 
 					if (CameraUtils.renamePreset(oldPreset, newName))
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.INFO, PREFIX+"_renamed", String.format("%02d", id), oldPreset.name(), newName);
+						InfoUtils.showInGameMessage(Message.MessageType.INFO, PREFIX + "_renamed", String.format("%02d", id), oldPreset.name(), newName);
 					}
 				}
 				else
 				{
-					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_enough_args_given"));
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
 				}
 			}
 			else
 			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_not_found", String.format("%02d", id)));
 			}
 		}
 		catch (Exception err)
@@ -364,9 +395,10 @@ public class FcCommand implements IClientCommandListener
 
 	public enum Sub
 	{
-		ADD     ("add",     false, List.of("a")),
+		ADD     ("add",     false, List.of("a", "new")),
 		SET     ("set",     true,  List.of("s", "update", "upd")),
 		DEL     ("del",     true,  List.of("d", "delete")),
+		DEL_ALL ("del_all", false, List.of("da", "del-all")),
 		LIST    ("list",    false, List.of("l", "lst")),
 		RENAME  ("rename",  true,  List.of("n", "ren")),
 		RECALL  ("recall",  true,  List.of("r", "rec", "goto", "go")),
