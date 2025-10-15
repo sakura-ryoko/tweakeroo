@@ -394,7 +394,7 @@ public class Callbacks
 
 			if (key == Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind())
 			{
-				final int id = CameraPresetCache.getInstance().size() + 1;
+				final int id = CameraPresetCache.getInstance().getNextId(-1);
 				String name = "Preset "+id;
 				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
 
@@ -428,7 +428,7 @@ public class Callbacks
 			{
 				if (CameraUtils.deleteAllPresets(dimKey))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim");
+					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim", dimKey.getValue().toString());
 				}
 
 				return true;

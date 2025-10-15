@@ -113,6 +113,8 @@ public class WorldLoadListener implements IWorldLoadListener
 		JsonObject root = new JsonObject();
 		boolean shouldSave = false;
 
+		FileUtils.delete(file);
+
 		if (!CameraPresetCache.getInstance().isEmpty())
 		{
 			root.add("camera_presets", CameraPresetCache.getInstance().toJson());
