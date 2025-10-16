@@ -78,7 +78,7 @@ public class FcCommand implements IClientCommandListener
 
 			if (CameraUtils.addPreset(newPreset))
 			{
-				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_added", newPreset.toShortString());
+				InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_added", newPreset.toShortString()));
 			}
 			else
 			{
@@ -110,7 +110,7 @@ public class FcCommand implements IClientCommandListener
 						CameraPreset newPreset = new CameraPreset(id, oldPreset.name(), dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
 
 						CameraUtils.updatePreset(newPreset);
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_updated", newPreset.toShortString());
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_updated", newPreset.toShortString()));
 					}
 				}
 				else
@@ -144,7 +144,7 @@ public class FcCommand implements IClientCommandListener
 
 					if (CameraUtils.deletePreset(oldPreset))
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX + "_deleted", oldPreset.toShortString());
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_deleted", oldPreset.toShortString()));
 					}
 				}
 				else
@@ -160,7 +160,7 @@ public class FcCommand implements IClientCommandListener
 
 					if (CameraUtils.deletePresetAtPosition(mc) && oldPreset != null)
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX + "_deleted", oldPreset.toShortString());
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_deleted", oldPreset.toShortString()));
 					}
 				}
 			}
@@ -182,7 +182,7 @@ public class FcCommand implements IClientCommandListener
 
 			if (CameraUtils.deleteAllPresets(dimKey))
 			{
-				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim", dimKey.getValue().toString());
+				InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.getValue().toString()));
 			}
 		}
 
@@ -231,7 +231,7 @@ public class FcCommand implements IClientCommandListener
 
 					if (CameraUtils.renamePreset(oldPreset, newName))
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.INFO, PREFIX + "_renamed", String.format("%02d", id), oldPreset.name(), newName);
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_renamed", String.format("%02d", id), oldPreset.name(), newName));
 					}
 				}
 				else

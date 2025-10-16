@@ -365,11 +365,11 @@ public class Callbacks
 
 				if (CameraUtils.addPreset(newPreset))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_added", newPreset.toShortString());
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_added", newPreset.toShortString()));
 				}
 				else
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_already_in_use"));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_already_in_use"));
 				}
 
 				return true;
@@ -380,11 +380,11 @@ public class Callbacks
 
 				if (CameraUtils.deletePreset(preset))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted", preset.toShortString());
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted", preset.toShortString()));
 				}
 				else
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.WARNING, PREFIX+"_not_found", String.format("%02d", 0));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_not_found", String.format("%02d", 0)));
 				}
 
 				return true;
@@ -393,7 +393,7 @@ public class Callbacks
 			{
 				if (CameraUtils.deleteAllPresets(dimKey))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim", dimKey.getValue().toString());
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.getValue().toString()));
 				}
 
 				return true;
@@ -410,12 +410,12 @@ public class Callbacks
 					}
 					else
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
 					}
 				}
 				else
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_cycle_not_found"));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_cycle_not_found"));
 				}
 
 				return true;
