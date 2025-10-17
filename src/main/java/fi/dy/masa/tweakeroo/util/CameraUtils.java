@@ -263,22 +263,25 @@ public class CameraUtils
 
 	public static boolean recallPreset(@Nonnull CameraPreset preset, MinecraftClient mc)
 	{
-		if (!preset.equals(mc.getCameraEntity()))
+		if (!preset.equals(mc.getCameraEntity()) && mc.world != null)
 		{
-			CameraPresetManager.getInstance().setLastPreset(preset.getId());
-
-			if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+			if (mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 			{
-				CameraEntity.updatePositionAtPreset(preset);
-			}
-			else
-			{
-				FeatureToggle.TWEAK_FREE_CAMERA.setEnabledNoCallback();
-				CameraEntity.setCameraState(true, preset);
-			}
+				CameraPresetManager.getInstance().setLastPreset(preset.getId());
 
-			Tweakeroo.debugLog("CameraUtils#recallPreset(): Recall preset: {}", preset.toShortString());
-			return true;
+				if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+				{
+					CameraEntity.updatePositionAtPreset(preset);
+				}
+				else
+				{
+					FeatureToggle.TWEAK_FREE_CAMERA.setEnabledNoCallback();
+					CameraEntity.setCameraState(true, preset);
+				}
+
+				Tweakeroo.debugLog("CameraUtils#recallPreset(): Recall preset: {}", preset.toShortString());
+				return true;
+			}
 		}
 
 		return false;

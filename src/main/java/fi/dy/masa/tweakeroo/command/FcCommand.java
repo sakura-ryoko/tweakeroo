@@ -264,15 +264,22 @@ public class FcCommand implements IClientCommandListener
 			{
 				CameraPreset preset = CameraPresetManager.getInstance().get(id);
 
-				if (preset != null)
+				if (preset != null && mc.world != null)
 				{
-					if (CameraUtils.recallPreset(preset, mc))
+					if (mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 					{
-						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						if (CameraUtils.recallPreset(preset, mc))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						}
+						else
+						{
+							mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
+						}
 					}
 					else
 					{
-						mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.getId())));
+						mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
 					}
 				}
 			}
