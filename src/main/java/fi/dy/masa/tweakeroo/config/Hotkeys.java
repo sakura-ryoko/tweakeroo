@@ -48,6 +48,7 @@ public class Hotkeys
     public static final ConfigHotkey INVENTORY_PREVIEW                  = new ConfigHotkey("inventoryPreview",                  "LEFT_ALT", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey INVENTORY_PREVIEW_TOGGLE_SCREEN    = new ConfigHotkey("inventoryPreviewToggleScreen",      "", KeybindSettings.create(KeybindSettings.Context.ANY, KeyAction.PRESS, true, true, false, true)).apply(HOTKEY_KEY);
     public static final ConfigHotkey OPEN_CONFIG_GUI                    = new ConfigHotkey("openConfigGui",                     "X,C").apply(HOTKEY_KEY);
+	public static final ConfigHotkey OPEN_CAMERA_PRESET_EDITOR_GUI      = new ConfigHotkey("openCameraPresetEditorGui",         "X,P").apply(HOTKEY_KEY);
     public static final ConfigHotkey PLACEMENT_Y_MIRROR                 = new ConfigHotkey("placementYMirror",                  "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey PLAYER_INVENTORY_PEEK              = new ConfigHotkey("playerInventoryPeek",               "", KeybindSettings.PRESS_ALLOWEXTRA).apply(HOTKEY_KEY);
     public static final ConfigHotkey PLACEMENT_RESTRICTION_MODE_COLUMN  = new ConfigHotkey("placementRestrictionModeColumn",    "Z,3").apply(HOTKEY_KEY);
@@ -101,6 +102,7 @@ public class Hotkeys
             INVENTORY_PREVIEW,
             INVENTORY_PREVIEW_TOGGLE_SCREEN,
             OPEN_CONFIG_GUI,
+            OPEN_CAMERA_PRESET_EDITOR_GUI,
             PLACEMENT_Y_MIRROR,
             PLAYER_INVENTORY_PEEK,
             PLACEMENT_RESTRICTION_MODE_COLUMN,

@@ -199,12 +199,12 @@ public class CameraEntity extends ClientPlayerEntity
 
 	public static void updatePositionAtPreset(@Nonnull CameraPreset preset)
 	{
-		if (camera != null && isValidDim(camera.getEntityWorld(), preset.dim()))
+		if (camera != null && isValidDim(camera.getEntityWorld(), preset.getDim()))
 		{
 //			Tweakeroo.LOGGER.error("CameraEntity#updatePositionAtPreset(): oldPos [{}], newPos [{}] // yaw [{}], pitch [{}]", camera.getEyePos().toString(), preset.pos().toString(), preset.yaw(), preset.pitch());
-			camera.setPos(preset.pos().getX(), preset.pos().getY(), preset.pos().getZ());
-			camera.setYaw(preset.yaw());
-			camera.setPitch(preset.pitch());
+			camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());
+			camera.setYaw(preset.getYaw());
+			camera.setPitch(preset.getPitch());
 			camera.setVelocity(Vec3d.ZERO);
 		}
 	}
@@ -230,9 +230,9 @@ public class CameraEntity extends ClientPlayerEntity
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
 
-		camera.setPos(preset.pos().getX(), preset.pos().getY(), preset.pos().getZ());
-		camera.setYaw(preset.yaw());
-		camera.setPitch(preset.pitch());
+		camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());
+		camera.setYaw(preset.getYaw());
+		camera.setPitch(preset.getPitch());
 		camera.setVelocity(Vec3d.ZERO);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
@@ -256,15 +256,15 @@ public class CameraEntity extends ClientPlayerEntity
 	        RegistryKey<World> dim = mc.world.getRegistryKey();
 
             if (enabled && preset != null &&
-	            preset.id() > -1)
+	            preset.getId() > -1)
             {
-				if (preset.dim().equals(dim.getValue()))
+				if (preset.getDim().equals(dim.getValue()))
 				{
 					createAndSetCameraAtPreset(mc, preset);
 				}
 				else
 				{
-					Tweakeroo.LOGGER.error("freeCam: Recalled preset is in a different Dimension: [{}]", preset.dim().toString());
+					Tweakeroo.LOGGER.error("freeCam: Recalled preset is in a different Dimension: [{}]", preset.getDim().toString());
 				}
             }
 	        else if (enabled)
@@ -294,7 +294,7 @@ public class CameraEntity extends ClientPlayerEntity
 	@ApiStatus.Experimental
 	private static void createAndSetCameraAtPreset(MinecraftClient mc, CameraPreset preset)
 	{
-		if (isValidDim(mc.world, preset.dim()))
+		if (isValidDim(mc.world, preset.getDim()))
 		{
 			camera = createCameraAtPreset(mc, preset);
 			setCamera(mc);
