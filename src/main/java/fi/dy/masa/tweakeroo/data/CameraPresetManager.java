@@ -1,13 +1,14 @@
 package fi.dy.masa.tweakeroo.data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.jetbrains.annotations.ApiStatus;
 
 import com.mojang.serialization.JsonOps;
 import net.minecraft.entity.Entity;
@@ -20,26 +21,40 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
 
 /**
- * A Camera Presets Data Provider
+ * A Camera Presets Data Manager
  */
-@ApiStatus.Experimental
-public class CameraPresetCache
+public class CameraPresetManager
 {
-	private static final CameraPresetCache INSTANCE = new CameraPresetCache();
+	private static final CameraPresetManager INSTANCE = new CameraPresetManager();
 
-	public static CameraPresetCache getInstance() {return INSTANCE;}
+	public static CameraPresetManager getInstance()
+	{
+		return INSTANCE;
+	}
 
 	private final List<CameraPreset> presets;
+	private CameraPreset selectedPreset;
 	private int lastPreset;
 
-	private CameraPresetCache()
+	private CameraPresetManager()
 	{
 		this.presets = new ArrayList<>();
 		this.lastPreset = -1;
+		this.selectedPreset = null;
+	}
+
+	public @Nullable CameraPreset getSelectedPreset()
+	{
+		return this.selectedPreset;
+	}
+
+	public void setSelectedPreset(@Nullable CameraPreset preset)
+	{
+		this.selectedPreset = preset;
 	}
 
 	/**
-	 * Return whether a Preset with id() exists
+	 * Return whether a Preset with getId() exists
 	 *
 	 * @param id ()
 	 * @return (True|False)
@@ -51,7 +66,7 @@ public class CameraPresetCache
 		this.presets.forEach(
 				(entry) ->
 				{
-					if (entry.id() == id)
+					if (entry.getId() == id)
 					{
 						bool.set(true);
 					}
@@ -77,7 +92,7 @@ public class CameraPresetCache
 
 		for (CameraPreset entry : this.presets)
 		{
-			if (entry.id() == index)
+			if (entry.getId() == index)
 			{
 				index++;
 			}
@@ -134,24 +149,24 @@ public class CameraPresetCache
 	 */
 	public boolean add(CameraPreset preset, boolean message)
 	{
-		if (!this.hasId(preset.id()))
+		if (!this.hasId(preset.getId()))
 		{
 			if (this.hasPosition(preset))
 			{
 				if (message)
 				{
-					Tweakeroo.LOGGER.error("CameraPresetCache: Error adding new preset [{}]; A matching position already exists.", preset.id());
+					Tweakeroo.LOGGER.error("CameraPresetCache: Error adding new preset [{}]; A matching position already exists.", preset.getId());
 				}
 
 				return false;
 			}
 
 			this.presets.add(preset);
-			this.presets.sort(Comparator.comparingInt(CameraPreset::id));
+			this.presets.sort(Comparator.comparingInt(CameraPreset::getId));
 
 			if (message)
 			{
-				Tweakeroo.LOGGER.info("CameraPresetCache: Added new preset [{}/{}]", preset.id(), preset.name());
+				Tweakeroo.LOGGER.info("CameraPresetCache: Added new preset [{}/{}]", preset.getId(), preset.getName());
 			}
 
 			return true;
@@ -170,7 +185,7 @@ public class CameraPresetCache
 	{
 		for (CameraPreset entry : this.presets)
 		{
-			if (entry.id() == id)
+			if (entry.getId() == id)
 			{
 				return entry;
 			}
@@ -225,7 +240,7 @@ public class CameraPresetCache
 
 			if (message)
 			{
-				Tweakeroo.LOGGER.info("CameraPresetCache: Removed preset [{}/{}]", oldPreset.id(), oldPreset.name());
+				Tweakeroo.LOGGER.info("CameraPresetCache: Removed preset [{}/{}]", oldPreset.getId(), oldPreset.getName());
 			}
 
 			return true;
@@ -252,7 +267,7 @@ public class CameraPresetCache
 	 */
 	public boolean update(@Nonnull CameraPreset preset, boolean message)
 	{
-		this.remove(preset.id(), message);
+		this.remove(preset.getId(), message);
 		return this.add(preset, message);
 	}
 
@@ -281,7 +296,7 @@ public class CameraPresetCache
 
 		if (!list.isEmpty())
 		{
-			list.sort(Comparator.comparingInt(CameraPreset::id));
+			list.sort(Comparator.comparingInt(CameraPreset::getId));
 		}
 
 		return list;
@@ -322,13 +337,13 @@ public class CameraPresetCache
 
 		for (CameraPreset entry : this.presets)
 		{
-			if (entry != null && entry.dim().equals(dim))
+			if (entry != null && entry.getDim().equals(dim))
 			{
 				list.add(entry);
 			}
 		}
 
-		list.sort(Comparator.comparingInt(CameraPreset::id));
+		list.sort(Comparator.comparingInt(CameraPreset::getId));
 
 		return list;
 	}
@@ -366,11 +381,11 @@ public class CameraPresetCache
 
 		for (CameraPreset entry : this.presets)
 		{
-			if (entry != null && entry.dim().equals(dim))
+			if (entry != null && entry.getDim().equals(dim))
 			{
 				if (getNext)
 				{
-					if (entry.id() == this.lastPreset)
+					if (entry.getId() == this.lastPreset)
 					{
 						// Stop recursion to the same preset.
 						CameraPreset first = this.getFirst(worldKey);
@@ -382,15 +397,15 @@ public class CameraPresetCache
 								return null;
 							}
 
-							this.lastPreset = first.id();
+							this.lastPreset = first.getId();
 							return first;
 						}
 					}
 
-					this.lastPreset = entry.id();
+					this.lastPreset = entry.getId();
 					return entry;
 				}
-				else if (entry.id() == this.lastPreset)
+				else if (entry.getId() == this.lastPreset)
 				{
 					getNext = true;
 				}
@@ -403,13 +418,13 @@ public class CameraPresetCache
 
 			if (last != null)
 			{
-				if (last.id() == this.lastPreset)
+				if (last.getId() == this.lastPreset)
 				{
 					this.lastPreset = -1;
 					return this.getFirst(worldKey);
 				}
 
-				this.lastPreset = last.id();
+				this.lastPreset = last.getId();
 				return last;
 			}
 		}
@@ -429,9 +444,9 @@ public class CameraPresetCache
 
 		for (CameraPreset entry : this.presets)
 		{
-			if (entry != null && entry.dim().equals(dim))
+			if (entry != null && entry.getDim().equals(dim))
 			{
-				this.lastPreset = entry.id();
+				this.lastPreset = entry.getId();
 				return entry;
 			}
 		}
@@ -452,7 +467,7 @@ public class CameraPresetCache
 
 		for (CameraPreset entry : this.presets)
 		{
-			if (entry != null && entry.dim().equals(dim))
+			if (entry != null && entry.getDim().equals(dim))
 			{
 				last = entry;
 			}
@@ -460,7 +475,7 @@ public class CameraPresetCache
 
 		if (last != null)
 		{
-			this.lastPreset = last.id();
+			this.lastPreset = last.getId();
 		}
 
 		return last;
@@ -489,13 +504,13 @@ public class CameraPresetCache
 
 		for (CameraPreset entry : list)
 		{
-			if (entry != null && entry.dim().equals(dim))
+			if (entry != null && entry.getDim().equals(dim))
 			{
 				this.presets.remove(entry);
 
 				if (message)
 				{
-					Tweakeroo.LOGGER.info("CameraPresetCache: Clear preset [{}/{}]", entry.id(), entry.name());
+					Tweakeroo.LOGGER.info("CameraPresetCache: Clear preset [{}/{}]", entry.getId(), entry.getName());
 				}
 			}
 		}

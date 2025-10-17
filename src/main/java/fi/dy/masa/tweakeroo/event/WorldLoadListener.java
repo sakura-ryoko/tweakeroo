@@ -20,7 +20,7 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
-import fi.dy.masa.tweakeroo.data.CameraPresetCache;
+import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -118,9 +118,9 @@ public class WorldLoadListener implements IWorldLoadListener
 
 		FileUtils.delete(file);
 
-		if (!CameraPresetCache.getInstance().isEmpty())
+		if (!CameraPresetManager.getInstance().isEmpty())
 		{
-			root.add("camera_presets", CameraPresetCache.getInstance().toJson());
+			root.add("camera_presets", CameraPresetManager.getInstance().toJson());
 			shouldSave = true;
 		}
 
@@ -159,7 +159,7 @@ public class WorldLoadListener implements IWorldLoadListener
 
 			if (JsonUtils.hasObject(root, "camera_presets"))
 			{
-				CameraPresetCache.getInstance().fromJson(JsonUtils.getNestedObject(root, "camera_presets", false));
+				CameraPresetManager.getInstance().fromJson(JsonUtils.getNestedObject(root, "camera_presets", false));
 			}
 		}
 	}
