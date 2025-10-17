@@ -10,16 +10,20 @@ import net.minecraft.entity.Entity;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
+import fi.dy.masa.tweakeroo.util.CameraUtils;
 
 public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 {
@@ -45,6 +49,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		posX -= this.addButton(posX, y, ButtonListener.Type.REMOVE);
 		posX -= this.addButton(posX, y, ButtonListener.Type.SET_HERE);
 		posX -= this.addButton(posX, y, ButtonListener.Type.RENAME);
+		posX -= this.addButton(posX, y, ButtonListener.Type.RECALL);
 		this.buttonsStartX = posX;
 	}
 
@@ -73,13 +78,6 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 
 		return super.onKeyTyped(input);
 	}
-
-//	@Override
-//	protected boolean onMouseClickedImpl(Click click, boolean doubleClick)
-//	{
-//		this.parent.refreshEntries();
-//		return super.onMouseClickedImpl(click, doubleClick);
-//	}
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, boolean selected)
@@ -138,8 +136,33 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		public void actionPerformedWithButton(ButtonBase button, int mouseButton)
 		{
 			if (this.widget.preset == null) return;
+			MinecraftClient mc = MinecraftClient.getInstance();
 
-			if (this.type == Type.RENAME)
+			if (this.type == Type.RECALL)
+			{
+				CameraPreset preset = this.widget.preset;
+
+				if (mc.world != null && mc.world.getRegistryKey().getValue().equals(preset.getDim()))
+				{
+					if (CameraUtils.recallPreset(preset, mc))
+					{
+						InfoUtils.showGuiMessage(Message.MessageType.INFO, 2500, "tweakeroo.message.free_cam.preset_recalled",
+						                         FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(),
+						                         String.format("%02d", preset.getId()), preset.getName());
+					}
+					else
+					{
+						InfoUtils.showGuiMessage(Message.MessageType.WARNING, "tweakeroo.message.free_cam.preset_matches_camera",
+						                         String.format("%02d", preset.getId()));
+					}
+				}
+				else
+				{
+					InfoUtils.showGuiMessage(Message.MessageType.ERROR, "tweakeroo.message.free_cam.preset_wrong_dimension",
+					                         String.format("%02d", preset.getId()), preset.getName());
+				}
+			}
+			else if (this.type == Type.RENAME)
 			{
 				String title = "tweakeroo.gui.title.camera_preset_rename";
 				String name = this.widget.preset.getName();
@@ -148,8 +171,6 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 			}
 			else if (this.type == Type.SET_HERE)
 			{
-				MinecraftClient mc = MinecraftClient.getInstance();
-
 				if (mc.getCameraEntity() != null)
 				{
 					Entity camera = mc.getCameraEntity();
@@ -167,6 +188,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 
 		public enum Type
 		{
+			RECALL      ("tweakeroo.gui.button.preset_entry.recall"),
 			RENAME      ("tweakeroo.gui.button.preset_entry.rename"),
 			SET_HERE    ("tweakeroo.gui.button.preset_entry.set_here"),
 			REMOVE      ("tweakeroo.gui.button.preset_entry.remove"),

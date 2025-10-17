@@ -438,15 +438,22 @@ public class Callbacks
 			{
 				CameraPreset preset = CameraPresetManager.getInstance().cycle(dimKey);
 
-				if (preset != null)
+				if (preset != null && this.mc.world != null)
 				{
-					if (CameraUtils.recallPreset(preset, mc))
+					if (this.mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 					{
-						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						if (CameraUtils.recallPreset(preset, this.mc))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						}
+						else
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
+						}
 					}
 					else
 					{
-						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_matches_camera", String.format("%02d", preset.getId())));
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
 					}
 				}
 				else

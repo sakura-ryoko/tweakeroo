@@ -66,10 +66,10 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 
 		x += this.createButton(x, y, -1, ButtonListener.Type.SHOW) + 4;
 
-		int posX = this.getBrowserWidth() - 24;
-		posX -= ButtonListener.Type.CLEAR.getDisplayName().length() + 14;
+		int posX = this.getBrowserWidth() - 22;
+		posX -= ButtonListener.Type.CLEAR.getDisplayName().length() + 15;
 		posX -= this.createButton(posX, y, -1, ButtonListener.Type.CLEAR) + 4;
-		posX -= ButtonListener.Type.CREATE.getDisplayName().length() + 14;;
+		posX -= ButtonListener.Type.CREATE.getDisplayName().length() + 15;;
 		posX -= this.createButton(posX, y, -1, ButtonListener.Type.CREATE) + 4;
 		y += 22;
 	}
