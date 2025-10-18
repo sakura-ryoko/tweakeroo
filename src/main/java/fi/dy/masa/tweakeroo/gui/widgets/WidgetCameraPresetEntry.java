@@ -58,6 +58,23 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
 		this.addButton(button, new ButtonListener(type, this));
 
+		if (type == ButtonListener.Type.RECALL)
+		{
+			button.setHoverStrings("tweakeroo.gui.button.hover.preset_entry.recall");
+		}
+//		else if (type == ButtonListener.Type.RENAME)
+//		{
+//			button.setHoverStrings("tweakeroo.gui.button.hover.preset_entry.rename");
+//		}
+//		else if (type == ButtonListener.Type.SET_HERE)
+//		{
+//			button.setHoverStrings("tweakeroo.gui.button.hover.preset_entry.set_here");
+//		}
+//		else if (type == ButtonListener.Type.REMOVE)
+//		{
+//			button.setHoverStrings("tweakeroo.gui.button.hover.preset_entry.remove");
+//		}
+
 		return button.getWidth() + 2;
 	}
 
@@ -208,7 +225,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 
 			public String getDisplayName(Object... args)
 			{
-				return StringUtils.translate(this.translationKey, args);
+				return StringUtils.translate(this.getTranslationKey(), args);
 			}
 		}
 	}
@@ -227,9 +244,17 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		@Override
 		public boolean setString(String string)
 		{
-			boolean result = this.preset.renamePreset(string, this.widget.parent);
+			if (string.isEmpty())
+			{
+				string = "Preset "+this.preset.getId();
+			}
+
+			String newName = CameraUtils.fixPresetName(string);
+			boolean result = this.preset.renamePreset(newName, this.widget.parent);
+
 			CameraPresetManager.getInstance().update(this.preset);
 			this.widget.parent.refreshEntries();
+
 			return result;
 		}
 	}

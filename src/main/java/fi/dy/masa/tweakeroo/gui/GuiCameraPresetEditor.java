@@ -69,7 +69,7 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 		int posX = this.getBrowserWidth() - 22;
 		posX -= ButtonListener.Type.CLEAR.getDisplayName().length() + 15;
 		posX -= this.createButton(posX, y, -1, ButtonListener.Type.CLEAR) + 4;
-		posX -= ButtonListener.Type.CREATE.getDisplayName().length() + 15;;
+		posX -= ButtonListener.Type.CREATE.getDisplayName().length() + 15;
 		posX -= this.createButton(posX, y, -1, ButtonListener.Type.CREATE) + 4;
 		y += 22;
 	}
@@ -88,6 +88,20 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 		}
 
 		ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+
+		if (type == ButtonListener.Type.SHOW)
+		{
+			button.setHoverStrings("tweakeroo.gui.button.hover.preset_gui.show");
+		}
+//		else if (type == ButtonListener.Type.CREATE)
+//		{
+//			button.setHoverStrings("tweakeroo.gui.button.hover.preset_gui.create");
+//		}
+//		else if (type == ButtonListener.Type.CLEAR)
+//		{
+//			button.setHoverStrings("tweakeroo.gui.button.hover.preset_gui.clear");
+//		}
+
 		this.addButton(button, listener);
 
 		return width + 2;
@@ -210,7 +224,7 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 
 			public String getDisplayName(Object... args)
 			{
-				return StringUtils.translate(this.translationKey, args);
+				return StringUtils.translate(this.getTranslationKey(), args);
 			}
 		}
 	}

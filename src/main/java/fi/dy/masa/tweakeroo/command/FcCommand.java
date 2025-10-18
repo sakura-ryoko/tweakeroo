@@ -226,11 +226,19 @@ public class FcCommand implements IClientCommandListener
 				if (!args.isEmpty())
 				{
 					CameraPreset oldPreset = CameraPresetManager.getInstance().get(id);
-					final String newName = CameraUtils.fixPresetName(args.toString());
+					String newName = CameraUtils.fixPresetName(args.toString());
 
-					if (CameraUtils.renamePreset(oldPreset, newName))
+					if (oldPreset != null)
 					{
-						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_renamed", String.format("%02d", id), oldPreset.getName(), newName));
+						if (newName.isEmpty())
+						{
+							newName = "Preset " + oldPreset.getId();
+						}
+
+						if (CameraUtils.renamePreset(oldPreset, newName))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_renamed", String.format("%02d", id), oldPreset.getName(), newName));
+						}
 					}
 				}
 				else
