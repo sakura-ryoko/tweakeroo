@@ -37,31 +37,55 @@ public class FcCommand implements IClientCommandListener
 	{
 		List<String> list = new ArrayList<>(args);      // Copy it first
 		list.removeFirst();
-		Sub sub = Sub.fromString(list.removeFirst());
 
-		if (sub != null)
+		if (!list.isEmpty())
 		{
-			if (sub.needsArgs() && list.isEmpty())
-			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(  PREFIX+"_not_enough_args_given"));
-				return true;
-			}
+			Sub sub = Sub.fromString(list.getFirst());
 
-			return switch (sub.getName().toLowerCase())
+			if (sub != null)
 			{
-				case "add" -> this.executeAdd(list, mc);
-				case "set" -> this.executeSet(list, mc);
-				case "del" -> this.executeDel(list, mc);
-				case "del_all" -> this.executeDelAll(list, mc);
-				case "list" -> this.executeList(list, mc);
-				case "rename" -> this.executeRename(list, mc);
-				case "recall" -> this.executeRecall(list, mc);
-				case "cycle" -> this.executeCycle(list, mc);
-				case "help" -> this.executeHelp(list, mc);
-				default -> throw new IllegalStateException("Unexpected value: " + sub.getName());
-			};
+				list.removeFirst();
+
+				if (sub.needsArgs() && list.isEmpty())
+				{
+					mc.inGameHud.getChatHud()
+								.addMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
+					return true;
+				}
+
+				return switch (sub.getName().toLowerCase())
+				{
+					case "add" -> this.executeAdd(list, mc);
+					case "set" -> this.executeSet(list, mc);
+					case "del" -> this.executeDel(list, mc);
+					case "del_all" -> this.executeDelAll(list, mc);
+					case "list" -> this.executeList(list, mc);
+					case "rename" -> this.executeRename(list, mc);
+					case "recall" -> this.executeRecall(list, mc);
+					case "cycle" -> this.executeCycle(list, mc);
+					case "help" -> this.executeHelp(list, mc);
+					default -> this.executeInvalid(mc);
+				};
+			}
+		}
+		else if (!FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+		{
+			FeatureToggle.TWEAK_FREE_CAMERA.setBooleanValue(true);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), true);
+			return true;
+		}
+		else
+		{
+			FeatureToggle.TWEAK_FREE_CAMERA.setBooleanValue(false);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), false);
+			return true;
 		}
 
+		return this.executeInvalid(mc);
+	}
+
+	private boolean executeInvalid(MinecraftClient mc)
+	{
 		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
 		return true;
 	}
