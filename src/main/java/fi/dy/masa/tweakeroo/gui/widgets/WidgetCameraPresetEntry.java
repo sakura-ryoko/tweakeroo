@@ -3,9 +3,7 @@ package fi.dy.masa.tweakeroo.gui.widgets;
 import java.util.List;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
 import net.minecraft.entity.Entity;
 
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -79,21 +77,21 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 	}
 
 	@Override
-	public boolean canSelectAt(Click click)
+	public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
 	{
-		return super.canSelectAt(click) && click.x() < this.buttonsStartX;
+		return super.canSelectAt(mouseX, mouseY, mouseButton) && mouseX < this.buttonsStartX;
 	}
 
 	@Override
-	public boolean onKeyTyped(KeyInput input)
+	public boolean onKeyTyped(int keyCode, int scanCode, int modifiers)
 	{
-		if (input.key() == KeyCodes.KEY_ESCAPE)
+		if (keyCode == KeyCodes.KEY_ESCAPE)
 		{
 			this.parent.setParent(null);
 			GuiBase.openGui(null);
 		}
 
-		return super.onKeyTyped(input);
+		return super.onKeyTyped(keyCode, scanCode, modifiers);
 	}
 
 	@Override
@@ -191,7 +189,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 				if (mc.getCameraEntity() != null)
 				{
 					Entity camera = mc.getCameraEntity();
-					this.widget.preset.setPos(camera.getEntityPos(), camera.getYaw(), camera.getPitch());
+					this.widget.preset.setPos(camera.getPos(), camera.getYaw(), camera.getPitch());
 					CameraPresetManager.getInstance().update(this.widget.preset);
 					this.widget.parent.refreshEntries();
 				}

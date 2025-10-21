@@ -710,7 +710,7 @@
     "tweakeroo.config.hotkey.comment.toggleAccuratePlacementProtocol": "일반 -> '정확한 설치 프로토콜' 옵션의 값을 토글합니다.",
     "tweakeroo.config.hotkey.comment.toggleGrabCursor": "현재 상태에 따라 마우스 커서를 그랩하거나 그랩하지 않습니다.",
     "tweakeroo.config.hotkey.comment.toolPick": "목표 블록에 대해 효과적인 도구로 전환합니다.",
-    "tweakeroo.config.hotkey.comment.writeMapsAsImages": "현재 사용 가능한 모든 지도를 이미지로 'config/tweakeroo/map_images/<worldname>/' 디렉토리에 저장합니다.",
+    "tweakeroo.config.hotkey.comment.writeMapsAsImages": "현재 사용 가능한 모든 지도를 이미지로 'config/tweakeroo/map_images/<worldname>/' 디렉터리에 저장합니다.",
     "tweakeroo.config.hotkey.comment.zoomActivate": "확대 활성화 단축키입니다.",
     "tweakeroo.config.hotkey.name.accurateBlockPlacementInto": "정확한 블록 설치 면 향해",
     "tweakeroo.config.hotkey.name.accurateBlockPlacementReverse": "정확한 블록 설치 역방향",

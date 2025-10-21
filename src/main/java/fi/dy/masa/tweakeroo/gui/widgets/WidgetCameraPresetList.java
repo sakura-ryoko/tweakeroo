@@ -7,7 +7,6 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
@@ -63,14 +62,14 @@ public class WidgetCameraPresetList extends WidgetListBase<CameraPreset, WidgetC
 	}
 
 	@Override
-	public boolean onKeyTyped(KeyInput input)
+	public boolean onKeyTyped(int keyCode, int scanCode, int modifiers)
 	{
-		if (input.key() == KeyCodes.KEY_ESCAPE)
+		if (keyCode == KeyCodes.KEY_ESCAPE)
 		{
 			this.parent.close();
 		}
 
-		return super.onKeyTyped(input);
+		return super.onKeyTyped(keyCode, scanCode, modifiers);
 	}
 
 	@Override

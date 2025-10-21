@@ -199,7 +199,7 @@ public class CameraEntity extends ClientPlayerEntity
 
 	public static void updatePositionAtPreset(@Nonnull CameraPreset preset)
 	{
-		if (camera != null && isValidDim(camera.getEntityWorld(), preset.getDim()))
+		if (camera != null && isValidDim(camera.getWorld(), preset.getDim()))
 		{
 //			Tweakeroo.LOGGER.error("CameraEntity#updatePositionAtPreset(): oldPos [{}], newPos [{}] // yaw [{}], pitch [{}]", camera.getEyePos().toString(), preset.pos().toString(), preset.yaw(), preset.pitch());
 			camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());

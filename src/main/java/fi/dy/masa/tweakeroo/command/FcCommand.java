@@ -97,7 +97,7 @@ public class FcCommand implements IClientCommandListener
 			Entity camera = mc.getCameraEntity();
 			final int id = CameraPresetManager.getInstance().getNextId(-1);
 			String name = !args.isEmpty() ? CameraUtils.fixPresetName(args.toString()) : "Preset "+id;
-			CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
+			CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getPos(), camera.getYaw(), camera.getPitch());
 
 			if (CameraUtils.addPreset(newPreset))
 			{
