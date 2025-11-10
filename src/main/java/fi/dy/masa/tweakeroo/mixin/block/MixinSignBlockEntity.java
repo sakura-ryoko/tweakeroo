@@ -1,15 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HangingSignEditScreen;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +10,16 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.IGuiEditSign;
 import fi.dy.masa.tweakeroo.util.ISignTextAccess;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
+import net.minecraft.client.gui.screens.inventory.SignEditScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
 
 @Mixin(SignBlockEntity.class)
 public abstract class MixinSignBlockEntity extends BlockEntity implements ISignTextAccess
@@ -32,19 +32,19 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Inject(method = "readData", at = @At("RETURN"))
-    private void tweakeroo_restoreCopiedText(ReadView view, CallbackInfo ci)
+    @Inject(method = "loadAdditional", at = @At("RETURN"))
+    private void tweakeroo_restoreCopiedText(ValueInput view, CallbackInfo ci)
     {
         // Restore the copied/pasted text after the TileEntity sync overrides it with empty lines
-        if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue() && this.getWorld() != null && this.getWorld().isClient())
+        if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue() && this.getLevel() != null && this.getLevel().isClientSide())
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
 
-            if (mc.currentScreen instanceof SignEditScreen || mc.currentScreen instanceof HangingSignEditScreen)
+            if (mc.screen instanceof SignEditScreen || mc.screen instanceof HangingSignEditScreen)
             {
-                if (((IGuiEditSign) mc.currentScreen).tweakeroo$getTile() == (Object) this)
+                if (((IGuiEditSign) mc.screen).tweakeroo$getTile() == (Object) this)
                 {
-                    MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isPlayerFacingFront(mc.player));
+                    MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isFacingFrontText(mc.player));
                 }
             }
         }

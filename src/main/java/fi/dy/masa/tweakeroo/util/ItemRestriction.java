@@ -3,13 +3,12 @@ package fi.dy.masa.tweakeroo.util;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 
@@ -36,16 +35,21 @@ public class ItemRestriction
             try
             {
                 //Item item = Registries.ITEM.get(Identifier.tryParse(name));
-                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.tryParse(name));
+	            ResourceLocation id = ResourceLocation.tryParse(name);
 
-                if (opt.isPresent() && opt.get().value() != Items.AIR)
-                {
-                    set.add(opt.get().value());
-                }
-                else
-                {
-                    Tweakeroo.LOGGER.warn("Invalid item name in a black- or whitelist: '{}", name);
-                }
+				if (id != null)
+				{
+					Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(id);
+
+					if (opt.isPresent() && opt.get().value() != Items.AIR)
+					{
+						set.add(opt.get().value());
+					}
+					else
+					{
+						Tweakeroo.LOGGER.warn("Invalid item name in a black- or whitelist: '{}", name);
+					}
+				}
             }
             catch (Exception e)
             {
@@ -56,16 +60,11 @@ public class ItemRestriction
 
     public boolean isItemAllowed(ItemStack stack)
     {
-        switch (this.type)
-        {
-            case BLACKLIST:
-                return this.blackList.contains(stack.getItem()) == false;
-
-            case WHITELIST:
-                return this.whiteList.contains(stack.getItem());
-
-            default:
-                return true;
-        }
+	    return switch (this.type)
+	    {
+		    case BLACKLIST -> !this.blackList.contains(stack.getItem());
+		    case WHITELIST -> this.whiteList.contains(stack.getItem());
+		    default -> true;
+	    };
     }
 }

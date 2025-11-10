@@ -1,20 +1,18 @@
 package fi.dy.masa.tweakeroo.network;
 
 import io.netty.buffer.Unpooled;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtSizeTracker;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.random.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import fi.dy.masa.malilib.network.IClientPayloadData;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
@@ -22,7 +20,7 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
 
 @Environment(EnvType.CLIENT)
-public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IPluginClientPlayHandler<T>
+public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> implements IPluginClientPlayHandler<T>
 {
     private static final ServuxTweaksHandler<ServuxTweaksPacket.Payload> INSTANCE = new ServuxTweaksHandler<>() {
         @Override
@@ -33,7 +31,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     };
     public static ServuxTweaksHandler<ServuxTweaksPacket.Payload> getInstance() { return INSTANCE; }
 
-    public static final Identifier CHANNEL_ID = Identifier.of("servux", "tweaks");
+    public static final ResourceLocation CHANNEL_ID = ResourceLocation.fromNamespaceAndPath("servux", "tweaks");
 
     private boolean servuxRegistered;
     private boolean payloadRegistered = false;
@@ -42,10 +40,10 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     private long readingSessionKey = -1;
 
     @Override
-    public Identifier getPayloadChannel() { return CHANNEL_ID; }
+    public ResourceLocation getPayloadChannel() { return CHANNEL_ID; }
 
     @Override
-    public boolean isPlayRegistered(Identifier channel)
+    public boolean isPlayRegistered(ResourceLocation channel)
     {
         if (channel.equals(CHANNEL_ID))
         {
@@ -56,7 +54,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     }
 
     @Override
-    public void setPlayRegistered(Identifier channel)
+    public void setPlayRegistered(ResourceLocation channel)
     {
         if (channel.equals(CHANNEL_ID))
         {
@@ -65,7 +63,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     }
 
     @Override
-    public <P extends IClientPayloadData> void decodeClientData(Identifier channel, P data)
+    public <P extends IClientPayloadData> void decodeClientData(ResourceLocation channel, P data)
     {
         ServuxTweaksPacket packet = (ServuxTweaksPacket) data;
 
@@ -88,18 +86,18 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
             {
                 if (this.readingSessionKey == -1)
                 {
-                    this.readingSessionKey = Random.create(Util.getMeasuringTimeMs()).nextLong();
+                    this.readingSessionKey = RandomSource.create(Util.getMillis()).nextLong();
                 }
 
                 //Tweakeroo.printDebug("ServuxTweaksHandler#decodeClientData(): received Tweaks Data Packet Slice of size {} (in bytes) // reading session key [{}]", packet.getTotalSize(), this.readingSessionKey);
-                PacketByteBuf fullPacket = PacketSplitter.receive(this, this.readingSessionKey, packet.getBuffer());
+                FriendlyByteBuf fullPacket = PacketSplitter.receive(this, this.readingSessionKey, packet.getBuffer());
 
                 if (fullPacket != null)
                 {
                     try
                     {
                         this.readingSessionKey = -1;
-                        ServerDataSyncer.getInstance().handleBulkEntityData(fullPacket.readVarInt(), (NbtCompound) fullPacket.readNbt(NbtSizeTracker.ofUnlimitedBytes()));
+                        ServerDataSyncer.getInstance().handleBulkEntityData(fullPacket.readVarInt(), (CompoundTag) fullPacket.readNbt(NbtAccounter.unlimitedHeap()));
                     }
                     catch (Exception e)
                     {
@@ -112,7 +110,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     }
 
     @Override
-    public void reset(Identifier channel)
+    public void reset(ResourceLocation channel)
     {
         if (channel.equals(CHANNEL_ID) && this.servuxRegistered)
         {
@@ -122,7 +120,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
         }
     }
 
-    public void resetFailures(Identifier channel)
+    public void resetFailures(ResourceLocation channel)
     {
         if (channel.equals(CHANNEL_ID) && this.failures > 0)
         {
@@ -133,14 +131,14 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
     @Override
     public void receivePlayPayload(T payload, ClientPlayNetworking.Context ctx)
     {
-        if (payload.getId().id().equals(CHANNEL_ID))
+        if (payload.type().id().equals(CHANNEL_ID))
         {
             ServuxTweaksHandler.INSTANCE.decodeClientData(CHANNEL_ID, ((ServuxTweaksPacket.Payload) payload).data());
         }
     }
 
     @Override
-    public void encodeWithSplitter(PacketByteBuf buffer, ClientPlayNetworkHandler handler)
+    public void encodeWithSplitter(FriendlyByteBuf buffer, ClientPacketListener handler)
     {
         // Send each PacketSplitter buffer slice
         ServuxTweaksHandler.INSTANCE.sendPlayPayload(new ServuxTweaksPacket.Payload(ServuxTweaksPacket.ResponseS2CData(buffer)));
@@ -153,10 +151,10 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
 
         if (packet.getType().equals(ServuxTweaksPacket.Type.PACKET_C2S_NBT_RESPONSE_START))
         {
-            PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+            FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
             buffer.writeVarInt(packet.getTransactionId());
             buffer.writeNbt(packet.getCompound());
-            PacketSplitter.send(this, buffer, MinecraftClient.getInstance().getNetworkHandler());
+            PacketSplitter.send(this, buffer, Minecraft.getInstance().getConnection());
         }
         else if (!ServuxTweaksHandler.INSTANCE.sendPlayPayload(new ServuxTweaksPacket.Payload(packet)))
         {

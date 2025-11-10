@@ -4,13 +4,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.render.block.entity.MobSpawnerBlockEntityRenderer;
 import fi.dy.masa.tweakeroo.config.Configs;
+import net.minecraft.client.renderer.blockentity.SpawnerRenderer;
 
-@Mixin(MobSpawnerBlockEntityRenderer.class)
+@Mixin(SpawnerRenderer.class)
 public abstract class MixinMobSpawnerBlockEntityRenderer
 {
-    @Inject(method = "renderDisplayEntity(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/entity/state/EntityRenderState;Lnet/minecraft/client/render/entity/EntityRenderManager;FFLnet/minecraft/client/render/state/CameraRenderState;)V",
+    @Inject(method = "submitEntityInSpawner(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;FFLnet/minecraft/client/renderer/state/CameraRenderState;)V",
             at = @At("HEAD"), cancellable = true)
     private static void cancelRender(CallbackInfo ci)
     {

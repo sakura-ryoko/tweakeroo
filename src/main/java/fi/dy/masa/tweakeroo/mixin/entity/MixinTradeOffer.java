@@ -7,15 +7,15 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.village.TradeOffer;
 import fi.dy.masa.tweakeroo.config.Configs;
+import net.minecraft.world.item.trading.MerchantOffer;
 
-@Mixin(TradeOffer.class)
+@Mixin(MerchantOffer.class)
 public abstract class MixinTradeOffer
 {
     @Shadow @Mutable @Final private int maxUses;
 
-    @Inject(method = "use", at = @At("RETURN"))
+    @Inject(method = "increaseUses", at = @At("RETURN"))
     private void preventTradeLocking(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_VILLAGER_TRADE_LOCKING.getBooleanValue())

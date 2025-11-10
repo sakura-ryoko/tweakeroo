@@ -1,14 +1,14 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.BlockAttachedEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import fi.dy.masa.tweakeroo.util.IDecorationEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.BlockAttachedEntity;
+import net.minecraft.world.level.Level;
 
 /**
  * Copied From Tweak Fork by Andrew54757
@@ -16,9 +16,9 @@ import fi.dy.masa.tweakeroo.util.IDecorationEntity;
 @Mixin(BlockAttachedEntity.class)
 public abstract class MixinBlockAttachedEntity extends Entity implements IDecorationEntity
 {
-    @Shadow protected BlockPos attachedBlockPos;
+    @Shadow protected BlockPos pos;
 
-    public MixinBlockAttachedEntity(EntityType<?> type, World world)
+    public MixinBlockAttachedEntity(EntityType<?> type, Level world)
     {
         super(type, world);
     }
@@ -26,6 +26,6 @@ public abstract class MixinBlockAttachedEntity extends Entity implements IDecora
     @Override
     public BlockPos tweakeroo$getAttached()
     {
-        return this.attachedBlockPos;
+        return this.pos;
     }
 }

@@ -1,28 +1,28 @@
 package fi.dy.masa.tweakeroo.mixin.hud;
 
 import java.util.UUID;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.BossEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.entity.boss.BossBar;
-import net.minecraft.text.Text;
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(ClientBossBar.class)
-public abstract class MixinClientBossBar extends BossBar
+@Mixin(LerpingBossEvent.class)
+public abstract class MixinClientBossBar extends BossEvent
 {
-    public MixinClientBossBar(UUID uniqueIdIn, Text nameIn, BossBar.Color colorIn, BossBar.Style styleIn)
+    public MixinClientBossBar(UUID uniqueIdIn, Component nameIn, BossEvent.BossBarColor colorIn, BossEvent.BossBarOverlay styleIn)
     {
         super(uniqueIdIn, nameIn, colorIn, styleIn);
     }
 
     @Override
-    public boolean shouldThickenFog()
+    public boolean shouldCreateWorldFog()
     {
         if (Configs.Disable.DISABLE_BOSS_FOG.getBooleanValue())
         {
             return false;
         }
 
-        return super.shouldThickenFog();
+        return super.shouldCreateWorldFog();
     }
 }

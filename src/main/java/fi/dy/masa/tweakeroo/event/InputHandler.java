@@ -1,21 +1,6 @@
 package fi.dy.masa.tweakeroo.event;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.input.Input;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-
 import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.*;
@@ -27,6 +12,19 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 import fi.dy.masa.tweakeroo.util.SnapAimMode;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.player.ClientInput;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
@@ -78,9 +76,9 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onKeyInput(KeyInput input, boolean eventKeyState)
+    public boolean onKeyInput(KeyEvent input, boolean eventKeyState)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && eventKeyState)
@@ -94,32 +92,32 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onMouseClick(Click click, boolean eventButtonState)
+    public boolean onMouseClick(MouseButtonEvent click, boolean eventButtonState)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
-        if (mc.world == null || mc.player == null || mc.interactionManager == null || mc.crosshairTarget == null ||
+        if (mc.level == null || mc.player == null || mc.gameMode == null || mc.hitResult == null ||
             GuiUtils.getCurrentScreen() != null)
         {
             return false;
         }
 
         if (mc.player.isCreative() && FeatureToggle.TWEAK_ANGEL_BLOCK.getBooleanValue() && eventButtonState &&
-            mc.options.useKey.matchesMouse(click) && mc.crosshairTarget.getType() == HitResult.Type.MISS)
+            mc.options.keyUse.matchesMouse(click) && mc.hitResult.getType() == HitResult.Type.MISS)
         {
-            Vec3d eyePos = mc.player.getEyePos();
-            Vec3d rotVec = mc.player.getRotationVec(1.0f);
+            Vec3 eyePos = mc.player.getEyePosition();
+            Vec3 rotVec = mc.player.getViewVector(1.0f);
 
-            Vec3d vec3d = eyePos.add(rotVec.multiply(Configs.Generic.ANGEL_BLOCK_PLACEMENT_DISTANCE.getDoubleValue()));
-            BlockHitResult context = mc.world.raycast(new RaycastContext(eyePos, vec3d, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.SOURCE_ONLY, mc.player));
+            Vec3 vec3d = eyePos.add(rotVec.scale(Configs.Generic.ANGEL_BLOCK_PLACEMENT_DISTANCE.getDoubleValue()));
+            BlockHitResult context = mc.level.clip(new ClipContext(eyePos, vec3d, ClipContext.Block.OUTLINE, ClipContext.Fluid.SOURCE_ONLY, mc.player));
             
-            for (Hand hand : Hand.values())
+            for (InteractionHand hand : InteractionHand.values())
             {
-                ItemStack stack = mc.player.getStackInHand(hand);
+                ItemStack stack = mc.player.getItemInHand(hand);
                 if (stack.isEmpty() == false && stack.getItem() instanceof BlockItem)
                 {
-                    mc.interactionManager.interactBlock(mc.player, hand, context);
-                    mc.player.swingHand(hand);
+                    mc.gameMode.useItemOn(mc.player, hand, context);
+                    mc.player.swing(hand);
                     return true;
                 }
             }
@@ -322,56 +320,56 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return this.lastForwardInput;
     }
 
-    private void storeLastMovementDirection(KeyInput input, MinecraftClient mc)
+    private void storeLastMovementDirection(KeyEvent input, Minecraft mc)
     {
-        if (mc.options.forwardKey.matchesKey(input))
+        if (mc.options.keyUp.matches(input))
         {
             this.lastForwardInput = ForwardBack.FORWARD;
         }
-        else if (mc.options.backKey.matchesKey(input))
+        else if (mc.options.keyDown.matches(input))
         {
             this.lastForwardInput = ForwardBack.BACK;
         }
-        else if (mc.options.leftKey.matchesKey(input))
+        else if (mc.options.keyLeft.matches(input))
         {
             this.lastSidewaysInput = LeftRight.LEFT;
         }
-        else if (mc.options.rightKey.matchesKey(input))
+        else if (mc.options.keyRight.matches(input))
         {
             this.lastSidewaysInput = LeftRight.RIGHT;
         }
     }
 
-    public void handleMovementKeys(Input input)
+    public void handleMovementKeys(ClientInput input)
     {
-        GameOptions settings = MinecraftClient.getInstance().options;
-        PlayerInput m = input.playerInput;
+        Options settings = Minecraft.getInstance().options;
+        Input m = input.keyPresses;
 
-        if (settings.leftKey.isPressed() && settings.rightKey.isPressed())
+        if (settings.keyLeft.isDown() && settings.keyRight.isDown())
         {
             if (this.lastSidewaysInput == LeftRight.LEFT)
             {
                 //m.movementSideways = 1;
-                input.playerInput = new PlayerInput(m.forward(), m.backward(), true, false, m.jump(), m.sneak(), m.sprint());
+                input.keyPresses = new Input(m.forward(), m.backward(), true, false, m.jump(), m.shift(), m.sprint());
             }
             else if (this.lastSidewaysInput == LeftRight.RIGHT)
             {
                 //m.movementSideways = -1;
-                input.playerInput =  new PlayerInput(m.forward(), m.backward(), false, true, m.jump(), m.sneak(), m.sprint());
+                input.keyPresses =  new Input(m.forward(), m.backward(), false, true, m.jump(), m.shift(), m.sprint());
             }
         }
 
-        if (settings.backKey.isPressed() && settings.forwardKey.isPressed())
+        if (settings.keyDown.isDown() && settings.keyUp.isDown())
         {
             if (this.lastForwardInput == ForwardBack.FORWARD)
             {
                 //m.movementForward = 1;
-                input.playerInput = new PlayerInput(true, false, m.left(), m.right(), m.jump(), m.sneak(), m.sprint());
+                input.keyPresses = new Input(true, false, m.left(), m.right(), m.jump(), m.shift(), m.sprint());
             }
             else if (this.lastForwardInput == ForwardBack.BACK)
             {
                 //m.movementForward = -1;
-                input.playerInput = new PlayerInput(false, true, m.left(), m.right(), m.jump(), m.sneak(), m.sprint());
+                input.keyPresses = new Input(false, true, m.left(), m.right(), m.jump(), m.shift(), m.sprint());
             }
         }
     }

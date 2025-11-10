@@ -1,16 +1,17 @@
 package fi.dy.masa.tweakeroo.mixin.screen;
 
 import java.util.Collections;
+import javax.annotation.Nonnull;
 
-import net.minecraft.block.entity.CommandBlockBlockEntity;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.CommandBlockScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.CyclingButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.inventory.AbstractCommandBlockEditScreen;
+import net.minecraft.client.gui.screens.inventory.CommandBlockEditScreen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,16 +25,16 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
-@Mixin(CommandBlockScreen.class)
-public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
+@Mixin(CommandBlockEditScreen.class)
+public abstract class MixinCommandBlockScreen extends AbstractCommandBlockEditScreen
 {
-    @Shadow @Final private CommandBlockBlockEntity blockEntity;
-    @Shadow private CyclingButtonWidget<CommandBlockBlockEntity.Type> modeButton;
-    @Shadow private CyclingButtonWidget<Boolean> conditionalModeButton;
-    @Shadow private CyclingButtonWidget<Boolean> redstoneTriggerButton;
+    @Shadow @Final private CommandBlockEntity autoCommandBlock;
+    @Shadow private CycleButton<CommandBlockEntity.Mode> modeButton;
+    @Shadow private CycleButton<Boolean> conditionalButton;
+    @Shadow private CycleButton<Boolean> autoexecButton;
 
-    @Unique private TextFieldWidget textFieldName;
-    @Unique private CyclingButtonWidget<Boolean> buttonUpdateExec;
+    @Unique private EditBox textFieldName;
+    @Unique private CycleButton<Boolean> buttonUpdateExec;
     @Unique private boolean updateExecValue;
     @Unique private String lastName = "";
 
@@ -47,60 +48,60 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
             int y = 158;
             int width = 200;
 
-            if (this.client == null || this.client.player == null)
+            if (this.minecraft == null || this.minecraft.player == null)
             {
                 return;
             }
 
             // Move the vanilla buttons a little bit tighter, otherwise the large GUI scale is a mess
             this.modeButton.setY(y);
-            this.conditionalModeButton.setY(y);
-            this.redstoneTriggerButton.setY(y);
+            this.conditionalButton.setY(y);
+            this.autoexecButton.setY(y);
 
             y += 46;
             this.doneButton.setY(y);
             this.cancelButton.setY(y);
 
-            Text str = Text.translatable("tweakeroo.gui.button.misc.command_block.set_name");
-            int widthBtn = this.textRenderer.getWidth(str) + 10;
+            Component str = Component.translatable("tweakeroo.gui.button.misc.command_block.set_name");
+            int widthBtn = this.font.width(str) + 10;
 
             y = 181;
-            this.textFieldName = new TextFieldWidget(this.textRenderer, x1, y, width, 20, Text.of(""));
-            this.textFieldName.setText(this.blockEntity.getCommandExecutor().getName().getString());
-            this.addSelectableChild(this.textFieldName);
-            final TextFieldWidget tf = this.textFieldName;
-            final BlockPos pos = this.blockEntity.getPos();
+            this.textFieldName = new EditBox(this.font, x1, y, width, 20, Component.nullToEmpty(""));
+            this.textFieldName.setValue(this.autoCommandBlock.getCommandBlock().getName().getString());
+            this.addWidget(this.textFieldName);
+            final EditBox tf = this.textFieldName;
+            final BlockPos pos = this.autoCommandBlock.getBlockPos();
 
-            ButtonWidget.Builder builder = ButtonWidget.builder(str, (button) ->
+            Button.Builder builder = Button.builder(str, (button) ->
             {
-                String name = tf.getText();
+                String name = tf.getValue();
                 name = String.format("{\"CustomName\":\"{\\\"text\\\":\\\"%s\\\"}\"}", name);
-                this.client.player.networkHandler.sendChatCommand(String.format("data merge block %d %d %d %s", pos.getX(), pos.getY(), pos.getZ(), name));
+                this.minecraft.player.connection.sendCommand(String.format("data merge block %d %d %d %s", pos.getX(), pos.getY(), pos.getZ(), name));
             });
 
-            builder.position(x2, y).size(widthBtn, 20);
-            this.addDrawableChild(builder.build());
+            builder.pos(x2, y).size(widthBtn, 20);
+            this.addRenderableWidget(builder.build());
 
-            this.updateExecValue = MiscUtils.getUpdateExec(this.blockEntity);
+            this.updateExecValue = MiscUtils.getUpdateExec(this.autoCommandBlock);
 
-            Text strOn = Text.translatable("tweakeroo.gui.button.misc.command_block.update_execution.on");
-            Text strOff = Text.translatable("tweakeroo.gui.button.misc.command_block.update_execution.off");
-            Text strLooping = Text.translatable("tweakeroo.gui.button.misc.command_block.update_execution.looping");
-            width = this.textRenderer.getWidth(strOff) + 10;
+            Component strOn = Component.translatable("tweakeroo.gui.button.misc.command_block.update_execution.on");
+            Component strOff = Component.translatable("tweakeroo.gui.button.misc.command_block.update_execution.off");
+            Component strLooping = Component.translatable("tweakeroo.gui.button.misc.command_block.update_execution.looping");
+            width = this.font.width(strOff) + 10;
 
-            this.buttonUpdateExec = CyclingButtonWidget.onOffBuilder(strOn, strOff)
-                                    .omitKeyText().initially(this.updateExecValue)
-                                    .build(x2 + widthBtn + 4, y, width, 20, strLooping, (button, val) ->
+            this.buttonUpdateExec = CycleButton.booleanBuilder(strOn, strOff)
+                                    .displayOnlyValue().withInitialValue(this.updateExecValue)
+                                    .create(x2 + widthBtn + 4, y, width, 20, strLooping, (button, val) ->
             {
                 this.updateExecValue = val;
-                MiscUtils.setUpdateExec(this.blockEntity, this.updateExecValue);
+                MiscUtils.setUpdateExec(this.autoCommandBlock, this.updateExecValue);
 
                 String cmd = String.format("data merge block %d %d %d {\"UpdateLastExecution\":%s}",
                         pos.getX(), pos.getY(), pos.getZ(), this.updateExecValue ? "1b" : "0b");
-                this.client.player.networkHandler.sendChatCommand(cmd);
+                this.minecraft.player.connection.sendCommand(cmd);
             });
 
-            this.addDrawableChild(this.buttonUpdateExec);
+            this.addRenderableWidget(this.buttonUpdateExec);
         }
     }
 
@@ -112,31 +113,31 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
 
         if (this.textFieldName != null)
         {
-            String currentName = this.blockEntity.getCommandExecutor().getName().getString();
+            String currentName = this.autoCommandBlock.getCommandBlock().getName().getString();
 
             if (currentName.equals(this.lastName) == false)
             {
-                this.textFieldName.setText(currentName);
+                this.textFieldName.setValue(currentName);
                 this.lastName = currentName;
             }
         }
 
         if (this.buttonUpdateExec != null)
         {
-            boolean updateExec = MiscUtils.getUpdateExec(this.blockEntity);
+            boolean updateExec = MiscUtils.getUpdateExec(this.autoCommandBlock);
 
             if (this.updateExecValue != updateExec)
             {
                 this.updateExecValue = updateExec;
-                Text str = getDisplayStringForCurrentStatus(this.updateExecValue);
+                Component str = getDisplayStringForCurrentStatus(this.updateExecValue);
                 this.buttonUpdateExec.setMessage(str);
-                this.buttonUpdateExec.setWidth(this.textRenderer.getWidth(str) + 10);
+                this.buttonUpdateExec.setWidth(this.font.width(str) + 10);
             }
         }
     }
 
     @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull GuiGraphics drawContext, int mouseX, int mouseY, float partialTicks)
     {
         super.render(drawContext, mouseX, mouseY, partialTicks);
 
@@ -153,11 +154,11 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
     }
 
     @Unique
-    private static Text getDisplayStringForCurrentStatus(boolean updateExecValue)
+    private static Component getDisplayStringForCurrentStatus(boolean updateExecValue)
     {
         String translationKey = "tweakeroo.gui.button.misc.command_block.update_execution";
         boolean isCurrentlyOn = ! updateExecValue;
         String strStatus = "malilib.gui.label_colored." + (isCurrentlyOn ? "on" : "off");
-        return Text.translatable(translationKey, StringUtils.translate(strStatus));
+        return Component.translatable(translationKey, StringUtils.translate(strStatus));
     }
 }

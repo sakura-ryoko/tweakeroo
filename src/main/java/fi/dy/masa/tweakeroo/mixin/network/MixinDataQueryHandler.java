@@ -1,7 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin.network;
 
-import net.minecraft.client.network.DataQueryHandler;
-import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -9,15 +7,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import net.minecraft.client.DebugQueryHandler;
+import net.minecraft.nbt.CompoundTag;
 
-@Mixin(DataQueryHandler.class)
+@Mixin(DebugQueryHandler.class)
 public class MixinDataQueryHandler
 {
     @Inject(
-            method = "handleQueryResponse",
+            method = "handleResponse",
             at = @At("HEAD")
     )
-    private void tweakeroo_queryResponse(int transactionId, NbtCompound nbt, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_queryResponse(int transactionId, CompoundTag nbt, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
         {

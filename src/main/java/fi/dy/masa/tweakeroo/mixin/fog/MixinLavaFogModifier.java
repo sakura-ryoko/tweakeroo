@@ -1,11 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin.fog;
 
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.fog.FogData;
-import net.minecraft.client.render.fog.LavaFogModifier;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,12 +7,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.fog.environment.LavaFogEnvironment;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 
-@Mixin(LavaFogModifier.class)
+@Mixin(LavaFogEnvironment.class)
 public class MixinLavaFogModifier
 {
-    @Inject(method = "applyStartEndModifier", at = @At("RETURN"))
-    private void tweakeroo_redirectLavaFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance, RenderTickCounter tickCounter, CallbackInfo ci)
+    @Inject(method = "setupFog", at = @At("RETURN"))
+    private void tweakeroo_redirectLavaFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientLevel world, float viewDistance, DeltaTracker tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_LAVA_VISIBILITY.getBooleanValue())
         {

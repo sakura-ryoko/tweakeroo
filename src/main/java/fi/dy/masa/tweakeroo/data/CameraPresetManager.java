@@ -6,16 +6,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import com.mojang.serialization.JsonOps;
-import net.minecraft.entity.Entity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
@@ -308,7 +307,7 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @return (True|False)
 	 */
-	public boolean isEmpty(@Nonnull RegistryKey<World> worldKey)
+	public boolean isEmpty(@Nonnull ResourceKey<Level> worldKey)
 	{
 		return this.toList(worldKey).isEmpty();
 	}
@@ -319,7 +318,7 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @return ()
 	 */
-	public int size(@Nonnull RegistryKey<World> worldKey)
+	public int size(@Nonnull ResourceKey<Level> worldKey)
 	{
 		return this.toList(worldKey).size();
 	}
@@ -330,9 +329,9 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @return ()
 	 */
-	public List<CameraPreset> toList(@Nonnull RegistryKey<World> worldKey)
+	public List<CameraPreset> toList(@Nonnull ResourceKey<Level> worldKey)
 	{
-		Identifier dim = worldKey.getValue();
+		ResourceLocation dim = worldKey.location();
 		List<CameraPreset> list = new ArrayList<>();
 
 		for (CameraPreset entry : this.presets)
@@ -374,9 +373,9 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @return ()
 	 */
-	public @Nullable CameraPreset cycle(@Nonnull RegistryKey<World> worldKey)
+	public @Nullable CameraPreset cycle(@Nonnull ResourceKey<Level> worldKey)
 	{
-		Identifier dim = worldKey.getValue();
+		ResourceLocation dim = worldKey.location();
 		boolean getNext = this.lastPreset == -1;
 
 		for (CameraPreset entry : this.presets)
@@ -438,9 +437,9 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @return ()
 	 */
-	public @Nullable CameraPreset getFirst(@Nonnull RegistryKey<World> worldKey)
+	public @Nullable CameraPreset getFirst(@Nonnull ResourceKey<Level> worldKey)
 	{
-		Identifier dim = worldKey.getValue();
+		ResourceLocation dim = worldKey.location();
 
 		for (CameraPreset entry : this.presets)
 		{
@@ -460,9 +459,9 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @return ()
 	 */
-	public @Nullable CameraPreset getLast(@Nonnull RegistryKey<World> worldKey)
+	public @Nullable CameraPreset getLast(@Nonnull ResourceKey<Level> worldKey)
 	{
-		Identifier dim = worldKey.getValue();
+		ResourceLocation dim = worldKey.location();
 		CameraPreset last = null;
 
 		for (CameraPreset entry : this.presets)
@@ -486,7 +485,7 @@ public class CameraPresetManager
 	 *
 	 * @param worldKey (dim)
 	 */
-	public void clear(@Nonnull RegistryKey<World> worldKey)
+	public void clear(@Nonnull ResourceKey<Level> worldKey)
 	{
 		this.clear(worldKey, true);
 	}
@@ -497,9 +496,9 @@ public class CameraPresetManager
 	 * @param worldKey (dim)
 	 * @param message  (True|False)
 	 */
-	public void clear(@Nonnull RegistryKey<World> worldKey, boolean message)
+	public void clear(@Nonnull ResourceKey<Level> worldKey, boolean message)
 	{
-		Identifier dim = worldKey.getValue();
+		ResourceLocation dim = worldKey.location();
 		List<CameraPreset> list = new ArrayList<>(this.presets);
 
 		for (CameraPreset entry : list)

@@ -1,6 +1,6 @@
 package fi.dy.masa.tweakeroo.util;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 /**
  * Copied From Tweak Fork by Andrew54757

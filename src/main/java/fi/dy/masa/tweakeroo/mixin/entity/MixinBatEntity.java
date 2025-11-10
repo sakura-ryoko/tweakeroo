@@ -4,23 +4,23 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldAccess;
 import fi.dy.masa.tweakeroo.config.Configs;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.level.LevelAccessor;
 
-@Mixin(BatEntity.class)
+@Mixin(Bat.class)
 public abstract class MixinBatEntity
 {
-    @Inject(method = "canSpawn", at = @At("HEAD"), cancellable = true)
-    private static void tweakeroo_disableBatSpawning(EntityType<BatEntity> type,
-                                                     WorldAccess world,
-                                                     SpawnReason spawnReason,
+    @Inject(method = "checkBatSpawnRules", at = @At("HEAD"), cancellable = true)
+    private static void tweakeroo_disableBatSpawning(EntityType<Bat> type,
+                                                     LevelAccessor world,
+                                                     EntitySpawnReason spawnReason,
                                                      BlockPos pos,
-                                                     Random random,
+                                                     RandomSource random,
                                                      CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Disable.DISABLE_BAT_SPAWNING.getBooleanValue())

@@ -4,32 +4,31 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.IDecorationEntity;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 
-@Mixin(EntityRenderManager.class)
+@Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderManager
 {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void onShouldRender(Entity entityIn, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
     {
-        boolean isPlayer = (entityIn instanceof PlayerEntity);
+        boolean isPlayer = (entityIn instanceof Player);
 
-        if (entityIn instanceof AbstractDecorationEntity)
+        if (entityIn instanceof HangingEntity)
         {
             if (!RenderTweaks.isPositionValidForRendering(((IDecorationEntity) entityIn).tweakeroo$getAttached()))
             {
@@ -39,13 +38,13 @@ public abstract class MixinEntityRenderManager
 
         if (!isPlayer && Configs.Generic.SELECTIVE_BLOCKS_HIDE_ENTITIES.getBooleanValue())
         {
-            if (!RenderTweaks.isPositionValidForRendering(entityIn.getBlockPos()))
+            if (!RenderTweaks.isPositionValidForRendering(entityIn.blockPosition()))
             {
                 cir.setReturnValue(false);
             }
         }
 
-        if (Configs.Disable.DISABLE_ENTITY_RENDERING.getBooleanValue() && (entityIn instanceof PlayerEntity) == false)
+        if (Configs.Disable.DISABLE_ENTITY_RENDERING.getBooleanValue() && (entityIn instanceof Player) == false)
         {
             cir.setReturnValue(false);
         }
@@ -54,11 +53,11 @@ public abstract class MixinEntityRenderManager
         {
             cir.setReturnValue(false);
         }
-        else if (entityIn instanceof ArmorStandEntity && Configs.Disable.DISABLE_ARMOR_STAND_RENDERING.getBooleanValue())
+        else if (entityIn instanceof ArmorStand && Configs.Disable.DISABLE_ARMOR_STAND_RENDERING.getBooleanValue())
         {
             cir.setReturnValue(false);
         }
-        else if (entityIn instanceof ExperienceOrbEntity)
+        else if (entityIn instanceof ExperienceOrb)
         {
             if (FeatureToggle.TWEAK_RENDER_LIMIT_ENTITIES.getBooleanValue())
             {

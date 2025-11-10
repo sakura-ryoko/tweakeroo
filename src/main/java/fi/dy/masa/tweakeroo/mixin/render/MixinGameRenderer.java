@@ -1,13 +1,12 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
 import java.util.function.Predicate;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.HangingEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,12 +28,12 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 @Mixin(value = GameRenderer.class, priority = 1001)
 public abstract class MixinGameRenderer
 {
-    @Shadow @Final private MinecraftClient client;
+    @Shadow @Final private Minecraft minecraft;
 
     @Unique private float realYaw;
     @Unique private float realPitch;
 
-    @Inject(method = "renderWorld", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderLevel", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_onRenderWorld(CallbackInfo ci)
     {
         if (Callbacks.skipWorldRendering)
@@ -52,15 +51,9 @@ public abstract class MixinGameRenderer
         }
     }
 
-    @ModifyArg(method = "findCrosshairTarget",
+    @ModifyArg(method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(" +
-                                 "Lnet/minecraft/entity/Entity;" +
-                                 "Lnet/minecraft/util/math/Vec3d;" +
-                                 "Lnet/minecraft/util/math/Vec3d;" +
-                                 "Lnet/minecraft/util/math/Box;" +
-                                 "Ljava/util/function/Predicate;D)" +
-                                 "Lnet/minecraft/util/hit/EntityHitResult;"))
+                        target = "Lnet/minecraft/world/entity/projectile/ProjectileUtil;getEntityHitResult(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Ljava/util/function/Predicate;D)Lnet/minecraft/world/phys/EntityHitResult;"))
     private Predicate<Entity> tweakeroo_overrideTargetedEntityCheck(Predicate<Entity> predicate)
     {
         if (Configs.Disable.DISABLE_DEAD_MOB_TARGETING.getBooleanValue())
@@ -68,39 +61,39 @@ public abstract class MixinGameRenderer
             predicate = predicate.and((entityIn) -> (entityIn instanceof LivingEntity) == false || ((LivingEntity) entityIn).getHealth() > 0f);
         }
 
-        if ((FeatureToggle.TWEAK_HANGABLE_ENTITY_BYPASS.getBooleanValue() && this.client.player != null
-             && this.client.player.isSneaking() == Configs.Generic.HANGABLE_ENTITY_BYPASS_INVERSE.getBooleanValue()))
+        if ((FeatureToggle.TWEAK_HANGABLE_ENTITY_BYPASS.getBooleanValue() && this.minecraft.player != null
+             && this.minecraft.player.isShiftKeyDown() == Configs.Generic.HANGABLE_ENTITY_BYPASS_INVERSE.getBooleanValue()))
         {
-            predicate = predicate.and((entityIn) -> (entityIn instanceof AbstractDecorationEntity) == false);
+            predicate = predicate.and((entityIn) -> (entityIn instanceof HangingEntity) == false);
         }
 
         return predicate;
     }
 
-    @Inject(method = "renderWorld", at = @At(
+    @Inject(method = "renderLevel", at = @At(
                 value = "INVOKE", shift = Shift.AFTER,
-                target = "Lnet/minecraft/client/render/GameRenderer;updateCrosshairTarget(F)V"))
+                target = "Lnet/minecraft/client/renderer/GameRenderer;pick(F)V"))
     private void tweakeroo_overrideRenderViewEntityPre(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
-            Entity entity = this.client.getCameraEntity();
+            Entity entity = this.minecraft.getCameraEntity();
 
             if (entity != null)
             {
-                this.realYaw = entity.getYaw();
-                this.realPitch = entity.getPitch();
+                this.realYaw = entity.getYRot();
+                this.realPitch = entity.getXRot();
                 MiscUtils.setEntityRotations(entity, CameraUtils.getCameraYaw(), CameraUtils.getCameraPitch());
             }
         }
     }
 
-    @Inject(method = "renderWorld", at = @At("RETURN"))
+    @Inject(method = "renderLevel", at = @At("RETURN"))
     private void tweakeroo_overrideRenderViewEntityPost(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
-            Entity entity = this.client.getCameraEntity();
+            Entity entity = this.minecraft.getCameraEntity();
 
             if (entity != null)
             {

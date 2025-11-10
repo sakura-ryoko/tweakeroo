@@ -1,9 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.block;
 
-import net.minecraft.block.AbstractBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(AbstractBlock.AbstractBlockState.class)
+@Mixin(BlockBehaviour.BlockStateBase.class)
 public class MixinAbstractBlockState
 {
     // todo this has the same effect as noClip; and causes your player to fall through the world.

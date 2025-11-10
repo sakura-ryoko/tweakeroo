@@ -1,13 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.Perspective;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,13 +10,21 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity
 {
-    @Shadow public abstract Hand getActiveHand();
+    @Shadow public abstract InteractionHand getUsedItemHand();
 
-    private MixinLivingEntity(EntityType<?> type, World worldIn)
+    private MixinLivingEntity(EntityType<?> type, Level worldIn)
     {
         super(type, worldIn);
     }
@@ -39,40 +39,40 @@ public abstract class MixinLivingEntity extends Entity
     }
      */
 
-    @Inject(method = "tickStatusEffects", at = @At(value = "INVOKE", ordinal = 0,
-            target = "Lnet/minecraft/entity/data/DataTracker;get(Lnet/minecraft/entity/data/TrackedData;)Ljava/lang/Object;"),
+    @Inject(method = "tickEffects", at = @At(value = "INVOKE", ordinal = 0,
+            target = "Lnet/minecraft/network/syncher/SynchedEntityData;get(Lnet/minecraft/network/syncher/EntityDataAccessor;)Ljava/lang/Object;"),
             cancellable = true)
     private void removeOwnPotionEffects(CallbackInfo ci)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (Configs.Disable.DISABLE_FP_EFFECT_PARTICLES.getBooleanValue() &&
             ((Object) this) == mc.player &&
-            mc.options.getPerspective() == Perspective.FIRST_PERSON)
+            mc.options.getCameraType() == CameraType.FIRST_PERSON)
         {
             ci.cancel();
         }
     }
 
-    @Inject(method = "tickMovement", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/LivingEntity;isGliding()Z"))
+    @Inject(method = "aiStep", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;isFallFlying()Z"))
     private void tweakeroo_applyCustomDeceleration(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CUSTOM_FLY_DECELERATION.getBooleanValue() &&
-            ((Entity) this) == MinecraftClient.getInstance().player)
+            ((Entity) this) == Minecraft.getInstance().player)
         {
             MiscUtils.handlePlayerDeceleration();
         }
     }
 
-    @Inject(method = "consumeItem", at = @At("RETURN"))
+    @Inject(method = "completeUsingItem", at = @At("RETURN"))
     private void onItemConsumed(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue())
         {
-            if ((Object) this instanceof PlayerEntity player)
+            if ((Object) this instanceof Player player)
             {
-                PlacementTweaks.onProcessRightClickPost(player, this.getActiveHand());
+                PlacementTweaks.onProcessRightClickPost(player, this.getUsedItemHand());
             }
         }
     }

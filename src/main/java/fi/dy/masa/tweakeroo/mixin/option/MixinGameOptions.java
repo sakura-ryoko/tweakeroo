@@ -1,15 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.option;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.Options;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-
-@Mixin(GameOptions.class)
+@Mixin(Options.class)
 public class MixinGameOptions
 {
 //    @Inject(method = "getTextBackgroundColor(I)I", at = @At("RETURN"), cancellable = true)

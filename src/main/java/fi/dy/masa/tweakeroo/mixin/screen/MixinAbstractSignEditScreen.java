@@ -6,40 +6,38 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.IGuiEditSign;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class MixinAbstractSignEditScreen extends Screen implements IGuiEditSign
 {
-    protected MixinAbstractSignEditScreen(Text textComponent)
+    protected MixinAbstractSignEditScreen(Component textComponent)
     {
         super(textComponent);
     }
 
-    @Shadow @Final protected SignBlockEntity blockEntity;
+    @Shadow @Final protected SignBlockEntity sign;
     @Shadow private SignText text;
-    @Shadow @Final private boolean front;
+    @Shadow @Final private boolean isFrontText;
     @Shadow @Final private String[] messages;
 
     @Override
     public SignBlockEntity tweakeroo$getTile()
     {
-        return this.blockEntity;
+        return this.sign;
     }
 
     @Inject(method = "removed", at = @At("HEAD"))
@@ -47,7 +45,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     {
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue())
         {
-            MiscUtils.copyTextFromSign(this.blockEntity, this.front);
+            MiscUtils.copyTextFromSign(this.sign, this.isFrontText);
         }
     }
 
@@ -56,19 +54,19 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     {
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue())
         {
-            MiscUtils.applyPreviousTextToSign(this.blockEntity, ((AbstractSignEditScreen) (Object) this), this.front);
+            MiscUtils.applyPreviousTextToSign(this.sign, ((AbstractSignEditScreen) (Object) this), this.isFrontText);
         }
 
         if (Configs.Disable.DISABLE_SIGN_GUI.getBooleanValue())
         {
             // Update the keybind state, because opening a GUI resets them all.
             // Also, KeyBinding.updateKeyBindState() only works for keyboard keys
-            KeyBinding keybind = MinecraftClient.getInstance().options.useKey;
-            InputUtil.Key input = InputUtil.fromTranslationKey(keybind.getBoundKeyTranslationKey());
+            KeyMapping keybind = Minecraft.getInstance().options.keyUse;
+            InputConstants.Key input = InputConstants.getKey(keybind.saveString());
 
             if (input != null)
             {
-                KeyBinding.setKeyPressed(input, KeybindMulti.isKeyDown(KeybindMulti.getKeyCode(keybind)));
+                KeyMapping.set(input, KeybindMulti.isKeyDown(KeybindMulti.getKeyCode(keybind)));
             }
 
             GuiBase.openGui(null);

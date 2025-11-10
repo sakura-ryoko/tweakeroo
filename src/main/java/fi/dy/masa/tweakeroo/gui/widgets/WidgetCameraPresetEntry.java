@@ -1,13 +1,11 @@
 package fi.dy.masa.tweakeroo.gui.widgets;
 
 import java.util.List;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.entity.Entity;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.world.entity.Entity;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message;
@@ -79,13 +77,13 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 	}
 
 	@Override
-	public boolean canSelectAt(Click click)
+	public boolean canSelectAt(MouseButtonEvent click)
 	{
 		return super.canSelectAt(click) && click.x() < this.buttonsStartX;
 	}
 
 	@Override
-	public boolean onKeyTyped(KeyInput input)
+	public boolean onKeyTyped(KeyEvent input)
 	{
 		if (input.key() == KeyCodes.KEY_ESCAPE)
 		{
@@ -97,7 +95,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 	}
 
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY, boolean selected)
+	public void render(GuiGraphics context, int mouseX, int mouseY, boolean selected)
 	{
 		boolean presetSelected = CameraPresetManager.getInstance().getSelectedPreset() == this.entry;
 		int y = this.y + 7;
@@ -128,7 +126,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 	}
 
 	@Override
-	public void postRenderHovered(DrawContext context, int mouseX, int mouseY, boolean selected)
+	public void postRenderHovered(GuiGraphics context, int mouseX, int mouseY, boolean selected)
 	{
 		super.postRenderHovered(context, mouseX, mouseY, selected);
 
@@ -153,13 +151,13 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		public void actionPerformedWithButton(ButtonBase button, int mouseButton)
 		{
 			if (this.widget.preset == null) return;
-			MinecraftClient mc = MinecraftClient.getInstance();
+			Minecraft mc = Minecraft.getInstance();
 
 			if (this.type == Type.RECALL)
 			{
 				CameraPreset preset = this.widget.preset;
 
-				if (mc.world != null && mc.world.getRegistryKey().getValue().equals(preset.getDim()))
+				if (mc.level != null && mc.level.dimension().location().equals(preset.getDim()))
 				{
 					if (CameraUtils.recallPreset(preset, mc))
 					{
@@ -191,7 +189,7 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 				if (mc.getCameraEntity() != null)
 				{
 					Entity camera = mc.getCameraEntity();
-					this.widget.preset.setPos(camera.getEntityPos(), camera.getYaw(), camera.getPitch());
+					this.widget.preset.setPos(camera.position(), camera.getYRot(), camera.getXRot());
 					CameraPresetManager.getInstance().update(this.widget.preset);
 					this.widget.parent.refreshEntries();
 				}

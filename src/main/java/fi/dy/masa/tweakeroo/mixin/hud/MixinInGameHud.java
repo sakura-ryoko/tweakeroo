@@ -1,13 +1,5 @@
 package fi.dy.masa.tweakeroo.mixin.hud;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.hud.PlayerListHud;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardDisplaySlot;
-import net.minecraft.scoreboard.ScoreboardObjective;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,30 +9,38 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.PlayerTabOverlay;
+import net.minecraft.world.scores.DisplaySlot;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
 
-@Mixin(value = InGameHud.class, priority = 1001)
+@Mixin(value = Gui.class, priority = 1001)
 public abstract class MixinInGameHud
 {
-    @Shadow @Final private PlayerListHud playerListHud;
-    @Shadow @Final private MinecraftClient client;
+    @Shadow @Final private PlayerTabOverlay tabList;
+    @Shadow @Final private Minecraft minecraft;
 
-    @Inject(method = "renderPlayerList",
+    @Inject(method = "renderTabList",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/gui/hud/PlayerListHud;setVisible(Z)V",
+                     target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;setVisible(Z)V",
                      ordinal = 1, shift = At.Shift.AFTER))
-    private void tweakeroo_alwaysRenderPlayerList(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void tweakeroo_alwaysRenderPlayerList(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue() && this.client.world != null)
+        if (FeatureToggle.TWEAK_PLAYER_LIST_ALWAYS_ON.getBooleanValue() && this.minecraft.level != null)
         {
-            Scoreboard scoreboard = this.client.world.getScoreboard();
-            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
+            Scoreboard scoreboard = this.minecraft.level.getScoreboard();
+            Objective objective = scoreboard.getDisplayObjective(DisplaySlot.LIST);
 
-            this.playerListHud.setVisible(true);
-            this.playerListHud.render(context, context.getScaledWindowWidth(), scoreboard, objective);
+            this.tabList.setVisible(true);
+            this.tabList.render(context, context.guiWidth(), scoreboard, objective);
         }
     }
 
-    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
+    @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/scores/Objective;)V",
             at = @At("HEAD"), cancellable = true)
     private void tweakeroo_disableScoreboardRendering(CallbackInfo ci)
     {
@@ -50,7 +50,7 @@ public abstract class MixinInGameHud
         }
     }
 
-    @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_disableStatusEffectHudRendering(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_STATUS_EFFECT_HUD.getBooleanValue())

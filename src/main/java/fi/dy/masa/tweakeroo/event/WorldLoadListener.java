@@ -3,14 +3,11 @@ package fi.dy.masa.tweakeroo.event;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.RegistryAccess;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.DynamicRegistryManager;
-
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -28,13 +25,13 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 public class WorldLoadListener implements IWorldLoadListener
 {
     @Override
-    public void onWorldLoadImmutable(DynamicRegistryManager.Immutable immutable)
+    public void onWorldLoadImmutable(RegistryAccess.Frozen immutable)
     {
         RenderTweaks.setDynamicRegistryManager(immutable);
     }
 
     @Override
-    public void onWorldLoadPre(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
+    public void onWorldLoadPre(@Nullable ClientLevel worldBefore, @Nullable ClientLevel worldAfter, Minecraft mc)
     {
         // Always disable the Free Camera mode when leaving the world or switching dimensions
         FeatureToggle.TWEAK_FREE_CAMERA.setBooleanValue(false);
@@ -57,7 +54,7 @@ public class WorldLoadListener implements IWorldLoadListener
     }
 
     @Override
-    public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
+    public void onWorldLoadPost(@Nullable ClientLevel worldBefore, @Nullable ClientLevel worldAfter, Minecraft mc)
     {
         DataManager.getInstance().reset(worldAfter == null);
         ServerDataSyncer.getInstance().reset(worldAfter == null);
@@ -72,10 +69,10 @@ public class WorldLoadListener implements IWorldLoadListener
 
             // Prevents option value de-sync
             if (FeatureToggle.TWEAK_DARKNESS_VISIBILITY.getBooleanValue() &&
-                mc.options.getDarknessEffectScale().getValue() != Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue())
+                mc.options.darknessEffectScale().get() != Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue())
             {
-                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(mc.options.getDarknessEffectScale().getValue());
-                mc.options.getDarknessEffectScale().setValue(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
+                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(mc.options.darknessEffectScale().get());
+                mc.options.darknessEffectScale().set(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
             }
         }
 

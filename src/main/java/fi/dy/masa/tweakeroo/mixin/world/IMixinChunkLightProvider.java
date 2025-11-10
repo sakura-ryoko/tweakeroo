@@ -1,13 +1,13 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
+import net.minecraft.world.level.chunk.LightChunkGetter;
+import net.minecraft.world.level.lighting.LightEngine;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import net.minecraft.world.chunk.ChunkProvider;
-import net.minecraft.world.chunk.light.ChunkLightProvider;
 
-@Mixin(ChunkLightProvider.class)
+@Mixin(LightEngine.class)
 public interface IMixinChunkLightProvider
 {
-    @Accessor("chunkProvider")
-    ChunkProvider tweakeroo_getChunkProvider();
+    @Accessor("chunkSource")
+    LightChunkGetter tweakeroo_getChunkProvider();
 }

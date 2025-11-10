@@ -1,15 +1,15 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
 import java.util.Map;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.item.map.MapState;
 
-@Mixin(ClientWorld.class)
+@Mixin(ClientLevel.class)
 public interface IMixinClientWorld
 {
-    @Invoker("getMapStates")
-    Map<MapIdComponent, MapState> tweakeroo_getMapStates();
+    @Invoker("getAllMapData")
+    Map<MapId, MapItemSavedData> tweakeroo_getMapStates();
 }
