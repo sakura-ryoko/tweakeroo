@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version '1.13-SNAPSHOT'
 }
 
 repositories {
@@ -12,7 +12,8 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.mappings_version}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+//    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 	implementation "com.google.code.findbugs:jsr305:3.0.2"
 
 	//modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_out}:${project.malilib_version}"
@@ -22,7 +23,7 @@ dependencies {
 	//include(modApi(fabricApi.module("fabric-api-base", project.fabric_api_version)))
 
 	modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
-//	modRuntimeOnly 'me.fallenbreath:mixin-auditor:0.1.0'
+	modRuntimeOnly 'me.fallenbreath:mixin-auditor:0.1.0'
 }
 
 base {
@@ -36,18 +37,18 @@ base {
 }
 
 loom {
-//    def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
-//	// [FEATURE] MIXIN_AUDITOR
-//	runs {
-//		def auditVmArgs = [*commonVmArgs, '-DmixinAuditor.audit=true']
-//		clientMixinAudit {
-//			client()
-//			vmArgs auditVmArgs
-//			ideConfigGenerated false
-//		}
-//	}
-
     accessWidenerPath = file("src/main/resources/tweakeroo.accesswidener")
+
+    def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
+	// [FEATURE] MIXIN_AUDITOR
+	runs {
+		def auditVmArgs = [*commonVmArgs, '-DmixinAuditor.audit=true']
+		clientMixinAudit {
+			client()
+			vmArgs auditVmArgs
+			ideConfigGenerated false
+		}
+	}
 }
 
 processResources {
