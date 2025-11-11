@@ -3,10 +3,10 @@ package fi.dy.masa.tweakeroo.mixin.hud;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.client.gui.spectator.PlayerMenuItem;
-import net.minecraft.client.gui.spectator.SpectatorMenuItem;
-import net.minecraft.client.gui.spectator.categories.TeleportToPlayerMenuCategory;
-import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.gui.hud.spectator.SpectatorMenuCommand;
+import net.minecraft.client.gui.hud.spectator.TeleportSpectatorMenu;
+import net.minecraft.client.gui.hud.spectator.TeleportToSpecificPlayerSpectatorCommand;
+import net.minecraft.client.network.PlayerListEntry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -16,19 +16,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(TeleportToPlayerMenuCategory.class)
+@Mixin(TeleportSpectatorMenu.class)
 public abstract class MixinTeleportSpectatorMenu
 {
-    @Shadow @Final private static Comparator<PlayerInfo> PROFILE_ORDER;
-    @Shadow @Final @Mutable private List<SpectatorMenuItem> items;
+    @Shadow @Final private static Comparator<PlayerListEntry> ORDERING;
+    @Shadow @Final @Mutable private List<SpectatorMenuCommand> elements;
 
     @Inject(method = "<init>(Ljava/util/Collection;)V", at = @At("RETURN"))
-    private void allowSpectatorTeleport(Collection<PlayerInfo> profiles, CallbackInfo ci)
+    private void allowSpectatorTeleport(Collection<PlayerListEntry> profiles, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_SPECTATOR_TELEPORT.getBooleanValue())
         {
-            this.items = profiles.stream().sorted(PROFILE_ORDER).map(
-                    entry -> (SpectatorMenuItem) new PlayerMenuItem(entry)).toList();
+            this.elements = profiles.stream().sorted(ORDERING).map(
+                    entry -> (SpectatorMenuCommand) new TeleportToSpecificPlayerSpectatorCommand(entry)).toList();
         }
     }
 }

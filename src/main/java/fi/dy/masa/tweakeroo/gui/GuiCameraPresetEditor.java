@@ -14,15 +14,15 @@ import fi.dy.masa.tweakeroo.gui.widgets.WidgetCameraPresetEntry;
 import fi.dy.masa.tweakeroo.gui.widgets.WidgetCameraPresetList;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCameraPresetEntry, WidgetCameraPresetList>
 									implements ISelectionListener<CameraPreset>
 {
-	private ResourceKey<Level> dimKey;
+	private RegistryKey<World> dimKey;
 	private boolean showAll;
 
 	public GuiCameraPresetEditor()
@@ -30,9 +30,9 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 		super(10, 44);
 		this.title = StringUtils.translate("tweakeroo.gui.title.camera_preset_editor");
 
-		if (this.mc.level != null)
+		if (this.mc.world != null)
 		{
-			this.dimKey = this.mc.level.dimension();
+			this.dimKey = this.mc.world.getRegistryKey();
 			this.showAll = false;
 		}
 		else
@@ -112,7 +112,7 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 
 	private void toggleShowAll(boolean toggle)
 	{
-		if (this.mc.level == null)
+		if (this.mc.world == null)
 		{
 			this.dimKey = null;
 			this.showAll = true;
@@ -166,21 +166,21 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 				else
 				{
 					CameraPresetManager.getInstance().clear(this.parent.dimKey);
-					InfoUtils.showGuiMessage(Message.MessageType.SUCCESS, "tweakeroo.message.free_cam.preset_deleted_all_dim", this.parent.dimKey.location().toString());
+					InfoUtils.showGuiMessage(Message.MessageType.SUCCESS, "tweakeroo.message.free_cam.preset_deleted_all_dim", this.parent.dimKey.getValue().toString());
 				}
 			}
 			else if (this.type == Type.CREATE)
 			{
-				Minecraft mc = Minecraft.getInstance();
+				MinecraftClient mc = MinecraftClient.getInstance();
 
-				if (mc.level != null && mc.getCameraEntity() != null)
+				if (mc.world != null && mc.getCameraEntity() != null)
 				{
 					Entity camera = mc.getCameraEntity();
-					ResourceKey<Level> dimKey = mc.level.dimension();
+					RegistryKey<World> dimKey = mc.world.getRegistryKey();
 
 					final int id = CameraPresetManager.getInstance().getNextId(-1);
 					String name = "Preset "+id;
-					CameraPreset newPreset = new CameraPreset(id, name, dimKey.location(), camera.position(), camera.getYRot(), camera.getXRot());
+					CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
 
 					if (CameraUtils.addPreset(newPreset))
 					{

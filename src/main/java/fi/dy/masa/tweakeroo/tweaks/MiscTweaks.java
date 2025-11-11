@@ -1,21 +1,21 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
 import javax.annotation.Nullable;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import java.util.*;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import com.mojang.blaze3d.platform.InputConstants;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigInteger;
 import fi.dy.masa.malilib.gui.Message;
@@ -32,20 +32,20 @@ public class MiscTweaks
     public static final EntityRestriction ENTITY_TYPE_ATTACK_RESTRICTION = new EntityRestriction();
     public static final PotionRestriction POTION_RESTRICTION = new PotionRestriction();
 
-    private static final KeybindState KEY_STATE_ATTACK = new KeybindState(Minecraft.getInstance().options.keyAttack, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoAttack());
-    private static final KeybindState KEY_STATE_USE = new KeybindState(Minecraft.getInstance().options.keyUse, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoItemUse());
+    private static final KeybindState KEY_STATE_ATTACK = new KeybindState(MinecraftClient.getInstance().options.attackKey, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoAttack());
+    private static final KeybindState KEY_STATE_USE = new KeybindState(MinecraftClient.getInstance().options.useKey, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoItemUse());
 
     private static int potionWarningTimer;
 
     private static class KeybindState
     {
-        private final KeyMapping keybind;
-        private final Consumer<Minecraft> clickFunc;
+        private final KeyBinding keybind;
+        private final Consumer<MinecraftClient> clickFunc;
         private boolean state;
         private int durationCounter;
         private int intervalCounter;
 
-        public KeybindState(KeyMapping keybind, Consumer<Minecraft> clickFunc)
+        public KeybindState(KeyBinding keybind, Consumer<MinecraftClient> clickFunc)
         {
             this.keybind = keybind;
             this.clickFunc = clickFunc;
@@ -58,7 +58,7 @@ public class MiscTweaks
             this.durationCounter = 0;
         }
 
-        public void handlePeriodicHold(int interval, int holdDuration, Minecraft mc)
+        public void handlePeriodicHold(int interval, int holdDuration, MinecraftClient mc)
         {
             if (this.state)
             {
@@ -76,7 +76,7 @@ public class MiscTweaks
             }
         }
 
-        public void handlePeriodicClick(int interval, Minecraft mc)
+        public void handlePeriodicClick(int interval, MinecraftClient mc)
         {
             if (++this.intervalCounter >= interval)
             {
@@ -86,24 +86,24 @@ public class MiscTweaks
             }
         }
 
-        private void setKeyState(boolean state, Minecraft mc)
+        private void setKeyState(boolean state, MinecraftClient mc)
         {
             this.state = state;
 
-            InputConstants.Key key = InputConstants.getKey(this.keybind.saveString());
-            KeyMapping.set(key, state);
+            InputUtil.Key key = InputUtil.fromTranslationKey(this.keybind.getBoundKeyTranslationKey());
+            KeyBinding.setKeyPressed(key, state);
 
             if (state)
             {
                 this.clickFunc.accept(mc);
-                KeyMapping.click(key);
+                KeyBinding.onKeyPressed(key);
             }
         }
     }
 
-    public static void onTick(Minecraft mc)
+    public static void onTick(MinecraftClient mc)
     {
-        LocalPlayer player = mc.player;
+        ClientPlayerEntity player = mc.player;
 
         if (player == null)
         {
@@ -121,7 +121,7 @@ public class MiscTweaks
         CameraEntity.movementTick();
     }
 
-    public static void onGameLoop(Minecraft mc)
+    public static void onGameLoop(MinecraftClient mc)
     {
         PlacementTweaks.onTick(mc);
         RenderTweaks.onTick();
@@ -130,7 +130,7 @@ public class MiscTweaks
         Tweakeroo.renderCountXPOrbs = 0;
     }
 
-    private static void doPeriodicClicks(Minecraft mc)
+    private static void doPeriodicClicks(MinecraftClient mc)
     {
         if (GuiUtils.getCurrentScreen() == null)
         {
@@ -164,7 +164,7 @@ public class MiscTweaks
             IConfigInteger cfgHoldClickInterval,
             IConfigInteger cfgHoldDuration,
             IConfigInteger cfgClickInterval,
-            Minecraft mc)
+            MinecraftClient mc)
     {
         if (cfgPeriodicHold.getBooleanValue())
         {
@@ -183,21 +183,21 @@ public class MiscTweaks
         }
     }
 
-    private static void doPotionWarnings(Player player)
+    private static void doPotionWarnings(PlayerEntity player)
     {
         if (FeatureToggle.TWEAK_POTION_WARNING.getBooleanValue() &&
             ++potionWarningTimer >= 100)
         {
             potionWarningTimer = 0;
 
-            Collection<MobEffectInstance> effects = player.getActiveEffects();
+            Collection<StatusEffectInstance> effects = player.getStatusEffects();
 
             if (effects.isEmpty() == false)
             {
                 int minDuration = -1;
                 int count = 0;
 
-                for (MobEffectInstance effectInstance : effects)
+                for (StatusEffectInstance effectInstance : effects)
                 {
                     if (potionWarningShouldInclude(effectInstance))
                     {
@@ -241,19 +241,19 @@ public class MiscTweaks
     }
 
 
-    private static boolean potionWarningShouldInclude(MobEffectInstance effect)
+    private static boolean potionWarningShouldInclude(StatusEffectInstance effect)
     {
         return effect.isAmbient() == false &&
-               (effect.getEffect().value().isBeneficial() ||
+               (effect.getEffectType().value().isBeneficial() ||
                Configs.Generic.POTION_WARNING_BENEFICIAL_ONLY.getBooleanValue() == false) &&
                effect.getDuration() <= Configs.Generic.POTION_WARNING_THRESHOLD.getIntegerValue() &&
                effect.getDuration() >= 0 &&
-               POTION_RESTRICTION.isAllowed(effect.getEffect().value());
+               POTION_RESTRICTION.isAllowed(effect.getEffectType().value());
     }
 
-    public static @NotNull List<FlatLayerInfo> parseBlockString(String blockString)
+    public static @NotNull List<FlatChunkGeneratorLayer> parseBlockString(String blockString)
     {
-        List<FlatLayerInfo> list = new ArrayList<>();
+        List<FlatChunkGeneratorLayer> list = new ArrayList<>();
         String[] strings = blockString.split(",");
         final int count = strings.length;
         int thicknessSum = 0;
@@ -261,7 +261,7 @@ public class MiscTweaks
         for (int i = 0; i < count; ++i)
         {
             String str = strings[i];
-            FlatLayerInfo layer = parseLayerString(str, thicknessSum);
+            FlatChunkGeneratorLayer layer = parseLayerString(str, thicknessSum);
 
             if (layer == null)
             {
@@ -270,14 +270,14 @@ public class MiscTweaks
             }
 
             list.add(layer);
-            thicknessSum += layer.getHeight();
+            thicknessSum += layer.getThickness();
         }
 
         return list;
     }
 
     @Nullable
-    private static FlatLayerInfo parseLayerString(String string, int startY)
+    private static FlatChunkGeneratorLayer parseLayerString(String string, int startY)
     {
         String[] strings = string.split("\\*", 2);
         int thickness;
@@ -322,7 +322,7 @@ public class MiscTweaks
         {
             // FIXME 1.17 is this just not needed anymore?
             //layer.setStartY(startY);
-            return new FlatLayerInfo(finalThickness, block);
+            return new FlatChunkGeneratorLayer(finalThickness, block);
         }
     }
 
@@ -331,11 +331,11 @@ public class MiscTweaks
     {
         try
         {
-	        ResourceLocation id = ResourceLocation.tryParse(name);
+	        Identifier id = Identifier.tryParse(name);
 
 			if (id != null)
 			{
-				Optional<Holder.Reference<Block>> opt = BuiltInRegistries.BLOCK.get(id);
+				Optional<RegistryEntry.Reference<Block>> opt = Registries.BLOCK.getEntry(id);
 
 				if (opt.isPresent())
 				{

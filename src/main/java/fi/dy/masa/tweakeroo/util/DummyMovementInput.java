@@ -1,13 +1,12 @@
 package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nonnull;
-
-import net.minecraft.client.Options;
-import net.minecraft.client.player.KeyboardInput;
+import net.minecraft.client.input.KeyboardInput;
+import net.minecraft.client.option.GameOptions;
 
 public class DummyMovementInput extends KeyboardInput
 {
-    public DummyMovementInput(Options options)
+    public DummyMovementInput(GameOptions options)
     {
         super(options);
     }

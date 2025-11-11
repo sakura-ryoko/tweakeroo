@@ -1,7 +1,6 @@
 package fi.dy.masa.tweakeroo.config;
 
 import fi.dy.masa.malilib.config.options.ConfigDouble;
-import com.mojang.blaze3d.platform.InputConstants;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -20,27 +19,28 @@ import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.*;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
-import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
-import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
+import net.minecraft.client.gui.hud.debug.DebugHudEntryVisibility;
+import net.minecraft.client.gui.hud.debug.DebugHudProfile;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class Callbacks
 {
     public static boolean skipWorldRendering;
 
-    public static void init(Minecraft mc)
+    public static void init(MinecraftClient mc)
     {
 		FeatureToggle.TWEAK_F3_CURSOR.setValueChangeCallback(new FeatureCallbackF3Toggle(FeatureToggle.TWEAK_F3_CURSOR, mc));
         FeatureToggle.TWEAK_GAMMA_OVERRIDE.setValueChangeCallback(new FeatureCallbackGamma(FeatureToggle.TWEAK_GAMMA_OVERRIDE, mc));
@@ -56,8 +56,8 @@ public class Callbacks
                                                                             }
                                                                         });
         FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> CameraEntity.setCameraState(cfg.getBooleanValue(), null));
-        FeatureToggle.TWEAK_HOLD_ATTACK.setValueChangeCallback(new FeatureCallbackHold(mc.options.keyAttack));
-        FeatureToggle.TWEAK_HOLD_USE.setValueChangeCallback(new FeatureCallbackHold(mc.options.keyUse));
+        FeatureToggle.TWEAK_HOLD_ATTACK.setValueChangeCallback(new FeatureCallbackHold(mc.options.attackKey));
+        FeatureToggle.TWEAK_HOLD_USE.setValueChangeCallback(new FeatureCallbackHold(mc.options.useKey));
 
         IHotkeyCallback callbackGeneric = new KeyCallbackHotkeysGeneric(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackHotkeyWithMessage(mc);
@@ -144,7 +144,7 @@ public class Callbacks
         Configs.Lists.SELECTIVE_BLOCKS_WHITELIST.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
         Configs.Lists.SELECTIVE_BLOCKS_LIST_TYPE.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
         FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.setValueChangeCallback((cfg) -> RenderTweaks.rebuildLists());
-        Configs.Disable.DISABLE_RENDERING_SCAFFOLDING.setValueChangeCallback((cfg) -> mc.levelRenderer.allChanged());
+        Configs.Disable.DISABLE_RENDERING_SCAFFOLDING.setValueChangeCallback((cfg) -> mc.worldRenderer.reload());
         Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.setValueChangeCallback(
                 (cfg) ->
                         CachedTagManager.parseSilkTouchOverride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
@@ -153,40 +153,40 @@ public class Callbacks
 
 	public static class FeatureCallbackF3Toggle implements IValueChangeCallback<IConfigBoolean>
 	{
-		private final Minecraft mc;
+		private final MinecraftClient mc;
 
-		public FeatureCallbackF3Toggle(FeatureToggle feature, Minecraft mc)
+		public FeatureCallbackF3Toggle(FeatureToggle feature, MinecraftClient mc)
 		{
 			this.mc = mc;
-			this.applyValue(mc.debugEntries, feature.getBooleanValue());
+			this.applyValue(mc.debugHudEntryList, feature.getBooleanValue());
 		}
 
 		@Override
 		public void onValueChanged(IConfigBoolean config)
 		{
-			this.applyValue(this.mc.debugEntries, config.getBooleanValue());
+			this.applyValue(this.mc.debugHudEntryList, config.getBooleanValue());
 		}
 
-		private void applyValue(DebugScreenEntryList profile, boolean enable)
+		private void applyValue(DebugHudProfile profile, boolean enable)
 		{
 			if (enable &&
-					profile.getStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugScreenEntryStatus.ALWAYS_ON)
+					profile.getVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugHudEntryVisibility.ALWAYS_ON)
 			{
-				profile.setStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugScreenEntryStatus.ALWAYS_ON);
+				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.ALWAYS_ON);
 			}
 			else if (!enable &&
-					profile.getStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugScreenEntryStatus.IN_F3)
+					profile.getVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugHudEntryVisibility.IN_F3)
 			{
-				profile.setStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugScreenEntryStatus.IN_F3);
+				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.IN_F3);
 			}
 		}
 	}
 
     public static class FeatureCallbackHold implements IValueChangeCallback<IConfigBoolean>
     {
-        private final KeyMapping keyBind;
+        private final KeyBinding keyBind;
 
-        public FeatureCallbackHold(KeyMapping keyBind)
+        public FeatureCallbackHold(KeyBinding keyBind)
         {
             this.keyBind = keyBind;
         }
@@ -196,24 +196,24 @@ public class Callbacks
         {
             if (config.getBooleanValue())
             {
-                KeyMapping.set(InputConstants.getKey(this.keyBind.saveString()), true);
-                KeyMapping.click(InputConstants.getKey(this.keyBind.saveString()));
+                KeyBinding.setKeyPressed(InputUtil.fromTranslationKey(this.keyBind.getBoundKeyTranslationKey()), true);
+                KeyBinding.onKeyPressed(InputUtil.fromTranslationKey(this.keyBind.getBoundKeyTranslationKey()));
             }
             else
             {
-                KeyMapping.set(InputConstants.getKey(this.keyBind.saveString()), false);
+                KeyBinding.setKeyPressed(InputUtil.fromTranslationKey(this.keyBind.getBoundKeyTranslationKey()), false);
             }
         }
     }
 
     public static class FeatureCallbackGamma implements IValueChangeCallback<IConfigBoolean>
     {
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
-        public FeatureCallbackGamma(FeatureToggle feature, Minecraft mc)
+        public FeatureCallbackGamma(FeatureToggle feature, MinecraftClient mc)
         {
             this.mc = mc;
-            double gamma = this.mc.options.gamma().get();
+            double gamma = this.mc.options.getGamma().getValue();
 
             if (gamma <= 1.0F)
             {
@@ -234,7 +234,7 @@ public class Callbacks
 
             if (config.getBooleanValue())
             {
-                Configs.Internal.GAMMA_VALUE_ORIGINAL.setDoubleValue(this.mc.options.gamma().get());
+                Configs.Internal.GAMMA_VALUE_ORIGINAL.setDoubleValue(this.mc.options.getGamma().getValue());
                 gamma = Configs.Generic.GAMMA_OVERRIDE_VALUE.getDoubleValue();
             }
             else
@@ -248,7 +248,7 @@ public class Callbacks
         private void applyValue(double gamma)
         {
             @SuppressWarnings("unchecked")
-            IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.gamma();
+            IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getGamma();
 
             if (opt != null)
             {
@@ -259,12 +259,12 @@ public class Callbacks
 
     public static class FeatureCallbackDarkness implements IValueChangeCallback<IConfigBoolean>
     {
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
-        public FeatureCallbackDarkness(FeatureToggle feature, Minecraft mc)
+        public FeatureCallbackDarkness(FeatureToggle feature, MinecraftClient mc)
         {
             this.mc = mc;
-            double darkness = this.mc.options.darknessEffectScale().get();
+            double darkness = this.mc.options.getDarknessEffectScale().getValue();
 
             if (darkness <= 1.0F)
             {
@@ -285,7 +285,7 @@ public class Callbacks
 
             if (config.getBooleanValue())
             {
-                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(this.mc.options.darknessEffectScale().get());
+                Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(this.mc.options.getDarknessEffectScale().getValue());
                 darkness = Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue();
             }
             else
@@ -299,7 +299,7 @@ public class Callbacks
         private void applyValue(double darkness)
         {
             @SuppressWarnings("unchecked")
-            IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.darknessEffectScale();
+            IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) this.mc.options.getDarknessEffectScale();
 
             if (opt != null)
             {
@@ -312,12 +312,12 @@ public class Callbacks
     {
         public FeatureCallbackSlime(ConfigBoolean feature)
         {
-            Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.setDoubleValue(Blocks.SLIME_BLOCK.getFriction());
+            Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.setDoubleValue(Blocks.SLIME_BLOCK.getSlipperiness());
 
             // If the feature is enabled on game launch, apply the overridden value here
             if (feature.getBooleanValue())
             {
-                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getFriction());
+                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getSlipperiness());
             }
         }
 
@@ -326,7 +326,7 @@ public class Callbacks
         {
             if (config.getBooleanValue())
             {
-                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getFriction());
+                ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getSlipperiness());
             }
             else
             {
@@ -337,9 +337,9 @@ public class Callbacks
 
     public static class KeyCallbackHotkeyWithMessage implements IHotkeyCallback
     {
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
-        public KeyCallbackHotkeyWithMessage(Minecraft mc)
+        public KeyCallbackHotkeyWithMessage(MinecraftClient mc)
         {
             this.mc = mc;
         }
@@ -349,10 +349,10 @@ public class Callbacks
         {
             if (key == Hotkeys.SKIP_ALL_RENDERING.getKeybind())
             {
-                this.mc.noRender = !this.mc.noRender;
+                this.mc.skipGameRender = !this.mc.skipGameRender;
 
-                String pre = mc.noRender ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-                String status = StringUtils.translate("tweakeroo.message.value." + (this.mc.noRender ? "on" : "off"));
+                String pre = mc.skipGameRender ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+                String status = StringUtils.translate("tweakeroo.message.value." + (this.mc.skipGameRender ? "on" : "off"));
                 String message = StringUtils.translate("tweakeroo.message.toggled", "Skip All Rendering", pre + status + GuiBase.TXT_RST);
                 InfoUtils.printActionbarMessage(message);
             }
@@ -374,9 +374,9 @@ public class Callbacks
 	private static class KeyCallbackFreeCameraPresets implements IHotkeyCallback
 	{
 		private final String PREFIX = Reference.MOD_ID+".message.free_cam.preset";
-		private final Minecraft mc;
+		private final MinecraftClient mc;
 
-		public KeyCallbackFreeCameraPresets(Minecraft mc)
+		public KeyCallbackFreeCameraPresets(MinecraftClient mc)
 		{
 			this.mc = mc;
 		}
@@ -384,19 +384,19 @@ public class Callbacks
 		@Override
 		public boolean onKeyAction(KeyAction action, IKeybind key)
 		{
-			if (this.mc.player == null || this.mc.level == null || this.mc.getCameraEntity() == null)
+			if (this.mc.player == null || this.mc.world == null || this.mc.getCameraEntity() == null)
 			{
 				return false;
 			}
 
-			ResourceKey<Level> dimKey = this.mc.level.dimension();
+			RegistryKey<World> dimKey = this.mc.world.getRegistryKey();
 			Entity camera = this.mc.getCameraEntity();
 
 			if (key == Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind())
 			{
 				final int id = CameraPresetManager.getInstance().getNextId(-1);
 				String name = "Preset "+id;
-				CameraPreset newPreset = new CameraPreset(id, name, dimKey.location(), camera.position(), camera.getYRot(), camera.getXRot());
+				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
 
 				if (CameraUtils.addPreset(newPreset))
 				{
@@ -428,7 +428,7 @@ public class Callbacks
 			{
 				if (CameraUtils.deleteAllPresets(dimKey))
 				{
-					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.location().toString()));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.getValue().toString()));
 				}
 
 				return true;
@@ -437,9 +437,9 @@ public class Callbacks
 			{
 				CameraPreset preset = CameraPresetManager.getInstance().cycle(dimKey);
 
-				if (preset != null && this.mc.level != null)
+				if (preset != null && this.mc.world != null)
 				{
-					if (this.mc.level.dimension().location().equals(preset.getDim()))
+					if (this.mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 					{
 						if (CameraUtils.recallPreset(preset, this.mc))
 						{
@@ -469,9 +469,9 @@ public class Callbacks
 
     private static class KeyCallbackHotkeysGeneric implements IHotkeyCallback
     {
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
-        public KeyCallbackHotkeysGeneric(Minecraft mc)
+        public KeyCallbackHotkeysGeneric(MinecraftClient mc)
         {
             this.mc = mc;
         }
@@ -491,25 +491,25 @@ public class Callbacks
             }
             else if (key == Hotkeys.TOOL_PICK.getKeybind())
             {
-                if (this.mc.hitResult != null && this.mc.hitResult.getType() == HitResult.Type.BLOCK)
+                if (this.mc.crosshairTarget != null && this.mc.crosshairTarget.getType() == HitResult.Type.BLOCK)
                 {
-                    InventoryUtils.trySwitchToEffectiveTool(((BlockHitResult) this.mc.hitResult).getBlockPos());
+                    InventoryUtils.trySwitchToEffectiveTool(((BlockHitResult) this.mc.crosshairTarget).getBlockPos());
                     return true;
                 }
             }
             else if (key == Hotkeys.COPY_SIGN_TEXT.getKeybind())
             {
-                HitResult trace = this.mc.hitResult;
+                HitResult trace = this.mc.crosshairTarget;
 
                 if (trace != null && trace.getType() == HitResult.Type.BLOCK &&
-                    this.mc.level != null)
+                    this.mc.world != null)
                 {
                     BlockPos pos = ((BlockHitResult) trace).getBlockPos();
-                    BlockEntity te = this.mc.level.getBlockEntity(pos);
+                    BlockEntity te = this.mc.world.getBlockEntity(pos);
 
                     if (te instanceof SignBlockEntity && this.mc.player != null)
                     {
-                        MiscUtils.copyTextFromSign((SignBlockEntity) te, ((SignBlockEntity) te).isFacingFrontText(this.mc.player));
+                        MiscUtils.copyTextFromSign((SignBlockEntity) te, ((SignBlockEntity) te).isPlayerFacingFront(this.mc.player));
                         InfoUtils.printActionbarMessage("tweakeroo.message.sign_text_copied");
                     }
                 }
@@ -668,16 +668,16 @@ public class Callbacks
             }
             else if (key == Hotkeys.TOGGLE_GRAB_CURSOR.getKeybind())
             {
-                if (this.mc.isWindowActive())
+                if (this.mc.isWindowFocused())
                 {
-                    if (this.mc.mouseHandler.isMouseGrabbed())
+                    if (this.mc.mouse.isCursorLocked())
                     {
-                        this.mc.mouseHandler.releaseMouse();
+                        this.mc.mouse.unlockCursor();
                         InfoUtils.printActionbarMessage("tweakeroo.message.unfocusing_game");
                     }
                     else
                     {
-                        this.mc.mouseHandler.grabMouse();
+                        this.mc.mouse.lockCursor();
                         InfoUtils.printActionbarMessage("tweakeroo.message.focusing_game");
                     }
                 }
@@ -699,7 +699,7 @@ public class Callbacks
             }
             else if (key == Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind())
             {
-                if (mc.screen instanceof InventoryOverlayScreen)
+                if (mc.currentScreen instanceof InventoryOverlayScreen)
                 {
                     mc.setScreen(null);
                 }
@@ -824,11 +824,11 @@ public class Callbacks
                 }
                 else
                 {
-                    Player player = Minecraft.getInstance().player;
+                    PlayerEntity player = MinecraftClient.getInstance().player;
 
                     if (player != null)
                     {
-                        player.getAbilities().setFlyingSpeed(0.05f);
+                        player.getAbilities().setFlySpeed(0.05f);
                     }
 
                     InfoUtils.printActionbarMessage("tweakeroo.message.toggled", prettyName, strStatus);

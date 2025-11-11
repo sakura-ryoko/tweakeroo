@@ -8,21 +8,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ingame.StatusEffectsDisplay;
+import net.minecraft.entity.effect.StatusEffectInstance;
 
-@Mixin(value = EffectsInInventory.class, priority = 1001)
+@Mixin(value = StatusEffectsDisplay.class, priority = 1001)
 public abstract class MixinStatusEffectsDisplay
 {
-    @Shadow private @Nullable MobEffectInstance hoveredEffect;
+    @Shadow private @Nullable StatusEffectInstance hoveredStatusEffect;
 
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_disableStatusEffectRendering1(GuiGraphics context, int mouseX, int mouseY, CallbackInfo ci)
+    @Inject(method = "drawStatusEffects", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_disableStatusEffectRendering1(DrawContext context, int mouseX, int mouseY, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_INVENTORY_EFFECTS.getBooleanValue())
         {
-            this.hoveredEffect = null;
+            this.hoveredStatusEffect = null;
             ci.cancel();
         }
     }

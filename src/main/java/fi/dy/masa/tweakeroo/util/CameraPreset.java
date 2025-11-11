@@ -2,11 +2,11 @@ package fi.dy.masa.tweakeroo.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,21 +23,21 @@ public class CameraPreset
 			inst -> inst.group(
 					PrimitiveCodec.INT.fieldOf("id").forGetter(get -> get.id),
 					PrimitiveCodec.STRING.fieldOf("name").forGetter(get -> get.name),
-					ResourceLocation.CODEC.fieldOf("dim").forGetter(get -> get.dim),
-					Vec3.CODEC.fieldOf("pos").forGetter(get -> get.pos),
+					Identifier.CODEC.fieldOf("dim").forGetter(get -> get.dim),
+					Vec3d.CODEC.fieldOf("pos").forGetter(get -> get.pos),
 					PrimitiveCodec.FLOAT.fieldOf("yaw").forGetter(get -> get.yaw),
 					PrimitiveCodec.FLOAT.fieldOf("pitch").forGetter(get -> get.pitch)
 			).apply(inst, CameraPreset::new)
 	);
-	public static final CameraPreset EMPTY = new CameraPreset(-1, "EMPTY", Level.OVERWORLD.location(), Vec3.ZERO, 0.0f, 0.0f);
+	public static final CameraPreset EMPTY = new CameraPreset(-1, "EMPTY", World.OVERWORLD.getValue(), Vec3d.ZERO, 0.0f, 0.0f);
 	private final int id;
 	private String name;
-	private final ResourceLocation dim;
-	private Vec3 pos;
+	private final Identifier dim;
+	private Vec3d pos;
 	private float yaw;
 	private float pitch;
 
-	public CameraPreset(final int id, String name, ResourceLocation dim, Vec3 pos, float yaw, float pitch)
+	public CameraPreset(final int id, String name, Identifier dim, Vec3d pos, float yaw, float pitch)
 	{
 		this.id = id;
 		this.name = name;
@@ -57,12 +57,12 @@ public class CameraPreset
 		return this.name;
 	}
 
-	public ResourceLocation getDim()
+	public Identifier getDim()
 	{
 		return this.dim;
 	}
 
-	public Vec3 getPos()
+	public Vec3d getPos()
 	{
 		return this.pos;
 	}
@@ -82,7 +82,7 @@ public class CameraPreset
 		this.name = name;
 	}
 
-	public void setPos(Vec3 pos, float yaw, float pitch)
+	public void setPos(Vec3d pos, float yaw, float pitch)
 	{
 		this.pos = pos;
 		this.yaw = yaw;
@@ -139,11 +139,11 @@ public class CameraPreset
 		else if (o instanceof Entity camera)
 		{
 			// Should match a relative position.  Need to dial this in.
-			return   this.dim.equals(camera.level().dimension().location()) &&
-					(this.pos.closerThan(camera.getEyePosition(), 0.75d, 0.75d) ||        // 3/4-block offset ?
-					 this.pos.closerThan(camera.position(), 0.75d, 0.75d)) &&
-					 Math.abs(this.yaw - camera.getYRot()) < 35.0f &&        // 35 deg offset ?
-					 Math.abs(this.pitch - camera.getXRot()) < 35.0f;
+			return   this.dim.equals(camera.getEntityWorld().getRegistryKey().getValue()) &&
+					(this.pos.isWithinRangeOf(camera.getEyePos(), 0.75d, 0.75d) ||        // 3/4-block offset ?
+					 this.pos.isWithinRangeOf(camera.getEntityPos(), 0.75d, 0.75d)) &&
+					 Math.abs(this.yaw - camera.getYaw()) < 35.0f &&        // 35 deg offset ?
+					 Math.abs(this.pitch - camera.getPitch()) < 35.0f;
 		}
 
 		return false;
@@ -175,12 +175,12 @@ public class CameraPreset
 	{
 		return  "[#"+this.toIdName()+"]"+
 				" "+this.dim.getPath()+":"+
-				" ("+BlockPos.containing(this.pos.x, this.pos.y, this.pos.z).toShortString()+")";
+				" ("+BlockPos.ofFloored(this.pos.x, this.pos.y, this.pos.z).toShortString()+")";
 	}
 
 	public String toShortStringStyled()
 	{
-		BlockPos pos = BlockPos.containing(this.pos.x, this.pos.y, this.pos.z);
+		BlockPos pos = BlockPos.ofFloored(this.pos.x, this.pos.y, this.pos.z);
 
 		return  "[§b#"+String.format("%02d", this.id)+"§r, §a"+this.name+"§r]"+
 				" §e"+this.dim.getPath()+":§r"+

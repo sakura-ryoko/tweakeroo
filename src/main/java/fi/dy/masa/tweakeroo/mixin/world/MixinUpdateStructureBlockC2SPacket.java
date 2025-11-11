@@ -8,16 +8,16 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Slice;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.network.protocol.game.ServerboundSetStructureBlockPacket;
+import net.minecraft.network.packet.c2s.play.UpdateStructureBlockC2SPacket;
 
-@Mixin(value = ServerboundSetStructureBlockPacket.class, priority = 999)
+@Mixin(value = UpdateStructureBlockC2SPacket.class, priority = 999)
 public abstract class MixinUpdateStructureBlockC2SPacket
 {
-    @ModifyConstant(method = "<init>(Lnet/minecraft/network/FriendlyByteBuf;)V",
+    @ModifyConstant(method = "<init>(Lnet/minecraft/network/PacketByteBuf;)V",
             slice = @Slice(from = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
-                                      target = "Lnet/minecraft/network/protocol/game/ServerboundSetStructureBlockPacket;name:Ljava/lang/String;"),
+                                      target = "Lnet/minecraft/network/packet/c2s/play/UpdateStructureBlockC2SPacket;templateName:Ljava/lang/String;"),
                            to   = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
-                                      target = "Lnet/minecraft/network/protocol/game/ServerboundSetStructureBlockPacket;mirror:Lnet/minecraft/world/level/block/Mirror;")),
+                                      target = "Lnet/minecraft/network/packet/c2s/play/UpdateStructureBlockC2SPacket;mirror:Lnet/minecraft/util/BlockMirror;")),
             constant = { @Constant(intValue = -48), @Constant(intValue = 48) }, require = 0)
     private int tweakeroo_overrideStructureBlockSizeLimit(int original)
     {

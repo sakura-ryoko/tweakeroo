@@ -6,18 +6,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.Camera;
-import net.minecraft.world.level.material.FogType;
+import net.minecraft.block.enums.CameraSubmersionType;
+import net.minecraft.client.render.Camera;
 
 @Mixin(value = Camera.class, priority = 1005)
 public class MixinCamera_freeCam
 {
-    @Inject(method = "getFluidInCamera", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_disableFluidFog(CallbackInfoReturnable<FogType> cir)
+    @Inject(method = "getSubmersionType", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_disableFluidFog(CallbackInfoReturnable<CameraSubmersionType> cir)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
-            cir.setReturnValue(FogType.NONE);
+            cir.setReturnValue(CameraSubmersionType.NONE);
         }
     }
 }

@@ -4,32 +4,32 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.fog.FogRenderer;
-import net.minecraft.util.Mth;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.fog.FogRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.MathHelper;
 
 @Mixin(FogRenderer.class)
 public class MixinFogRenderer
 {
-    @Redirect(method = "computeFogColor",
+    @Redirect(method = "getFogColor",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;voidDarknessOnsetRange()F"))
-    private float tweakeroo_disableSkyDarkness(ClientLevel.ClientLevelData instance)
+                       target = "Lnet/minecraft/client/world/ClientWorld$Properties;getVoidDarknessRange()F"))
+    private float tweakeroo_disableSkyDarkness(ClientWorld.Properties instance)
     {
-        return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : instance.voidDarknessOnsetRange();
+        return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : instance.getVoidDarknessRange();
     }
 
-    @ModifyConstant(method = "setupFog(Lnet/minecraft/client/Camera;IZLnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lorg/joml/Vector4f;",
+    @ModifyConstant(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
                     constant = { @Constant(intValue = 16) })
     private int tweakeroo_tweakRenderDistanceFog_DistanceMultiplier(int constant)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {
-            Minecraft mc = Minecraft.getInstance();
+            MinecraftClient mc = MinecraftClient.getInstance();
 
-            final int viewDistance = mc.options.getEffectiveRenderDistance();
-            final float blocksDistance = Math.max(512.0F, mc.gameRenderer.getRenderDistance());
+            final int viewDistance = mc.options.getClampedViewDistance();
+            final float blocksDistance = Math.max(512.0F, mc.gameRenderer.getViewDistanceBlocks());
 
             // 42 is the answer :)
             return (int) (blocksDistance / viewDistance);
@@ -38,9 +38,9 @@ public class MixinFogRenderer
         return constant;
     }
 
-    @Redirect(method = "setupFog(Lnet/minecraft/client/Camera;IZLnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lorg/joml/Vector4f;",
+    @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/util/Mth;clamp(FFF)F"))
+                     target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"))
     private float tweakeroo_tweakRenderDistanceFog_StartDiff(float value, float min, float max)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
@@ -48,6 +48,6 @@ public class MixinFogRenderer
             return min;
         }
 
-        return Mth.clamp(value, min, max);
+        return MathHelper.clamp(value, min, max);
     }
 }

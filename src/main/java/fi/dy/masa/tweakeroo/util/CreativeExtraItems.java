@@ -5,27 +5,27 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.InfestedBlock;
+import net.minecraft.block.InfestedBlock;
+import net.minecraft.item.*;
+import net.minecraft.text.TextContent;
+import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.util.collection.DefaultedList;
 
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 
 public class CreativeExtraItems
 {
-    private static final ArrayListMultimap<CreativeModeTab, ItemStack> ADDED_ITEMS = ArrayListMultimap.create();
-    private static final HashMap<Item, CreativeModeTab> OVERRIDDEN_GROUPS = new HashMap<>();
+    private static final ArrayListMultimap<ItemGroup, ItemStack> ADDED_ITEMS = ArrayListMultimap.create();
+    private static final HashMap<Item, ItemGroup> OVERRIDDEN_GROUPS = new HashMap<>();
 
     @Nullable
-    public static CreativeModeTab getGroupFor(Item item)
+    public static ItemGroup getGroupFor(Item item)
     {
         return OVERRIDDEN_GROUPS.get(item);
     }
 
-    public static List<ItemStack> getExtraStacksForGroup(CreativeModeTab group)
+    public static List<ItemStack> getExtraStacksForGroup(ItemGroup group)
     {
         return ADDED_ITEMS.get(group);
     }
@@ -36,11 +36,11 @@ public class CreativeExtraItems
         // So use an ugly workaround for now to find the correct group, to avoid the API
         // dependency and an extra Mixin accessor.
         // TODO 1.19.3+ ?
-        for (CreativeModeTab group : CreativeModeTabs.allTabs())
+        for (ItemGroup group : ItemGroups.getGroups())
         {
-            ComponentContents content = group.getDisplayName().getContents();
+            TextContent content = group.getDisplayName().getContent();
 
-            if (content instanceof TranslatableContents translatableTextContent &&
+            if (content instanceof TranslatableTextContent translatableTextContent &&
                 translatableTextContent.getKey().equals("itemGroup.op"))
             {
                 setCreativeExtraItems(group, items);
@@ -49,7 +49,7 @@ public class CreativeExtraItems
         }
     }
 
-    private static void setCreativeExtraItems(CreativeModeTab group, List<String> items)
+    private static void setCreativeExtraItems(ItemGroup group, List<String> items)
     {
         ADDED_ITEMS.clear();
         OVERRIDDEN_GROUPS.clear();
@@ -79,7 +79,7 @@ public class CreativeExtraItems
         }
     }
 
-    public static void removeInfestedBlocks(NonNullList<ItemStack> stacks)
+    public static void removeInfestedBlocks(DefaultedList<ItemStack> stacks)
     {
         stacks.removeIf((stack) -> stack.getItem() instanceof BlockItem &&
                                    ((BlockItem) stack.getItem()).getBlock() instanceof InfestedBlock);

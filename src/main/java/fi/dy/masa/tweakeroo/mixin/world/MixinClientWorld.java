@@ -1,39 +1,39 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.storage.WritableLevelData;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.MutableWorldProperties;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientLevel.class)
-public abstract class MixinClientWorld extends Level
+@Mixin(ClientWorld.class)
+public abstract class MixinClientWorld extends World
 {
-    private MixinClientWorld(WritableLevelData properties,
-                             ResourceKey<Level> registryRef,
-                             RegistryAccess registryManager,
-                             Holder<DimensionType> dimension,
+    private MixinClientWorld(MutableWorldProperties properties,
+                             RegistryKey<World> registryRef,
+                             DynamicRegistryManager registryManager,
+                             RegistryEntry<DimensionType> dimension,
                              boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates)
     {
         super(properties, registryRef, registryManager, dimension, isClient, debugWorld, seed, maxChainedNeighborUpdates);
     }
 
-    @Inject(method = "tickNonPassenger", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "tickEntity(Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void disableClientEntityTicking(Entity entity, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CLIENT_ENTITY_UPDATES.getBooleanValue() &&
-            (entity instanceof Player) == false)
+            (entity instanceof PlayerEntity) == false)
         {
             ci.cancel();
         }
@@ -60,7 +60,7 @@ public abstract class MixinClientWorld extends Level
     }
     */
 
-    @Inject(method = "setBlocksDirty", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "scheduleBlockRerenderIfNeeded", at = @At("HEAD"), cancellable = true)
     private void disableChunkReRenders(BlockPos pos, BlockState old, BlockState updated, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
@@ -69,7 +69,7 @@ public abstract class MixinClientWorld extends Level
         }
     }
 
-    @Inject(method = "setSectionDirtyWithNeighbors", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "scheduleBlockRenders", at = @At("HEAD"), cancellable = true)
     private void disableChunkReRenders(int x, int y, int z, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
@@ -78,7 +78,7 @@ public abstract class MixinClientWorld extends Level
         }
     }
 
-    @Inject(method = "sendBlockUpdated", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "updateListeners", at = @At("HEAD"), cancellable = true)
     private void disableChunkReRenders(BlockPos pos, BlockState oldState, BlockState newState, int flags, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
@@ -87,7 +87,7 @@ public abstract class MixinClientWorld extends Level
         }
     }
 
-	@Inject(method = "addDestroyBlockEffect(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V",
+	@Inject(method = "addBlockBreakParticles(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V",
 			at = @At("HEAD"), cancellable = true)
 	private void tweakeroo_onAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci)
 	{

@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 
-@Mixin(value = MultiPlayerGameMode.class, priority = 1005)
+@Mixin(value = ClientPlayerInteractionManager.class, priority = 1005)
 public class MixinClientPlayerInteractionManager_freeCam
 {
-	@Inject(method = "hasExperience", at = @At("RETURN"), cancellable = true)
+	@Inject(method = "hasExperienceBar", at = @At("RETURN"), cancellable = true)
 	private void tweakeroo_disableExpLevel(CallbackInfoReturnable<Boolean> cir)
 	{
 		// This disables the "Exp Level" number (We can't Mixin into an Interface class)

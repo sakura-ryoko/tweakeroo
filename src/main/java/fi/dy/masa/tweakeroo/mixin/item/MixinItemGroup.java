@@ -1,9 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.item;
 
-import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.item.ItemGroup;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(CreativeModeTab.class)
+@Mixin(ItemGroup.class)
 public abstract class MixinItemGroup
 {
     /* // TODO 1.19.3+

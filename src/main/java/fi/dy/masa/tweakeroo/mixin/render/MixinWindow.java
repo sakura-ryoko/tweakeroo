@@ -5,23 +5,23 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.mojang.blaze3d.platform.Window;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.Window;
 
 @Mixin(Window.class)
 public abstract class MixinWindow
 {
-    @Shadow public abstract int getScreenWidth();
-    @Shadow public abstract int getScreenHeight();
+    @Shadow public abstract int getWidth();
+    @Shadow public abstract int getHeight();
 
-    @Inject(method = "getGuiScale", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getScaleFactor", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_customGuiScaleGetScale(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
-            Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>)
+            MinecraftClient.getInstance().currentScreen instanceof HandledScreen<?>)
         {
             int scale = Configs.Generic.CUSTOM_INVENTORY_GUI_SCALE.getIntegerValue();
 
@@ -32,32 +32,32 @@ public abstract class MixinWindow
         }
     }
 
-    @Inject(method = "getGuiScaledWidth", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getScaledWidth", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_customGuiScaleGetWidth(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
-            Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>)
+            MinecraftClient.getInstance().currentScreen instanceof HandledScreen<?>)
         {
             int scale = Configs.Generic.CUSTOM_INVENTORY_GUI_SCALE.getIntegerValue();
 
             if (scale > 0)
             {
-                cir.setReturnValue((int) Math.ceil((double) this.getScreenWidth() / scale));
+                cir.setReturnValue((int) Math.ceil((double) this.getWidth() / scale));
             }
         }
     }
 
-    @Inject(method = "getGuiScaledHeight", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getScaledHeight", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_customGuiScaleGetHeight(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
-            Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>)
+            MinecraftClient.getInstance().currentScreen instanceof HandledScreen<?>)
         {
             int scale = Configs.Generic.CUSTOM_INVENTORY_GUI_SCALE.getIntegerValue();
 
             if (scale > 0)
             {
-                cir.setReturnValue((int) Math.ceil((double) this.getScreenHeight() / scale));
+                cir.setReturnValue((int) Math.ceil((double) this.getHeight() / scale));
             }
         }
     }

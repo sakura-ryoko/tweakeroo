@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.item.ItemStack;
 
 /**
  * <a href="https://github.com/kikugie/stackable-shulkers-fix">...</a> by KikuGie
@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 public class MixinHopperBlockEntity
 {
     @WrapOperation(
-            method = "inventoryFull",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I")
+            method = "isFull",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getMaxCount()I")
     )
     private int modifyShulkerMaxCount(ItemStack instance, Operation<Integer> original)
     {
@@ -34,8 +34,8 @@ public class MixinHopperBlockEntity
     }
 
     @WrapOperation(
-            method = "isFullContainer",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I")
+            method = "isInventoryFull",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getMaxCount()I")
     )
     private static int modifyShulkerMaxCountStatic(ItemStack instance, Operation<Integer> original)
     {

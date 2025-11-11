@@ -2,35 +2,33 @@ package fi.dy.masa.tweakeroo.tweaks;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.AxeItem;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.ShovelItem;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -51,8 +49,8 @@ public class PlacementTweaks
     private static BlockPos posFirstBreaking = null;
     private static BlockPos posLast = null;
     private static PositionUtils.HitPart hitPartFirst = null;
-    private static InteractionHand handFirst = InteractionHand.MAIN_HAND;
-    private static Vec3 hitVecFirst = null;
+    private static Hand handFirst = Hand.MAIN_HAND;
+    private static Vec3d hitVecFirst = null;
     private static Direction sideFirst = null;
     private static Direction sideFirstBreaking = null;
     private static Direction sideRotatedFirst = null;
@@ -73,10 +71,10 @@ public class PlacementTweaks
     public static final ItemRestriction FAST_PLACEMENT_ITEM_RESTRICTION = new ItemRestriction();
     public static final ItemRestriction HAND_RESTOCK_RESTRICTION = new ItemRestriction();
 
-    public static void onTick(Minecraft mc)
+    public static void onTick(MinecraftClient mc)
     {
-        boolean attack = mc.options.keyAttack.isDown();
-        boolean use = mc.options.keyUse.isDown();
+        boolean attack = mc.options.attackKey.isPressed();
+        boolean use = mc.options.useKey.isPressed();
 
         if (GuiUtils.getCurrentScreen() == null && !FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
         {
@@ -115,11 +113,11 @@ public class PlacementTweaks
         }
     }
 
-    public static boolean onProcessRightClickPre(Player player, InteractionHand hand)
+    public static boolean onProcessRightClickPre(PlayerEntity player, Hand hand)
     {
         InventoryUtils.trySwapCurrentToolIfNearlyBroken();
 
-        ItemStack stackOriginal = player.getItemInHand(hand);
+        ItemStack stackOriginal = player.getStackInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
                 stackOriginal.isEmpty() == false &&
@@ -140,7 +138,7 @@ public class PlacementTweaks
         return InventoryUtils.canUnstackingItemNotFitInInventory(stackOriginal, player);
     }
 
-    public static void onProcessRightClickPost(Player player, InteractionHand hand)
+    public static void onProcessRightClickPost(PlayerEntity player, Hand hand)
     {
         //System.out.printf("onProcessRightClickPost -> tryRestockHand with: %s, current: %s\n", stackBeforeUse[hand.ordinal()], player.getStackInHand(hand));
         tryRestockHand(player, hand, stackBeforeUse[hand.ordinal()]);
@@ -148,29 +146,29 @@ public class PlacementTweaks
 
     public static void onLeftClickMousePre()
     {
-        Minecraft mc = Minecraft.getInstance();
-        HitResult trace = mc.hitResult;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        HitResult trace = mc.crosshairTarget;
 
         // Only set the position if it was null, otherwise the fast left click tweak
         // would just reset it every time.
         if (trace != null && trace.getType() == HitResult.Type.BLOCK && posFirstBreaking == null)
         {
             posFirstBreaking = ((BlockHitResult) trace).getBlockPos();
-            sideFirstBreaking = ((BlockHitResult) trace).getDirection();
+            sideFirstBreaking = ((BlockHitResult) trace).getSide();
         }
 
-        onProcessRightClickPre(mc.player, InteractionHand.MAIN_HAND);
+        onProcessRightClickPre(mc.player, Hand.MAIN_HAND);
     }
 
     public static void onLeftClickMousePost()
     {
-        onProcessRightClickPost(Minecraft.getInstance().player, InteractionHand.MAIN_HAND);
+        onProcessRightClickPost(MinecraftClient.getInstance().player, Hand.MAIN_HAND);
     }
 
-    public static void cacheStackInHand(InteractionHand hand)
+    public static void cacheStackInHand(Hand hand)
     {
-        Player player = Minecraft.getInstance().player;
-        ItemStack stackOriginal = player.getItemInHand(hand);
+        PlayerEntity player = MinecraftClient.getInstance().player;
+        ItemStack stackOriginal = player.getStackInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
                 stackOriginal.isEmpty() == false &&
@@ -181,12 +179,12 @@ public class PlacementTweaks
         }
     }
 
-    private static void onAttackTick(Minecraft mc)
+    private static void onAttackTick(MinecraftClient mc)
     {
         if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())
         {
-            if (mc.player.getAbilities().instabuild ||
-                    (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (EquipmentUtils.isAnyTool(mc.player.getMainHandItem())) == false))
+            if (mc.player.getAbilities().creativeMode ||
+                    (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (EquipmentUtils.isAnyTool(mc.player.getMainHandStack())) == false))
             {
                 final int count = Configs.Generic.FAST_LEFT_CLICK_COUNT.getIntegerValue();
 
@@ -201,14 +199,14 @@ public class PlacementTweaks
         else
         {
             InventoryUtils.trySwapCurrentToolIfNearlyBroken();
-            InteractionHand hand = InteractionHand.MAIN_HAND;
+            Hand hand = Hand.MAIN_HAND;
             tryRestockHand(mc.player, hand, stackBeforeUse[hand.ordinal()]);
         }
     }
 
     private static void onUsingTick()
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         if (mc.player == null)
         {
@@ -218,16 +216,16 @@ public class PlacementTweaks
         if (posFirst != null && FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.getBooleanValue() &&
                 canUseItemWithRestriction(FAST_PLACEMENT_ITEM_RESTRICTION, mc.player))
         {
-            LocalPlayer player = mc.player;
-            Level world = player.level();
-            final double reach = mc.player.blockInteractionRange();
+            ClientPlayerEntity player = mc.player;
+            World world = player.getEntityWorld();
+            final double reach = mc.player.getBlockInteractionRange();
             final int maxCount = Configs.Generic.FAST_BLOCK_PLACEMENT_COUNT.getIntegerValue();
 
-            mc.hitResult = player.pick(reach, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), false);
+            mc.crosshairTarget = player.raycast(reach, mc.getRenderTickCounter().getTickProgress(false), false);
 
             for (int i = 0; i < maxCount; ++i)
             {
-                HitResult trace = mc.hitResult;
+                HitResult trace = mc.crosshairTarget;
 
                 if (trace == null || trace.getType() != HitResult.Type.BLOCK)
                 {
@@ -235,28 +233,28 @@ public class PlacementTweaks
                 }
 
                 BlockHitResult blockHitResult = (BlockHitResult) trace;
-                InteractionHand hand = handFirst;
-                Direction side = blockHitResult.getDirection();
+                Hand hand = handFirst;
+                Direction side = blockHitResult.getSide();
                 BlockPos pos = blockHitResult.getBlockPos();
-                Vec3 hitVec = blockHitResult.getLocation();
+                Vec3d hitVec = blockHitResult.getPos();
 
                 // Written by Andrew54757 under TweakFork
                 if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue())
                 {
-                    ItemStack stack = player.getItemInHand(hand);
+                    ItemStack stack = player.getStackInHand(hand);
 
                     side = getScaffoldPlaceDirection(side, hitPartFirst, player);
                     pos = getScaffoldPlacePosition(pos, side, world, stack, player);
                     if (pos == null) return;
 
-                    pos = pos.relative(side.getOpposite());
+                    pos = pos.offset(side.getOpposite());
                 }
 
                 BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
-                BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+                ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
                 BlockPos posNew = getPlacementPositionForTargetedPosition(world, pos, side, ctx);
                 hitResult = new BlockHitResult(hitVec, side, posNew, false);
-                ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+                ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
 
                 if (hand != null &&
                         posNew.equals(posLast) == false &&
@@ -278,13 +276,13 @@ public class PlacementTweaks
                     */
 
                     hitVec = hitVecFirst.add(posNew.getX(), posNew.getY(), posNew.getZ());
-                    InteractionResult result = tryPlaceBlock(mc.gameMode, player, mc.level,
+                    ActionResult result = tryPlaceBlock(mc.interactionManager, player, mc.world,
                                                         posNew, sideFirst, sideRotatedFirst, playerYawFirst, hitVec, hand, hitPartFirst, false);
 
-                    if (result == InteractionResult.SUCCESS)
+                    if (result == ActionResult.SUCCESS)
                     {
                         posLast = posNew;
-                        mc.hitResult = player.pick(reach, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), false);
+                        mc.crosshairTarget = player.raycast(reach, mc.getRenderTickCounter().getTickProgress(false), false);
                     }
                     else
                     {
@@ -301,7 +299,7 @@ public class PlacementTweaks
             ((IMinecraftClientInvoker) mc).tweakeroo_setItemUseCooldown(4);
         }
         else if (FeatureToggle.TWEAK_FAST_RIGHT_CLICK.getBooleanValue() &&
-                mc.options.keyUse.isDown() &&
+                mc.options.useKey.isPressed() &&
                 canUseFastRightClick(mc.player))
         {
             final int count = Configs.Generic.FAST_RIGHT_CLICK_COUNT.getIntegerValue();
@@ -315,45 +313,45 @@ public class PlacementTweaks
         }
     }
 
-    public static InteractionResult onProcessRightClickBlock(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            ClientLevel world,
-            InteractionHand hand,
+    public static ActionResult onProcessRightClickBlock(
+            ClientPlayerInteractionManager controller,
+            ClientPlayerEntity player,
+            ClientWorld world,
+            Hand hand,
             BlockHitResult hitResult)
     {
         if (CameraUtils.shouldPreventPlayerInputs())
         {
-            return InteractionResult.PASS;
+            return ActionResult.PASS;
         }
 
         InventoryUtils.trySwapCurrentToolIfNearlyBroken();
 
-        ItemStack stackPre = player.getItemInHand(hand);
+        ItemStack stackPre = player.getStackInHand(hand);
         BlockPos posIn = hitResult.getBlockPos();
 
         if (Configs.Disable.DISABLE_AXE_STRIPPING.getBooleanValue() &&
             stackPre.getItem() instanceof AxeItem &&
             MiscUtils.isStrippableLog(world, posIn))
         {
-            return InteractionResult.PASS;
+            return ActionResult.PASS;
         }
 
         if (Configs.Disable.DISABLE_SHOVEL_PATHING.getBooleanValue() &&
             stackPre.getItem() instanceof ShovelItem &&
             MiscUtils.isShovelPathConvertableBlock(world, posIn))
         {
-            return InteractionResult.PASS;
+            return ActionResult.PASS;
         }
 
         stackPre = stackPre.copy();
         boolean restricted = FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.getBooleanValue() || FeatureToggle.TWEAK_PLACEMENT_GRID.getBooleanValue();
-        Direction sideIn = hitResult.getDirection();
-        Vec3 hitVec = hitResult.getLocation();
-        Direction playerFacingH = player.getDirection();
+        Direction sideIn = hitResult.getSide();
+        Vec3d hitVec = hitResult.getPos();
+        Direction playerFacingH = player.getHorizontalFacing();
         PositionUtils.HitPart hitPart = PositionUtils.getHitPart(sideIn, playerFacingH, posIn, hitVec);
         Direction sideRotated = getRotatedFacing(sideIn, playerFacingH, hitPart);
-        float yaw = player.getYRot();
+        float yaw = player.getYaw();
 
         cacheStackInHand(hand);
 
@@ -366,7 +364,7 @@ public class PlacementTweaks
 
         if (canPlaceBlockAgainst(world, posIn, player, hand) == false)
         {
-            return InteractionResult.PASS;
+            return ActionResult.PASS;
         }
 
         boolean flexible = FeatureToggle.TWEAK_FLEXIBLE_BLOCK_PLACEMENT.getBooleanValue();
@@ -377,26 +375,26 @@ public class PlacementTweaks
         // Written by Andrew54757 under TweakFork
         if (FeatureToggle.TWEAK_SCAFFOLD_PLACE.getBooleanValue() && (!flexible || (!rotation && !offset && !adjacent)))
         {
-            ItemStack stack = player.getItemInHand(hand);
+            ItemStack stack = player.getStackInHand(hand);
             Direction extendDirection = getScaffoldPlaceDirection(sideIn, hitPart, player);
             BlockPos newPos = getScaffoldPlacePosition(posIn, extendDirection, world, stack, player);
 
             if (newPos == null)
             {
-                return InteractionResult.PASS;
+                return ActionResult.PASS;
             }
 
-            newPos = newPos.relative(extendDirection.getOpposite());
+            newPos = newPos.offset(extendDirection.getOpposite());
             sideIn = extendDirection;
             hitVec = hitVec.subtract(posIn.getX(), posIn.getY(), posIn.getZ()).add(newPos.getX(),newPos.getY(),newPos.getZ());
             posIn = newPos;
         }
 
         //System.out.printf("onProcessRightClickBlock() pos: %s, side: %s, part: %s, hitVec: %s\n", posIn, sideIn, hitPart, hitVec);
-        InteractionResult result = tryPlaceBlock(controller, player, world, posIn, sideIn, sideRotated, yaw, hitVec, hand, hitPart, true);
+        ActionResult result = tryPlaceBlock(controller, player, world, posIn, sideIn, sideRotated, yaw, hitVec, hand, hitPart, true);
 
         // Store the initial click data for the fast placement mode
-        if (posFirst == null && result == InteractionResult.SUCCESS && restricted)
+        if (posFirst == null && result == ActionResult.SUCCESS && restricted)
         {
             boolean accurate = FeatureToggle.TWEAK_ACCURATE_BLOCK_PLACEMENT.getBooleanValue();
             boolean accurateIn = Hotkeys.ACCURATE_BLOCK_PLACEMENT_IN.getKeybind().isKeybindHeld();
@@ -405,7 +403,7 @@ public class PlacementTweaks
             firstWasRotation = (flexible && rotation) || (accurate && (accurateIn || accurateReverse));
             firstWasOffset = flexible && offset;
             BlockHitResult hitResultTmp = new BlockHitResult(hitVec, sideIn, posIn, false);
-            BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResultTmp));
+            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResultTmp));
             posFirst = getPlacementPositionForTargetedPosition(world, posIn, sideIn, ctx);
             posLast = posFirst;
             hitPartFirst = hitPart;
@@ -422,14 +420,14 @@ public class PlacementTweaks
     }
 
     // Written by Andrew54757 under TweakFork
-    private static Direction getScaffoldPlaceDirection(Direction side, PositionUtils.HitPart hitPart, Player player)
+    private static Direction getScaffoldPlaceDirection(Direction side, PositionUtils.HitPart hitPart, PlayerEntity player)
     {
-        Direction offsetIn = getRotatedFacing(side, player.getDirection(), hitPart).getOpposite();
+        Direction offsetIn = getRotatedFacing(side, player.getHorizontalFacing(), hitPart).getOpposite();
         Direction extendDirection;
 
         if (side == Direction.UP || side == Direction.DOWN)
         {
-            extendDirection = (hitPart == PositionUtils.HitPart.CENTER || Configs.Generic.SCAFFOLD_PLACE_VANILLA.getBooleanValue()) ? player.getDirection() : offsetIn;
+            extendDirection = (hitPart == PositionUtils.HitPart.CENTER || Configs.Generic.SCAFFOLD_PLACE_VANILLA.getBooleanValue()) ? player.getHorizontalFacing() : offsetIn;
         }
         else
         {
@@ -439,7 +437,7 @@ public class PlacementTweaks
         return extendDirection;
     }
 
-    private static BlockPos getScaffoldPlacePosition(BlockPos pos, Direction extendDirection, Level world, ItemStack stack, Player player)
+    private static BlockPos getScaffoldPlacePosition(BlockPos pos, Direction extendDirection, World world, ItemStack stack, PlayerEntity player)
     {
         if (!(stack.getItem() instanceof BlockItem) || extendDirection == null)
         {
@@ -447,9 +445,9 @@ public class PlacementTweaks
         }
 
         Block itemBlock = ((BlockItem)stack.getItem()).getBlock();
-        Minecraft mc = Minecraft.getInstance();
-        double reach = mc.player.blockInteractionRange();
-        BlockPos.MutableBlockPos tempPos = new BlockPos.MutableBlockPos(pos.getX(),pos.getY(),pos.getZ());
+        MinecraftClient mc = MinecraftClient.getInstance();
+        double reach = mc.player.getBlockInteractionRange();
+        BlockPos.Mutable tempPos = new BlockPos.Mutable(pos.getX(),pos.getY(),pos.getZ());
 
         for (int i = 0; i < Configs.Generic.SCAFFOLD_PLACE_DISTANCE.getIntegerValue(); i++)
         {
@@ -464,9 +462,9 @@ public class PlacementTweaks
 
             if (state.getBlock() != itemBlock)
             {
-                if (state.isAir() || state.canBeReplaced())
+                if (state.isAir() || state.isReplaceable())
                 {
-                    return tempPos.immutable();
+                    return tempPos.toImmutable();
                 }
 
                 return null;
@@ -476,16 +474,16 @@ public class PlacementTweaks
         return null;
     }
 
-    private static InteractionResult tryPlaceBlock(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            ClientLevel world,
+    private static ActionResult tryPlaceBlock(
+            ClientPlayerInteractionManager controller,
+            ClientPlayerEntity player,
+            ClientWorld world,
             BlockPos posIn,
             Direction sideIn,
             Direction sideRotatedIn,
             float playerYaw,
-            Vec3 hitVec,
-            InteractionHand hand,
+            Vec3d hitVec,
+            Hand hand,
             PositionUtils.HitPart hitPart,
             boolean isFirstClick)
     {
@@ -499,19 +497,19 @@ public class PlacementTweaks
         boolean rememberFlexible = Configs.Generic.REMEMBER_FLEXIBLE.getBooleanValue();
         boolean rotation = rotationHeld || (rememberFlexible && firstWasRotation);
         boolean offset = offsetHeld || (rememberFlexible && firstWasOffset);
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = player.getStackInHand(hand);
 
         if (flexible)
         {
             BlockHitResult hitResult = new BlockHitResult(hitVec, sideIn, posIn, false);
-            BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
             posNew = isFirstClick && (rotation || offset || adjacent) ? getPlacementPositionForTargetedPosition(world, posIn, sideIn, ctx) : posIn;
 
             // Place the block into the adjacent position
             if (adjacent && hitPart != null && hitPart != PositionUtils.HitPart.CENTER)
             {
-                posNew = posNew.relative(sideRotatedIn.getOpposite()).relative(sideIn.getOpposite());
-                hitVec = hitVec.add(Vec3.atLowerCornerOf(sideRotatedIn.getOpposite().getUnitVec3i().offset(sideIn.getOpposite().getUnitVec3i())));
+                posNew = posNew.offset(sideRotatedIn.getOpposite()).offset(sideIn.getOpposite());
+                hitVec = hitVec.add(Vec3d.of(sideRotatedIn.getOpposite().getVector().add(sideIn.getOpposite().getVector())));
                 handleFlexible = true;
             }
 
@@ -530,8 +528,8 @@ public class PlacementTweaks
             // Place the block into the diagonal position
             if (offset)
             {
-                posNew = posNew.relative(sideRotatedIn.getOpposite());
-                hitVec = hitVec.add(Vec3.atLowerCornerOf(sideRotatedIn.getOpposite().getUnitVec3i()));
+                posNew = posNew.offset(sideRotatedIn.getOpposite());
+                hitVec = hitVec.add(Vec3d.of(sideRotatedIn.getOpposite().getVector()));
                 handleFlexible = true;
             }
         }
@@ -543,7 +541,7 @@ public class PlacementTweaks
             stack.getItem() instanceof BlockItem)
         {
             BlockHitResult hitResult = new BlockHitResult(hitVec, sideIn, posIn, false);
-            BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
             posNew = getPlacementPositionForTargetedPosition(world, posIn, sideIn, ctx);
             simpleOffset = true;
         }
@@ -567,7 +565,7 @@ public class PlacementTweaks
                 else
                 {
                     BlockHitResult hitResult = new BlockHitResult(hitVec, side, posIn, false);
-                    BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+                    ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
                     posNew = getPlacementPositionForTargetedPosition(world, posIn, side, ctx);
                 }
             }
@@ -592,20 +590,20 @@ public class PlacementTweaks
                 {
 
                     BlockHitResult hitResult = new BlockHitResult(hitVec, sideIn, posNew, false);
-                    BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+                    ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
 
                     BlockPos posPlacement = getPlacementPositionForTargetedPosition(world, posNew, sideIn, ctx);
 
                     hitResult = new BlockHitResult(hitVec, sideIn, posPlacement, false);
-                    ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+                    ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
 
                     BlockItem item = (BlockItem) stack.getItem();
-                    BlockState state = item.getBlock().getStateForPlacement(ctx);
+                    BlockState state = item.getBlock().getPlacementState(ctx);
 
                     // getStateForPlacement can return null in 1.13+
                     if (state == null)
                     {
-                        return InteractionResult.PASS;
+                        return ActionResult.PASS;
                     }
 
                     Optional<Direction> facingTmp = fi.dy.masa.malilib.util.game.BlockUtils.getFirstPropertyFacingValue(state);
@@ -618,7 +616,7 @@ public class PlacementTweaks
                 }
                 else
                 {
-                    facing = player.getDirection();
+                    facing = player.getHorizontalFacing();
                 }
             }
 
@@ -639,21 +637,21 @@ public class PlacementTweaks
                 // Carpet-Extra mod accurate block placement protocol support
                 double relX = hitVec.x - posNew.getX();
                 double x = hitVec.x;
-                int afterClickerClickCount = Mth.clamp(Configs.Generic.AFTER_CLICKER_CLICK_COUNT.getIntegerValue(), 0, 32);
+                int afterClickerClickCount = MathHelper.clamp(Configs.Generic.AFTER_CLICKER_CLICK_COUNT.getIntegerValue(), 0, 32);
 
                 if (handleAccurate && fi.dy.masa.malilib.util.game.BlockUtils.isFacingValidForDirection(stack, facing))
                 {
                     int protocolValue = 0;
                     int shiftBy = 1;
-                    final int facingAdj = (facing.get3DDataValue() * 2);
+                    final int facingAdj = (facing.getIndex() * 2);
 
-                    protocolValue |= facing.get3DDataValue() << shiftBy;
+                    protocolValue |= facing.getIndex() << shiftBy;
                     shiftBy += 3;
 
-                    if (stack.is(ItemTags.TRAPDOORS) || stack.is(ItemTags.STAIRS))
+                    if (stack.isIn(ItemTags.TRAPDOORS) || stack.isIn(ItemTags.STAIRS))
                     {
                         // add BLOCK_HALF handling --> (BOTTOM)
-                        int requiredBits = Mth.log2(Mth.smallestEncompassingPowerOfTwo(2));
+                        int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
                         protocolValue |= (1 << shiftBy);
                         shiftBy += requiredBits;
                     }
@@ -672,7 +670,7 @@ public class PlacementTweaks
                     }
                     else
                     {
-                        x = posNew.getX() + relX + 2 + (facing.get3DDataValue() * 2);
+                        x = posNew.getX() + relX + 2 + (facing.getIndex() * 2);
                     }
                 }
 
@@ -683,7 +681,7 @@ public class PlacementTweaks
 
                 //System.out.printf("accurate - pre hitVec: %s\n", hitVec);
                 //System.out.printf("processRightClickBlockWrapper facing: %s, x: %.3f, pos: %s, side: %s\n", facing, x, posNew, side);
-                hitVec = new Vec3(x, hitVec.y, hitVec.z);
+                hitVec = new Vec3d(x, hitVec.y, hitVec.z);
                 //System.out.printf("accurate - post hitVec: %s\n", hitVec);
             }
 
@@ -694,7 +692,7 @@ public class PlacementTweaks
         if (handleFlexible)
         {
             BlockHitResult hitResult = new BlockHitResult(hitVec, side, posNew, false);
-            BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
 
             if (canPlaceBlockIntoPosition(world, posNew, ctx))
             {
@@ -703,7 +701,7 @@ public class PlacementTweaks
             }
             else
             {
-                return InteractionResult.PASS;
+                return ActionResult.PASS;
             }
         }
 
@@ -715,7 +713,7 @@ public class PlacementTweaks
         return processRightClickBlockWrapper(controller, player, world, simpleOffset ? posNew : posIn, sideIn, hitVec, hand);
     }
 
-    private static boolean canPlaceBlockAgainst(Level world, BlockPos pos, Player player, InteractionHand hand)
+    private static boolean canPlaceBlockAgainst(World world, BlockPos pos, PlayerEntity player, Hand hand)
     {
         if (FeatureToggle.TWEAK_PLACEMENT_REST_FIRST.getBooleanValue())
         {
@@ -743,7 +741,7 @@ public class PlacementTweaks
         {
             BlockState state = world.getBlockState(pos);
             ItemStack stackClicked = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
-            ItemStack stackHand = player.getItemInHand(hand);
+            ItemStack stackHand = player.getStackInHand(hand);
 
             return fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClicked, stackHand);
         }
@@ -751,9 +749,9 @@ public class PlacementTweaks
         return true;
     }
 
-    public static boolean canUseItemWithRestriction(ItemRestriction restriction, InteractionHand hand, Player player)
+    public static boolean canUseItemWithRestriction(ItemRestriction restriction, Hand hand, PlayerEntity player)
     {
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = player.getStackInHand(hand);
         return canUseItemWithRestriction(restriction, stack);
     }
 
@@ -762,40 +760,40 @@ public class PlacementTweaks
         return stack.isEmpty() || restriction.isAllowed(stack.getItem());
     }
 
-    public static boolean canUseItemWithRestriction(ItemRestriction restriction, Player player)
+    public static boolean canUseItemWithRestriction(ItemRestriction restriction, PlayerEntity player)
     {
-        return canUseItemWithRestriction(restriction, InteractionHand.MAIN_HAND, player) &&
-                canUseItemWithRestriction(restriction, InteractionHand.OFF_HAND, player);
+        return canUseItemWithRestriction(restriction, Hand.MAIN_HAND, player) &&
+                canUseItemWithRestriction(restriction, Hand.OFF_HAND, player);
     }
 
-    private static boolean canUseFastRightClick(Player player)
+    private static boolean canUseFastRightClick(PlayerEntity player)
     {
         if (canUseItemWithRestriction(FAST_RIGHT_CLICK_ITEM_RESTRICTION, player) == false)
         {
             return false;
         }
 
-        HitResult trace = player.pick(6, 0f, false);
+        HitResult trace = player.raycast(6, 0f, false);
 
         if (trace == null || trace.getType() != HitResult.Type.BLOCK)
         {
             return FAST_RIGHT_CLICK_BLOCK_RESTRICTION.isAllowed(Blocks.AIR);
         }
 
-        Block block = player.level().getBlockState(((BlockHitResult) trace).getBlockPos()).getBlock();
+        Block block = player.getEntityWorld().getBlockState(((BlockHitResult) trace).getBlockPos()).getBlock();
 
         return FAST_RIGHT_CLICK_BLOCK_RESTRICTION.isAllowed(block);
     }
 
-    public static void tryRestockHand(Player player, InteractionHand hand, ItemStack stackOriginal)
+    public static void tryRestockHand(PlayerEntity player, Hand hand, ItemStack stackOriginal)
     {
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
             canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
-            ItemStack stackCurrent = player.getItemInHand(hand);
+            ItemStack stackCurrent = player.getStackInHand(hand);
 
             if (stackOriginal.isEmpty() == false && player.getInventory().getSelectedSlot() == hotbarSlot &&
-                (stackCurrent.isEmpty() || ItemStack.isSameItem(stackCurrent, stackOriginal) == false))
+                (stackCurrent.isEmpty() || ItemStack.areItemsEqual(stackCurrent, stackOriginal) == false))
             {
                 // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
                 boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
@@ -806,20 +804,20 @@ public class PlacementTweaks
         }
     }
 
-    private static InteractionResult processRightClickBlockWrapper(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            ClientLevel world,
+    private static ActionResult processRightClickBlockWrapper(
+            ClientPlayerInteractionManager controller,
+            ClientPlayerEntity player,
+            ClientWorld world,
             BlockPos posIn,
             Direction sideIn,
-            Vec3 hitVecIn,
-            InteractionHand hand)
+            Vec3d hitVecIn,
+            Hand hand)
     {
         //System.out.printf("processRightClickBlockWrapper() start @ %s, side: %s, hand: %s\n", posIn, sideIn, hand);
         if (FeatureToggle.TWEAK_PLACEMENT_LIMIT.getBooleanValue() &&
             placementCount >= Configs.Generic.PLACEMENT_LIMIT.getIntegerValue())
         {
-            return InteractionResult.PASS;
+            return ActionResult.PASS;
         }
 
         // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
@@ -831,7 +829,7 @@ public class PlacementTweaks
         // We need to grab the stack here if the cached stack is still empty,
         // because this code runs before the cached stack gets set on the first click/use.
         BlockHitResult hitResult = new BlockHitResult(hitVecIn, sideIn, posIn, false);
-        BlockPlaceContext ctx = new BlockPlaceContext(new UseOnContext(player, hand, hitResult));
+        ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, hand, hitResult));
         BlockPos posPlacement = getPlacementPositionForTargetedPosition(world, posIn, sideIn, ctx);
         BlockState stateBefore = world.getBlockState(posPlacement);
         BlockState state = world.getBlockState(posIn);
@@ -845,26 +843,26 @@ public class PlacementTweaks
         }
         else
         {
-            stackOriginal = player.getItemInHand(hand).copy();
+            stackOriginal = player.getStackInHand(hand).copy();
         }
 
         if (FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.getBooleanValue() &&
-            state.canBeReplaced(ctx) == false && state.canBeReplaced())
+            state.canReplace(ctx) == false && state.isReplaceable())
         {
             // If the block itself says it's not replaceable, but the material is (fluids),
             // then we need to offset the position back, otherwise the check in ItemBlock
             // will offset the position by one forward from the desired position.
             // FIXME This will break if the block behind the desired position is replaceable though... >_>
-            posIn = posIn.relative(sideIn.getOpposite());
+            posIn = posIn.offset(sideIn.getOpposite());
         }
 
         if (posFirst != null && isPositionAllowedByPlacementRestriction(posIn, sideIn) == false)
         {
             //System.out.printf("processRightClickBlockWrapper() PASS @ %s, side: %s\n", posIn, sideIn);
-            return InteractionResult.PASS;
+            return ActionResult.PASS;
         }
 
-        final int afterClickerClickCount = Mth.clamp(Configs.Generic.AFTER_CLICKER_CLICK_COUNT.getIntegerValue(), 0, 32);
+        final int afterClickerClickCount = MathHelper.clamp(Configs.Generic.AFTER_CLICKER_CLICK_COUNT.getIntegerValue(), 0, 32);
 
         Direction facing = sideIn;
         boolean flexible = FeatureToggle.TWEAK_FLEXIBLE_BLOCK_PLACEMENT.getBooleanValue();
@@ -885,15 +883,15 @@ public class PlacementTweaks
             //double x = posIn.getX() + relX + 2 + (facing.getId() * 2);
             int protocolValue = 0;
             int shiftBy = 1;
-            final int facingAdj = (facing.get3DDataValue() * 2);
+            final int facingAdj = (facing.getIndex() * 2);
 
-            protocolValue |= facing.get3DDataValue() << shiftBy;
+            protocolValue |= facing.getIndex() << shiftBy;
             shiftBy += 3;
 
-            if (stackOriginal.is(ItemTags.TRAPDOORS) || stackOriginal.is(ItemTags.STAIRS))
+            if (stackOriginal.isIn(ItemTags.TRAPDOORS) || stackOriginal.isIn(ItemTags.STAIRS))
             {
                 // add BLOCK_HALF handling --> (BOTTOM)
-                int requiredBits = Mth.log2(Mth.smallestEncompassingPowerOfTwo(2));
+                int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(2));
                 protocolValue |= (1 << shiftBy);
                 shiftBy += requiredBits;
             }
@@ -908,7 +906,7 @@ public class PlacementTweaks
             }
 
             //System.out.printf("processRightClickBlockWrapper/Direction req facing: %s, x: %.3f, pos: %s, sideIn: %s\n", facing, x, posIn, sideIn);
-            hitVecIn = new Vec3(x, hitVecIn.y, hitVecIn.z);
+            hitVecIn = new Vec3d(x, hitVecIn.y, hitVecIn.z);
         }
         else if (flexible && rotation && accurate == false &&
                 Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL.getBooleanValue() &&
@@ -926,7 +924,7 @@ public class PlacementTweaks
             }
             else
             {
-                x = posIn.getX() + 2 + (facing.get3DDataValue() * 2);
+                x = posIn.getX() + 2 + (facing.getIndex() * 2);
             }
 
             if (FeatureToggle.TWEAK_AFTER_CLICKER.getBooleanValue())
@@ -935,17 +933,17 @@ public class PlacementTweaks
             }
 
             //System.out.printf("processRightClickBlockWrapper/Orientation req facing: %s, x: %.3f, pos: %s, sideIn: %s\n", facing, x, posIn, sideIn);
-            hitVecIn = new Vec3(x, hitVecIn.y, hitVecIn.z);
+            hitVecIn = new Vec3d(x, hitVecIn.y, hitVecIn.z);
         }
 
         if (FeatureToggle.TWEAK_Y_MIRROR.getBooleanValue() && Hotkeys.PLACEMENT_Y_MIRROR.getKeybind().isKeybindHeld())
         {
             double y = 1 - hitVecIn.y + 2 * posIn.getY(); // = 1 - (hitVec.y - pos.getY()) + pos.getY();
-            hitVecIn = new Vec3(hitVecIn.x, y, hitVecIn.z);
+            hitVecIn = new Vec3d(hitVecIn.x, y, hitVecIn.z);
 
             if (sideIn.getAxis() == Direction.Axis.Y)
             {
-                posIn = posIn.relative(sideIn);
+                posIn = posIn.offset(sideIn);
                 sideIn = sideIn.getOpposite();
             }
         }
@@ -958,20 +956,20 @@ public class PlacementTweaks
         InventoryUtils.trySwapCurrentToolIfNearlyBroken();
 
         //System.out.printf("processRightClickBlockWrapper() pos: %s, side: %s, hitVec: %s\n", posIn, sideIn, hitVecIn);
-        InteractionResult result;
+        ActionResult result;
 
         if (InventoryUtils.canUnstackingItemNotFitInInventory(stackOriginal, player))
         {
-            result = InteractionResult.PASS;
+            result = ActionResult.PASS;
         }
         else
         {
             //System.out.printf("processRightClickBlockWrapper() PLACE @ %s, side: %s, hit: %s\n", posIn, sideIn, hitVecIn);
             BlockHitResult context = new BlockHitResult(hitVecIn, sideIn, posIn, false);
-            result = controller.useItemOn(player, hand, context);
+            result = controller.interactBlock(player, hand, context);
         }
 
-        if (result == InteractionResult.SUCCESS)
+        if (result == ActionResult.SUCCESS)
         {
             placementCount++;
         }
@@ -990,13 +988,13 @@ public class PlacementTweaks
             {
                 //System.out.printf("processRightClickBlockWrapper() after-clicker - i: %d, pos: %s, side: %s, hitVec: %s\n", i, posPlacement, sideIn, hitVecIn);
                 BlockHitResult context = new BlockHitResult(hitVecIn, sideIn, posPlacement, false);
-                result = controller.useItemOn(player, hand, context);
+                result = controller.interactBlock(player, hand, context);
             }
         }
 
-        if (result == InteractionResult.SUCCESS)
+        if (result == ActionResult.SUCCESS)
         {
-            Inventory inv = player.getInventory();
+            PlayerInventory inv = player.getInventory();
 
             if (FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue())
             {
@@ -1018,20 +1016,20 @@ public class PlacementTweaks
         return result;
     }
 
-    private static InteractionResult handleFlexibleBlockPlacement(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            ClientLevel world,
+    private static ActionResult handleFlexibleBlockPlacement(
+            ClientPlayerInteractionManager controller,
+            ClientPlayerEntity player,
+            ClientWorld world,
             BlockPos pos,
             Direction side,
             float playerYaw,
-            Vec3 hitVec,
-            InteractionHand hand,
+            Vec3d hitVec,
+            Hand hand,
             @Nullable PositionUtils.HitPart hitPart)
     {
-        Direction facing = Direction.from2DDataValue(Mth.floor((playerYaw * 4.0F / 360.0F) + 0.5D) & 3);
+        Direction facing = Direction.fromHorizontalQuarterTurns(MathHelper.floor((playerYaw * 4.0F / 360.0F) + 0.5D) & 3);
         Direction facingOrig = facing;
-        float yawOrig = player.getYRot();
+        float yawOrig = player.getYaw();
 
         if (hitPart == PositionUtils.HitPart.CENTER)
         {
@@ -1039,23 +1037,23 @@ public class PlacementTweaks
         }
         else if (hitPart == PositionUtils.HitPart.LEFT)
         {
-            facing = facing.getCounterClockWise();
+            facing = facing.rotateYCounterclockwise();
         }
         else if (hitPart == PositionUtils.HitPart.RIGHT)
         {
-            facing = facing.getClockWise();
+            facing = facing.rotateYClockwise();
         }
 
-        float yaw = facing.toYRot();
-        float pitch = player.getXRot();
-        player.setYRot(yaw);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(yaw, pitch, player.onGround(), false));
+        float yaw = facing.getPositiveHorizontalDegrees();
+        float pitch = player.getPitch();
+        player.setYaw(yaw);
+        player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround(), false));
 
         //System.out.printf("handleFlexibleBlockPlacement() pos: %s, side: %s, facing orig: %s facing new: %s\n", pos, side, facingOrig, facing);
-        InteractionResult result = processRightClickBlockWrapper(controller, player, world, pos, side, hitVec, hand);
+        ActionResult result = processRightClickBlockWrapper(controller, player, world, pos, side, hitVec, hand);
 
-        player.setYRot(yawOrig);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(yawOrig, pitch, player.onGround(), false));
+        player.setYaw(yawOrig);
+        player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yawOrig, pitch, player.isOnGround(), false));
 
         return result;
     }
@@ -1087,8 +1085,8 @@ public class PlacementTweaks
         {
             return switch (hitPart)
             {
-                case LEFT -> playerFacingH.getClockWise();
-                case RIGHT -> playerFacingH.getCounterClockWise();
+                case LEFT -> playerFacingH.rotateYClockwise();
+                case RIGHT -> playerFacingH.rotateYCounterclockwise();
                 case BOTTOM -> originalSide == Direction.UP ? playerFacingH : playerFacingH.getOpposite();
                 case TOP -> originalSide == Direction.DOWN ? playerFacingH : playerFacingH.getOpposite();
                 case CENTER -> originalSide.getOpposite();
@@ -1098,8 +1096,8 @@ public class PlacementTweaks
         {
             return switch (hitPart)
             {
-                case LEFT -> originalSide.getCounterClockWise();
-                case RIGHT -> originalSide.getClockWise();
+                case LEFT -> originalSide.rotateYCounterclockwise();
+                case RIGHT -> originalSide.rotateYClockwise();
                 case BOTTOM -> Direction.UP;
                 case TOP -> Direction.DOWN;
                 case CENTER -> originalSide.getOpposite();
@@ -1125,8 +1123,8 @@ public class PlacementTweaks
 
     public static boolean isPositionAllowedByBreakingRestriction(BlockPos pos, Direction side)
     {
-        Minecraft mc = Minecraft.getInstance();
-        Level world = mc.level;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        World world = mc.world;
 
         if (world != null && FeatureToggle.TWEAK_BLOCK_TYPE_BREAK_RESTRICTION.getBooleanValue())
         {
@@ -1194,22 +1192,22 @@ public class PlacementTweaks
         }
     }
 
-    private static BlockPos getPlacementPositionForTargetedPosition(Level world, BlockPos pos, Direction side, BlockPlaceContext useContext)
+    private static BlockPos getPlacementPositionForTargetedPosition(World world, BlockPos pos, Direction side, ItemPlacementContext useContext)
     {
         if (canPlaceBlockIntoPosition(world, pos, useContext))
         {
             return pos;
         }
 
-        return pos.relative(side);
+        return pos.offset(side);
     }
 
     @SuppressWarnings({"deprecation"})
-    private static boolean canPlaceBlockIntoPosition(Level world, BlockPos pos, BlockPlaceContext useContext)
+    private static boolean canPlaceBlockIntoPosition(World world, BlockPos pos, ItemPlacementContext useContext)
     {
         BlockState state = world.getBlockState(pos);
         // FIXME - state.getFluidState().equals(Fluids.EMPTY.getDefaultState()) -- could work
-        return state.canBeReplaced(useContext) || state.liquid() || state.canBeReplaced();
+        return state.canReplace(useContext) || state.isLiquid() || state.isReplaceable();
     }
 
     private static boolean isNewPositionValidForColumnMode(BlockPos posNew, BlockPos posFirst, Direction sideFirst)
@@ -1348,16 +1346,16 @@ public class PlacementTweaks
 
     public static boolean shouldSkipSlotSync(int slotNumber, ItemStack newStack)
     {
-        Minecraft mc = Minecraft.getInstance();
-        Player player = mc.player;
-        AbstractContainerMenu container = player != null ? player.containerMenu : null;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        PlayerEntity player = mc.player;
+        ScreenHandler container = player != null ? player.currentScreenHandler : null;
 
         if (Configs.Generic.SLOT_SYNC_WORKAROUND.getBooleanValue() &&
                 FeatureToggle.TWEAK_PICK_BEFORE_PLACE.getBooleanValue() == false &&
-                container != null && container == player.inventoryMenu &&
+                container != null && container == player.playerScreenHandler &&
                 (slotNumber == 45 || (slotNumber - 36) == player.getInventory().getSelectedSlot()))
         {
-            if (mc.options.keyUse.isDown() &&
+            if (mc.options.useKey.isPressed() &&
                     (Configs.Generic.SLOT_SYNC_WORKAROUND_ALWAYS.getBooleanValue() ||
                             FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.getBooleanValue() ||
                             FeatureToggle.TWEAK_FAST_RIGHT_CLICK.getBooleanValue()))
@@ -1365,7 +1363,7 @@ public class PlacementTweaks
                 return true;
             }
 
-            return mc.options.keyAttack.isDown() && FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue();
+            return mc.options.attackKey.isPressed() && FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue();
         }
 
         return false;

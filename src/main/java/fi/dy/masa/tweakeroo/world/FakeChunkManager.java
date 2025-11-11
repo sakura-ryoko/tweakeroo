@@ -4,16 +4,16 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BooleanSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.ChunkManager;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.light.LightingProvider;
 
 /**
  * Copied From Tweak Fork by Andrew54757
  */
-public class FakeChunkManager extends ChunkSource
+public class FakeChunkManager extends ChunkManager
 {
     private final FakeWorld world;
     private final FakeChunk blankChunk;
@@ -29,7 +29,7 @@ public class FakeChunkManager extends ChunkSource
     }
 
     @Override
-    public @Nonnull FakeWorld getLevel()
+    public @Nonnull FakeWorld getWorld()
     {
         return this.world;
     }
@@ -41,30 +41,30 @@ public class FakeChunkManager extends ChunkSource
     }
 
     @Override
-    public boolean hasChunk(int chunkX, int chunkZ)
+    public boolean isChunkLoaded(int chunkX, int chunkZ)
     {
         return this.chunks.get(chunkX, chunkZ) != null;
     }
 
-    public @Nonnull String gatherStats()
+    public @Nonnull String getDebugString()
     {
-        return "Fake Chunk Cache: " + this.getLoadedChunksCount();
+        return "Fake Chunk Cache: " + this.getLoadedChunkCount();
     }
 
-    public int getLoadedChunksCount()
+    public int getLoadedChunkCount()
     {
         return 1;
     }
 
     @Override
-    public LevelChunk getChunk(int chunkX, int chunkZ, @Nonnull ChunkStatus status, boolean fallbackToEmpty)
+    public WorldChunk getChunk(int chunkX, int chunkZ, @Nonnull ChunkStatus status, boolean fallbackToEmpty)
     {
-        FakeChunk chunk = this.getChunkForLighting(chunkX, chunkZ);
+        FakeChunk chunk = this.getChunk(chunkX, chunkZ);
         return chunk == null && fallbackToEmpty ? this.blankChunk : chunk;
     }
 
     @Override
-    public FakeChunk getChunkForLighting(int chunkX, int chunkZ)
+    public FakeChunk getChunk(int chunkX, int chunkZ)
     {
         FakeChunk chunk = this.chunks.get(chunkX, chunkZ);
         return chunk == null ? this.blankChunk : chunk;
@@ -82,7 +82,7 @@ public class FakeChunkManager extends ChunkSource
     }
 
     @Override
-    public @Nonnull LevelLightEngine getLightEngine()
+    public @Nonnull LightingProvider getLightingProvider()
     {
         return null;
     }
@@ -185,7 +185,7 @@ public class FakeChunkManager extends ChunkSource
                     && Math.abs(chunkZ - this.centerChunkZ) <= this.radius;
         }
 
-        private static boolean positionEquals(@Nullable LevelChunk chunk, int x, int z)
+        private static boolean positionEquals(@Nullable WorldChunk chunk, int x, int z)
         {
             if (chunk == null)
             {

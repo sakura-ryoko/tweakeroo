@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.MaLiLibIcons;
@@ -22,12 +22,12 @@ public class WidgetCameraPresetList extends WidgetListBase<CameraPreset, WidgetC
 {
 	private final GuiCameraPresetEditor parent;
 	private List<CameraPreset> presets;
-	private final ResourceKey<Level> dimKey;
+	private final RegistryKey<World> dimKey;
 	private static int lastScrollbarPosition;
 	private boolean scrollbarRestored;
 
 	public WidgetCameraPresetList(int x, int y, int width, int height,
-								  @Nullable ResourceKey<Level> dimKey,
+								  @Nullable RegistryKey<World> dimKey,
 	                              @Nullable GuiCameraPresetEditor parent)
 	{
 		super(x, y, width, height, parent);
@@ -61,18 +61,18 @@ public class WidgetCameraPresetList extends WidgetListBase<CameraPreset, WidgetC
 	}
 
 	@Override
-	public boolean onKeyTyped(KeyEvent input)
+	public boolean onKeyTyped(KeyInput input)
 	{
 		if (input.key() == KeyCodes.KEY_ESCAPE)
 		{
-			this.parent.onClose();
+			this.parent.close();
 		}
 
 		return super.onKeyTyped(input);
 	}
 
 	@Override
-	public void drawContents(GuiGraphics drawContext, int mouseX, int mouseY, float partialTicks)
+	public void drawContents(DrawContext drawContext, int mouseX, int mouseY, float partialTicks)
 	{
 		super.drawContents(drawContext, mouseX, mouseY, partialTicks);
 		lastScrollbarPosition = this.scrollBar.getValue();

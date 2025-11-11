@@ -6,27 +6,27 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.util.CreativeExtraItems;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.Text;
 
-@Mixin(CreativeModeInventoryScreen.class)
-public abstract class MixinCreativeInventoryScreen extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu>
+@Mixin(CreativeInventoryScreen.class)
+public abstract class MixinCreativeInventoryScreen extends HandledScreen<CreativeInventoryScreen.CreativeScreenHandler>
 {
-    private MixinCreativeInventoryScreen(CreativeModeInventoryScreen.ItemPickerMenu screenHandler, Inventory playerInventory, Component text)
+    private MixinCreativeInventoryScreen(CreativeInventoryScreen.CreativeScreenHandler screenHandler, PlayerInventory playerInventory, Text text)
     {
         super(screenHandler, playerInventory, text);
     }
 
     // This needs to happen before the `this.handler.scrollItems(0.0F);` call.
-    @Inject(method = "refreshSearchResults", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$ItemPickerMenu;scrollTo(F)V"))
+    @Inject(method = "search", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screen/ingame/CreativeInventoryScreen$CreativeScreenHandler;scrollItems(F)V"))
     private void tweakeroo_removeInfestedStoneFromCreativeSearchInventory(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CREATIVE_INFESTED_BLOCKS.getBooleanValue())
         {
-            CreativeExtraItems.removeInfestedBlocks(this.menu.items);
+            CreativeExtraItems.removeInfestedBlocks(this.handler.itemList);
         }
     }
 }

@@ -4,19 +4,19 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.world.entity.monster.Ravager;
+import net.minecraft.entity.mob.RavagerEntity;
 
-@Mixin(Ravager.class)
+@Mixin(RavagerEntity.class)
 public abstract class MixinRavagerEntity
 {
-    @Redirect(method = "aiStep", at = @At(
+    @Redirect(method = "tickMovement", at = @At(
                 value = "FIELD",
-                target = "Lnet/minecraft/world/entity/monster/Ravager;horizontalCollision:Z"))
-    private boolean fixDontBreakBlocksOnClient(Ravager entity)
+                target = "Lnet/minecraft/entity/mob/RavagerEntity;horizontalCollision:Z"))
+    private boolean fixDontBreakBlocksOnClient(RavagerEntity entity)
     {
         if (Configs.Fixes.RAVAGER_CLIENT_BLOCK_BREAK_FIX.getBooleanValue())
         {
-            return entity.horizontalCollision && entity.level().isClientSide() == false;
+            return entity.horizontalCollision && entity.getEntityWorld().isClient() == false;
         }
 
         return entity.horizontalCollision;

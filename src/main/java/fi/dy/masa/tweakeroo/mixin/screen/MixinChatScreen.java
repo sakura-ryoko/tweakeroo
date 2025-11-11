@@ -11,22 +11,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 
 @Mixin(ChatScreen.class)
 public abstract class MixinChatScreen
 {
-    @Shadow protected EditBox input;
-    @Mutable @Shadow protected String initial;
+    @Shadow protected TextFieldWidget chatField;
+    @Mutable @Shadow protected String originalChatText;
 
     @Inject(method = "removed", at = @At("HEAD"))
     private void tweakeroo_storeChatText(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue())
         {
-            MiscUtils.setLastChatText(this.input.getValue());
+            MiscUtils.setLastChatText(this.chatField.getText());
         }
     }
 
@@ -36,15 +36,15 @@ public abstract class MixinChatScreen
         if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue() &&
 			MiscUtils.getLastChatText().isEmpty() == false)
         {
-            this.initial = MiscUtils.getLastChatText();
+            this.originalChatText = MiscUtils.getLastChatText();
         }
     }
 
-    @Inject(method = "keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z",
+    @Inject(method = "keyPressed(Lnet/minecraft/client/input/KeyInput;)Z",
             slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/ChatScreen;handleChatInput(Ljava/lang/String;Z)V")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", shift = Shift.AFTER))
-    private void tweakeroo_onSendMessage(KeyEvent input, CallbackInfoReturnable<Boolean> cir)
+                    from = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ChatScreen;sendMessage(Ljava/lang/String;Z)V")),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V", shift = Shift.AFTER))
+    private void tweakeroo_onSendMessage(KeyInput input, CallbackInfoReturnable<Boolean> cir)
     {
         MiscUtils.setLastChatText("");
     }

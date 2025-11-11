@@ -1,9 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.screen;
 
-import net.minecraft.client.gui.screens.PresetFlatWorldScreen;
+import net.minecraft.client.gui.screen.world.PresetsScreen;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(PresetFlatWorldScreen.class)
+@Mixin(PresetsScreen.class)
 public abstract class MixinPresetsScreen
 {
     //@Shadow @Final private static RegistryKey<Biome> BIOME_KEY;

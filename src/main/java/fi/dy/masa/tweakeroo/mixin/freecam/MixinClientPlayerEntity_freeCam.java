@@ -13,21 +13,21 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.CameraEntity;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.DummyMovementInput;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.ClientInput;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.Hand;
 
-@Mixin(value = LocalPlayer.class, priority = 1005)
-public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlayer
+@Mixin(value = ClientPlayerEntity.class, priority = 1005)
+public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlayerEntity
 {
-    @Shadow public ClientInput input;
+    @Shadow public Input input;
 
     @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
-    @Unique private ClientInput realInput;
+    @Unique private Input realInput;
 
-    private MixinClientPlayerEntity_freeCam(ClientLevel world, GameProfile profile)
+    private MixinClientPlayerEntity_freeCam(ClientWorld world, GameProfile profile)
     {
         super(world, profile);
     }
@@ -52,7 +52,7 @@ public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlay
         }
     }
 
-    @Inject(method = "isControlledCamera", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isCamera", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_allowPlayerMovementInFreeCameraMode(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && CameraEntity.originalCameraWasPlayer())
@@ -61,8 +61,8 @@ public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlay
         }
     }
 
-    @Inject(method = "swing", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_preventHandSwing(InteractionHand hand, CallbackInfo ci)
+    @Inject(method = "swingHand", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_preventHandSwing(Hand hand, CallbackInfo ci)
     {
         if (CameraUtils.shouldPreventPlayerInputs())
         {

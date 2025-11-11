@@ -5,29 +5,29 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.HalfTransparentBlock;
-import net.minecraft.world.level.block.SlimeBlock;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.SlimeBlock;
+import net.minecraft.block.TranslucentBlock;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 @Mixin(SlimeBlock.class)
-public abstract class MixinSlimeBlock extends HalfTransparentBlock
+public abstract class MixinSlimeBlock extends TranslucentBlock
 {
-    public MixinSlimeBlock(BlockBehaviour.Properties settings)
+    public MixinSlimeBlock(AbstractBlock.Settings settings)
     {
         super(settings);
     }
 
-    @Inject(method = "stepOn", at = @At("HEAD"), cancellable = true)
-    private void onEntityWalkOnSlime(Level worldIn, BlockPos pos, BlockState state, Entity entityIn, CallbackInfo ci)
+    @Inject(method = "onSteppedOn", at = @At("HEAD"), cancellable = true)
+    private void onEntityWalkOnSlime(World worldIn, BlockPos pos, BlockState state, Entity entityIn, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.getBooleanValue() && entityIn instanceof Player)
+        if (Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.getBooleanValue() && entityIn instanceof PlayerEntity)
         {
-            super.stepOn(worldIn, pos, state, entityIn);
+            super.onSteppedOn(worldIn, pos, state, entityIn);
             ci.cancel();
         }
     }

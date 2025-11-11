@@ -10,67 +10,67 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.mojang.blaze3d.platform.InputConstants;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 
-@Mixin(Minecraft.class)
+@Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
 {
-    @Shadow @Nullable public LocalPlayer player;
-    @Shadow @Nullable public ClientLevel level;
-    @Shadow @Nullable public Screen screen;
-    @Shadow @Final public Options options;
-    @Shadow private int rightClickDelay;
-    @Shadow protected int missTime;
+    @Shadow @Nullable public ClientPlayerEntity player;
+    @Shadow @Nullable public ClientWorld world;
+    @Shadow @Nullable public Screen currentScreen;
+    @Shadow @Final public GameOptions options;
+    @Shadow private int itemUseCooldown;
+    @Shadow protected int attackCooldown;
 
-    @Shadow private boolean startAttack() {return false;}
-    @Shadow private void startUseItem() {}
+    @Shadow private boolean doAttack() {return false;}
+    @Shadow private void doItemUse() {}
 
     @Override
     public void tweakeroo_setItemUseCooldown(int value)
     {
-        this.rightClickDelay = value;
+        this.itemUseCooldown = value;
     }
 
     @Override
     public boolean tweakeroo_invokeDoAttack()
     {
-        return this.startAttack();
+        return this.doAttack();
     }
 
     @Override
     public void tweakeroo_invokeDoItemUse()
     {
-        this.startUseItem();
+        this.doItemUse();
     }
 
-    @Inject(method = "runTick", at = @At("RETURN"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void onGameLoop(boolean renderWorld, CallbackInfo ci)
     {
-        if (this.player != null && this.level != null)
+        if (this.player != null && this.world != null)
         {
-            MiscTweaks.onGameLoop((Minecraft) (Object) this);
+            MiscTweaks.onGameLoop((MinecraftClient) (Object) this);
         }
     }
 
     /**
      * Copied From Tweak Fork by Andrew54757
      */
-    @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
     private void onLeftClickMouse(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
@@ -84,7 +84,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     /**
      * Copied From Tweak Fork by Andrew54757
      */
-    @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
     private void onRightClickMouse(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
@@ -95,57 +95,57 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
         }
     }
 
-    @Inject(method = "startAttack", at = {
+    @Inject(method = "doAttack", at = {
             @At(value = "INVOKE",
-                target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V"),
+                target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackEntity(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;)V"),
             @At(value = "INVOKE",
-                target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z")
+                target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z")
     })
     private void onLeftClickMousePre(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePre();
     }
 
-    @Inject(method = "startAttack", at = @At(
+    @Inject(method = "doAttack", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private void onLeftClickMousePost(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePost();
     }
 
-    @Redirect(method = "startUseItem()V", at = @At(
+    @Redirect(method = "doItemUse()V", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
-    private InteractionResult onProcessRightClickBlock(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            InteractionHand hand,
+            target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;interactBlock(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;"))
+    private ActionResult onProcessRightClickBlock(
+            ClientPlayerInteractionManager controller,
+            ClientPlayerEntity player,
+            Hand hand,
             BlockHitResult hitResult)
     {
-        return PlacementTweaks.onProcessRightClickBlock(controller, player, this.level, hand, hitResult);
+        return PlacementTweaks.onProcessRightClickBlock(controller, player, this.world, hand, hitResult);
     }
 
-    @Inject(method = "handleKeybinds", at = @At("HEAD"))
+    @Inject(method = "handleInputEvents", at = @At("HEAD"))
     private void onProcessKeybindsPre(CallbackInfo ci)
     {
-        if (this.screen == null)
+        if (this.currentScreen == null)
         {
             if (FeatureToggle.TWEAK_HOLD_ATTACK.getBooleanValue())
             {
                 // Opening a GUI sets the cooldown to 10000, and it won't have a chance
                 // to get reset normally when this tweak is active.
-                if (this.missTime >= 10000)
+                if (this.attackCooldown >= 10000)
                 {
-                    this.missTime = 0;
+                    this.attackCooldown = 0;
                 }
 
-                KeyMapping.set(InputConstants.getKey(this.options.keyAttack.saveString()), true);
+                KeyBinding.setKeyPressed(InputUtil.fromTranslationKey(this.options.attackKey.getBoundKeyTranslationKey()), true);
             }
 
             if (FeatureToggle.TWEAK_HOLD_USE.getBooleanValue())
             {
-                KeyMapping.set(InputConstants.getKey(this.options.keyUse.saveString()), true);
+                KeyBinding.setKeyPressed(InputUtil.fromTranslationKey(this.options.useKey.getBoundKeyTranslationKey()), true);
             }
         }
     }

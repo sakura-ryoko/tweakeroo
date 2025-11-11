@@ -6,20 +6,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Abilities;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerAbilities;
+import net.minecraft.entity.player.PlayerEntity;
 
-@Mixin(Abilities.class)
+@Mixin(PlayerAbilities.class)
 public abstract class MixinPlayerAbilities
 {
-    @Inject(method = "getFlyingSpeed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getFlySpeed", at = @At("HEAD"), cancellable = true)
     private void overrideFlySpeed(CallbackInfoReturnable<Float> cir)
     {
-        Player player = Minecraft.getInstance().player;
+        PlayerEntity player = MinecraftClient.getInstance().player;
 
         if (FeatureToggle.TWEAK_FLY_SPEED.getBooleanValue() &&
-            player != null && player.getAbilities().mayfly)
+            player != null && player.getAbilities().allowFlying)
         {
             cir.setReturnValue((float) Configs.getActiveFlySpeedConfig().getDoubleValue());
         }

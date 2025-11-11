@@ -14,72 +14,72 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.InventoryUtils;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.ClientInput;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
-@Mixin(value = LocalPlayer.class, priority = 1001)
-public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
+@Mixin(value = ClientPlayerEntity.class, priority = 1001)
+public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 {
-    @Shadow public ClientInput input;
-    @Shadow protected int sprintTriggerTime;
-    @Shadow public float oPortalEffectIntensity;
-    @Shadow public float portalEffectIntensity;
-    @Shadow private boolean wasFallFlying;
+    @Shadow public Input input;
+    @Shadow protected int ticksLeftToDoubleTapSprint;
+    @Shadow public float lastNauseaIntensity;
+    @Shadow public float nauseaIntensity;
+    @Shadow private boolean falling;
 
     @Unique private float realNauseaIntensity;
     @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
 
-    private MixinClientPlayerEntity(ClientLevel world, GameProfile profile)
+    private MixinClientPlayerEntity(ClientWorld world, GameProfile profile)
     {
         super(world, profile);
     }
 
-    @Inject(method = "handlePortalTransitionEffect", at = @At("HEAD"))
+    @Inject(method = "tickNausea", at = @At("HEAD"))
     private void tweakeroo_disableNauseaEffectPre(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_NAUSEA_EFFECT.getBooleanValue())
         {
-            this.portalEffectIntensity = this.realNauseaIntensity;
+            this.nauseaIntensity = this.realNauseaIntensity;
         }
     }
 
-    @Inject(method = "handlePortalTransitionEffect", at = @At(value = "TAIL"))
+    @Inject(method = "tickNausea", at = @At(value = "TAIL"))
     private void tweakeroo_disableNauseaEffectPost(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_NAUSEA_EFFECT.getBooleanValue())
         {
             // This is used to set the value to the correct value for the duration of the
             // updateNausea() method, so that the portal sound plays correctly only once.
-            this.realNauseaIntensity = this.portalEffectIntensity;
-            this.oPortalEffectIntensity = 0.0f;
-            this.portalEffectIntensity = 0.0f;
+            this.realNauseaIntensity = this.nauseaIntensity;
+            this.lastNauseaIntensity = 0.0f;
+            this.nauseaIntensity = 0.0f;
         }
     }
 
-    @Inject(method = "aiStep",
+    @Inject(method = "tickMovement",
             at = @At(value = "FIELD",
-                     target = "Lnet/minecraft/client/player/LocalPlayer;wasFallFlying:Z"))
+                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;falling:Z"))
     private void tweakeroo_overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
-            ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardImpulse() &&
-            (this.getFoodData().getFoodLevel() > 6.0F || this.getAbilities().mayfly) &&
-            ! this.hasEffect(MobEffects.BLINDNESS) && ! this.isInWater())
+            ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardMovement() &&
+            (this.getHungerManager().getFoodLevel() > 6.0F || this.getAbilities().allowFlying) &&
+            ! this.hasStatusEffect(StatusEffects.BLINDNESS) && ! this.isTouchingWater())
         {
             this.setSprinting(true);
         }
     }
 
-    @Redirect(method = "shouldStopRunSprinting", at = @At(value = "FIELD",
-                target = "Lnet/minecraft/client/player/LocalPlayer;horizontalCollision:Z"))
-    private boolean tweakeroo_overrideCollidedHorizontally(LocalPlayer player)
+    @Redirect(method = "shouldStopSprinting", at = @At(value = "FIELD",
+                target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z"))
+    private boolean tweakeroo_overrideCollidedHorizontally(ClientPlayerEntity player)
     {
         if (Configs.Disable.DISABLE_WALL_UNSPRINT.getBooleanValue())
         {
@@ -89,33 +89,33 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
         return player.horizontalCollision;
     }
 
-    @Inject(method = "aiStep",
+    @Inject(method = "tickMovement",
             /*
             slice = @Slice(from = @At(value = "FIELD",
                                       target = "Lnet/minecraft/client/option/GameOptions;sprintKey:Lnet/minecraft/client/option/KeyBinding;")),
              */
             at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, ordinal = 2, shift = At.Shift.AFTER,
-                     target = "Lnet/minecraft/client/player/LocalPlayer;sprintTriggerTime:I"))
+                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksLeftToDoubleTapSprint:I"))
     private void tweakeroo_disableDoubleTapSprint(CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_DOUBLE_TAP_SPRINT.getBooleanValue())
         {
-            this.sprintTriggerTime = 0;
+            this.ticksLeftToDoubleTapSprint = 0;
         }
     }
 
-    @Inject(method = "aiStep",
+    @Inject(method = "tickMovement",
             at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/player/LocalPlayer;tryToStartFallFlying()Z"))
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;checkGliding()Z"))
     private void tweakeroo_onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
             // this.checkGliding()
-            if (!this.onGround() && !this.isPassenger() && this.fallFlyTicks == 0 && !this.isInLiquid() && !this.onClimbable() && !this.hasEffect(MobEffects.LEVITATION))
+            if (!this.isOnGround() && !this.hasVehicle() && this.glidingTicks == 0 && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
             {
-                if (!this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) ||
-                    this.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage() - 10)
+                if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
+                    this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
                 {
                     InventoryUtils.equipBestElytra(this);
                 }
@@ -128,20 +128,20 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
         }
     }
 
-    @Inject(method = "onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V", at = @At("RETURN"))
-    private void tweakeroo_onStopFlying(EntityDataAccessor<?> data, CallbackInfo ci)
+    @Inject(method = "onTrackedDataSet(Lnet/minecraft/entity/data/TrackedData;)V", at = @At("RETURN"))
+    private void tweakeroo_onStopFlying(TrackedData<?> data, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
         {
-            if (DATA_SHARED_FLAGS_ID.equals(data) && this.wasFallFlying)
+            if (FLAGS.equals(data) && this.falling)
             {
-                if (!this.isFallFlying() && this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA))
+                if (!this.isGliding() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
                 {
-                    if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.is(Items.ELYTRA))
+                    if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.isOf(Items.ELYTRA))
                     {
-                        if (this.inventoryMenu.getCarried().isEmpty())
+                        if (this.playerScreenHandler.getCursorStack().isEmpty())
                         {
-                            int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchElytraChestplate, true, false);
+                            int targetSlot = InventoryUtils.findSlotWithItem(this.playerScreenHandler, this.autoSwitchElytraChestplate, true, false);
 
                             if (targetSlot >= 0)
                             {

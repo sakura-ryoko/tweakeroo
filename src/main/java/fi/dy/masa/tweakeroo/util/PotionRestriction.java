@@ -3,32 +3,32 @@ package fi.dy.masa.tweakeroo.util;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 
-public class PotionRestriction extends UsageRestriction<MobEffect>
+public class PotionRestriction extends UsageRestriction<StatusEffect>
 {
     @Override
-    protected void setValuesForList(Set<MobEffect> set, List<String> names)
+    protected void setValuesForList(Set<StatusEffect> set, List<String> names)
     {
         for (String name : names)
         {
-            ResourceLocation rl = null;
+            Identifier rl = null;
 
             try
             {
-                rl = ResourceLocation.tryParse(name);
+                rl = Identifier.tryParse(name);
             }
             catch (Exception ignored) { }
 
 			if (rl != null)
 			{
 				//StatusEffect effect = rl != null ? Registries.STATUS_EFFECT.get(rl) : null;
-				Optional<Holder.Reference<MobEffect>> opt = BuiltInRegistries.MOB_EFFECT.get(rl);
+				Optional<RegistryEntry.Reference<StatusEffect>> opt = Registries.STATUS_EFFECT.getEntry(rl);
 
 				if (opt.isPresent())
 				{

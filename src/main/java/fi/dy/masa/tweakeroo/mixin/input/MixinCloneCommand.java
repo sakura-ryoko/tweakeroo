@@ -5,18 +5,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.server.commands.CloneCommands;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameRules.IntegerValue;
-import net.minecraft.world.level.GameRules.Key;
+import net.minecraft.server.command.CloneCommand;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.GameRules.IntRule;
+import net.minecraft.world.GameRules.Key;
 
-@Mixin(value = CloneCommands.class, priority = 999)
+@Mixin(value = CloneCommand.class, priority = 999)
 public abstract class MixinCloneCommand
 {
-    @Redirect(method = "clone", require = 0,
+    @Redirect(method = "execute", require = 0,
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/level/GameRules;getInt(Lnet/minecraft/world/level/GameRules$Key;)I"))
-    private static int tweakeroo_overrideBlockLimit(GameRules instance, Key<IntegerValue> rule)
+                       target = "Lnet/minecraft/world/GameRules;getInt(Lnet/minecraft/world/GameRules$Key;)I"))
+    private static int tweakeroo_overrideBlockLimit(GameRules instance, Key<IntRule> rule)
     {
         if (FeatureToggle.TWEAK_FILL_CLONE_LIMIT.getBooleanValue())
         {

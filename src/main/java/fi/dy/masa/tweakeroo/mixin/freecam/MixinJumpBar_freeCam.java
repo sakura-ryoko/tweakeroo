@@ -7,15 +7,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.contextualbar.JumpableVehicleBarRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.bar.JumpBar;
+import net.minecraft.client.render.RenderTickCounter;
 
-@Mixin(value = JumpableVehicleBarRenderer.class, priority = 999)
+@Mixin(value = JumpBar.class, priority = 999)
 public class MixinJumpBar_freeCam
 {
-	@Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
-	private void tweakeroo_disableJumpBar(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci)
+	@Inject(method = "renderBar", at = @At("HEAD"), cancellable = true)
+	private void tweakeroo_disableJumpBar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
 	{
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
 			!Configs.Generic.FREE_CAMERA_SHOW_STATUS_BARS.getBooleanValue())

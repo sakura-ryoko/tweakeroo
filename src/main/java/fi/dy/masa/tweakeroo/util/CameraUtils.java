@@ -2,14 +2,14 @@ package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkStatus;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -46,12 +46,12 @@ public class CameraUtils
 
     public static float getCameraYaw()
     {
-        return net.minecraft.util.Mth.wrapDegrees(cameraYaw);
+        return net.minecraft.util.math.MathHelper.wrapDegrees(cameraYaw);
     }
 
     public static float getCameraPitch()
     {
-        return net.minecraft.util.Mth.wrapDegrees(cameraPitch);
+        return net.minecraft.util.math.MathHelper.wrapDegrees(cameraPitch);
     }
 
     public static void setCameraYaw(float yaw)
@@ -86,14 +86,14 @@ public class CameraUtils
 
     public static void markChunksForRebuild(int chunkX, int chunkZ, int lastChunkX, int lastChunkZ)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (mc.level == null || (chunkX == lastChunkX && chunkZ == lastChunkZ))
+        if (mc.world == null || (chunkX == lastChunkX && chunkZ == lastChunkZ))
         {
             return;
         }
 
-        final int viewDistance = mc.options.renderDistance().get();
+        final int viewDistance = mc.options.getViewDistance().getValue();
 
         if (chunkX != lastChunkX)
         {
@@ -104,9 +104,9 @@ public class CameraUtils
             {
                 for (int cz = chunkZ - viewDistance; cz <= chunkZ + viewDistance; ++cz)
                 {
-                    if (isClientChunkLoaded(mc.level, cx, cz))
+                    if (isClientChunkLoaded(mc.world, cx, cz))
                     {
-                        markChunkForReRender(mc.levelRenderer, cx, cz);
+                        markChunkForReRender(mc.worldRenderer, cx, cz);
                     }
                 }
             }
@@ -121,9 +121,9 @@ public class CameraUtils
             {
                 for (int cx = chunkX - viewDistance; cx <= chunkX + viewDistance; ++cx)
                 {
-                    if (isClientChunkLoaded(mc.level, cx, cz))
+                    if (isClientChunkLoaded(mc.world, cx, cz))
                     {
-                        markChunkForReRender(mc.levelRenderer, cx, cz);
+                        markChunkForReRender(mc.worldRenderer, cx, cz);
                     }
                 }
             }
@@ -132,17 +132,17 @@ public class CameraUtils
 
     public static void markChunksForRebuildOnDeactivation(int lastChunkX, int lastChunkZ)
     {
-        Minecraft mc = Minecraft.getInstance();
-        final int viewDistance = mc.options.renderDistance().get();
+        MinecraftClient mc = MinecraftClient.getInstance();
+        final int viewDistance = mc.options.getViewDistance().getValue();
         Entity entity = EntityUtils.getCameraEntity();
 
-        if (mc.level == null || entity == null)
+        if (mc.world == null || entity == null)
         {
             return;
         }
 
-        final int chunkX = Mth.floor(entity.getX() / 16.0) >> 4;
-        final int chunkZ = Mth.floor(entity.getZ() / 16.0) >> 4;
+        final int chunkX = MathHelper.floor(entity.getX() / 16.0) >> 4;
+        final int chunkZ = MathHelper.floor(entity.getZ() / 16.0) >> 4;
 
         final int minCameraCX = lastChunkX - viewDistance;
         final int maxCameraCX = lastChunkX + viewDistance;
@@ -159,25 +159,25 @@ public class CameraUtils
             {
                 // Mark all chunks that were not in free camera range
                 if ((cx < minCameraCX || cx > maxCameraCX || cz < minCameraCZ || cz > maxCameraCZ) &&
-                    isClientChunkLoaded(mc.level, cx, cz))
+                    isClientChunkLoaded(mc.world, cx, cz))
                 {
-                    markChunkForReRender(mc.levelRenderer, cx, cz);
+                    markChunkForReRender(mc.worldRenderer, cx, cz);
                 }
             }
         }
     }
 
-    public static void markChunkForReRender(LevelRenderer renderer, int chunkX, int chunkZ)
+    public static void markChunkForReRender(WorldRenderer renderer, int chunkX, int chunkZ)
     {
         for (int cy = 0; cy < 16; ++cy)
         {
-            renderer.setSectionDirty(chunkX, cy, chunkZ);
+            renderer.scheduleChunkRender(chunkX, cy, chunkZ);
         }
     }
 
-    public static boolean isClientChunkLoaded(ClientLevel world, int chunkX, int chunkZ)
+    public static boolean isClientChunkLoaded(ClientWorld world, int chunkX, int chunkZ)
     {
-        return world.getChunkSource().getChunk(chunkX, chunkZ, ChunkStatus.FULL, false) != null;
+        return world.getChunkManager().getChunk(chunkX, chunkZ, ChunkStatus.FULL, false) != null;
     }
 
 	public static String fixPresetName(String in)
@@ -216,7 +216,7 @@ public class CameraUtils
 		return false;
 	}
 
-	public static boolean deletePresetAtPosition(Minecraft mc)
+	public static boolean deletePresetAtPosition(MinecraftClient mc)
 	{
 		if (mc.getCameraEntity() != null)
 		{
@@ -233,12 +233,12 @@ public class CameraUtils
 		return false;
 	}
 
-	public static boolean deleteAllPresets(ResourceKey<Level> dimKey)
+	public static boolean deleteAllPresets(RegistryKey<World> dimKey)
 	{
 		if (dimKey != null)
 		{
 			CameraPresetManager.getInstance().clear(dimKey, false);
-			Tweakeroo.debugLog("CameraUtils#deletePresetAtPosition(): Deleted all presets for dimension '{}'", dimKey.location().toString());
+			Tweakeroo.debugLog("CameraUtils#deletePresetAtPosition(): Deleted all presets for dimension '{}'", dimKey.getValue().toString());
 			return true;
 		}
 
@@ -259,11 +259,11 @@ public class CameraUtils
 		return false;
 	}
 
-	public static boolean recallPreset(@Nonnull CameraPreset preset, Minecraft mc)
+	public static boolean recallPreset(@Nonnull CameraPreset preset, MinecraftClient mc)
 	{
-		if (!preset.equals(mc.getCameraEntity()) && mc.level != null)
+		if (!preset.equals(mc.getCameraEntity()) && mc.world != null)
 		{
-			if (mc.level.dimension().location().equals(preset.getDim()))
+			if (mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 			{
 				CameraPresetManager.getInstance().setLastPreset(preset.getId());
 
@@ -285,11 +285,11 @@ public class CameraUtils
 		return false;
 	}
 
-	public static boolean cyclePreset(Minecraft mc)
+	public static boolean cyclePreset(MinecraftClient mc)
 	{
-		if (mc.level != null)
+		if (mc.world != null)
 		{
-			ResourceKey<Level> dimKey = mc.level.dimension();
+			RegistryKey<World> dimKey = mc.world.getRegistryKey();
 			CameraPreset preset = CameraPresetManager.getInstance().cycle(dimKey);
 
 			if (preset != null)
