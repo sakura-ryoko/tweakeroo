@@ -140,6 +140,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       	STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
         public static final ConfigString        	TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
         public static final ConfigString        	TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
+	    public static final ConfigBooleanHotkeyed	TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK= new ConfigBooleanHotkeyed ("toolSwapAllowUnenchantedToBreak", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_PREFER_SILK_TOUCH			= new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_BAMBOO_USES_SWORD_FIRST	= new ConfigBooleanHotkeyed ("toolSwapBambooUsesSwordFirst", true, "").apply(GENERIC_KEY);
@@ -259,6 +260,7 @@ public class Configs implements IConfigHandler
                 SNAP_AIM_YAW_STEP,
                 STRUCTURE_BLOCK_MAX_SIZE,
                 TOOL_SWITCHABLE_SLOTS,
+                TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK,
                 TOOL_SWITCH_IGNORED_SLOTS,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_SILK_TOUCH,

@@ -956,7 +956,8 @@ public class InventoryUtils
 
     private static int getMinDurability(ItemStack stack)
     {
-        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue())
+        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() ||
+	        (Configs.Generic.TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK.getBooleanValue() && !stack.hasEnchantments()))
         {
             return 0;
         }
