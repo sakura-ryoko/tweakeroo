@@ -16,7 +16,7 @@ import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.data.CameraPresetCache;
+import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 
 public class CameraUtils
 {
@@ -189,9 +189,9 @@ public class CameraUtils
 
 	public static boolean addPreset(@Nonnull CameraPreset preset)
 	{
-		if (!CameraPresetCache.getInstance().hasPosition(preset))
+		if (!CameraPresetManager.getInstance().hasPosition(preset))
 		{
-			CameraPresetCache.getInstance().add(preset);
+			CameraPresetManager.getInstance().add(preset);
 			Tweakeroo.debugLog("CameraUtils#addPreset(): Added new preset: {}", preset.toShortString());
 			return true;
 		}
@@ -201,7 +201,7 @@ public class CameraUtils
 
 	public static boolean updatePreset(@Nonnull CameraPreset preset)
 	{
-		CameraPresetCache.getInstance().update(preset, false);
+		CameraPresetManager.getInstance().update(preset, false);
 		Tweakeroo.debugLog("CameraUtils#updatePreset(): Updated preset: {}", preset.toShortString());
 		return true;
 	}
@@ -210,7 +210,7 @@ public class CameraUtils
 	{
 		if (oldPreset != null)
 		{
-			CameraPresetCache.getInstance().remove(oldPreset.id(), false);
+			CameraPresetManager.getInstance().remove(oldPreset.getId(), false);
 			Tweakeroo.debugLog("CameraUtils#deletePreset(): Deleted preset: {}", oldPreset.toShortString());
 			return true;
 		}
@@ -222,11 +222,11 @@ public class CameraUtils
 	{
 		if (mc.getCameraEntity() != null)
 		{
-			CameraPreset preset = CameraPresetCache.getInstance().getAtPosition(mc.getCameraEntity());
+			CameraPreset preset = CameraPresetManager.getInstance().getAtPosition(mc.getCameraEntity());
 
 			if (preset != null)
 			{
-				CameraPresetCache.getInstance().remove(preset.id(), false);
+				CameraPresetManager.getInstance().remove(preset.getId(), false);
 				Tweakeroo.debugLog("CameraUtils#deletePresetAtPosition(): Deleted preset: {}", preset.toShortString());
 				return true;
 			}
@@ -239,7 +239,7 @@ public class CameraUtils
 	{
 		if (dimKey != null)
 		{
-			CameraPresetCache.getInstance().clear(dimKey, false);
+			CameraPresetManager.getInstance().clear(dimKey, false);
 			Tweakeroo.debugLog("CameraUtils#deletePresetAtPosition(): Deleted all presets for dimension '{}'", dimKey.getValue().toString());
 			return true;
 		}
@@ -247,13 +247,14 @@ public class CameraUtils
 		return false;
 	}
 
-	public static boolean renamePreset(@Nullable CameraPreset oldPreset, final String newName)
+	public static boolean renamePreset(@Nullable CameraPreset preset, final String newName)
 	{
-		if (oldPreset != null)
+		if (preset != null)
 		{
-			CameraPreset newPreset = new CameraPreset(oldPreset.id(), CameraUtils.fixPresetName(newName), oldPreset.dim(), oldPreset.pos(), oldPreset.yaw(), oldPreset.pitch());
-			CameraPresetCache.getInstance().update(newPreset, false);
-			Tweakeroo.debugLog("CameraUtils#renamePreset(): Renamed preset: [{}] / '{}' -> '{}'", oldPreset.id(), oldPreset.name(), newPreset.name());
+			String oldName = preset.getName();
+			preset.setName(CameraUtils.fixPresetName(newName));
+			CameraPresetManager.getInstance().update(preset, false);
+			Tweakeroo.debugLog("CameraUtils#renamePreset(): Renamed preset: [{}] / '{}' -> '{}'", preset.getId(), oldName, preset.getName());
 			return true;
 		}
 
@@ -262,22 +263,25 @@ public class CameraUtils
 
 	public static boolean recallPreset(@Nonnull CameraPreset preset, MinecraftClient mc)
 	{
-		if (!preset.equals(mc.getCameraEntity()))
+		if (!preset.equals(mc.getCameraEntity()) && mc.world != null)
 		{
-			CameraPresetCache.getInstance().setLastPreset(preset.id());
-
-			if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+			if (mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 			{
-				CameraEntity.updatePositionAtPreset(preset);
-			}
-			else
-			{
-				FeatureToggle.TWEAK_FREE_CAMERA.setEnabledNoCallback();
-				CameraEntity.setCameraState(true, preset);
-			}
+				CameraPresetManager.getInstance().setLastPreset(preset.getId());
 
-			Tweakeroo.debugLog("CameraUtils#recallPreset(): Recall preset: {}", preset.toShortString());
-			return true;
+				if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+				{
+					CameraEntity.updatePositionAtPreset(preset);
+				}
+				else
+				{
+					FeatureToggle.TWEAK_FREE_CAMERA.setEnabledNoCallback();
+					CameraEntity.setCameraState(true, preset);
+				}
+
+				Tweakeroo.debugLog("CameraUtils#recallPreset(): Recall preset: {}", preset.toShortString());
+				return true;
+			}
 		}
 
 		return false;
@@ -288,7 +292,7 @@ public class CameraUtils
 		if (mc.world != null)
 		{
 			RegistryKey<World> dimKey = mc.world.getRegistryKey();
-			CameraPreset preset = CameraPresetCache.getInstance().cycle(dimKey);
+			CameraPreset preset = CameraPresetManager.getInstance().cycle(dimKey);
 
 			if (preset != null)
 			{

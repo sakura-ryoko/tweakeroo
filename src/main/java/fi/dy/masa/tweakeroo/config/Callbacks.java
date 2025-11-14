@@ -18,7 +18,6 @@ import net.minecraft.world.World;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.hotkeys.*;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.render.InventoryOverlayScreen;
@@ -26,7 +25,8 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
-import fi.dy.masa.tweakeroo.data.CameraPresetCache;
+import fi.dy.masa.tweakeroo.data.CameraPresetManager;
+import fi.dy.masa.tweakeroo.gui.GuiCameraPresetEditor;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
@@ -97,6 +97,7 @@ public class Callbacks
         Hotkeys.HOTBAR_SCROLL.getKeybind().setCallback(callbackGeneric);
         Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.OPEN_CONFIG_GUI.getKeybind().setCallback(callbackGeneric);
+	    Hotkeys.OPEN_CAMERA_PRESET_EDITOR_GUI.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_COLUMN.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_DIAGONAL.getKeybind().setCallback(callbackGeneric);
         Hotkeys.PLACEMENT_RESTRICTION_MODE_FACE.getKeybind().setCallback(callbackGeneric);
@@ -359,32 +360,32 @@ public class Callbacks
 
 			if (key == Hotkeys.FREE_CAMERA_PRESET_ADD.getKeybind())
 			{
-				final int id = CameraPresetCache.getInstance().getNextId(-1);
+				final int id = CameraPresetManager.getInstance().getNextId(-1);
 				String name = "Preset "+id;
 				CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
 
 				if (CameraUtils.addPreset(newPreset))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_added", newPreset.toShortString());
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_added", newPreset.toShortString()));
 				}
 				else
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_already_in_use"));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_already_in_use"));
 				}
 
 				return true;
 			}
 			else if (key == Hotkeys.FREE_CAMERA_PRESET_DELETE.getKeybind())
 			{
-				CameraPreset preset = CameraPresetCache.getInstance().getAtPosition(camera);
+				CameraPreset preset = CameraPresetManager.getInstance().getAtPosition(camera);
 
 				if (CameraUtils.deletePreset(preset))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted", preset.toShortString());
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted", preset.toShortString()));
 				}
 				else
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.WARNING, PREFIX+"_not_found", String.format("%02d", 0));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_not_found", String.format("%02d", 0)));
 				}
 
 				return true;
@@ -393,29 +394,36 @@ public class Callbacks
 			{
 				if (CameraUtils.deleteAllPresets(dimKey))
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim", dimKey.getValue().toString());
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.getValue().toString()));
 				}
 
 				return true;
 			}
 			else if (key == Hotkeys.FREE_CAMERA_PRESET_CYCLE.getKeybind())
 			{
-				CameraPreset preset = CameraPresetCache.getInstance().cycle(dimKey);
+				CameraPreset preset = CameraPresetManager.getInstance().cycle(dimKey);
 
-				if (preset != null)
+				if (preset != null && this.mc.world != null)
 				{
-					if (CameraUtils.recallPreset(preset, mc))
+					if (this.mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 					{
-						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.id()), preset.name()));
+						if (CameraUtils.recallPreset(preset, this.mc))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						}
+						else
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
+						}
 					}
 					else
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
 					}
 				}
 				else
 				{
-					InfoUtils.showInGameMessage(Message.MessageType.WARNING, StringUtils.translate(PREFIX+"_cycle_not_found"));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_cycle_not_found"));
 				}
 
 				return true;
@@ -612,6 +620,11 @@ public class Callbacks
             {
                 GuiBase.openGui(new GuiConfigs());
                 return true;
+            }
+            else if (key == Hotkeys.OPEN_CAMERA_PRESET_EDITOR_GUI.getKeybind())
+            {
+	            GuiBase.openGui(new GuiCameraPresetEditor());
+	            return true;
             }
             else if (key == Hotkeys.SWAP_ELYTRA_CHESTPLATE.getKeybind())
             {

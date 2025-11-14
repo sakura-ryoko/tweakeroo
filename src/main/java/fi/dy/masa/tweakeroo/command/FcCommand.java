@@ -10,14 +10,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
-import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.interfaces.IClientCommandListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.data.CameraPresetCache;
+import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 
@@ -37,31 +36,55 @@ public class FcCommand implements IClientCommandListener
 	{
 		List<String> list = new ArrayList<>(args);      // Copy it first
 		list.removeFirst();
-		Sub sub = Sub.fromString(list.removeFirst());
 
-		if (sub != null)
+		if (!list.isEmpty())
 		{
-			if (sub.needsArgs() && list.isEmpty())
-			{
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(  PREFIX+"_not_enough_args_given"));
-				return true;
-			}
+			Sub sub = Sub.fromString(list.getFirst());
 
-			return switch (sub.getName().toLowerCase())
+			if (sub != null)
 			{
-				case "add" -> this.executeAdd(list, mc);
-				case "set" -> this.executeSet(list, mc);
-				case "del" -> this.executeDel(list, mc);
-				case "del_all" -> this.executeDelAll(list, mc);
-				case "list" -> this.executeList(list, mc);
-				case "rename" -> this.executeRename(list, mc);
-				case "recall" -> this.executeRecall(list, mc);
-				case "cycle" -> this.executeCycle(list, mc);
-				case "help" -> this.executeHelp(list, mc);
-				default -> throw new IllegalStateException("Unexpected value: " + sub.getName());
-			};
+				list.removeFirst();
+
+				if (sub.needsArgs() && list.isEmpty())
+				{
+					mc.inGameHud.getChatHud()
+								.addMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
+					return true;
+				}
+
+				return switch (sub.getName().toLowerCase())
+				{
+					case "add" -> this.executeAdd(list, mc);
+					case "set" -> this.executeSet(list, mc);
+					case "del" -> this.executeDel(list, mc);
+					case "del_all" -> this.executeDelAll(list, mc);
+					case "list" -> this.executeList(list, mc);
+					case "rename" -> this.executeRename(list, mc);
+					case "recall" -> this.executeRecall(list, mc);
+					case "cycle" -> this.executeCycle(list, mc);
+					case "help" -> this.executeHelp(list, mc);
+					default -> this.executeInvalid(mc);
+				};
+			}
+		}
+		else if (!FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
+		{
+			FeatureToggle.TWEAK_FREE_CAMERA.setBooleanValue(true);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), true);
+			return true;
+		}
+		else
+		{
+			FeatureToggle.TWEAK_FREE_CAMERA.setBooleanValue(false);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), false);
+			return true;
 		}
 
+		return this.executeInvalid(mc);
+	}
+
+	private boolean executeInvalid(MinecraftClient mc)
+	{
 		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
 		return true;
 	}
@@ -72,13 +95,13 @@ public class FcCommand implements IClientCommandListener
 		{
 			RegistryKey<World> dimKey = mc.world.getRegistryKey();
 			Entity camera = mc.getCameraEntity();
-			final int id = CameraPresetCache.getInstance().getNextId(-1);
+			final int id = CameraPresetManager.getInstance().getNextId(-1);
 			String name = !args.isEmpty() ? CameraUtils.fixPresetName(args.toString()) : "Preset "+id;
 			CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
 
 			if (CameraUtils.addPreset(newPreset))
 			{
-				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_added", newPreset.toShortString());
+				InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_added", newPreset.toShortString()));
 			}
 			else
 			{
@@ -99,18 +122,18 @@ public class FcCommand implements IClientCommandListener
 			{
 				id = Integer.parseInt(args.getFirst());
 
-				if (CameraPresetCache.getInstance().hasId(id))
+				if (CameraPresetManager.getInstance().hasId(id))
 				{
 					RegistryKey<World> dimKey = mc.world.getRegistryKey();
 					Entity camera = mc.getCameraEntity();
-					CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
+					CameraPreset oldPreset = CameraPresetManager.getInstance().get(id);
 
 					if (oldPreset != null)
 					{
-						CameraPreset newPreset = new CameraPreset(id, oldPreset.name(), dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
+						CameraPreset newPreset = new CameraPreset(id, oldPreset.getName(), dimKey.getValue(), camera.getEyePos(), camera.getYaw(), camera.getPitch());
 
 						CameraUtils.updatePreset(newPreset);
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_updated", newPreset.toShortString());
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_updated", newPreset.toShortString()));
 					}
 				}
 				else
@@ -138,13 +161,13 @@ public class FcCommand implements IClientCommandListener
 			{
 				id = Integer.parseInt(args.getFirst());
 
-				if (CameraPresetCache.getInstance().hasId(id))
+				if (CameraPresetManager.getInstance().hasId(id))
 				{
-					CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
+					CameraPreset oldPreset = CameraPresetManager.getInstance().get(id);
 
 					if (CameraUtils.deletePreset(oldPreset))
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX + "_deleted", oldPreset.toShortString());
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_deleted", oldPreset.toShortString()));
 					}
 				}
 				else
@@ -156,11 +179,11 @@ public class FcCommand implements IClientCommandListener
 			{
 				if (mc.world != null && mc.getCameraEntity() != null)
 				{
-					CameraPreset oldPreset = CameraPresetCache.getInstance().getAtPosition(mc.getCameraEntity());
+					CameraPreset oldPreset = CameraPresetManager.getInstance().getAtPosition(mc.getCameraEntity());
 
 					if (CameraUtils.deletePresetAtPosition(mc) && oldPreset != null)
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX + "_deleted", oldPreset.toShortString());
+						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_deleted", oldPreset.toShortString()));
 					}
 				}
 			}
@@ -182,7 +205,7 @@ public class FcCommand implements IClientCommandListener
 
 			if (CameraUtils.deleteAllPresets(dimKey))
 			{
-				InfoUtils.showInGameMessage(Message.MessageType.SUCCESS, PREFIX+"_deleted_all_dim", dimKey.getValue().toString());
+				InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_deleted_all_dim", dimKey.getValue().toString()));
 			}
 		}
 
@@ -194,7 +217,7 @@ public class FcCommand implements IClientCommandListener
 		if (mc.world != null)
 		{
 			RegistryKey<World> dimKey = mc.world.getRegistryKey();
-			List<CameraPreset> list = CameraPresetCache.getInstance().toList(dimKey);
+			List<CameraPreset> list = CameraPresetManager.getInstance().toList(dimKey);
 
 			if (list.isEmpty())
 			{
@@ -220,18 +243,26 @@ public class FcCommand implements IClientCommandListener
 		{
 			id = Integer.parseInt(args.getFirst());
 
-			if (CameraPresetCache.getInstance().hasId(id))
+			if (CameraPresetManager.getInstance().hasId(id))
 			{
 				args.removeFirst();
 
 				if (!args.isEmpty())
 				{
-					CameraPreset oldPreset = CameraPresetCache.getInstance().get(id);
-					final String newName = CameraUtils.fixPresetName(args.toString());
+					CameraPreset oldPreset = CameraPresetManager.getInstance().get(id);
+					String newName = CameraUtils.fixPresetName(args.toString());
 
-					if (CameraUtils.renamePreset(oldPreset, newName))
+					if (oldPreset != null)
 					{
-						InfoUtils.showInGameMessage(Message.MessageType.INFO, PREFIX + "_renamed", String.format("%02d", id), oldPreset.name(), newName);
+						if (newName.isEmpty())
+						{
+							newName = "Preset " + oldPreset.getId();
+						}
+
+						if (CameraUtils.renamePreset(oldPreset, newName))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_renamed", String.format("%02d", id), oldPreset.getName(), newName));
+						}
 					}
 				}
 				else
@@ -261,19 +292,26 @@ public class FcCommand implements IClientCommandListener
 		{
 			id = Integer.parseInt(args.getFirst());
 
-			if (CameraPresetCache.getInstance().hasId(id))
+			if (CameraPresetManager.getInstance().hasId(id))
 			{
-				CameraPreset preset = CameraPresetCache.getInstance().get(id);
+				CameraPreset preset = CameraPresetManager.getInstance().get(id);
 
-				if (preset != null)
+				if (preset != null && mc.world != null)
 				{
-					if (CameraUtils.recallPreset(preset, mc))
+					if (mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 					{
-						InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.id()), preset.name()));
+						if (CameraUtils.recallPreset(preset, mc))
+						{
+							InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX + "_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
+						}
+						else
+						{
+							mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
+						}
 					}
 					else
 					{
-						mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+						mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
 					}
 				}
 			}
@@ -304,7 +342,7 @@ public class FcCommand implements IClientCommandListener
 
 			if (args.isEmpty())
 			{
-				preset = CameraPresetCache.getInstance().cycle(dimKey);
+				preset = CameraPresetManager.getInstance().cycle(dimKey);
 			}
 			else
 			{
@@ -312,10 +350,10 @@ public class FcCommand implements IClientCommandListener
 				{
 					id = Integer.parseInt(args.getFirst());
 
-					if (CameraPresetCache.getInstance().hasId(id))
+					if (CameraPresetManager.getInstance().hasId(id))
 					{
-						preset = CameraPresetCache.getInstance().get(id);
-						CameraPresetCache.getInstance().setLastPreset(id);
+						preset = CameraPresetManager.getInstance().get(id);
+						CameraPresetManager.getInstance().setLastPreset(id);
 					}
 				}
 				catch (Exception err)
@@ -330,11 +368,11 @@ public class FcCommand implements IClientCommandListener
 			{
 				if (CameraUtils.recallPreset(preset, mc))
 				{
-					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.id()), preset.name()));
+					InfoUtils.printActionbarMessage(StringUtils.translate(PREFIX+"_recalled", FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(), String.format("%02d", preset.getId()), preset.getName()));
 				}
 				else
 				{
-					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.id())));
+					mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.getId())));
 				}
 			}
 			else if (!exception)
@@ -357,10 +395,9 @@ public class FcCommand implements IClientCommandListener
 			if (sub != null)
 			{
 				String key = sub.getName();
-				String name = sub.getDisplayName();
 
 				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix));
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"."+key, name));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"."+key));
 
 				if (!sub.getAlias().isEmpty())
 				{
@@ -379,9 +416,8 @@ public class FcCommand implements IClientCommandListener
 			for (Sub entry : Sub.values())
 			{
 				String key = entry.getName();
-				String name = entry.getDisplayName();
 
-				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"."+key, name));
+				mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(prefix+"."+key));
 
 				if (!entry.getAlias().isEmpty())
 				{
@@ -406,14 +442,12 @@ public class FcCommand implements IClientCommandListener
 		HELP    ("help",    false, List.of("h", "hlp"));
 
 		private final String name;
-		private final String translationKey;
 		private final boolean needsArgs;
 		private final List<String> alias;
 
 		Sub(String name, boolean needsArgs, List<String> alias)
 		{
 			this.name = name;
-			this.translationKey = Reference.MOD_ID+".label.free_cam.preset_sub."+name;
 			this.needsArgs = needsArgs;
 			this.alias = alias;
 		}
@@ -421,11 +455,6 @@ public class FcCommand implements IClientCommandListener
 		public String getName()
 		{
 			return this.name;
-		}
-
-		public String getDisplayName()
-		{
-			return StringUtils.getTranslatedOrFallback(this.translationKey, this.name);
 		}
 
 		public boolean needsArgs()
@@ -443,11 +472,6 @@ public class FcCommand implements IClientCommandListener
 			for (Sub entry : values())
 			{
 				if (entry.getName().equalsIgnoreCase(s))
-				{
-					return entry;
-				}
-
-				if (entry.getDisplayName().equalsIgnoreCase(s))
 				{
 					return entry;
 				}
