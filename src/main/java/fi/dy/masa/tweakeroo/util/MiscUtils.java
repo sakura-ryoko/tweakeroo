@@ -741,6 +741,22 @@ public class MiscUtils
         return false;
     }
 
+	public static void toggleGammaOverrideWithMessage()
+	{
+		boolean orig = FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue();
+
+		if (!orig)
+		{
+			FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(true);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_GAMMA_OVERRIDE.getPrettyName(), true);
+		}
+		else
+		{
+			FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
+			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_GAMMA_OVERRIDE.getPrettyName(), false);
+		}
+	}
+
     public static class PostKeyAction
     {
         private int lastIntValue;
