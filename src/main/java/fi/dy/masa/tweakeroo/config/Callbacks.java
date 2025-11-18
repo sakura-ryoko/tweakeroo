@@ -175,9 +175,9 @@ public class Callbacks
 				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.ALWAYS_ON);
 			}
 			else if (!enable &&
-					profile.getVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugHudEntryVisibility.IN_F3)
+					profile.getVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugHudEntryVisibility.IN_OVERLAY)
 			{
-				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.IN_F3);
+				profile.setEntryVisibility(DebugHudEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugHudEntryVisibility.IN_OVERLAY);
 			}
 		}
 	}

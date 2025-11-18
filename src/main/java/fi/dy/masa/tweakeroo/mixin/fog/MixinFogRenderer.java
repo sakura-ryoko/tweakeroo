@@ -20,7 +20,7 @@ public class MixinFogRenderer
         return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : instance.getVoidDarknessRange();
     }
 
-    @ModifyConstant(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
+    @ModifyConstant(method = "applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
                     constant = { @Constant(intValue = 16) })
     private int tweakeroo_tweakRenderDistanceFog_DistanceMultiplier(int constant)
     {
@@ -38,7 +38,7 @@ public class MixinFogRenderer
         return constant;
     }
 
-    @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
+    @Redirect(method = "applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"))
     private float tweakeroo_tweakRenderDistanceFog_StartDiff(float value, float min, float max)

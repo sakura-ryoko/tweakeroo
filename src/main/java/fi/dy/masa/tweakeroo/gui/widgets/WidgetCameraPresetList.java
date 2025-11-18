@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import net.minecraft.client.gui.DrawContext;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.MaLiLibIcons;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.render.GuiContext;
 import fi.dy.masa.malilib.util.KeyCodes;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.gui.GuiCameraPresetEditor;
@@ -72,9 +74,9 @@ public class WidgetCameraPresetList extends WidgetListBase<CameraPreset, WidgetC
 	}
 
 	@Override
-	public void drawContents(DrawContext drawContext, int mouseX, int mouseY, float partialTicks)
+	public void drawContents(GuiContext ctx, int mouseX, int mouseY, float partialTicks)
 	{
-		super.drawContents(drawContext, mouseX, mouseY, partialTicks);
+		super.drawContents(ctx, mouseX, mouseY, partialTicks);
 		lastScrollbarPosition = this.scrollBar.getValue();
 	}
 

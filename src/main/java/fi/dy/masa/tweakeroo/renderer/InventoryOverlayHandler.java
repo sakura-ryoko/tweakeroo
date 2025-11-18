@@ -2,22 +2,7 @@ package fi.dy.masa.tweakeroo.renderer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import fi.dy.masa.malilib.interfaces.IDataSyncer;
-import fi.dy.masa.malilib.interfaces.IInventoryOverlayHandler;
-import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
-import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
-import fi.dy.masa.malilib.render.InventoryOverlay;
-import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.InventoryUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.game.RayTraceUtils;
-import fi.dy.masa.malilib.util.nbt.NbtBlockUtils;
-import fi.dy.masa.malilib.util.nbt.NbtEntityUtils;
-import fi.dy.masa.malilib.util.nbt.NbtInventory;
-import fi.dy.masa.malilib.util.nbt.NbtKeys;
-import fi.dy.masa.tweakeroo.Reference;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -25,7 +10,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinEntity;
@@ -36,7 +20,6 @@ import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
@@ -47,17 +30,37 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+import fi.dy.masa.malilib.interfaces.IDataSyncer;
+import fi.dy.masa.malilib.interfaces.IInventoryOverlayHandler;
+import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
+import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
+import fi.dy.masa.malilib.render.*;
+import fi.dy.masa.malilib.util.EntityUtils;
+import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.data.DataBlockUtils;
+import fi.dy.masa.malilib.util.data.DataEntityUtils;
+import fi.dy.masa.malilib.util.data.tag.CompoundData;
+import fi.dy.masa.malilib.util.data.tag.converter.DataConverterNbt;
+import fi.dy.masa.malilib.util.game.RayTraceUtils;
+import fi.dy.masa.malilib.util.nbt.NbtInventory;
+import fi.dy.masa.malilib.util.nbt.NbtKeys;
+import fi.dy.masa.tweakeroo.Reference;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
+
 public class InventoryOverlayHandler implements IInventoryOverlayHandler
 {
     private static final InventoryOverlayHandler INSTANCE = new InventoryOverlayHandler();
     public static InventoryOverlayHandler getInstance() { return INSTANCE; }
 
-    InventoryOverlay.Context context;
-    InventoryOverlay.Refresher refresher;
+    InventoryOverlayContext context;
+    InventoryOverlayRefresher refresher;
     IDataSyncer syncer;
 
-    private Pair<BlockPos, InventoryOverlay.Context> lastBlockEntityContext;
-    private Pair<Integer,  InventoryOverlay.Context> lastEntityContext;
+    private Pair<BlockPos, InventoryOverlayContext> lastBlockEntityContext;
+    private Pair<Integer,  InventoryOverlayContext> lastEntityContext;
     
     public InventoryOverlayHandler()
     {
@@ -79,7 +82,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
     {
         if (this.syncer == null)
         {
-            this.syncer = ServerDataSyncer.getInstance();
+            this.syncer = EntityDataManager.getInstance();
         }
         
         return this.syncer;
@@ -92,7 +95,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
     }
 
     @Override
-    public InventoryOverlay.Refresher getRefreshHandler()
+    public InventoryOverlayRefresher getRefreshHandler()
     {
         if (this.refresher == null)
         {
@@ -109,20 +112,20 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
     }
 
     @Override
-    public @Nullable InventoryOverlay.Context getRenderContextNullable()
+    public @Nullable InventoryOverlayContext getRenderContextNullable()
     {
         return this.context;
     }
 
     @Override
-    public @Nullable InventoryOverlay.Context getRenderContext(DrawContext drawContext, Profiler profiler, MinecraftClient mc)
+    public @Nullable InventoryOverlayContext getRenderContext(GuiContext ctx, Profiler profiler)
     {
         profiler.push(this.getClass().getName() + "_inventory_overlay");
-        this.getTargetInventory(mc);
+        this.getTargetInventory(ctx.mc());
 
         if (!this.isEmpty())
         {
-            this.renderInventoryOverlay(drawContext, this.getRenderContextNullable(), mc,
+            this.renderInventoryOverlay(ctx, this.getRenderContextNullable(),
                                         Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue(),
                                         Configs.Generic.INVENTORY_PREVIEW_VILLAGER_BG_COLOR.getBooleanValue());
         }
@@ -133,7 +136,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
     }
 
     @Override
-    public @Nullable InventoryOverlay.Context getTargetInventory(MinecraftClient mc)
+    public @Nullable InventoryOverlayContext getTargetInventory(MinecraftClient mc)
     {
         World world = WorldUtils.getBestWorld(mc);
         Entity cameraEntity = EntityUtils.getCameraEntity();
@@ -172,7 +175,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             trace = mc.crosshairTarget;
         }
 
-        NbtCompound nbt = new NbtCompound();
+	    CompoundData data = new CompoundData();
 
         if (trace == null || trace.getType() == HitResult.Type.MISS)
         {
@@ -196,21 +199,21 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
                     if (be != null)
                     {
-                        nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+	                    data = DataConverterNbt.fromVanillaCompound(be.createNbtWithIdentifyingData(world.getRegistryManager()));
                     }
                 }
                 else
                 {
-                    Pair<BlockEntity, NbtCompound> pair = this.requestBlockEntityAt(world, pos);
+	                Pair<BlockEntity, CompoundData> pair = this.getDataSyncer().requestBlockEntity(world, pos);
 
                     if (pair != null)
                     {
-                        nbt = pair.getRight();
+                        data = pair.getRight();
                     }
                 }
 
                 //Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, nbt != null);
-                InventoryOverlay.Context ctx = getTargetInventoryFromBlock(world, pos, be, nbt);
+                InventoryOverlayContext ctx = getTargetInventoryFromBlock(world, pos, be, data);
                 //dumpContext(ctx);
 
                 if (this.lastBlockEntityContext != null && !this.lastBlockEntityContext.getLeft().equals(pos))
@@ -243,17 +246,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
                 if (entity != null)
                 {
-//                    NbtView view = NbtView.getWriter(world.getRegistryManager());
-//                    entity.writeData(view.getWriter());
-//                    nbt = view.readNbt() != null ? view.readNbt() : nbt;
-//                    Identifier id = EntityType.getId(entity.getType());
-
-//                    if (nbt != null && id != null)
-//                    {
-//                        nbt.putString("id", id.toString());
-//                    }
-
-                    nbt = NbtEntityUtils.invokeEntityNbtDataNoPassengers(entity, entity.getId());
+                    data = DataEntityUtils.invokeEntityDataTagNoPassengers(entity, entity.getId());
                 }
                 else
                 {
@@ -262,16 +255,16 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             else
             {
-                Pair<Entity, NbtCompound> pair = this.getDataSyncer().requestEntity(world, entity.getId());
+                Pair<Entity, CompoundData> pair = this.getDataSyncer().requestEntity(world, entity.getId());
 
                 if (pair != null)
                 {
-                    nbt = pair.getRight();
+                    data = pair.getRight();
                 }
             }
 
             //Tweakeroo.LOGGER.error("getTarget(): Entity [{}] raw NBT [{}]", entity.getId(), nbt.toString());
-            InventoryOverlay.Context ctx = getTargetInventoryFromEntity(world.getEntityById(entity.getId()), nbt);
+            InventoryOverlayContext ctx = getTargetInventoryFromEntity(world.getEntityById(entity.getId()), data);
             //dumpContext(ctx);
 
             if (this.lastEntityContext != null && this.lastEntityContext.getLeft() != entity.getId())
@@ -288,7 +281,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             // Has Inventory, Empty, but Has the Offers tag (Villager/Merchant)
             else if (ctx != null && ctx.inv() != null && ctx.inv().isEmpty() &&
-                     ctx.nbt() != null && ctx.nbt().contains(NbtKeys.OFFERS))
+                     ctx.data() != null && ctx.data().containsLenient(NbtKeys.OFFERS))
             {
                 this.lastEntityContext = Pair.of(entity.getId(), ctx);
                 this.context = ctx;
@@ -296,12 +289,12 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
             // Non-Inventory/Empty Entity
             else if (ctx != null && ctx.inv() == null &&
-                    (ctx.type() == InventoryOverlay.InventoryRenderType.WOLF ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.PLAYER ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.ARMOR_STAND ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.LIVING_ENTITY))
+                    (ctx.type() == InventoryOverlayType.WOLF ||
+                     ctx.type() == InventoryOverlayType.VILLAGER ||
+                     ctx.type() == InventoryOverlayType.HORSE ||
+                     ctx.type() == InventoryOverlayType.PLAYER ||
+                     ctx.type() == InventoryOverlayType.ARMOR_STAND ||
+                     ctx.type() == InventoryOverlayType.LIVING_ENTITY))
             {
                 this.lastEntityContext = Pair.of(entity.getId(), ctx);
                 this.context = ctx;
@@ -310,9 +303,9 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Has Inventory, but empty, and exists in lastEntityContext
             else if (this.lastEntityContext != null && this.lastEntityContext.getLeft() == entity.getId() &&
                     ctx != null && ctx.inv() != null && ctx.inv().isEmpty() &&
-                    (ctx.type() == InventoryOverlay.InventoryRenderType.VILLAGER ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.HORSE ||
-                     ctx.type() == InventoryOverlay.InventoryRenderType.PLAYER))
+                    (ctx.type() == InventoryOverlayType.VILLAGER ||
+                     ctx.type() == InventoryOverlayType.HORSE ||
+                     ctx.type() == InventoryOverlayType.PLAYER))
             {
                 this.context = this.lastEntityContext.getRight();
                 return this.context;
@@ -329,7 +322,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
     }
 
     @Override
-    public @Nullable InventoryOverlay.Context getTargetInventoryFromBlock(World world, BlockPos pos, @Nullable BlockEntity be, NbtCompound nbt)
+    public @Nullable InventoryOverlayContext getTargetInventoryFromBlock(World world, BlockPos pos, @Nullable BlockEntity be, CompoundData data)
     {
         Inventory inv;
 
@@ -337,29 +330,29 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
         if (be != null)
         {
-            if (nbt.isEmpty())
+            if (data.isEmpty())
             {
-                nbt = be.createNbtWithIdentifyingData(world.getRegistryManager());
+	            data = DataConverterNbt.fromVanillaCompound(be.createNbtWithIdentifyingData(world.getRegistryManager()));
             }
 
             inv = InventoryUtils.getInventory(world, pos);
         }
         else
         {
-            if (nbt.isEmpty())
+            if (data.isEmpty())
             {
-                Pair<BlockEntity, NbtCompound> pair = this.requestBlockEntityAt(world, pos);
+                Pair<BlockEntity, CompoundData> pair = this.requestBlockEntityAt(world, pos);
 
                 if (pair != null)
                 {
-                    nbt = pair.getRight();
+	                data = pair.getRight();
                 }
             }
 
             inv = this.getDataSyncer().getBlockInventory(world, pos, false);
         }
 
-        BlockEntityType<?> beType = nbt != null ? NbtBlockUtils.getBlockEntityTypeFromNbt(nbt) : null;
+        BlockEntityType<?> beType = data != null ? DataBlockUtils.getBlockEntityType(data) : null;
         //Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beType != null ? beType.toString() : "<null>", inv != null ? inv.size() : "<null>");
 
         if ((beType != null && beType.equals(BlockEntityType.ENDER_CHEST)) ||
@@ -372,12 +365,12 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 if (player != null)
                 {
                     // Fetch your own EnderItems from Server ...
-                    Pair<Entity, NbtCompound> enderPair = this.getDataSyncer().requestEntity(world, player.getId());
-                    EnderChestInventory enderItems;
+                    Pair<Entity, CompoundData> enderPair = this.getDataSyncer().requestEntity(world, player.getId());
+                    EnderChestInventory enderItems = null;
 
-                    if (enderPair != null && enderPair.getRight() != null && enderPair.getRight().contains(NbtKeys.ENDER_ITEMS))
+                    if (enderPair != null && enderPair.getRight() != null && enderPair.getRight().contains(NbtKeys.ENDER_ITEMS, Constants.NBT.TAG_LIST))
                     {
-                        enderItems = InventoryUtils.getPlayerEnderItemsFromNbt(enderPair.getRight(), world.getRegistryManager());
+                        enderItems = InventoryUtils.getPlayerEnderItemsFromData(enderPair.getRight(), world.getRegistryManager());
                     }
                     else
                     {
@@ -392,10 +385,10 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
         }
 
-        if (nbt != null && !nbt.isEmpty())
+        if (data != null && !data.isEmpty())
         {
             //Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock(): rawNbt: [{}]", nbt.toString());
-            Inventory inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, world.getRegistryManager());
+            Inventory inv2 = InventoryUtils.getDataInventory(data, inv != null ? inv.size() : -1, world.getRegistryManager());
 
             if (inv == null)
             {
@@ -405,18 +398,18 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
         //Tweakeroo.LOGGER.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, nbt != null ? nbt.getString("id") : new NbtCompound());
 
-        if (inv == null || nbt == null)
+        if (inv == null || data == null)
         {
             return null;
         }
 
-        this.context = new InventoryOverlay.Context(InventoryOverlay.getBestInventoryType(inv, nbt), inv, be != null ? be : world.getBlockEntity(pos), null, nbt, this.getRefreshHandler());
+        this.context = new InventoryOverlayContext(InventoryOverlay.getBestInventoryType(inv, data), inv, be != null ? be : world.getBlockEntity(pos), null, data, this.getRefreshHandler());
 
         return this.context;
     }
 
     @Override
-    public @Nullable InventoryOverlay.Context getTargetInventoryFromEntity(Entity entity, NbtCompound nbt)
+    public @Nullable InventoryOverlayContext getTargetInventoryFromEntity(Entity entity, CompoundData data)
     {
         Inventory inv = null;
         LivingEntity entityLivingBase = null;
@@ -446,7 +439,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         {
             inv = ((IMixinPiglinEntity) entity).malilib_getInventory();
         }
-        if (!nbt.isEmpty())
+        if (!data.isEmpty())
         {
             Inventory inv2;
 
@@ -455,38 +448,38 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
             // Fix for empty horse inv
             if (inv != null &&
-                nbt.contains(NbtKeys.ITEMS) &&
-                nbt.getListOrEmpty(NbtKeys.ITEMS).size() > 1)
+	            data.contains(NbtKeys.ITEMS, Constants.NBT.TAG_LIST) &&
+	            data.getList(NbtKeys.ITEMS).size() > 1)
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
-                    inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, inv.size(), entity.getRegistryManager());
+                    inv2 = InventoryUtils.getDataInventoryHorseFix(data, inv.size(), entity.getRegistryManager());
                 }
                 else
                 {
-                    inv2 = InventoryUtils.getNbtInventory(nbt, inv.size(), entity.getRegistryManager());
+                    inv2 = InventoryUtils.getDataInventory(data, inv.size(), entity.getRegistryManager());
                 }
 
                 inv = null;
             }
             // Fix for saddled horse, no inv
             else if (inv != null &&
-                     nbt.contains(NbtKeys.EQUIPMENT) && nbt.contains(NbtKeys.EATING_HAY))
+		            data.containsLenient(NbtKeys.EQUIPMENT) && data.containsLenient(NbtKeys.EATING_HAY))
             {
-                inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, inv.size(), entity.getRegistryManager());
+                inv2 = InventoryUtils.getDataInventoryHorseFix(data, inv.size(), entity.getRegistryManager());
                 inv = null;
             }
             // Fix for empty Villager/Piglin inv
             else if (inv != null && inv.size() == NbtInventory.VILLAGER_SIZE &&
-                     nbt.contains(NbtKeys.INVENTORY) &&
-                     !nbt.getListOrEmpty(NbtKeys.INVENTORY).isEmpty())
+		            data.contains(NbtKeys.INVENTORY, Constants.NBT.TAG_LIST) &&
+		            !data.getList(NbtKeys.INVENTORY).isEmpty())
             {
-                inv2 = InventoryUtils.getNbtInventory(nbt, NbtInventory.VILLAGER_SIZE, entity.getRegistryManager());
+                inv2 = InventoryUtils.getDataInventory(data, NbtInventory.VILLAGER_SIZE, entity.getRegistryManager());
                 inv = null;
             }
             else
             {
-                inv2 = InventoryUtils.getNbtInventory(nbt, inv != null ? inv.size() : -1, entity.getRegistryManager());
+                inv2 = InventoryUtils.getDataInventory(data, inv != null ? inv.size() : -1, entity.getRegistryManager());
 
                 if (inv2 != null)
                 {
@@ -507,13 +500,13 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             return null;
         }
 
-        this.context = new InventoryOverlay.Context(inv != null ? InventoryOverlay.getBestInventoryType(inv, nbt) : InventoryOverlay.getInventoryType(nbt),
-                                                    inv, null, entityLivingBase, nbt, this.getRefreshHandler());
+        this.context = new InventoryOverlayContext(inv != null ? InventoryOverlay.getBestInventoryType(inv, data) : InventoryOverlay.getInventoryType(data),
+                                                    inv, null, entityLivingBase, data, this.getRefreshHandler());
 
         return this.context;
     }
 
-    private static void dumpContext(InventoryOverlay.Context ctx)
+    private static void dumpContext(InventoryOverlayContext ctx)
     {
         System.out.print("Context Dump --> ");
 
@@ -527,27 +520,27 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         System.out.printf("BE  : [%s]\n", ctx.be() != null ? Registries.BLOCK_ENTITY_TYPE.getId(ctx.be().getType()) : "<NULL>");
         System.out.printf("ENT : [%s]\n", ctx.entity() != null ? Registries.ENTITY_TYPE.getId(ctx.entity().getType()) : "<NULL>");
         System.out.printf("INV : [%s]\n", ctx.inv() != null ? "size: "+ctx.inv().size()+"/ empty: "+ctx.inv().isEmpty() : "<NULL>");
-        System.out.printf("NBT : [%s]\n", ctx.nbt() != null ? ctx.nbt().toString() : "<NULL>");
+        System.out.printf("DATA: [%s]\n", ctx.data() != null ? ctx.data().toString() : "<NULL>");
 
         System.out.print("--> EOF\n");
     }
 
-    public static class Refresher implements InventoryOverlay.Refresher
+    public static class Refresher implements InventoryOverlayRefresher
     {
 
         @Override
-        public InventoryOverlay.Context onContextRefresh(InventoryOverlay.Context data, World world)
+        public InventoryOverlayContext onContextRefresh(InventoryOverlayContext data, World world)
         {
             // Refresh data
             if (data.be() != null)
             {
                 InventoryOverlayHandler.getInstance().requestBlockEntityAt(world, data.be().getPos());
-                data = InventoryOverlayHandler.getInstance().getTargetInventoryFromBlock(data.be().getWorld(), data.be().getPos(), data.be(), data.nbt());
+                data = InventoryOverlayHandler.getInstance().getTargetInventoryFromBlock(data.be().getWorld(), data.be().getPos(), data.be(), data.data());
             }
             else if (data.entity() != null)
             {
                 InventoryOverlayHandler.getInstance().getDataSyncer().requestEntity(world, data.entity().getId());
-                data = InventoryOverlayHandler.getInstance().getTargetInventoryFromEntity(data.entity(), data.nbt());
+                data = InventoryOverlayHandler.getInstance().getTargetInventoryFromEntity(data.entity(), data.data());
             }
 
             return data;

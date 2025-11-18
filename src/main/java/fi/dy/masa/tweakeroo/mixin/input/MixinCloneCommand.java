@@ -6,23 +6,25 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import net.minecraft.server.command.CloneCommand;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.GameRules.IntRule;
-import net.minecraft.world.GameRules.Key;
+import net.minecraft.world.rule.GameRule;
+import net.minecraft.world.rule.GameRuleType;
+import net.minecraft.world.rule.GameRules;
 
 @Mixin(value = CloneCommand.class, priority = 999)
 public abstract class MixinCloneCommand
 {
+	@SuppressWarnings("unchecked")
     @Redirect(method = "execute", require = 0,
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/world/GameRules;getInt(Lnet/minecraft/world/GameRules$Key;)I"))
-    private static int tweakeroo_overrideBlockLimit(GameRules instance, Key<IntRule> rule)
+                       target = "Lnet/minecraft/world/rule/GameRules;getValue(Lnet/minecraft/world/rule/GameRule;)Ljava/lang/Object;"))
+    private static <T> T tweakeroo_overrideBlockLimit(GameRules instance, GameRule<T> rule)
     {
-        if (FeatureToggle.TWEAK_FILL_CLONE_LIMIT.getBooleanValue())
+        if (FeatureToggle.TWEAK_FILL_CLONE_LIMIT.getBooleanValue() &&
+	        rule.getType() == GameRuleType.INT)     // Ensure it's an Integer
         {
-            return Configs.Generic.FILL_CLONE_LIMIT.getIntegerValue();
+            return (T) (Object) Configs.Generic.FILL_CLONE_LIMIT.getIntegerValue();
         }
 
-        return instance.getInt(rule);
+        return instance.getValue(rule);
     }
 }

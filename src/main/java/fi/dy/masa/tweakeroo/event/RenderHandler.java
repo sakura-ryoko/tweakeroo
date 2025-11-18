@@ -2,24 +2,9 @@ package fi.dy.masa.tweakeroo.event;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.util.ActiveMode;
-import fi.dy.masa.malilib.util.InventoryUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.nbt.NbtInventory;
-import fi.dy.masa.malilib.util.nbt.NbtKeys;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
-import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
-import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
@@ -38,11 +23,29 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.GuiContext;
+import fi.dy.masa.malilib.util.ActiveMode;
+import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.data.tag.CompoundData;
+import fi.dy.masa.malilib.util.nbt.NbtInventory;
+import fi.dy.masa.malilib.util.nbt.NbtKeys;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
+import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
+import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
     private final MinecraftClient mc;
-    private Pair<Entity, NbtCompound> lastEnderItems;
+    private Pair<Entity, CompoundData> lastEnderItems;
 
     public RenderHandler()
     {
@@ -56,17 +59,17 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPostAdvanced(DrawContext drawContext, float partialTicks, Profiler profiler, MinecraftClient mc)
+    public void onRenderGameOverlayPostAdvanced(GuiContext ctx, float partialTicks, Profiler profiler)
     {
         if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() &&
             Hotkeys.HOTBAR_SWAP_BASE.getKeybind().isKeybindHeld())
         {
-            RenderUtils.renderHotbarSwapOverlay(mc, drawContext);
+            RenderUtils.renderHotbarSwapOverlay(ctx);
         }
         else if (FeatureToggle.TWEAK_HOTBAR_SCROLL.getBooleanValue() &&
                  Hotkeys.HOTBAR_SCROLL.getKeybind().isKeybindHeld())
         {
-            RenderUtils.renderHotbarScrollOverlay(mc, drawContext);
+            RenderUtils.renderHotbarScrollOverlay(ctx);
         }
 
         if (FeatureToggle.TWEAK_INVENTORY_PREVIEW.getBooleanValue() &&
@@ -81,19 +84,19 @@ public class RenderHandler implements IRenderer
             }
              */
 
-            InventoryOverlayHandler.getInstance().getRenderContext(drawContext, profiler, mc);
+            InventoryOverlayHandler.getInstance().getRenderContext(ctx, profiler);
         }
 
         if (FeatureToggle.TWEAK_PLAYER_INVENTORY_PEEK.getBooleanValue() &&
             Hotkeys.PLAYER_INVENTORY_PEEK.getKeybind().isKeybindHeld())
         {
-            RenderUtils.renderPlayerInventoryOverlay(mc, drawContext);
+            RenderUtils.renderPlayerInventoryOverlay(ctx);
         }
 
         if (FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue() &&
             Configs.Generic.SNAP_AIM_INDICATOR.getBooleanValue())
         {
-            RenderUtils.renderSnapAimAngleIndicator(drawContext);
+            RenderUtils.renderSnapAimAngleIndicator(ctx);
         }
 
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue())
@@ -102,13 +105,13 @@ public class RenderHandler implements IRenderer
 
             if (mode == ActiveMode.ALWAYS || (mode == ActiveMode.WITH_KEY && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld()))
             {
-                RenderUtils.renderPitchLockIndicator(mc, drawContext);
+                RenderUtils.renderPitchLockIndicator(ctx);
             }
         }
     }
 
     @Override
-    public void onRenderTooltipLast(DrawContext drawContext, ItemStack stack, int x, int y)
+    public void onRenderTooltipLast(GuiContext ctx, ItemStack stack, int x, int y)
     {
         Item item = stack.getItem();
         if (item instanceof FilledMapItem)
@@ -116,7 +119,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_MAP_PREVIEW.getBooleanValue() &&
                 (Configs.Generic.MAP_PREVIEW_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(drawContext, stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
+                fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(ctx, stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
             }
         }
         else if (stack.getComponents().contains(DataComponentTypes.CONTAINER) && InventoryUtils.shulkerBoxHasItems(stack))
@@ -124,7 +127,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(drawContext, stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+                fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(ctx, stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
             }
         }
         else if (stack.isOf(Items.ENDER_CHEST) && Configs.Generic.SHULKER_DISPLAY_ENDER_CHEST.getBooleanValue())
@@ -137,16 +140,17 @@ public class RenderHandler implements IRenderer
                 {
                     return;
                 }
+
                 PlayerEntity player = world.getPlayerByUuid(this.mc.player.getUuid());
 
                 if (player != null)
                 {
-                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
+                    Pair<Entity, CompoundData> pair = EntityDataManager.getInstance().requestEntity(world, player.getId());
                     EnderChestInventory inv;
 
-                    if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))
+                    if (pair != null && pair.getRight() != null && pair.getRight().containsLenient(NbtKeys.ENDER_ITEMS))
                     {
-                        inv = InventoryUtils.getPlayerEnderItemsFromNbt(pair.getRight(), world.getRegistryManager());
+                        inv = InventoryUtils.getPlayerEnderItemsFromData(pair.getRight(), world.getRegistryManager());
                         this.lastEnderItems = pair;
                     }
                     else if (pair != null && pair.getLeft() instanceof PlayerEntity pe && !pe.getEnderChestInventory().isEmpty())
@@ -155,7 +159,7 @@ public class RenderHandler implements IRenderer
                     }
                     else if (this.lastEnderItems != null)
                     {
-                        inv = InventoryUtils.getPlayerEnderItemsFromNbt(this.lastEnderItems.getRight(), world.getRegistryManager());
+                        inv = InventoryUtils.getPlayerEnderItemsFromData(this.lastEnderItems.getRight(), world.getRegistryManager());
                     }
                     else
                     {
@@ -163,18 +167,18 @@ public class RenderHandler implements IRenderer
                         inv = player.getEnderChestInventory();
                     }
 
-                    if (inv != null)
-                    {
-                        try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
-                        {
-                            NbtCompound nbt = new NbtCompound();
-                            NbtList list = nbtInv.toNbtList(world.getRegistryManager());
+	                if (inv != null)
+	                {
+		                try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
+		                {
+			                NbtList list = nbtInv.toNbtList(world.getRegistryManager());
+			                NbtCompound nbt = new NbtCompound();
 
-                            nbt.put(NbtKeys.ENDER_ITEMS, list);
-                            fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(drawContext, stack, nbt, x, y, false);
-                        }
-                        catch (Exception ignored) { }
-                    }
+			                nbt.put(NbtKeys.ENDER_ITEMS, list);
+			                fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(ctx, stack, nbt, x, y, false);
+		                }
+		                catch (Exception ignored) { }
+	                }
                 }
             }
         }
@@ -183,7 +187,7 @@ public class RenderHandler implements IRenderer
             if (FeatureToggle.TWEAK_BUNDLE_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.BUNDLE_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(drawContext, stack, x, y, Configs.Generic.BUNDLE_DISPLAY_ROW_WIDTH.getIntegerValue(), Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+                fi.dy.masa.malilib.render.RenderUtils.renderBundlePreview(ctx, stack, x, y, Configs.Generic.BUNDLE_DISPLAY_ROW_WIDTH.getIntegerValue(), Configs.Generic.BUNDLE_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
             }
         }
     }

@@ -19,7 +19,7 @@ public abstract class MixinHeldItemRenderer
 {
     @Redirect(method = "updateHeldItems()V", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getAttackCooldownProgress(F)F"))
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;getHandEquippingProgress(F)F"))
     public float tweakeroo_redirectedGetCooledAttackStrength(ClientPlayerEntity player, float adjustTicks)
     {
         return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : player.getAttackCooldownProgress(adjustTicks);

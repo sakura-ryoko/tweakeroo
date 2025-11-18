@@ -40,6 +40,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
+import net.minecraft.world.attribute.WorldEnvironmentAttributeAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
@@ -127,7 +128,7 @@ public class FakeWorld extends World
     }
 
     @Override
-    public @Nonnull FakeChunk getChunk(int chunkX, int chunkZ)
+    public FakeChunk getChunk(int chunkX, int chunkZ)
     {
         return this.chunkManager.getChunk(chunkX, chunkZ);
     }
@@ -274,26 +275,32 @@ public class FakeWorld extends World
         return this.registryManager;
     }
 
-    @Override
-    public @Nonnull BrewingRecipeRegistry getBrewingRecipeRegistry()
+	@Override
+	public WorldEnvironmentAttributeAccess getEnvironmentAttributes()
+	{
+		return null;
+	}
+
+	@Override
+    public BrewingRecipeRegistry getBrewingRecipeRegistry()
     {
         return null;
     }
 
     @Override
-    public @Nonnull FuelRegistry getFuelRegistry()
+    public FuelRegistry getFuelRegistry()
     {
         return null;
     }
 
     @Override
-    public @Nonnull QueryableTickScheduler<Block> getBlockTickScheduler()
+    public QueryableTickScheduler<Block> getBlockTickScheduler()
     {
         return null;
     }
 
     @Override
-    public @Nonnull QueryableTickScheduler<Fluid> getFluidTickScheduler()
+    public QueryableTickScheduler<Fluid> getFluidTickScheduler()
     {
         return null;
     }
@@ -305,7 +312,7 @@ public class FakeWorld extends World
     }
 
     @Override
-    public @Nonnull RegistryEntry<Biome> getGeneratorStoredBiome(int var1, int var2, int var3)
+    public RegistryEntry<Biome> getGeneratorStoredBiome(int var1, int var2, int var3)
     {
         // TODO Auto-generated method stub
         return null;
@@ -375,7 +382,7 @@ public class FakeWorld extends World
     }
 
     @Override
-    public @Nonnull TickManager getTickManager()
+    public TickManager getTickManager()
     {
         return null;
     }
@@ -393,21 +400,21 @@ public class FakeWorld extends World
     }
 
     @Override
-    public @Nonnull Scoreboard getScoreboard()
+    public Scoreboard getScoreboard()
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public @Nonnull RecipeManager getRecipeManager()
+    public RecipeManager getRecipeManager()
     {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected @Nonnull EntityLookup<Entity> getEntityLookup()
+    protected EntityLookup<Entity> getEntityLookup()
     {
         // TODO Auto-generated method stub
         return null;
@@ -416,6 +423,6 @@ public class FakeWorld extends World
 	@Override
 	public @Nonnull WorldBorder getWorldBorder()
 	{
-		return WorldBorder.Properties.DEFAULT.toWorldBorder();
+		return new WorldBorder();
 	}
 }

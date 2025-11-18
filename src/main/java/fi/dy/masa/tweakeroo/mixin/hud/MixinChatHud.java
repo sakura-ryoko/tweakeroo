@@ -31,19 +31,24 @@ public abstract class MixinChatHud
         return componentIn;
     }
 
+	// 1.21.10:
 	// method_71992(Lnet/minecraft/client/gui/GuiGraphics;IFFIIIIILnet/minecraft/client/GuiMessage$Line;IF)V // ARGB;color
-    // Bytecode-aware Mixin
-    @Redirect(method = "method_71992(Lnet/minecraft/client/gui/DrawContext;IFFIIIIILnet/minecraft/client/gui/hud/ChatHudLine$Visible;IF)V",
+	// 25w46a:
+	// method_75802(IILnet/minecraft/client/gui/hud/ChatHud$Backend;IFLnet/minecraft/client/gui/hud/ChatHudLine$Visible;IF)V
+	//
+    // INVOKEVIRTUAL Bytecode Mixin
+    @Redirect(method = "method_75802(IILnet/minecraft/client/gui/hud/ChatHud$Backend;IFLnet/minecraft/client/gui/hud/ChatHudLine$Visible;IF)V",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/util/math/ColorHelper;withAlpha(FI)I",
+                       target = "Lnet/minecraft/util/math/ColorHelper;toAlpha(F)I",
                        ordinal = 0))
-    private int tweakeroo_overrideChatBackgroundColor(float alpha, int color)
+    private static int tweakeroo_overrideChatBackgroundColor(float alpha)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())
         {
-            return MiscUtils.getChatBackgroundColor(ColorHelper.withAlpha(alpha, color));
+            return MiscUtils.getChatBackgroundColor(ColorHelper.toAlpha(alpha));
         }
 
-        return ColorHelper.withAlpha(alpha, color);
+//        return ColorHelper.withAlpha(alpha, rgb);
+	    return ColorHelper.toAlpha(alpha);
     }
 }

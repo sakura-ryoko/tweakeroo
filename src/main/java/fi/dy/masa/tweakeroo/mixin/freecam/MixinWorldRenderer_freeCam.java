@@ -35,9 +35,9 @@ public abstract class MixinWorldRenderer_freeCam
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
                                         target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=cullTerrain"))
-    private void preSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
-                                 Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2,
-                                 GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci)
+    private void tweakeroo_preSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
+                                           Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2,
+                                           GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -47,9 +47,9 @@ public abstract class MixinWorldRenderer_freeCam
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING",
                                         target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=compileSections"))
-    private void postSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
-                                  Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2,
-                                  GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci)
+    private void tweakeroo_postSetupTerrain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline,
+                                            Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2,
+                                            GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }
@@ -57,7 +57,7 @@ public abstract class MixinWorldRenderer_freeCam
     // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
     @Redirect(method = "fillEntityRenderStates", require = 0, at = @At(value = "INVOKE",
                                                                     target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;", ordinal = 3))
-    private Entity allowRenderingClientPlayerInFreeCameraMode(Camera camera)
+    private Entity tweakeroo_allowRenderingClientPlayerInFreeCameraMode(Camera camera)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -70,10 +70,10 @@ public abstract class MixinWorldRenderer_freeCam
 	// cullTerrain -> method_74752
     // These injections will fail when Sodium is present, but the Free Camera
     // rendering seems to work fine with Sodium without these anyway
-    @Inject(method = "method_74752", require = 0,
+    @Inject(method = "updateCamera", require = 0,
             at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
                      target = "Lnet/minecraft/client/render/WorldRenderer;lastCameraX:D"))
-    private void rebuildChunksAroundCamera1(
+    private void tweakeroo_rebuildChunksAroundCamera1(
             Camera camera, Frustum frustum, boolean bl, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
@@ -87,11 +87,10 @@ public abstract class MixinWorldRenderer_freeCam
 	// cullTerrain -> method_74752
     // These injections will fail when Sodium is present, but the Free Camera
     // rendering seems to work fine with Sodium without these anyway
-    @Inject(method = "method_74752", require = 0,
+    @Inject(method = "updateCamera", require = 0,
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
                      target = "Lnet/minecraft/client/render/BuiltChunkStorage;updateCameraPosition(Lnet/minecraft/util/math/ChunkSectionPos;)V"))
-    private void rebuildChunksAroundCamera2(
-            Camera camera, Frustum frustum, boolean bl, CallbackInfo ci)
+    private void tweakeroo_rebuildChunksAroundCamera2(Camera camera, Frustum frustum, boolean bl, CallbackInfo ci)
     {
         // Mark the chunks at the edge of the free camera's render range for rebuilding
         // when the camera moves around.
@@ -100,8 +99,8 @@ public abstract class MixinWorldRenderer_freeCam
         // to disappear because of no dirty marking calls from chunk loading.
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
-            int x = MathHelper.floor(camera.getPos().x) >> 4;
-            int z = MathHelper.floor(camera.getPos().z) >> 4;
+            int x = MathHelper.floor(camera.getCameraPos().x) >> 4;
+            int z = MathHelper.floor(camera.getCameraPos().z) >> 4;
             CameraUtils.markChunksForRebuild(x, z, this.lastUpdatePosX, this.lastUpdatePosZ);
             // Could send this to Servux in the future
         }

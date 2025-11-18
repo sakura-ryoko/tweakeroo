@@ -27,7 +27,7 @@ public class MixinWeatherRendering
     }
 
     @Inject(method = "addParticlesAndSound", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_cancelParticlesAndSounds(ClientWorld world, Camera camera, int ticks, ParticlesMode particlesMode, CallbackInfo ci)
+    private void tweakeroo_cancelParticlesAndSounds(ClientWorld world, Camera camera, int ticks, ParticlesMode particlesMode, int weatherRadius, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_RAIN_EFFECTS.getBooleanValue())
         {

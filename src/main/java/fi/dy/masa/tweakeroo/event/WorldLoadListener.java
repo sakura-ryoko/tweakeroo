@@ -19,7 +19,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
@@ -50,7 +50,7 @@ public class WorldLoadListener implements IWorldLoadListener
 
         if (worldAfter != null)
         {
-            ServerDataSyncer.getInstance().onWorldPre();
+            EntityDataManager.getInstance().onWorldPre();
         }
     }
 
@@ -58,7 +58,7 @@ public class WorldLoadListener implements IWorldLoadListener
     public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
         DataManager.getInstance().reset(worldAfter == null);
-        ServerDataSyncer.getInstance().reset(worldAfter == null);
+        EntityDataManager.getInstance().reset(worldAfter == null);
 
         if (worldBefore == null)
         {
@@ -86,7 +86,7 @@ public class WorldLoadListener implements IWorldLoadListener
 			}
 
 //	        this.readStoredDataPerDimension();
-            ServerDataSyncer.getInstance().onWorldJoin();
+            EntityDataManager.getInstance().onWorldJoin();
 			CachedTagManager.startCache();
         }
         else

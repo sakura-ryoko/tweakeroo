@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import fi.dy.masa.malilib.render.GuiContext;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -88,8 +89,8 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
             Text strLooping = Text.translatable("tweakeroo.gui.button.misc.command_block.update_execution.looping");
             width = this.textRenderer.getWidth(strOff) + 10;
 
-            this.buttonUpdateExec = CyclingButtonWidget.onOffBuilder(strOn, strOff)
-                                    .omitKeyText().initially(this.updateExecValue)
+            this.buttonUpdateExec = CyclingButtonWidget.onOffBuilder(strOn, strOff, this.updateExecValue)
+                                    .omitKeyText()
                                     .build(x2 + widthBtn + 4, y, width, 20, strLooping, (button, val) ->
             {
                 this.updateExecValue = val;
@@ -148,7 +149,7 @@ public abstract class MixinCommandBlockScreen extends AbstractCommandBlockScreen
         if (this.buttonUpdateExec != null && this.buttonUpdateExec.isHovered())
         {
             String hover = "tweakeroo.gui.button.misc.command_block.hover.update_execution";
-            RenderUtils.drawHoverText(drawContext, mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)));
+            RenderUtils.drawHoverText(GuiContext.fromGuiGraphics(drawContext), mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)));
         }
     }
 
