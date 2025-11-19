@@ -1,5 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import org.objectweb.asm.Opcodes;
 
 import com.mojang.authlib.GameProfile;
@@ -8,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -23,6 +28,8 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+
+import java.util.function.Predicate;
 
 @Mixin(value = ClientPlayerEntity.class, priority = 1001)
 public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
@@ -65,7 +72,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(method = "tickMovement",
             at = @At(value = "FIELD",
-                     target = "Lnet/minecraft/client/network/ClientPlayerEntity;falling:Z"))
+					 target = "Lnet/minecraft/client/network/ClientPlayerEntity;falling:Z",
+					 opcode = Opcodes.PUTFIELD))
     private void tweakeroo_overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
@@ -78,7 +86,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Redirect(method = "shouldStopSprinting", at = @At(value = "FIELD",
-                target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z"))
+													   target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z",
+													   opcode = Opcodes.GETFIELD))
     private boolean tweakeroo_overrideCollidedHorizontally(ClientPlayerEntity player)
     {
         if (Configs.Disable.DISABLE_WALL_UNSPRINT.getBooleanValue())
@@ -159,4 +168,25 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             }
         }
     }
+
+	@ModifyArg(method = "method_76763",
+			   at = @At(value = "INVOKE",
+						target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"))
+	private static Predicate<Entity> tweakeroo_overrideTargetedEntityCheck(Predicate<Entity> predicate)
+	{
+		if (Configs.Disable.DISABLE_DEAD_MOB_TARGETING.getBooleanValue())
+		{
+			predicate = predicate.and((entityIn) -> (entityIn instanceof LivingEntity) == false || ((LivingEntity) entityIn).getHealth() > 0f);
+		}
+
+		MinecraftClient mc = MinecraftClient.getInstance();
+
+		if ((FeatureToggle.TWEAK_HANGABLE_ENTITY_BYPASS.getBooleanValue() && mc.player != null
+			 && mc.player.isSneaking() == Configs.Generic.HANGABLE_ENTITY_BYPASS_INVERSE.getBooleanValue()))
+		{
+			predicate = predicate.and((entityIn) -> (entityIn instanceof AbstractDecorationEntity) == false);
+		}
+
+		return predicate;
+	}
 }

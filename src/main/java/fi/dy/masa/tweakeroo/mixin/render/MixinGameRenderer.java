@@ -1,12 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
-import java.util.function.Predicate;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,7 +11,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -49,25 +45,6 @@ public abstract class MixinGameRenderer
         {
             cir.setReturnValue((float) Configs.Generic.ZOOM_FOV.getDoubleValue());
         }
-    }
-
-    @ModifyArg(method = "findCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;",
-               at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"))
-    private Predicate<Entity> tweakeroo_overrideTargetedEntityCheck(Predicate<Entity> predicate)
-    {
-        if (Configs.Disable.DISABLE_DEAD_MOB_TARGETING.getBooleanValue())
-        {
-            predicate = predicate.and((entityIn) -> (entityIn instanceof LivingEntity) == false || ((LivingEntity) entityIn).getHealth() > 0f);
-        }
-
-        if ((FeatureToggle.TWEAK_HANGABLE_ENTITY_BYPASS.getBooleanValue() && this.client.player != null
-             && this.client.player.isSneaking() == Configs.Generic.HANGABLE_ENTITY_BYPASS_INVERSE.getBooleanValue()))
-        {
-            predicate = predicate.and((entityIn) -> (entityIn instanceof AbstractDecorationEntity) == false);
-        }
-
-        return predicate;
     }
 
     @Inject(method = "renderWorld", at = @At(
