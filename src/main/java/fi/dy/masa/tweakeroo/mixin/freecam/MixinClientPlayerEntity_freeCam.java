@@ -14,6 +14,7 @@ import fi.dy.masa.tweakeroo.util.CameraEntity;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.DummyMovementInput;
 import net.minecraft.client.input.Input;
+import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -35,7 +36,8 @@ public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlay
     @Inject(method = "tick", at = @At("HEAD"))
     private void tweakeroo_disableMovementInputsPre(CallbackInfo ci)
     {
-        if (CameraUtils.shouldPreventPlayerMovement())
+        // Check if input is vanilla's keyboard input to allow other mods to move the player while in freecam
+        if (CameraUtils.shouldPreventPlayerMovement() && input.getClass() == KeyboardInput.class)
         {
             this.realInput = this.input;
             this.input = this.dummyMovementInput;
