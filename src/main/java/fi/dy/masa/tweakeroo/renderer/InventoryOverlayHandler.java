@@ -453,11 +453,11 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
-                    inv2 = InventoryUtils.getDataInventoryHorseFix(data, inv.size(), entity.getRegistryManager());
+                    inv2 = InventoryUtils.getDataInventoryHorseFix(data, -1, entity.getRegistryManager());
                 }
                 else
                 {
-                    inv2 = InventoryUtils.getDataInventory(data, inv.size(), entity.getRegistryManager());
+                    inv2 = InventoryUtils.getDataInventory(data, -1, entity.getRegistryManager());
                 }
 
                 inv = null;
