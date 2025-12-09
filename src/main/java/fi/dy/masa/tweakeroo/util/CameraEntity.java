@@ -2,38 +2,38 @@ package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.recipebook.ClientRecipeBook;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MovementType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.stat.StatHandler;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.ClientRecipeBook;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.stats.StatsCounter;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-public class CameraEntity extends ClientPlayerEntity
+public class CameraEntity extends LocalPlayer
 {
     @Nullable private static CameraEntity camera;
     @Nullable private static Entity originalCameraEntity;
-    private static Vec3d cameraMotion = new Vec3d(0.0, 0.0, 0.0);
+    private static Vec3 cameraMotion = new Vec3(0.0, 0.0, 0.0);
     private static boolean cullChunksOriginal;
     private static boolean sprinting;
     private static boolean originalCameraWasPlayer;
 
-    private CameraEntity(MinecraftClient mc, ClientWorld world,
-                         ClientPlayNetworkHandler netHandler, StatHandler stats,
-                         ClientRecipeBook recipeBook, PlayerInput input, boolean sprinting)
+    private CameraEntity(Minecraft mc, ClientLevel world,
+                         ClientPacketListener netHandler, StatsCounter stats,
+                         ClientRecipeBook recipeBook, Input input, boolean sprinting)
     {
         super(mc, world, netHandler, stats, recipeBook, input, sprinting);
     }
@@ -65,15 +65,15 @@ public class CameraEntity extends ClientPlayerEntity
 
         if (camera != null && Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.getBooleanValue() == false)
         {
-            GameOptions options = MinecraftClient.getInstance().options;
+            Options options = Minecraft.getInstance().options;
 
             camera.updateLastTickPosition();
 
-            if (options.sprintKey.isPressed())
+            if (options.keySprint.isDown())
             {
                 sprinting = true;
             }
-            else if (options.forwardKey.isPressed() == false && options.backKey.isPressed() == false)
+            else if (options.keyUp.isDown() == false && options.keyDown.isDown() == false)
             {
                 sprinting = false;
             }
@@ -99,7 +99,7 @@ public class CameraEntity extends ClientPlayerEntity
 
     private void handleMotion(double forward, double up, double strafe)
     {
-        float yaw = this.getYaw();
+        float yaw = this.getYRot();
         double scale = getMoveSpeed();
         double xFactor = Math.sin(yaw * Math.PI / 180.0);
         double zFactor = Math.cos(yaw * Math.PI / 180.0);
@@ -108,33 +108,33 @@ public class CameraEntity extends ClientPlayerEntity
         double y = up * scale;
         double z = (forward * zFactor + strafe * xFactor) * scale;
 
-        this.setVelocity(new Vec3d(x, y, z));
-        this.move(MovementType.SELF, this.getVelocity());
+        this.setDeltaMovement(new Vec3(x, y, z));
+        this.move(MoverType.SELF, this.getDeltaMovement());
     }
 
     private void updateLastTickPosition()
     {
 //        this.setLastPositionAndAngles(new Vec3d(this.getX(), this.getY(), this.getZ()), this.getYaw(), this.getPitch());
-        this.lastRenderX = this.getX();
-        this.lastRenderY = this.getY();
-        this.lastRenderZ = this.getZ();
+        this.xOld = this.getX();
+        this.yOld = this.getY();
+        this.zOld = this.getZ();
 
-        this.lastX = this.getX();
-        this.lastY = this.getY();
-        this.lastZ = this.getZ();
+        this.xo = this.getX();
+        this.yo = this.getY();
+        this.zo = this.getZ();
 
-        this.lastYaw = this.getYaw();
-        this.lastPitch = this.getPitch();
+        this.yRotO = this.getYRot();
+        this.xRotO = this.getXRot();
 
-        this.lastHeadYaw = this.headYaw;
+        this.yHeadRotO = this.yHeadRot;
     }
 
     public void setCameraRotations(float yaw, float pitch)
     {
-        this.setYaw(yaw);
-        this.setPitch(pitch);
+        this.setYRot(yaw);
+        this.setXRot(pitch);
 
-        this.headYaw = yaw;
+        this.yHeadRot = yaw;
 
         //this.lastRotationYaw = this.rotationYaw;
         //this.lastRotationPitch = this.rotationPitch;
@@ -145,48 +145,48 @@ public class CameraEntity extends ClientPlayerEntity
 
     public void updateCameraRotations(float yawChange, float pitchChange)
     {
-        float yaw = this.getYaw() + yawChange * 0.15F;
-        float pitch = MathHelper.clamp(this.getPitch() + pitchChange * 0.15F, -90F, 90F);
+        float yaw = this.getYRot() + yawChange * 0.15F;
+        float pitch = Mth.clamp(this.getXRot() + pitchChange * 0.15F, -90F, 90F);
 
-        this.setYaw(yaw);
-        this.setPitch(pitch);
+        this.setYRot(yaw);
+        this.setXRot(pitch);
 
         this.setCameraRotations(yaw, pitch);
     }
 
-    private static CameraEntity createCameraEntity(MinecraftClient mc)
+    private static CameraEntity createCameraEntity(Minecraft mc)
     {
-	    if (mc.player == null || mc.world == null)
+	    if (mc.player == null || mc.level == null)
 	    {
 		    throw new RuntimeException("Cannot create CameraEntity from null!");
 	    }
 
-	    ClientPlayerEntity player = mc.player;
+	    LocalPlayer player = mc.player;
 
 //        Vec3d eyePos = player.getEyePos();
-        Vec3d entityPos = player.getEntityPos();
+        Vec3 entityPos = player.position();
 //        BlockPos blockPos = player.getBlockPos();
-        float yaw = player.getYaw();
-        float pitch = player.getPitch();
+        float yaw = player.getYRot();
+        float pitch = player.getXRot();
 
         // Don't reset velocity when flying / swimming.
-        if (mc.player.isOnGround())
+        if (mc.player.onGround())
         {
-            mc.player.setVelocity(Vec3d.ZERO);
+            mc.player.setDeltaMovement(Vec3.ZERO);
         }
 
-        CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook(), PlayerInput.DEFAULT, false);
-        camera.noClip = true;
+        CameraEntity camera = new CameraEntity(mc, mc.level, player.connection, player.getStats(), player.getRecipeBook(), Input.EMPTY, false);
+        camera.noPhysics = true;
 //
 //        camera.refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), yaw, pitch);
 //        camera.setRotation(yaw, pitch);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
 
-        camera.setPos(entityPos.getX(), entityPos.getY() + 0.125f, entityPos.getZ());
-        camera.setYaw(yaw);
-        camera.setPitch(pitch);
-        camera.setVelocity(Vec3d.ZERO);
+        camera.setPosRaw(entityPos.x(), entityPos.y() + 0.125f, entityPos.z());
+        camera.setYRot(yaw);
+        camera.setXRot(pitch);
+        camera.setDeltaMovement(Vec3.ZERO);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [AFTER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", mc.player.getEyePos().toString(), mc.player.getPos().toString(), mc.player.getBlockPos().toShortString(), mc.player.getVelocity().toString());
@@ -196,41 +196,41 @@ public class CameraEntity extends ClientPlayerEntity
 
 	public static void updatePositionAtPreset(@Nonnull CameraPreset preset)
 	{
-		if (camera != null && isValidDim(camera.getEntityWorld(), preset.getDim()))
+		if (camera != null && isValidDim(camera.level(), preset.getDim()))
 		{
 //			Tweakeroo.LOGGER.error("CameraEntity#updatePositionAtPreset(): oldPos [{}], newPos [{}] // yaw [{}], pitch [{}]", camera.getEyePos().toString(), preset.pos().toString(), preset.yaw(), preset.pitch());
-			camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());
-			camera.setYaw(preset.getYaw());
-			camera.setPitch(preset.getPitch());
-			camera.setVelocity(Vec3d.ZERO);
+			camera.setPosRaw(preset.getPos().x(), preset.getPos().y(), preset.getPos().z());
+			camera.setYRot(preset.getYaw());
+			camera.setXRot(preset.getPitch());
+			camera.setDeltaMovement(Vec3.ZERO);
 		}
 	}
 
 	@ApiStatus.Experimental
-	private static CameraEntity createCameraAtPreset(MinecraftClient mc, @Nonnull CameraPreset preset)
+	private static CameraEntity createCameraAtPreset(Minecraft mc, @Nonnull CameraPreset preset)
 	{
-		if (mc.player == null || mc.world == null)
+		if (mc.player == null || mc.level == null)
 		{
 			throw new RuntimeException("Cannot create CameraEntity from null!");
 		}
 
-		ClientPlayerEntity player = mc.player;
+		LocalPlayer player = mc.player;
 
 		// Don't reset velocity when flying / swimming.
-		if (mc.player.isOnGround())
+		if (mc.player.onGround())
 		{
-			mc.player.setVelocity(Vec3d.ZERO);
+			mc.player.setDeltaMovement(Vec3.ZERO);
 		}
 
-		CameraEntity camera = new CameraEntity(mc, mc.world, player.networkHandler, player.getStatHandler(), player.getRecipeBook(), PlayerInput.DEFAULT, false);
-		camera.noClip = true;
+		CameraEntity camera = new CameraEntity(mc, mc.level, player.connection, player.getStats(), player.getRecipeBook(), Input.EMPTY, false);
+		camera.noPhysics = true;
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
 
-		camera.setPos(preset.getPos().getX(), preset.getPos().getY(), preset.getPos().getZ());
-		camera.setYaw(preset.getYaw());
-		camera.setPitch(preset.getPitch());
-		camera.setVelocity(Vec3d.ZERO);
+		camera.setPosRaw(preset.getPos().x(), preset.getPos().y(), preset.getPos().z());
+		camera.setYRot(preset.getYaw());
+		camera.setXRot(preset.getPitch());
+		camera.setDeltaMovement(Vec3.ZERO);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [AFTER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", mc.player.getEyePos().toString(), mc.player.getPos().toString(), mc.player.getBlockPos().toShortString(), mc.player.getVelocity().toString());
@@ -246,16 +246,16 @@ public class CameraEntity extends ClientPlayerEntity
 
     public static void setCameraState(boolean enabled, @Nullable CameraPreset preset)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
-        if (mc.world != null && mc.player != null)
+        if (mc.level != null && mc.player != null)
         {
-	        RegistryKey<World> dim = mc.world.getRegistryKey();
+	        ResourceKey<Level> dim = mc.level.dimension();
 
             if (enabled && preset != null &&
 	            preset.getId() > -1)
             {
-				if (preset.getDim().equals(dim.getValue()))
+				if (preset.getDim().equals(dim.identifier()))
 				{
 					createAndSetCameraAtPreset(mc, preset);
 				}
@@ -282,45 +282,45 @@ public class CameraEntity extends ClientPlayerEntity
         return originalCameraWasPlayer;
     }
 
-    private static void createAndSetCamera(MinecraftClient mc)
+    private static void createAndSetCamera(Minecraft mc)
     {
         camera = createCameraEntity(mc);
 	    setCamera(mc);
     }
 
 	@ApiStatus.Experimental
-	private static void createAndSetCameraAtPreset(MinecraftClient mc, CameraPreset preset)
+	private static void createAndSetCameraAtPreset(Minecraft mc, CameraPreset preset)
 	{
-		if (isValidDim(mc.world, preset.getDim()))
+		if (isValidDim(mc.level, preset.getDim()))
 		{
 			camera = createCameraAtPreset(mc, preset);
 			setCamera(mc);
 		}
 	}
 
-	private static void setCamera(MinecraftClient mc)
+	private static void setCamera(Minecraft mc)
 	{
 		originalCameraEntity = mc.getCameraEntity();
 		originalCameraWasPlayer = originalCameraEntity == mc.player;
-		cullChunksOriginal = mc.chunkCullingEnabled;
+		cullChunksOriginal = mc.smartCull;
 
 		mc.setCameraEntity(camera);
-		mc.chunkCullingEnabled = false; // Disable chunk culling
+		mc.smartCull = false; // Disable chunk culling
 
 		// Disable the motion option when entering camera mode
 		Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.setBooleanValue(false);
 	}
 
-	private static void removeCamera(MinecraftClient mc)
+	private static void removeCamera(Minecraft mc)
     {
-        if (mc.world != null && camera != null)
+        if (mc.level != null && camera != null)
         {
             // Re-fetch the player entity, in case the player died while in Free Camera mode and the instance changed
             mc.setCameraEntity(originalCameraWasPlayer ? mc.player : originalCameraEntity);
-            mc.chunkCullingEnabled = cullChunksOriginal;
+            mc.smartCull = cullChunksOriginal;
 
-            final int chunkX = MathHelper.floor(camera.getX() / 16.0) >> 4;
-            final int chunkZ = MathHelper.floor(camera.getZ() / 16.0) >> 4;
+            final int chunkX = Mth.floor(camera.getX() / 16.0) >> 4;
+            final int chunkZ = Mth.floor(camera.getZ() / 16.0) >> 4;
             CameraUtils.markChunksForRebuildOnDeactivation(chunkX, chunkZ);
         }
 
@@ -328,13 +328,13 @@ public class CameraEntity extends ClientPlayerEntity
         camera = null;
     }
 
-	private static boolean isValidDim(World world, Identifier dim)
+	private static boolean isValidDim(Level world, Identifier dim)
 	{
 		if (world == null)
 		{
 			return false;
 		}
 
-		return world.getRegistryKey().getValue().equals(dim);
+		return world.dimension().identifier().equals(dim);
 	}
 }

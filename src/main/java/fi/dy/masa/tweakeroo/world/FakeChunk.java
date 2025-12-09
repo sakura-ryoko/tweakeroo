@@ -1,20 +1,20 @@
 package fi.dy.masa.tweakeroo.world;
 
 import javax.annotation.Nonnull;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 
 /**
  * Copied From Tweak Fork by Andrew54757
  */
-public class FakeChunk extends WorldChunk
+public class FakeChunk extends LevelChunk
 {
-    private static final BlockState AIR = Blocks.AIR.getDefaultState();
+    private static final BlockState AIR = Blocks.AIR.defaultBlockState();
     private final int bottomY;
     private final int topY;
     private boolean isEmpty = true;
@@ -22,8 +22,8 @@ public class FakeChunk extends WorldChunk
     public FakeChunk(FakeWorld world, ChunkPos pos)
     {
         super(world, pos);
-        this.bottomY = world.getBottomY();
-        this.topY = world.getTopYInclusive();
+        this.bottomY = world.getMinY();
+        this.topY = world.getMaxY();
     }
 
     @Override
@@ -35,13 +35,13 @@ public class FakeChunk extends WorldChunk
         int cy = this.getSectionIndex(y);
         y &= 0xF;
 
-        ChunkSection[] sections = this.getSectionArray();
+        LevelChunkSection[] sections = this.getSections();
 
         if (cy >= 0 && cy < sections.length)
         {
-            ChunkSection chunkSection = sections[cy];
+            LevelChunkSection chunkSection = sections[cy];
 
-            if (!chunkSection.isEmpty())
+            if (!chunkSection.hasOnlyAir())
             {
                 return chunkSection.getBlockState(x, y, z);
             }
@@ -68,9 +68,9 @@ public class FakeChunk extends WorldChunk
 
             Block blockNew = state.getBlock();
             Block blockOld = stateOld.getBlock();
-            ChunkSection section = this.getSectionArray()[cy];
+            LevelChunkSection section = this.getSections()[cy];
 
-            if (section.isEmpty() && state.isAir())
+            if (section.hasOnlyAir() && state.isAir())
             {
                 return null;
             }
@@ -86,7 +86,7 @@ public class FakeChunk extends WorldChunk
 
             if (blockOld != blockNew)
             {
-                this.getWorld().removeBlockEntity(pos);
+                this.getLevel().removeBlockEntity(pos);
             }
 
             if (section.getBlockState(x, y, z).getBlock() != blockNew)
@@ -110,7 +110,7 @@ public class FakeChunk extends WorldChunk
                 //     }
                 // }
 
-                this.needsSaving();
+                this.isUnsaved();
                 return stateOld;
             }
         }

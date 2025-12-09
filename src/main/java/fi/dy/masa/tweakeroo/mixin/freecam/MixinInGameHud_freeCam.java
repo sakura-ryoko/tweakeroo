@@ -10,30 +10,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.entity.player.Player;
 
-@Mixin(value = InGameHud.class, priority = 1005)
+@Mixin(value = Gui.class, priority = 1005)
 public abstract class MixinInGameHud_freeCam
 {
-    @Shadow @Final private MinecraftClient client;
+    @Shadow @Final private Minecraft minecraft;
 
     @Inject(method = "getCameraPlayer", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_overridePlayerForRendering(CallbackInfoReturnable<PlayerEntity> cir)
+    private void tweakeroo_overridePlayerForRendering(CallbackInfoReturnable<Player> cir)
     {
         // Fix the hotbar rendering in the Free Camera mode by using the actual player
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
-			this.client.player != null)
+			this.minecraft.player != null)
         {
-            cir.setReturnValue(this.client.player);
+            cir.setReturnValue(this.minecraft.player);
         }
     }
 
-    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    public void tweakeroo_overrideHotbarRendering(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
+    public void tweakeroo_overrideHotbarRendering(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci)
 	{
 		// This turns off rendering of the hotbar
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -43,8 +43,8 @@ public abstract class MixinInGameHud_freeCam
         }
     }
 
-	@Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideHeldItemTooltipRendering(DrawContext context, CallbackInfo ci)
+	@Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideHeldItemTooltipRendering(GuiGraphics context, CallbackInfo ci)
 	{
 		// This turns off rendering of the item "tooltips" when selecting hotbar items
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -55,8 +55,8 @@ public abstract class MixinInGameHud_freeCam
 		}
 	}
 
-	@Inject(method = "renderStatusBars", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideStatusBarRendering1(DrawContext context, CallbackInfo ci)
+	@Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideStatusBarRendering1(GuiGraphics context, CallbackInfo ci)
 	{
 		// This turns off all status bars
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -66,8 +66,8 @@ public abstract class MixinInGameHud_freeCam
 		}
 	}
 
-	@Inject(method = "renderMountHealth", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideStatusBarRendering2(DrawContext context, CallbackInfo ci)
+	@Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideStatusBarRendering2(GuiGraphics context, CallbackInfo ci)
 	{
 		// This turns off the "mount health" status bar
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -77,14 +77,14 @@ public abstract class MixinInGameHud_freeCam
 		}
 	}
 
-	@Inject(method = "getCurrentBarType", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideExpBarRendering(CallbackInfoReturnable<InGameHud.BarType> cir)
+	@Inject(method = "nextContextualInfoState", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideExpBarRendering(CallbackInfoReturnable<Gui.ContextualInfo> cir)
 	{
 		// This turns off all status bars
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
 			!Configs.Generic.FREE_CAMERA_SHOW_STATUS_BARS.getBooleanValue())
 		{
-			cir.setReturnValue(InGameHud.BarType.EMPTY);
+			cir.setReturnValue(Gui.ContextualInfo.EMPTY);
 		}
 	}
 }

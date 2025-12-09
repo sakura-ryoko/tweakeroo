@@ -3,11 +3,11 @@ package fi.dy.masa.tweakeroo.mixin.input;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,32 +16,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(ClientCommandSource.class)
+@Mixin(ClientSuggestionProvider.class)
 public abstract class MixinClientCommandSource
 {
-    @Inject(method = "getBlockPositionSuggestions", at = @At("HEAD"), cancellable = true)
-    private void onGetBlockPositionSuggestions(CallbackInfoReturnable<Collection<CommandSource.RelativePosition>> cir)
+    @Inject(method = "getRelevantCoordinates", at = @At("HEAD"), cancellable = true)
+    private void onGetBlockPositionSuggestions(CallbackInfoReturnable<Collection<SharedSuggestionProvider.TextCoordinates>> cir)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (FeatureToggle.TWEAK_TAB_COMPLETE_COORDINATE.getBooleanValue() &&
-            mc.player != null && (mc.crosshairTarget == null || mc.crosshairTarget.getType() == HitResult.Type.MISS))
+            mc.player != null && (mc.hitResult == null || mc.hitResult.getType() == HitResult.Type.MISS))
         {
             BlockPos pos = PositionUtils.getEntityBlockPos(mc.player);
             //System.out.printf("onGetBlockPositionSuggestions(): suggestedPos: [%s]\n", pos.toShortString());
-            cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(formatInt(pos.getX()), formatInt(pos.getY()), formatInt(pos.getZ()))));
+            cir.setReturnValue(Collections.singleton(new SharedSuggestionProvider.TextCoordinates(formatInt(pos.getX()), formatInt(pos.getY()), formatInt(pos.getZ()))));
         }
     }
 
-    @Inject(method = "getPositionSuggestions", at = @At("HEAD"), cancellable = true)
-    private void onGetPositionSuggestions(CallbackInfoReturnable<Collection<CommandSource.RelativePosition>> cir)
+    @Inject(method = "getAbsoluteCoordinates", at = @At("HEAD"), cancellable = true)
+    private void onGetPositionSuggestions(CallbackInfoReturnable<Collection<SharedSuggestionProvider.TextCoordinates>> cir)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (FeatureToggle.TWEAK_TAB_COMPLETE_COORDINATE.getBooleanValue() &&
-            mc.player != null && (mc.crosshairTarget == null || mc.crosshairTarget.getType() == HitResult.Type.MISS))
+            mc.player != null && (mc.hitResult == null || mc.hitResult.getType() == HitResult.Type.MISS))
         {
-            cir.setReturnValue(Collections.singleton(new CommandSource.RelativePosition(formatDouble(mc.player.getX()), formatDouble(mc.player.getY()), formatDouble(mc.player.getZ()))));
+            cir.setReturnValue(Collections.singleton(new SharedSuggestionProvider.TextCoordinates(formatDouble(mc.player.getX()), formatDouble(mc.player.getY()), formatDouble(mc.player.getZ()))));
         }
     }
 

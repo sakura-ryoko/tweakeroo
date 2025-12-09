@@ -6,20 +6,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.data.DataManager;
-import net.minecraft.client.network.ClientCommonNetworkHandler;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 
-@Mixin(ClientCommonNetworkHandler.class)
+@Mixin(ClientCommonPacketListenerImpl.class)
 public class MixinClientCommonNetworkHandler
 {
-    @Inject(method = "onCustomPayload(Lnet/minecraft/network/packet/s2c/common/CustomPayloadS2CPacket;)V", at = @At("HEAD"))
-    private void tweakeroo_onCustomPayload(CustomPayloadS2CPacket packet, CallbackInfo ci)
+    @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"))
+    private void tweakeroo_onCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci)
     {
-        if (packet.payload().getId().id().equals(DataManager.CARPET_HELLO))
+        if (packet.payload().type().id().equals(DataManager.CARPET_HELLO))
         {
             DataManager.getInstance().setHasCarpetServer(true);
         }
-        else if (packet.payload().getId().id().equals(DataManager.SERVUX_LITEMATIC_DATA))
+        else if (packet.payload().type().id().equals(DataManager.SERVUX_LITEMATIC_DATA))
         {
             DataManager.getInstance().setHasServuxServer(true);
         }

@@ -2,27 +2,7 @@ package fi.dy.masa.tweakeroo.event;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EnderChestInventory;
-import net.minecraft.item.FilledMapItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.profiler.Profiler;
-import net.minecraft.world.World;
-
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.render.GuiContext;
@@ -40,16 +20,34 @@ import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.PlayerEnderChestContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 public class RenderHandler implements IRenderer
 {
     private static final RenderHandler INSTANCE = new RenderHandler();
-    private final MinecraftClient mc;
+    private final Minecraft mc;
     private Pair<Entity, CompoundData> lastEnderItems;
 
     public RenderHandler()
     {
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
         this.lastEnderItems = null;
     }
 
@@ -59,7 +57,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPostAdvanced(GuiContext ctx, float partialTicks, Profiler profiler)
+    public void onRenderGameOverlayPostAdvanced(GuiContext ctx, float partialTicks, ProfilerFiller profiler)
     {
         if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() &&
             Hotkeys.HOTBAR_SWAP_BASE.getKeybind().isKeybindHeld())
@@ -114,7 +112,7 @@ public class RenderHandler implements IRenderer
     public void onRenderTooltipLast(GuiContext ctx, ItemStack stack, int x, int y)
     {
         Item item = stack.getItem();
-        if (item instanceof FilledMapItem)
+        if (item instanceof MapItem)
         {
             if (FeatureToggle.TWEAK_MAP_PREVIEW.getBooleanValue() &&
                 (Configs.Generic.MAP_PREVIEW_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
@@ -122,7 +120,7 @@ public class RenderHandler implements IRenderer
                 fi.dy.masa.malilib.render.RenderUtils.renderMapPreview(ctx, stack, x, y, Configs.Generic.MAP_PREVIEW_SIZE.getIntegerValue(), false);
             }
         }
-        else if (stack.getComponents().contains(DataComponentTypes.CONTAINER) && InventoryUtils.shulkerBoxHasItems(stack))
+        else if (stack.getComponents().has(DataComponents.CONTAINER) && InventoryUtils.shulkerBoxHasItems(stack))
         {
             if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
@@ -130,36 +128,36 @@ public class RenderHandler implements IRenderer
                 fi.dy.masa.malilib.render.RenderUtils.renderShulkerBoxPreview(ctx, stack, x, y, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
             }
         }
-        else if (stack.isOf(Items.ENDER_CHEST) && Configs.Generic.SHULKER_DISPLAY_ENDER_CHEST.getBooleanValue())
+        else if (stack.is(Items.ENDER_CHEST) && Configs.Generic.SHULKER_DISPLAY_ENDER_CHEST.getBooleanValue())
         {
             if (FeatureToggle.TWEAK_SHULKERBOX_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.SHULKER_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
             {
-                World world = WorldUtils.getBestWorld(this.mc);
+                Level world = WorldUtils.getBestWorld(this.mc);
                 if (world == null || this.mc.player == null)
                 {
                     return;
                 }
 
-                PlayerEntity player = world.getPlayerByUuid(this.mc.player.getUuid());
+                Player player = world.getPlayerByUUID(this.mc.player.getUUID());
 
                 if (player != null)
                 {
                     Pair<Entity, CompoundData> pair = EntityDataManager.getInstance().requestEntity(world, player.getId());
-                    EnderChestInventory inv;
+                    PlayerEnderChestContainer inv;
 
                     if (pair != null && pair.getRight() != null && pair.getRight().containsLenient(NbtKeys.ENDER_ITEMS))
                     {
-                        inv = InventoryUtils.getPlayerEnderItemsFromData(pair.getRight(), world.getRegistryManager());
+                        inv = InventoryUtils.getPlayerEnderItemsFromData(pair.getRight(), world.registryAccess());
                         this.lastEnderItems = pair;
                     }
-                    else if (pair != null && pair.getLeft() instanceof PlayerEntity pe && !pe.getEnderChestInventory().isEmpty())
+                    else if (pair != null && pair.getLeft() instanceof Player pe && !pe.getEnderChestInventory().isEmpty())
                     {
                         inv = pe.getEnderChestInventory();
                     }
                     else if (this.lastEnderItems != null)
                     {
-                        inv = InventoryUtils.getPlayerEnderItemsFromData(this.lastEnderItems.getRight(), world.getRegistryManager());
+                        inv = InventoryUtils.getPlayerEnderItemsFromData(this.lastEnderItems.getRight(), world.registryAccess());
                     }
                     else
                     {
@@ -171,8 +169,8 @@ public class RenderHandler implements IRenderer
 	                {
 		                try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
 		                {
-			                NbtList list = nbtInv.toNbtList(world.getRegistryManager());
-			                NbtCompound nbt = new NbtCompound();
+			                ListTag list = nbtInv.toNbtList(world.registryAccess());
+			                CompoundTag nbt = new CompoundTag();
 
 			                nbt.put(NbtKeys.ENDER_ITEMS, list);
 			                fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(ctx, stack, nbt, x, y, false);
@@ -182,7 +180,7 @@ public class RenderHandler implements IRenderer
                 }
             }
         }
-        else if (stack.getComponents().contains(DataComponentTypes.BUNDLE_CONTENTS) && InventoryUtils.bundleHasItems(stack))
+        else if (stack.getComponents().has(DataComponents.BUNDLE_CONTENTS) && InventoryUtils.bundleHasItems(stack))
         {
             if (FeatureToggle.TWEAK_BUNDLE_DISPLAY.getBooleanValue() &&
                 (Configs.Generic.BUNDLE_DISPLAY_REQUIRE_SHIFT.getBooleanValue() == false || GuiBase.isShiftDown()))
@@ -193,9 +191,9 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLastAdvanced(Framebuffer fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, BufferBuilderStorage buffers, Profiler profiler)
+    public void onRenderWorldLastAdvanced(RenderTarget fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, RenderBuffers buffers, ProfilerFiller profiler)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc.player != null)
         {
@@ -204,26 +202,26 @@ public class RenderHandler implements IRenderer
         }
     }
 
-    private void renderOverlays(Matrix4f posMatrix, MinecraftClient mc)
+    private void renderOverlays(Matrix4f posMatrix, Minecraft mc)
     {
         Entity entity = mc.getCameraEntity();
 
         if (FeatureToggle.TWEAK_FLEXIBLE_BLOCK_PLACEMENT.getBooleanValue() &&
             entity != null &&
-            mc.crosshairTarget != null &&
-            mc.crosshairTarget.getType() == HitResult.Type.BLOCK &&
+            mc.hitResult != null &&
+            mc.hitResult.getType() == HitResult.Type.BLOCK &&
             (Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ROTATION.getKeybind().isKeybindHeld() ||
              Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_OFFSET.getKeybind().isKeybindHeld() ||
              Hotkeys.FLEXIBLE_BLOCK_PLACEMENT_ADJACENT.getKeybind().isKeybindHeld()))
         {
-            BlockHitResult hitResult = (BlockHitResult) mc.crosshairTarget;
+            BlockHitResult hitResult = (BlockHitResult) mc.hitResult;
             Color4f color = Configs.Generic.FLEXIBLE_PLACEMENT_OVERLAY_COLOR.getColor();
 
             fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
                     entity,
                     hitResult.getBlockPos(),
-                    hitResult.getSide(),
-                    hitResult.getPos(),
+                    hitResult.getDirection(),
+                    hitResult.getLocation(),
                     color, posMatrix);
         }
     }

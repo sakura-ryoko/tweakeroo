@@ -12,21 +12,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.entity.Entity;
 
 @Mixin(value = GameRenderer.class, priority = 1005)
 public abstract class MixinGameRenderer_freeCam
 {
-    @Shadow @Final private MinecraftClient client;
+    @Shadow @Final private Minecraft minecraft;
 
     @ModifyExpressionValue(method = "getFov", at = @At(value = "CONSTANT", args = "floatValue=70.0"))
     private float tweakeroo_applyFreeCameraFov(float original)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
-            return ((float) this.client.options.getFov().getValue());
+            return ((float) this.minecraft.options.fov().get());
         }
 
         return original;
@@ -38,9 +38,9 @@ public abstract class MixinGameRenderer_freeCam
         return !FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && value;
     }
 
-    @Redirect(method = "updateCrosshairTarget(F)V", at = @At(value = "INVOKE",
-              target = "Lnet/minecraft/client/MinecraftClient;getCameraEntity()Lnet/minecraft/entity/Entity;"))
-    private Entity tweakeroo_overrideCameraEntityForRayTrace(MinecraftClient mc)
+    @Redirect(method = "pick(F)V", at = @At(value = "INVOKE",
+              target = "Lnet/minecraft/client/Minecraft;getCameraEntity()Lnet/minecraft/world/entity/Entity;"))
+    private Entity tweakeroo_overrideCameraEntityForRayTrace(Minecraft mc)
     {
         // Return the real player for the hit target ray tracing if the
         // player inputs option is enabled in Free Camera mode.
@@ -57,7 +57,7 @@ public abstract class MixinGameRenderer_freeCam
         return mc.getCameraEntity();
     }
 
-    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_removeHandRendering(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&

@@ -6,23 +6,23 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.FacingBlock;
-import net.minecraft.block.ObserverBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.ObserverBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 @Mixin(value = ObserverBlock.class, priority = 1001)
-public abstract class MixinObserverBlock extends FacingBlock
+public abstract class MixinObserverBlock extends DirectionalBlock
 {
-    public MixinObserverBlock(AbstractBlock.Settings builder)
+    public MixinObserverBlock(BlockBehaviour.Properties builder)
     {
         super(builder);
     }
 
-    @Inject(method = "scheduleTick", at = @At("HEAD"), cancellable = true)
-    private void preventTrigger(WorldView world, ScheduledTickView tickView, BlockPos pos, CallbackInfo ci)
+    @Inject(method = "startSignal", at = @At("HEAD"), cancellable = true)
+    private void preventTrigger(LevelReader world, ScheduledTickAccess tickView, BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_OBSERVER.getBooleanValue())
         {

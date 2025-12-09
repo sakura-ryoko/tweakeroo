@@ -1,10 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.item;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(net.minecraft.item.Item.class)
+@Mixin(net.minecraft.world.item.Item.class)
 public abstract class MixinItem
 {
     @Shadow public abstract Item asItem();

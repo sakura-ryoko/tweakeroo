@@ -18,7 +18,7 @@ import fi.dy.masa.tweakeroo.event.InputHandler;
 import fi.dy.masa.tweakeroo.event.RenderHandler;
 import fi.dy.masa.tweakeroo.event.WorldLoadListener;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class InitHandler implements IInitializationHandler
 {
@@ -50,6 +50,6 @@ public class InitHandler implements IInitializationHandler
         TickHandler.getInstance().registerClientTickHandler(EntityDataManager.getInstance());
 
 	    ClientCommandHandler.INSTANCE.registerCommand(new FcCommand());
-        Callbacks.init(MinecraftClient.getInstance());
+        Callbacks.init(Minecraft.getInstance());
     }
 }

@@ -1,8 +1,8 @@
 package fi.dy.masa.tweakeroo.data;
 
 import javax.annotation.Nullable;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.resources.Identifier;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fi.dy.masa.malilib.interfaces.IServerListener;
@@ -15,8 +15,8 @@ public class DataManager implements IServerListener
 
     private boolean hasCarpetServer;
     private boolean hasServuxServer;
-    public static final Identifier CARPET_HELLO = Identifier.of("carpet", "hello");
-    public static final Identifier SERVUX_LITEMATIC_DATA = Identifier.of("servux", "litematics");
+    public static final Identifier CARPET_HELLO = Identifier.fromNamespaceAndPath("carpet", "hello");
+    public static final Identifier SERVUX_LITEMATIC_DATA = Identifier.fromNamespaceAndPath("servux", "litematics");
     //private IntegratedServer integratedServer;
     //private DynamicRegistryManager.Immutable registryManager = DynamicRegistryManager.EMPTY;
     private boolean hasIntegratedServer;

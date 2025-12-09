@@ -4,18 +4,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BeaconRenderer;
+import net.minecraft.resources.Identifier;
 
-@Mixin(BeaconBlockEntityRenderer.class)
+@Mixin(BeaconRenderer.class)
 public abstract class MixinBeaconBlockEntityRenderer
 {
-    @Inject(method = "renderBeam(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/util/Identifier;FFIIIFF)V",
+    @Inject(method = "submitBeaconBeam(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/resources/Identifier;FFIIIFF)V",
             at = @At("HEAD"), cancellable = true)
-    private static void tweakeroo_disableBeamRendering(MatrixStack matrices, OrderedRenderCommandQueue queue, Identifier textureId,
+    private static void tweakeroo_disableBeamRendering(PoseStack matrices, SubmitNodeCollector queue, Identifier textureId,
 													   float beamHeight, float beamRotationDegrees, int minHeight, int maxHeight,
 													   int color, float innerScale, float outerScale, CallbackInfo ci)
     {

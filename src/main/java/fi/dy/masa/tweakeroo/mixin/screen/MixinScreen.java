@@ -6,16 +6,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 @Mixin(value = Screen.class)
 public abstract class MixinScreen
 {
-	@Shadow public abstract boolean shouldPause();
+	@Shadow public abstract boolean isPauseScreen();
 
-	@Redirect(method = "keepOpenThroughPortal",
+	@Redirect(method = "isAllowedInPortal",
 			  at = @At(value = "INVOKE",
-					 target = "Lnet/minecraft/client/gui/screen/Screen;shouldPause()Z"))
+					 target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
 	private boolean tweakeroo_keepGuiOpenThroughPortals(Screen instance)
 	{
 		// Spoof the return value to prevent entering the if block
@@ -24,6 +24,6 @@ public abstract class MixinScreen
 			return true;
 		}
 
-		return this.shouldPause();
+		return this.isPauseScreen();
 	}
 }

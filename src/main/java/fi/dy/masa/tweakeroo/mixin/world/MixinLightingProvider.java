@@ -8,22 +8,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.light.ChunkLightProvider;
-import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.lighting.LightEngine;
 
-@Mixin(LightingProvider.class)
+@Mixin(LevelLightEngine.class)
 public abstract class MixinLightingProvider
 {
-    @Shadow @Final @Nullable private ChunkLightProvider<?, ?> blockLightProvider;
+    @Shadow @Final @Nullable private LightEngine<?, ?> blockEngine;
 
     @Inject(method = "checkBlock", at = @At("HEAD"), cancellable = true)
     private void disableLightUpdates(BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CLIENT_LIGHT_UPDATES.getBooleanValue() &&
-            this.blockLightProvider != null &&
-            ((IMixinChunkLightProvider) this.blockLightProvider).tweakeroo_getChunkProvider().getWorld() == MinecraftClient.getInstance().world)
+            this.blockEngine != null &&
+            ((IMixinChunkLightProvider) this.blockEngine).tweakeroo_getChunkProvider().getLevel() == Minecraft.getInstance().level)
         {
             ci.cancel();
         }

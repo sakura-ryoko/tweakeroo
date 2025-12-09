@@ -7,23 +7,23 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.network.message.MessageSignatureData;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.GuiMessageTag;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MessageSignature;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.ARGB;
 
-@Mixin(value = ChatHud.class, priority = 1100)
+@Mixin(value = ChatComponent.class, priority = 1100)
 public abstract class MixinChatHud
 {
-    @ModifyVariable(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
+    @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V",
                     at = @At("HEAD"), argsOnly = true)
-    private Text tweakeroo_addMessageTimestamp(Text componentIn, Text parameterMessage, MessageSignatureData data, MessageIndicator indicator)
+    private Component tweakeroo_addMessageTimestamp(Component componentIn, Component parameterMessage, MessageSignature data, GuiMessageTag indicator)
     {
         if (FeatureToggle.TWEAK_CHAT_TIMESTAMP.getBooleanValue())
         {
-            MutableText newComponent = Text.literal(MiscUtils.getChatTimestamp() + " ");
+            MutableComponent newComponent = Component.literal(MiscUtils.getChatTimestamp() + " ");
             newComponent.append(componentIn);
             return newComponent;
         }
@@ -37,18 +37,18 @@ public abstract class MixinChatHud
 	// method_75802(IILnet/minecraft/client/gui/hud/ChatHud$Backend;IFLnet/minecraft/client/gui/hud/ChatHudLine$Visible;IF)V
 	//
     // INVOKEVIRTUAL Bytecode Mixin
-    @Redirect(method = "method_75802(IILnet/minecraft/client/gui/hud/ChatHud$Backend;IFLnet/minecraft/client/gui/hud/ChatHudLine$Visible;IF)V",
+    @Redirect(method = "method_75802(IILnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IFLnet/minecraft/client/GuiMessage$Line;IF)V",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/util/math/ColorHelper;toAlpha(F)I",
+                       target = "Lnet/minecraft/util/ARGB;black(F)I",
                        ordinal = 0))
     private static int tweakeroo_overrideChatBackgroundColor(float alpha)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())
         {
-            return MiscUtils.getChatBackgroundColor(ColorHelper.toAlpha(alpha));
+            return MiscUtils.getChatBackgroundColor(ARGB.black(alpha));
         }
 
 //        return ColorHelper.withAlpha(alpha, rgb);
-	    return ColorHelper.toAlpha(alpha);
+	    return ARGB.black(alpha);
     }
 }

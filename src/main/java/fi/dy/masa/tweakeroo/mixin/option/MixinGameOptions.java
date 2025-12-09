@@ -1,9 +1,9 @@
 package fi.dy.masa.tweakeroo.mixin.option;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.Options;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(GameOptions.class)
+@Mixin(Options.class)
 public class MixinGameOptions
 {
 //    @Inject(method = "getTextBackgroundColor(I)I", at = @At("RETURN"), cancellable = true)

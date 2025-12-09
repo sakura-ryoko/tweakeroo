@@ -5,24 +5,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.piston.PistonHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.profiler.Profiler;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.piston.PistonStructureResolver;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.phys.BlockHitResult;
 import fi.dy.masa.malilib.render.RenderUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
@@ -74,10 +74,10 @@ public class RenderTweaks
     private static UsageRestriction.ListType previousType = (UsageRestriction.ListType) Configs.Lists.SELECTIVE_BLOCKS_LIST_TYPE.getOptionListValue();
     private static boolean previousSelectiveToggle = FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.getBooleanValue();
 
-    private static DynamicRegistryManager.Immutable dynamicRegistryManager;
+    private static RegistryAccess.Frozen dynamicRegistryManager;
     private static FakeWorld fakeWorld = null;
 
-    public static void setDynamicRegistryManager(@Nullable DynamicRegistryManager.Immutable immutable)
+    public static void setDynamicRegistryManager(@Nullable RegistryAccess.Frozen immutable)
     {
         if (immutable == null)
         {
@@ -87,7 +87,7 @@ public class RenderTweaks
         dynamicRegistryManager = immutable;
     }
 
-    public static DynamicRegistryManager.Immutable getDynamicRegistryManager()
+    public static RegistryAccess.Frozen getDynamicRegistryManager()
     {
         return dynamicRegistryManager;
     }
@@ -105,15 +105,15 @@ public class RenderTweaks
     public static void onTick()
     {
         // Dumb rendundancy due to replaymod
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
         {
-            if (mc.options.attackKey.isPressed())
+            if (mc.options.keyAttack.isDown())
             {
                 select(false);
             }
 
-            if (mc.options.useKey.isPressed())
+            if (mc.options.keyUse.isDown())
             {
                 select(true);
             }
@@ -121,9 +121,9 @@ public class RenderTweaks
 
     }
 
-    public static void render(Matrix4f posMatrix, Matrix4f projMatrix, Profiler profiler)
+    public static void render(Matrix4f posMatrix, Matrix4f projMatrix, ProfilerFiller profiler)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
 
@@ -160,11 +160,11 @@ public class RenderTweaks
         }
     }
 
-    private static void renderLists(Matrix4f posMatrix, Matrix4f projMatrix, Profiler profiler)
+    private static void renderLists(Matrix4f posMatrix, Matrix4f projMatrix, ProfilerFiller profiler)
     {
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         profiler.push("lists");
         for (ListMapEntry entry : SELECTIVE_BLACKLIST.values())
@@ -180,16 +180,16 @@ public class RenderTweaks
 
     public static void updateLookingAt()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
-        if (mc.crosshairTarget != null && mc.crosshairTarget instanceof BlockHitResult)
+        if (mc.hitResult != null && mc.hitResult instanceof BlockHitResult)
         {
-            posLookingAt = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
+            posLookingAt = ((BlockHitResult) mc.hitResult).getBlockPos();
 
             // use offset
             if (Hotkeys.AREA_SELECTION_OFFSET.getKeybind().isKeybindHeld())
             {
-                posLookingAt = posLookingAt.offset(((BlockHitResult) mc.crosshairTarget).getSide());
+                posLookingAt = posLookingAt.relative(((BlockHitResult) mc.hitResult).getDirection());
             }
         }
         else
@@ -229,8 +229,8 @@ public class RenderTweaks
 
     public static void addSelectionToList()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc == null || mc.world == null)
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null || mc.level == null)
         {
             return;
         }
@@ -247,16 +247,16 @@ public class RenderTweaks
             return;
         }
 
-        Iterator<BlockPos> iterator = BlockPos.iterate(AREA_SELECTION.pos1, AREA_SELECTION.pos2).iterator();
+        Iterator<BlockPos> iterator = BlockPos.betweenClosed(AREA_SELECTION.pos1, AREA_SELECTION.pos2).iterator();
         int count = 0;
         ConcurrentHashMap<Long, ListMapEntry> list = (type == UsageRestriction.ListType.WHITELIST) ? SELECTIVE_WHITELIST
                                                                                                    : SELECTIVE_BLACKLIST;
 
         while (iterator.hasNext())
         {
-            BlockPos pos = iterator.next().toImmutable();
+            BlockPos pos = iterator.next().immutable();
 
-            if (Configs.Generic.AREA_SELECTION_USE_ALL.getBooleanValue() || !mc.world.getBlockState(pos).isAir())
+            if (Configs.Generic.AREA_SELECTION_USE_ALL.getBooleanValue() || !mc.level.getBlockState(pos).isAir())
             {
                 if (!list.containsKey(pos.asLong()))
                 {
@@ -271,8 +271,8 @@ public class RenderTweaks
 
     public static void removeSelectionFromList()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc == null || mc.world == null)
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null || mc.level == null)
         {
             return;
         }
@@ -289,7 +289,7 @@ public class RenderTweaks
             return;
         }
 
-        Iterator<BlockPos> iterator = BlockPos.iterate(AREA_SELECTION.pos1, AREA_SELECTION.pos2).iterator();
+        Iterator<BlockPos> iterator = BlockPos.betweenClosed(AREA_SELECTION.pos1, AREA_SELECTION.pos2).iterator();
         int count = 0;
         ConcurrentHashMap<Long, ListMapEntry> list = (type == UsageRestriction.ListType.WHITELIST) ? SELECTIVE_WHITELIST
                                                                                                    : SELECTIVE_BLACKLIST;
@@ -309,7 +309,7 @@ public class RenderTweaks
     }
 
     // From litematica
-    public static void renderSelection(Matrix4f posMatrix, Matrix4f projMatrix, Profiler profiler, Selection selection)
+    public static void renderSelection(Matrix4f posMatrix, Matrix4f projMatrix, ProfilerFiller profiler, Selection selection)
     {
 
         BlockPos pos1 = selection.pos1;
@@ -322,7 +322,7 @@ public class RenderTweaks
         float lineWidthBlockBox = 2f;
         float lineWidthArea = 1.5f;
 
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         profiler.push("selection");
 
@@ -357,7 +357,7 @@ public class RenderTweaks
         profiler.pop();
     }
 
-    public static void onPistonEvent(BlockState state, World world, BlockPos pos, int type, int data)
+    public static void onPistonEvent(BlockState state, Level world, BlockPos pos, int type, int data)
     {
         if (!Configs.Generic.SELECTIVE_BLOCKS_TRACK_PISTONS.getBooleanValue()
             || (!FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.getBooleanValue()
@@ -372,9 +372,9 @@ public class RenderTweaks
             return;
         }
 
-        Direction pushDirection = Direction.byIndex(data & 7);
+        Direction pushDirection = Direction.from3DDataValue(data & 7);
 
-        PistonHandler pistonHandler = new PistonHandler(world, pos, pushDirection, type == 0);
+        PistonStructureResolver pistonHandler = new PistonStructureResolver(world, pos, pushDirection, type == 0);
 
         BlockState state2 = null;
         BlockEntity entity = null;
@@ -388,32 +388,32 @@ public class RenderTweaks
         if (type != 0)
         {
 
-            state2 = world.getBlockState(pos.offset(pushDirection)); // piston head
+            state2 = world.getBlockState(pos.relative(pushDirection)); // piston head
             entity = world.getBlockEntity(pos);
-            entity2 = world.getBlockEntity(pos.offset(pushDirection));
-            world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
-            world.setBlockState(pos.offset(pushDirection), Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
+            entity2 = world.getBlockEntity(pos.relative(pushDirection));
+            world.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE);
+            world.setBlock(pos.relative(pushDirection), Blocks.AIR.defaultBlockState(), Block.UPDATE_KNOWN_SHAPE);
         }
-        boolean moveSuccess = pistonHandler.calculatePush();
+        boolean moveSuccess = pistonHandler.resolve();
 
         if (type != 0)
         {
-            world.setBlockState(pos, state, Block.FORCE_STATE);
-            world.setBlockState(pos.offset(pushDirection), state2, Block.FORCE_STATE);
+            world.setBlock(pos, state, Block.UPDATE_KNOWN_SHAPE);
+            world.setBlock(pos.relative(pushDirection), state2, Block.UPDATE_KNOWN_SHAPE);
             if (entity != null)
             {
-                world.addBlockEntity(entity);
+                world.setBlockEntity(entity);
             }
             if (entity2 != null)
             {
-                world.addBlockEntity(entity2);
+                world.setBlockEntity(entity2);
             }
         }
 
         boolean attatchedWhitelist = SELECTIVE_WHITELIST
-                .containsKey(pos.offset(pushDirection, (type == 0) ? 1 : 2).asLong());
+                .containsKey(pos.relative(pushDirection, (type == 0) ? 1 : 2).asLong());
         boolean attatchedBlacklist = SELECTIVE_BLACKLIST
-                .containsKey(pos.offset(pushDirection, (type == 0) ? 1 : 2).asLong());
+                .containsKey(pos.relative(pushDirection, (type == 0) ? 1 : 2).asLong());
 
         boolean whitelisted = SELECTIVE_WHITELIST.containsKey(pos.asLong());
         boolean blacklisted = SELECTIVE_BLACKLIST.containsKey(pos.asLong());
@@ -424,31 +424,31 @@ public class RenderTweaks
             {
                 if (attatchedWhitelist)
                 {
-                    SELECTIVE_WHITELIST.get(pos.offset(pushDirection).asLong()).preserve = true;
+                    SELECTIVE_WHITELIST.get(pos.relative(pushDirection).asLong()).preserve = true;
                 }
                 else
                 {
-                    SELECTIVE_WHITELIST.put(pos.offset(pushDirection, 1).asLong(),
-                                            new ListMapEntry(pos.offset(pushDirection, 1)));
+                    SELECTIVE_WHITELIST.put(pos.relative(pushDirection, 1).asLong(),
+                                            new ListMapEntry(pos.relative(pushDirection, 1)));
                 }
             }
             if (blacklisted)
             {
                 if (attatchedBlacklist)
                 {
-                    SELECTIVE_BLACKLIST.get(pos.offset(pushDirection).asLong()).preserve = true;
+                    SELECTIVE_BLACKLIST.get(pos.relative(pushDirection).asLong()).preserve = true;
                 }
                 else
                 {
-                    SELECTIVE_BLACKLIST.put(pos.offset(pushDirection, 1).asLong(),
-                                            new ListMapEntry(pos.offset(pushDirection, 1)));
+                    SELECTIVE_BLACKLIST.put(pos.relative(pushDirection, 1).asLong(),
+                                            new ListMapEntry(pos.relative(pushDirection, 1)));
                 }
             }
         }
         if (moveSuccess)
         {
             // List<BlockPos> brokenBlocks = pistonHandler.getBrokenBlocks();
-            List<BlockPos> movedBlocks = pistonHandler.getMovedBlocks();
+            List<BlockPos> movedBlocks = pistonHandler.getToPush();
 
             ArrayList<ListMapEntry> toMoveWhitelist = new ArrayList<>();
             ArrayList<ListMapEntry> toMoveBlacklist = new ArrayList<>();
@@ -488,7 +488,7 @@ public class RenderTweaks
 
             for (ListMapEntry p : toMoveWhitelist)
             {
-                p.currentPosition = p.currentPosition.offset(pushDirection, (type == 0) ? 1 : -1);
+                p.currentPosition = p.currentPosition.relative(pushDirection, (type == 0) ? 1 : -1);
                 if (SELECTIVE_WHITELIST.containsKey(p.currentPosition.asLong()))
                 {
                     p.preserve = true;
@@ -498,7 +498,7 @@ public class RenderTweaks
 
             for (ListMapEntry p : toMoveBlacklist)
             {
-                p.currentPosition = p.currentPosition.offset(pushDirection, (type == 0) ? 1 : -1);
+                p.currentPosition = p.currentPosition.relative(pushDirection, (type == 0) ? 1 : -1);
                 if (SELECTIVE_BLACKLIST.containsKey(p.currentPosition.asLong()))
                 {
                     p.preserve = true;
@@ -551,12 +551,12 @@ public class RenderTweaks
 
     public static void updateSelectiveAtPos(BlockPos pos)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.world == null)
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null)
         {
             return;
         }
-        BlockState state = mc.world.getBlockState(pos);
+        BlockState state = mc.level.getBlockState(pos);
 
         if (RenderTweaks.isPositionValidForRendering(pos))
         {
@@ -567,12 +567,12 @@ public class RenderTweaks
                 if (!originalState.isAir())
                 {
                     BlockEntity be = fakeWorld.getBlockEntity(pos);
-                    fakeWorld.setBlockState(pos, Blocks.AIR.getDefaultState());
-                    mc.world.setBlockState(pos, originalState,
-                                           Block.NOTIFY_ALL | Block.FORCE_STATE | PASSTHROUGH);
+                    fakeWorld.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                    mc.level.setBlock(pos, originalState,
+                                           Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE | PASSTHROUGH);
                     if (be != null)
                     {
-                        mc.world.addBlockEntity(be);
+                        mc.level.setBlockEntity(be);
                     }
                 }
             }
@@ -581,25 +581,25 @@ public class RenderTweaks
         {
             if (!state.isAir())
             {
-                BlockEntity be = mc.world.getBlockEntity(pos);
-                mc.world.setBlockState(pos, Blocks.AIR.getDefaultState(),
-                                       Block.NOTIFY_ALL | Block.FORCE_STATE | PASSTHROUGH);
-                setFakeBlockState(mc.world, pos, state, be);
+                BlockEntity be = mc.level.getBlockEntity(pos);
+                mc.level.setBlock(pos, Blocks.AIR.defaultBlockState(),
+                                       Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE | PASSTHROUGH);
+                setFakeBlockState(mc.level, pos, state, be);
             }
         }
     }
 
     public static void reloadSelective()
     {
-        MinecraftClient.getInstance().execute(RenderTweaks::reloadSelectiveInternal);
+        Minecraft.getInstance().execute(RenderTweaks::reloadSelectiveInternal);
     }
 
     public static void reloadSelectiveInternal()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         UsageRestriction.ListType listtype = (UsageRestriction.ListType) Configs.Lists.SELECTIVE_BLOCKS_LIST_TYPE.getOptionListValue();
         boolean toggle = FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.getBooleanValue();
-        if (mc.world == null)
+        if (mc.level == null)
         {
             CACHED_LIST.clear();
             if (listtype != UsageRestriction.ListType.NONE)
@@ -618,28 +618,28 @@ public class RenderTweaks
         }
         if (listtype != previousType || toggle != previousSelectiveToggle)
         {
-            ChunkPos center = fakeWorld.getChunkManager().getChunkMapCenter();
-            int radius = fakeWorld.getChunkManager().getRadius();
+            ChunkPos center = fakeWorld.getChunkSource().getChunkMapCenter();
+            int radius = fakeWorld.getChunkSource().getRadius();
 
-            BlockPos.Mutable pos = new BlockPos.Mutable();
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
             for (int cx = center.x - radius; cx <= center.x + radius; cx++)
             {
                 for (int cz = center.z - radius; cz <= center.z + radius; cz++)
                 {
 
-                    WorldChunk chunk = (WorldChunk) mc.world.getChunkManager().getChunk(cx, cz, ChunkStatus.FULL,
+                    LevelChunk chunk = (LevelChunk) mc.level.getChunkSource().getChunk(cx, cz, ChunkStatus.FULL,
                                                                                         false);
-                    FakeChunk fakeChunk = fakeWorld.getChunkManager().getChunkIfExists(cx, cz);
+                    FakeChunk fakeChunk = fakeWorld.getChunkSource().getChunkIfExists(cx, cz);
                     if (chunk != null && fakeChunk != null)
                     {
                         ChunkPos cpos = chunk.getPos();
-                        ChunkSection[] sections = chunk.getSectionArray();
-                        ChunkSection[] fakeSections = fakeChunk.getSectionArray();
+                        LevelChunkSection[] sections = chunk.getSections();
+                        LevelChunkSection[] fakeSections = fakeChunk.getSections();
                         for (int i = 0; i < sections.length; i++)
                         {
-                            ChunkSection section = sections[i];
-                            if (!section.isEmpty() || !fakeSections[i].isEmpty())
+                            LevelChunkSection section = sections[i];
+                            if (!section.hasOnlyAir() || !fakeSections[i].hasOnlyAir())
                             {
                                 for (int x = 0; x < 16; x++)
                                 {
@@ -647,8 +647,8 @@ public class RenderTweaks
                                     {
                                         for (int z = 0; z < 16; z++)
                                         {
-                                            pos.set(x + cpos.getStartX(), y + fakeWorld.sectionIndexToCoord(i),
-                                                    z + cpos.getStartZ());
+                                            pos.set(x + cpos.getMinBlockX(), y + fakeWorld.getSectionYFromSectionIndex(i),
+                                                    z + cpos.getMinBlockZ());
                                             updateSelectiveAtPos(pos);
                                         }
                                     }
@@ -715,9 +715,9 @@ public class RenderTweaks
             return;
         }
 
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         boolean found = false;
-        if (mc != null && mc.world != null && mc.world.getLightingProvider() != null)
+        if (mc != null && mc.level != null && mc.level.getLightEngine() != null)
         {
 
             ConcurrentHashMap<Long, ListMapEntry> list = (listtype == UsageRestriction.ListType.WHITELIST) ? SELECTIVE_WHITELIST
@@ -836,7 +836,7 @@ public class RenderTweaks
         public BlockPos pos2 = null;
     }
 
-    public static boolean onOpenScreen(Text name, ScreenHandlerType<?> screenHandlerType, int syncId)
+    public static boolean onOpenScreen(Component name, MenuType<?> screenHandlerType, int syncId)
     {
         LAST_CHECK = System.currentTimeMillis();
         return true;
@@ -844,21 +844,21 @@ public class RenderTweaks
 
     public static void loadFakeChunk(int x, int z)
     {
-        fakeWorld.getChunkManager().loadChunk(x, z);
+        fakeWorld.getChunkSource().loadChunk(x, z);
     }
 
-    public static void setFakeBlockState(World realWorld, BlockPos pos, BlockState state, BlockEntity be)
+    public static void setFakeBlockState(Level realWorld, BlockPos pos, BlockState state, BlockEntity be)
     {
-        fakeWorld.setBlockState(pos, state, 0);
+        fakeWorld.setBlock(pos, state, 0);
         if (be != null)
         {
-            fakeWorld.addBlockEntity(be);
-            be.setWorld(realWorld);
+            fakeWorld.setBlockEntity(be);
+            be.setLevel(realWorld);
         }
     }
 
     public static void unloadFakeChunk(int x, int z)
     {
-        fakeWorld.getChunkManager().unloadChunk(x, z);
+        fakeWorld.getChunkSource().unloadChunk(x, z);
     }
 }

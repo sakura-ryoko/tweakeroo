@@ -14,78 +14,78 @@ import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.InventoryUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 
-@Mixin(ClientPlayerInteractionManager.class)
+@Mixin(MultiPlayerGameMode.class)
 public abstract class MixinClientPlayerInteractionManager
 {
-    @Shadow @Final private MinecraftClient client;
-    @Shadow private int blockBreakingCooldown;
+    @Shadow @Final private Minecraft minecraft;
+    @Shadow private int destroyDelay;
 
-    @Shadow public abstract ActionResult interactBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult);
+    @Shadow public abstract InteractionResult useItemOn(LocalPlayer player, InteractionHand hand, BlockHitResult hitResult);
 
-    @Inject(method = "interactItem", at = @At(
+    @Inject(method = "useItem", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;syncSelectedSlot()V"),
+            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;ensureHasSentCarriedItem()V"),
             cancellable = true)
-    private void tweakeroo_onProcessRightClickFirst(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo_onProcessRightClickFirst(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.onProcessRightClickPre(player, hand))
         {
-            cir.setReturnValue(ActionResult.PASS);
+            cir.setReturnValue(InteractionResult.PASS);
             cir.cancel();
         }
     }
 
-    @Inject(method = "interactItem",
+    @Inject(method = "useItem",
             at = @At("TAIL"))
-    private void tweakeroo_onProcessRightClickPost(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo_onProcessRightClickPost(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
     {
-        if (cir.getReturnValue().isAccepted())
+        if (cir.getReturnValue().consumesAction())
         {
             PlacementTweaks.onProcessRightClickPost(player, hand);
         }
     }
 
-    @Inject(method = "interactEntity(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;",
+    @Inject(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
             at = @At("HEAD"),
             cancellable = true)
-    private void tweakeroo_onRightClickMouseOnEntityPre1(PlayerEntity player, Entity target, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo_onRightClickMouseOnEntityPre1(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.onProcessRightClickPre(player, hand))
         {
-            cir.setReturnValue(ActionResult.PASS);
+            cir.setReturnValue(InteractionResult.PASS);
         }
     }
 
-    @Inject(method = "interactEntityAtLocation(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/hit/EntityHitResult;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;",
+    @Inject(method = "interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
             at = @At("HEAD"),
             cancellable = true)
-    private void tweakeroo_onRightClickMouseOnEntityPre2(PlayerEntity player, Entity target, EntityHitResult trace, Hand hand, CallbackInfoReturnable<ActionResult> cir)
+    private void tweakeroo_onRightClickMouseOnEntityPre2(Player player, Entity target, EntityHitResult trace, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
     {
         if (CameraUtils.shouldPreventPlayerInputs() ||
             PlacementTweaks.onProcessRightClickPre(player, hand))
         {
-            cir.setReturnValue(ActionResult.PASS);
+            cir.setReturnValue(InteractionResult.PASS);
         }
     }
 
-    @Inject(method = "attackEntity", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_preventEntityAttacksInFreeCameraMode(PlayerEntity player, Entity target, CallbackInfo ci)
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_preventEntityAttacksInFreeCameraMode(Player player, Entity target, CallbackInfo ci)
     {
         if (CameraUtils.shouldPreventPlayerInputs())
         {
@@ -102,24 +102,24 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
-    @Inject(method = "attackBlock",
+    @Inject(method = "startDestroyBlock",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/world/ClientWorld;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;",
+                     target = "Lnet/minecraft/client/multiplayer/ClientLevel;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
                      ordinal = 2))
     private void tweakeroo_onClickBlockPre(BlockPos pos, Direction face, CallbackInfoReturnable<Boolean> cir)
     {
-        if (this.client.player != null && this.client.world != null)
+        if (this.minecraft.player != null && this.minecraft.level != null)
         {
             if (FeatureToggle.TWEAK_TOOL_SWITCH.getBooleanValue())
             {
                 InventoryUtils.trySwitchToEffectiveTool(pos);
             }
 
-            PlacementTweaks.cacheStackInHand(Hand.MAIN_HAND);
+            PlacementTweaks.cacheStackInHand(InteractionHand.MAIN_HAND);
         }
     }
 
-    @Inject(method = "attackBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_handleBreakingRestriction1(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() || CameraUtils.shouldPreventPlayerInputs() ||
@@ -134,28 +134,28 @@ public abstract class MixinClientPlayerInteractionManager
     }
 
     // can't just inject into breakBlock's RETURN directly anymore since it's now synced by sendSequencedPacket
-    @Inject(method = "attackBlock",
+    @Inject(method = "startDestroyBlock",
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-                     target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;sendSequencedPacket(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V"
+                     target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startPrediction(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V"
             ))
     private void tweakeroo_handleBreakReplaceInAttack(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue() &&
-			this.client.world != null && this.client.player != null)
+			this.minecraft.level != null && this.minecraft.player != null)
         {
-            if (this.client.world.getBlockState(targetPos).isAir()) {
-                BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
-                for (Hand hand : Hand.values())
+            if (this.minecraft.level.getBlockState(targetPos).isAir()) {
+                BlockHitResult blockHitResult = new BlockHitResult(targetPos.getCenter(), side, targetPos, false);
+                for (InteractionHand hand : InteractionHand.values())
                 {
-                    ItemStack stack = this.client.player.getStackInHand(hand);
+                    ItemStack stack = this.minecraft.player.getItemInHand(hand);
                     if (stack != null && stack.getItem() instanceof BlockItem
-                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted()
+                        && this.useItemOn(this.minecraft.player, hand, blockHitResult).consumesAction()
                     )
                     {
                         // set a cooldown of 1 tick for survival mode instant mining
-                        if (!this.client.player.getAbilities().creativeMode)
+                        if (!this.minecraft.player.getAbilities().instabuild)
                         {
-                            this.blockBreakingCooldown = 1;
+                            this.destroyDelay = 1;
                         }
                         return;
                     }
@@ -164,22 +164,22 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
-    @Inject(method = "updateBlockBreakingProgress",
+    @Inject(method = "continueDestroyBlock",
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-                     target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;sendSequencedPacket(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/SequencedPacketCreator;)V"
+                     target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startPrediction(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V"
             ))
     private void tweakeroo_handleBreakReplaceInUpdate(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue() &&
-			this.client.world != null && this.client.player != null)
+			this.minecraft.level != null && this.minecraft.player != null)
         {
-            if (this.client.world.getBlockState(targetPos).isAir()) {
-                BlockHitResult blockHitResult = new BlockHitResult(targetPos.toCenterPos(), side, targetPos, false);
-                for (Hand hand : Hand.values())
+            if (this.minecraft.level.getBlockState(targetPos).isAir()) {
+                BlockHitResult blockHitResult = new BlockHitResult(targetPos.getCenter(), side, targetPos, false);
+                for (InteractionHand hand : InteractionHand.values())
                 {
-                    ItemStack stack = this.client.player.getStackInHand(hand);
+                    ItemStack stack = this.minecraft.player.getItemInHand(hand);
                     if (stack != null && stack.getItem() instanceof BlockItem
-                        && this.interactBlock(this.client.player, hand, blockHitResult).isAccepted())
+                        && this.useItemOn(this.minecraft.player, hand, blockHitResult).consumesAction())
                     {
                         return;
                     }
@@ -188,13 +188,13 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
-    @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
+    @Inject(method = "continueDestroyBlock", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
     private void tweakeroo_handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Disable.DISABLE_BLOCK_BREAK_COOLDOWN.getBooleanValue())
             //&& this.client.player.isCreative() == false)
         {
-            this.blockBreakingCooldown = 0;
+            this.destroyDelay = 0;
         }
 
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() || CameraUtils.shouldPreventPlayerInputs() ||
@@ -208,7 +208,7 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
-    @Inject(method = "hasLimitedAttackSpeed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "hasMissTime", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_overrideLimitedAttackSpeed(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())

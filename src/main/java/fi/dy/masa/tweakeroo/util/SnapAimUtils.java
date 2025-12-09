@@ -6,9 +6,9 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 public class SnapAimUtils
 {
@@ -30,18 +30,18 @@ public class SnapAimUtils
     /**
      * This does the exact same thing as the vanilla code, but using doubles instead of floats for the sin and cos calls.
      */
-    public static void onUpdateVelocity(Entity entity, float yawIn, float speedIn, Vec3d motion, CallbackInfo ci)
+    public static void onUpdateVelocity(Entity entity, float yawIn, float speedIn, Vec3 motion, CallbackInfo ci)
     {
-        double speed = motion.lengthSquared();
+        double speed = motion.lengthSqr();
 
         if (speed >= 1.0E-7D)
         {
-            motion = (speed > 1.0D ? motion.normalize() : motion).multiply(speedIn);
+            motion = (speed > 1.0D ? motion.normalize() : motion).scale(speedIn);
             double xFactor = Math.sin(yawIn * Math.PI / 180D);
             double zFactor = Math.cos(yawIn * Math.PI / 180D);
-            Vec3d change = new Vec3d(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
+            Vec3 change = new Vec3(motion.x * zFactor - motion.z * xFactor, motion.y, motion.z * zFactor + motion.x * xFactor);
 
-            entity.setVelocity(entity.getVelocity().add(change));
+            entity.setDeltaMovement(entity.getDeltaMovement().add(change));
         }
 
         ci.cancel();
@@ -75,26 +75,26 @@ public class SnapAimUtils
                 newSnapPitch = calculateSnappedAngle(realPitch, step);
             }
 
-            double offset = Math.abs(MathHelper.wrapDegrees((float) (newSnapPitch - realPitch)));
+            double offset = Math.abs(Mth.wrapDegrees((float) (newSnapPitch - realPitch)));
             //if (GuiBase.isCtrlDown()) System.out.printf("real: %.2f, snapped: %.2f, offset: %.2f\n", realPitch, newSnapPitch, offset);
 
             if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue() == false ||
                 offset <= Configs.Generic.SNAP_AIM_THRESHOLD_PITCH.getDoubleValue())
             {
-                newSnapPitch = MathHelper.clamp(MathHelper.wrapDegrees(newSnapPitch), -limit, limit);
+                newSnapPitch = Mth.clamp(Mth.wrapDegrees(newSnapPitch), -limit, limit);
 
                 if (lastSnapPitch != newSnapPitch)
                 {
                     String g = GuiBase.TXT_GREEN;
                     String r = GuiBase.TXT_RST;
-                    String str = String.format("%s%s%s (step %s%s%s)", g, MathHelper.wrapDegrees(newSnapPitch), r, g, step, r);
+                    String str = String.format("%s%s%s (step %s%s%s)", g, Mth.wrapDegrees(newSnapPitch), r, g, step, r);
 
                     InfoUtils.printActionbarMessage("tweakeroo.message.snapped_to_pitch", str);
 
                     lastSnapPitch = newSnapPitch;
                 }
 
-                return MathHelper.wrapDegrees((float) newSnapPitch);
+                return Mth.wrapDegrees((float) newSnapPitch);
             }
         }
 
@@ -123,20 +123,20 @@ public class SnapAimUtils
             double newSnapYaw = calculateSnappedAngle(realYaw, step);
 
             if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue() == false ||
-                Math.abs(MathHelper.wrapDegrees((float) (newSnapYaw - realYaw))) <= Configs.Generic.SNAP_AIM_THRESHOLD_YAW.getDoubleValue())
+                Math.abs(Mth.wrapDegrees((float) (newSnapYaw - realYaw))) <= Configs.Generic.SNAP_AIM_THRESHOLD_YAW.getDoubleValue())
             {
                 if (lastSnapYaw != newSnapYaw)
                 {
                     String g = GuiBase.TXT_GREEN;
                     String r = GuiBase.TXT_RST;
-                    String str = String.format("%s%s%s (step %s%s%s)", g, MathHelper.wrapDegrees(newSnapYaw), r, g, step, r);
+                    String str = String.format("%s%s%s (step %s%s%s)", g, Mth.wrapDegrees(newSnapYaw), r, g, step, r);
 
                     InfoUtils.printActionbarMessage("tweakeroo.message.snapped_to_yaw", str);
 
                     lastSnapYaw = newSnapYaw;
                 }
 
-                return MathHelper.wrapDegrees((float) newSnapYaw);
+                return Mth.wrapDegrees((float) newSnapYaw);
             }
         }
 
@@ -148,7 +148,7 @@ public class SnapAimUtils
 
     public static double calculateSnappedAngle(double realRotation, double step)
     {
-        double offsetRealRotation = MathHelper.floorMod(realRotation, 360.0D) + (step / 2.0);
-        return MathHelper.floorMod(((int) (offsetRealRotation / step)) * step, 360.0D);
+        double offsetRealRotation = Mth.positiveModulo(realRotation, 360.0D) + (step / 2.0);
+        return Mth.positiveModulo(((int) (offsetRealRotation / step)) * step, 360.0D);
     }
 }

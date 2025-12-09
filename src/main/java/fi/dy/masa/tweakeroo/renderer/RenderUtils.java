@@ -1,24 +1,23 @@
 package fi.dy.masa.tweakeroo.renderer;
 
 import java.util.Set;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.Holder;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.MathHelper;
-
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.render.GuiContext;
 import fi.dy.masa.malilib.render.InventoryOverlay;
@@ -34,9 +33,9 @@ public class RenderUtils
 
     public static void renderHotbarSwapOverlay(GuiContext ctx)
     {
-        PlayerEntity player = ctx.mc().player;
+        Player player = ctx.mc().player;
 
-        if (player != null && ctx.mc().currentScreen == null)
+        if (player != null && ctx.mc().screen == null)
         {
             final int scaledWidth = GuiUtils.getScaledWindowWidth();
             final int scaledHeight = GuiUtils.getScaledWindowHeight();
@@ -68,21 +67,21 @@ public class RenderUtils
 
             int x = startX;
             int y = startY;
-            TextRenderer textRenderer = ctx.textRenderer();
+            Font textRenderer = ctx.fontRenderer();
             Matrix4f modelViewMatrix = new Matrix4f();
 
             modelViewMatrix.set(RenderSystem.getModelViewMatrix());
-            fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(ctx, HandledScreen.BACKGROUND_TEXTURE, x - 1, y - 1, 7, 83, 9 * 18, 3 * 18);
+            fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(ctx, AbstractContainerScreen.INVENTORY_LOCATION, x - 1, y - 1, 7, 83, 9 * 18, 3 * 18);
 
-	        ctx.drawTextWithShadow(textRenderer, "1", x - 10, y +  4, 0xFFFFFF);
-	        ctx.drawTextWithShadow(textRenderer, "2", x - 10, y + 22, 0xFFFFFF);
-	        ctx.drawTextWithShadow(textRenderer, "3", x - 10, y + 40, 0xFFFFFF);
+	        ctx.drawString(textRenderer, "1", x - 10, y +  4, 0xFFFFFF);
+	        ctx.drawString(textRenderer, "2", x - 10, y + 22, 0xFFFFFF);
+	        ctx.drawString(textRenderer, "3", x - 10, y + 40, 0xFFFFFF);
 
             for (int row = 1; row <= 3; row++)
             {
                 for (int column = 0; column < 9; column++)
                 {
-                    ItemStack stack = player.getInventory().getStack(row * 9 + column);
+                    ItemStack stack = player.getInventory().getItem(row * 9 + column);
 
                     if (stack.isEmpty() == false)
                     {
@@ -248,7 +247,7 @@ public class RenderUtils
             return;
         }
 
-        Inventory inv = ctx.mc().player.getInventory();
+        Container inv = ctx.mc().player.getInventory();
 
         int x = GuiUtils.getScaledWindowWidth() / 2 - 176 / 2;
         int y = GuiUtils.getScaledWindowHeight() / 2 + 10;
@@ -267,7 +266,7 @@ public class RenderUtils
             return;
         }
 
-        Inventory inv = ctx.mc().player.getInventory();
+        Container inv = ctx.mc().player.getInventory();
 
         final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
         final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
@@ -291,27 +290,27 @@ public class RenderUtils
     {
         if (entity instanceof LivingEntity living)
         {
-            ItemStack head = living.getEquippedStack(EquipmentSlot.HEAD);
+            ItemStack head = living.getItemBySlot(EquipmentSlot.HEAD);
 
             if (head.isEmpty() == false)
             {
-                ItemEnchantmentsComponent enchants = head.getEnchantments();
+                ItemEnchantments enchants = head.getEnchantments();
                 float lavaFog = (originalFog > 1.0f) ? 3.3f : 1.3f;
                 float fog = water ? (originalFog / 4) : lavaFog;
                 int resp = 0;
                 int aqua = 0;
 
-                if (enchants.equals(ItemEnchantmentsComponent.DEFAULT) == false)
+                if (enchants.equals(ItemEnchantments.EMPTY) == false)
                 {
-                    Set<RegistryEntry<Enchantment>> enchantList = enchants.getEnchantments();
+                    Set<Holder<Enchantment>> enchantList = enchants.keySet();
 
-                    for (RegistryEntry<Enchantment> entry : enchantList)
+                    for (Holder<Enchantment> entry : enchantList)
                     {
-                        if (entry.matchesKey(Enchantments.AQUA_AFFINITY))
+                        if (entry.is(Enchantments.AQUA_AFFINITY))
                         {
                             aqua = enchants.getLevel(entry);
                         }
-                        if (entry.matchesKey(Enchantments.RESPIRATION))
+                        if (entry.is(Enchantments.RESPIRATION))
                         {
                             resp = enchants.getLevel(entry);
                         }
@@ -355,7 +354,7 @@ public class RenderUtils
 
         if (current - lastRotationChangeTime < 750)
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
             final int xCenter = GuiUtils.getScaledWindowWidth() / 2;
             final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
             SnapAimMode mode = (SnapAimMode) Configs.Generic.SNAP_AIM_MODE.getOptionListValue();
@@ -375,26 +374,26 @@ public class RenderUtils
     private static void renderSnapAimAngleIndicatorYaw(GuiContext ctx, int xCenter, int yCenter, int width, int height)
     {
         double step = Configs.Generic.SNAP_AIM_YAW_STEP.getDoubleValue();
-        double realYaw = MathHelper.floorMod(SnapAimUtils.getLastRealYaw(), 360.0D);
+        double realYaw = Mth.positiveModulo(SnapAimUtils.getLastRealYaw(), 360.0D);
         double snappedYaw = SnapAimUtils.calculateSnappedAngle(realYaw, step);
         double startYaw = snappedYaw - (step / 2.0);
         final int x = xCenter - width / 2;
         final int y = yCenter + 10;
-        int lineX = x + (int) ((MathHelper.wrapDegrees(realYaw - startYaw)) / step * width);
-        TextRenderer textRenderer = ctx.textRenderer();
+        int lineX = x + (int) ((Mth.wrapDegrees(realYaw - startYaw)) / step * width);
+        Font textRenderer = ctx.fontRenderer();
         int bgColor = Configs.Generic.SNAP_AIM_INDICATOR_COLOR.getIntegerValue();
 
         // Draw the main box
         fi.dy.masa.malilib.render.RenderUtils.drawOutlinedBox(ctx, x, y, width, height, bgColor, 0xFFFFFFFF);
 
-        String str = MathHelper.wrapDegrees(snappedYaw) + "°";
-	    ctx.drawText(textRenderer, str, xCenter - textRenderer.getWidth(str) / 2, y + height + 2, 0xFFFFFFFF, false);
+        String str = Mth.wrapDegrees(snappedYaw) + "°";
+	    ctx.drawString(textRenderer, str, xCenter - textRenderer.width(str) / 2, y + height + 2, 0xFFFFFFFF, false);
 
-        str = "<  " + MathHelper.wrapDegrees(snappedYaw - step) + "°";
-	    ctx.drawText(textRenderer, str, x - textRenderer.getWidth(str), y + height + 2, 0xFFFFFFFF, false);
+        str = "<  " + Mth.wrapDegrees(snappedYaw - step) + "°";
+	    ctx.drawString(textRenderer, str, x - textRenderer.width(str), y + height + 2, 0xFFFFFFFF, false);
 
-        str = MathHelper.wrapDegrees(snappedYaw + step) + "°  >";
-	    ctx.drawText(textRenderer, str, x + width, y + height + 2, 0xFFFFFFFF, false);
+        str = Mth.wrapDegrees(snappedYaw + step) + "°  >";
+	    ctx.drawString(textRenderer, str, x + width, y + height + 2, 0xFFFFFFFF, false);
 
         if (Configs.Generic.SNAP_AIM_ONLY_CLOSE_TO_ANGLE.getBooleanValue())
         {
@@ -420,7 +419,7 @@ public class RenderUtils
         double step = Configs.Generic.SNAP_AIM_PITCH_STEP.getDoubleValue();
         int limit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
         //double realPitch = MathHelper.clamp(MathHelper.wrapDegrees(MiscUtils.getLastRealPitch()), -limit, limit);
-        double realPitch = MathHelper.wrapDegrees(SnapAimUtils.getLastRealPitch());
+        double realPitch = Mth.wrapDegrees(SnapAimUtils.getLastRealPitch());
         double snappedPitch;
 
         if (realPitch < 0)
@@ -432,7 +431,7 @@ public class RenderUtils
             snappedPitch = SnapAimUtils.calculateSnappedAngle(realPitch, step);
         }
 
-        snappedPitch = MathHelper.clamp(MathHelper.wrapDegrees(snappedPitch), -limit, limit);
+        snappedPitch = Mth.clamp(Mth.wrapDegrees(snappedPitch), -limit, limit);
 
         int x = xCenter - width / 2;
         int y = yCenter - height - 10;
@@ -453,7 +452,7 @@ public class RenderUtils
         int height = 50;
         int x = xCenter - width / 2;
         int y = yCenter - height - 10;
-        double currentPitch = ctx.mc().player.getPitch();
+        double currentPitch = ctx.mc().player.getXRot();
         double centerPitch = 0;
         double indicatorRange = 180;
 
@@ -466,26 +465,26 @@ public class RenderUtils
     {
         double startPitch = centerPitch - (indicatorRange / 2.0);
         double printedRange = isSnapRange ? indicatorRange : indicatorRange / 2;
-        int lineY = y + (int) ((MathHelper.wrapDegrees(currentPitch) - startPitch) / indicatorRange * height);
+        int lineY = y + (int) ((Mth.wrapDegrees(currentPitch) - startPitch) / indicatorRange * height);
         double angleUp = centerPitch - printedRange;
         double angleDown = centerPitch + printedRange;
 
-        TextRenderer textRenderer = ctx.textRenderer();
+        Font textRenderer = ctx.fontRenderer();
 
         if (isSnapRange)
         {
-            String strUp   = String.format("%6.1f° ^", MathHelper.wrapDegrees(angleUp));
-            String strDown = String.format("%6.1f° v", MathHelper.wrapDegrees(angleDown));
-	        ctx.drawText(textRenderer, strUp, x + width + 4, y - 4, 0xFFFFFFFF, false);
-	        ctx.drawText(textRenderer, strDown, x + width + 4, y + height - 4, 0xFFFFFFFF, false);
+            String strUp   = String.format("%6.1f° ^", Mth.wrapDegrees(angleUp));
+            String strDown = String.format("%6.1f° v", Mth.wrapDegrees(angleDown));
+	        ctx.drawString(textRenderer, strUp, x + width + 4, y - 4, 0xFFFFFFFF, false);
+	        ctx.drawString(textRenderer, strDown, x + width + 4, y + height - 4, 0xFFFFFFFF, false);
 
-            String str = String.format("%6.1f°", MathHelper.wrapDegrees(isSnapRange ? centerPitch : currentPitch));
-	        ctx.drawText(textRenderer, str, x + width + 4, y + height / 2 - 4, 0xFFFFFFFF, false);
+            String str = String.format("%6.1f°", Mth.wrapDegrees(isSnapRange ? centerPitch : currentPitch));
+	        ctx.drawString(textRenderer, str, x + width + 4, y + height / 2 - 4, 0xFFFFFFFF, false);
         }
         else
         {
-            String str = String.format("%4.1f°", MathHelper.wrapDegrees(isSnapRange ? centerPitch : currentPitch));
-	        ctx.drawText(textRenderer, str, x + width + 4, lineY - 4, 0xFFFFFFFF, false);
+            String str = String.format("%4.1f°", Mth.wrapDegrees(isSnapRange ? centerPitch : currentPitch));
+	        ctx.drawString(textRenderer, str, x + width + 4, lineY - 4, 0xFFFFFFFF, false);
         }
 
         int bgColor = Configs.Generic.SNAP_AIM_INDICATOR_COLOR.getIntegerValue();

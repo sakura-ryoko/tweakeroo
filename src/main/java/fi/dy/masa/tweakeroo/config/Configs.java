@@ -2,7 +2,7 @@ package fi.dy.masa.tweakeroo.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -586,7 +586,7 @@ public class Configs implements IConfigHandler
                 Lists.ENTITY_TYPE_ATTACK_RESTRICTION_BLACKLIST.getStrings(),
                 Lists.ENTITY_TYPE_ATTACK_RESTRICTION_WHITELIST.getStrings());
 
-        if (MinecraftClient.getInstance().world == null)
+        if (Minecraft.getInstance().level == null)
         {
             // Turn off after loading the configs, just in case it was enabled in the config somehow.
             // But only if we are currently not in a world, since changing configs also re-loads them when closing the menu.

@@ -11,48 +11,52 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.block.entity.CommandBlockBlockEntity;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
-import net.minecraft.client.gui.screen.world.CustomizeFlatLevelScreen;
-import net.minecraft.client.input.Input;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.world.GeneratorOptionsHolder;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.map.MapState;
-import net.minecraft.registry.*;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.structure.StructureSet;
-import net.minecraft.text.*;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.gui.screens.CreateFlatWorldScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
+import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.*;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
-import net.minecraft.world.gen.feature.PlacedFeature;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -96,55 +100,55 @@ public class MiscUtils
 
     public static void handlePlayerDeceleration()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        ClientPlayerEntity player = mc.player;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
 
 		if (player != null)
 		{
-			Input input = player.input;
+			ClientInput input = player.input;
 
 			//if (input.jumping || input.sneaking ||
-			if (input.playerInput.jump() || input.playerInput.sneak() ||
-				player.forwardSpeed != 0 || player.sidewaysSpeed != 0 || player.getAbilities().flying == false)
+			if (input.keyPresses.jump() || input.keyPresses.shift() ||
+				player.zza != 0 || player.xxa != 0 || player.getAbilities().flying == false)
 			{
 				return;
 			}
 
 			double factor = Configs.Generic.FLY_DECELERATION_FACTOR.getDoubleValue();
-			player.setVelocity(player.getVelocity().multiply(factor));
+			player.setDeltaMovement(player.getDeltaMovement().scale(factor));
 		}
     }
 
-    public static Vec3d calculatePlayerMotionWithDeceleration(Vec3d lastMotion,
+    public static Vec3 calculatePlayerMotionWithDeceleration(Vec3 lastMotion,
                                                               double rampAmount,
                                                               double decelerationFactor)
     {
-        GameOptions options = MinecraftClient.getInstance().options;
+        Options options = Minecraft.getInstance().options;
         int forward = 0;
         int vertical = 0;
         int strafe = 0;
 
-        if (options.forwardKey.isPressed())
+        if (options.keyUp.isDown())
         {
             forward += 1;
         }
-        if (options.backKey.isPressed())
+        if (options.keyDown.isDown())
         {
             forward -= 1;
         }
-        if (options.leftKey.isPressed())
+        if (options.keyLeft.isDown())
         {
             strafe += 1;
         }
-        if (options.rightKey.isPressed())
+        if (options.keyRight.isDown())
         {
             strafe -= 1;
         }
-        if (options.jumpKey.isPressed())
+        if (options.keyJump.isDown())
         {
             vertical += 1;
         }
-        if (options.sneakKey.isPressed())
+        if (options.keyShift.isDown())
         {
             vertical -= 1;
         }
@@ -154,7 +158,7 @@ public class MiscUtils
         double verticalRamped = getRampedMotion(lastMotion.y, vertical, rampAmount, decelerationFactor);
         double strafeRamped = getRampedMotion(lastMotion.z, strafe, rampAmount, decelerationFactor) / speed;
 
-        return new Vec3d(forwardRamped, verticalRamped, strafeRamped);
+        return new Vec3(forwardRamped, verticalRamped, strafeRamped);
     }
 
     public static double getRampedMotion(double current, int input, double rampAmount, double decelerationFactor)
@@ -172,7 +176,7 @@ public class MiscUtils
                 current = 0.0;
             }
 
-            current = MathHelper.clamp(current + rampAmount, -1.0, 1.0);
+            current = Mth.clamp(current + rampAmount, -1.0, 1.0);
         }
         else
         {
@@ -224,7 +228,7 @@ public class MiscUtils
             }
 
             // Refresh the rendered chunks when exiting zoom mode
-            MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate();
+            Minecraft.getInstance().levelRenderer.needsUpdate();
 
             zoomActive = false;
         }
@@ -232,22 +236,22 @@ public class MiscUtils
 
     public static void setMouseSensitivityForZoom()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         double fov = Configs.Generic.ZOOM_FOV.getDoubleValue();
-        double origFov = mc.options.getFov().getValue();
+        double origFov = mc.options.fov().get();
 
         if (fov < origFov)
         {
             // Only store it once
             if (mouseSensitivity <= 0.0 || mouseSensitivity > 1.0)
             {
-                mouseSensitivity = mc.options.getMouseSensitivity().getValue();
+                mouseSensitivity = mc.options.sensitivity().get();
             }
 
             double min = 0.04;
             double sens = min + (0.5 - min) * (1.0 - (origFov - fov) / origFov);
-            mc.options.getMouseSensitivity().setValue(Math.min(mouseSensitivity, sens));
+            mc.options.sensitivity().set(Math.min(mouseSensitivity, sens));
         }
     }
 
@@ -255,7 +259,7 @@ public class MiscUtils
     {
         if (mouseSensitivity > 0.0)
         {
-            MinecraftClient.getInstance().options.getMouseSensitivity().setValue(mouseSensitivity);
+            Minecraft.getInstance().options.sensitivity().set(mouseSensitivity);
             mouseSensitivity = -1.0;
         }
     }
@@ -380,44 +384,44 @@ public class MiscUtils
 //        }
 //    }
 
-    public static boolean isStrippableLog(World world, BlockPos pos)
+    public static boolean isStrippableLog(Level world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
         return IMixinAxeItem.tweakeroo_getStrippedBlocks().containsKey(state.getBlock());
     }
 
-    public static boolean isShovelPathConvertableBlock(World world, BlockPos pos)
+    public static boolean isShovelPathConvertableBlock(Level world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
         return IMixinShovelItem.tweakeroo_getPathStates().containsKey(state.getBlock());
     }
 
-    public static boolean getUpdateExec(CommandBlockBlockEntity te)
+    public static boolean getUpdateExec(CommandBlockEntity te)
     {
-        return ((IMixinCommandBlockExecutor) te.getCommandExecutor()).getUpdateLastExecution();
+        return ((IMixinCommandBlockExecutor) te.getCommandBlock()).getUpdateLastExecution();
     }
 
-    public static void setUpdateExec(CommandBlockBlockEntity te, boolean value)
+    public static void setUpdateExec(CommandBlockEntity te, boolean value)
     {
-        ((IMixinCommandBlockExecutor) te.getCommandExecutor()).setUpdateLastExecution(value);
+        ((IMixinCommandBlockExecutor) te.getCommandBlock()).setUpdateLastExecution(value);
     }
 
-    public static void printDeathCoordinates(MinecraftClient mc)
+    public static void printDeathCoordinates(Minecraft mc)
     {
 		if (mc.player == null) return;
         BlockPos pos = PositionUtils.getEntityBlockPos(mc.player);
-        String dim = mc.player.getEntityWorld().getRegistryKey().getValue().toString();
+        String dim = mc.player.level().dimension().identifier().toString();
         String str = StringUtils.translate("tweakeroo.message.death_coordinates",
                                            pos.getX(), pos.getY(), pos.getZ(), dim);
-        MutableText message = Text.literal(str);
+        MutableComponent message = Component.literal(str);
         Style style = message.getStyle();
         String coords = pos.getX() + " " + pos.getY() + " " + pos.getZ();
         //style = style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, coords));
         //style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(coords)));
         style = style.withClickEvent(new ClickEvent.SuggestCommand(coords));
-        style = style.withHoverEvent(new HoverEvent.ShowText(Text.literal(coords)));
+        style = style.withHoverEvent(new HoverEvent.ShowText(Component.literal(coords)));
         message.setStyle(style);
-        mc.inGameHud.getChatHud().addMessage(message);
+        mc.gui.getChat().addMessage(message);
         Tweakeroo.LOGGER.info(str);
     }
 
@@ -464,24 +468,24 @@ public class MiscUtils
 
     public static boolean commandNearbyPets(boolean sitDown)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        World world = mc.world;
-        PlayerEntity player = mc.player;
+        Minecraft mc = Minecraft.getInstance();
+        Level world = mc.level;
+        Player player = mc.player;
 
         if (world != null && player != null)
         {
-            UUID uuid = player.getUuid();
+            UUID uuid = player.getUUID();
             double centerX = player.getX();
             double centerY = player.getY();
             double centerZ = player.getZ();
             double range = 6.0;
-            Box box = new Box(centerX - range, centerY - range, centerZ - range,
+            AABB box = new AABB(centerX - range, centerY - range, centerZ - range,
                               centerX + range, centerY + range, centerZ + range);
             Predicate<Entity> filter = (e) -> isTameableOwnedBy(e, uuid);
 
-            for (Entity entity : world.getOtherEntities((Entity) null, box, filter))
+            for (Entity entity : world.getEntities((Entity) null, box, filter))
             {
-                if (((TameableEntity) entity).isInSittingPose() != sitDown)
+                if (((TamableAnimal) entity).isInSittingPose() != sitDown)
                 {
                     rightClickEntity(entity, mc, player);
                 }
@@ -500,88 +504,88 @@ public class MiscUtils
          */
 
         // todo new 'TamableEntityHolder<>` Generic type class is used here.
-        if (entity instanceof TameableEntity te)
+        if (entity instanceof TamableAnimal te)
         {
             LivingEntity owner = te.getOwner();
 
-            return owner != null && owner.getUuid().equals(ownerUuid);
+            return owner != null && owner.getUUID().equals(ownerUuid);
         }
 
         return false;
     }
 
-    public static void rightClickEntity(Entity entity, MinecraftClient mc, PlayerEntity player)
+    public static void rightClickEntity(Entity entity, Minecraft mc, Player player)
     {
-		if (mc.interactionManager == null) return;
-        Hand hand = Hand.MAIN_HAND;
-        ActionResult actionResult = mc.interactionManager.interactEntityAtLocation(player, entity, new EntityHitResult(entity), hand);
+		if (mc.gameMode == null) return;
+        InteractionHand hand = InteractionHand.MAIN_HAND;
+        InteractionResult actionResult = mc.gameMode.interactAt(player, entity, new EntityHitResult(entity), hand);
 
-        if (actionResult.isAccepted() == false)
+        if (actionResult.consumesAction() == false)
         {
-            actionResult = mc.interactionManager.interactEntity(player, entity, hand);
+            actionResult = mc.gameMode.interact(player, entity, hand);
         }
 
-        if (actionResult instanceof ActionResult.Success success)
+        if (actionResult instanceof InteractionResult.Success success)
         {
-            if (success.swingSource() == ActionResult.SwingSource.CLIENT)
+            if (success.swingSource() == InteractionResult.SwingSource.CLIENT)
             {
-                player.swingHand(hand);
+                player.swing(hand);
             }
         }
     }
 
     public static void setEntityRotations(Entity entity, float yaw, float pitch)
     {
-        entity.setYaw(yaw);
-        entity.setPitch(pitch);
-        entity.lastYaw = yaw;
-        entity.lastPitch = pitch;
+        entity.setYRot(yaw);
+        entity.setXRot(pitch);
+        entity.yRotO = yaw;
+        entity.xRotO = pitch;
 
         if (entity instanceof LivingEntity living)
         {
-	        living.headYaw = yaw;
-            living.lastHeadYaw = yaw;
+	        living.yHeadRot = yaw;
+            living.yHeadRotO = yaw;
         }
     }
 
     /**
      * Copied from Tweak Fork by Andrew54757
      */
-    public static Vec3d getEyesPos(PlayerEntity player)
+    public static Vec3 getEyesPos(Player player)
     {
-        return new Vec3d(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+        return new Vec3(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
     }
 
     /**
      * Copied from Tweak Fork by Andrew54757
      */
-    public static BlockPos getPlayerHeadPos(PlayerEntity player)
+    public static BlockPos getPlayerHeadPos(Player player)
     {
-        return (player.getPose() == EntityPose.STANDING) ? player.getBlockPos().offset(Direction.UP) : player.getBlockPos();
+        return (player.getPose() == Pose.STANDING) ? player.blockPosition().relative(Direction.UP) : player.blockPosition();
     }
 
     /**
      * Copied from Tweak Fork by Andrew54757
      */
-    public static boolean isInReach(BlockPos pos, PlayerEntity player, double reach)
+    public static boolean isInReach(BlockPos pos, Player player, double reach)
     {
-        Vec3d playerpos = getEyesPos(player);
-        double d = playerpos.getX() - ((double) pos.getX() + 0.5D);
-        double d1 = playerpos.getY() - ((double) pos.getY() + 0.5D);
-        double d2 = playerpos.getZ() - ((double) pos.getZ() + 0.5D);
+        Vec3 playerpos = getEyesPos(player);
+        double d = playerpos.x() - ((double) pos.getX() + 0.5D);
+        double d1 = playerpos.y() - ((double) pos.getY() + 0.5D);
+        double d2 = playerpos.z() - ((double) pos.getZ() + 0.5D);
         return d * d + d1 * d1 + d2 * d2 <= reach * reach;
     }
 
     public static boolean writeAllMapsAsImages()
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
-        if (mc.world == null)
+        if (mc.level == null)
         {
             return true;
         }
 
-        Map<MapIdComponent, MapState> data = ((IMixinClientWorld) mc.world).tweakeroo_getMapStates();
+        Map<MapId, MapItemSavedData> data = ((IMixinClientWorld) mc.level).tweakeroo_getMapStates();
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName == null)
@@ -602,9 +606,9 @@ public class MiscUtils
         {
             int count = 0;
 
-            for (Map.Entry<MapIdComponent, MapState> entry : data.entrySet())
+            for (Map.Entry<MapId, MapItemSavedData> entry : data.entrySet())
             {
-                Path file = dir.resolve(entry.getKey().asString() + ".png");
+                Path file = dir.resolve(entry.getKey().key() + ".png");
                 writeMapAsImage(file, entry.getValue());
                 ++count;
             }
@@ -619,7 +623,7 @@ public class MiscUtils
         return true;
     }
 
-    private static void writeMapAsImage(Path fileOut, MapState state)
+    private static void writeMapAsImage(Path fileOut, MapItemSavedData state)
     {
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 
@@ -628,7 +632,7 @@ public class MiscUtils
             for (int x = 0; x < 128; ++x)
             {
                 int index = x + y * 128;
-                int color = MapColor.getRenderColor(state.colors[index]);
+                int color = MapColor.getColorFromPackedId(state.colors[index]);
                 // Swap the color channels from ABGR to ARGB
                 //int outputColor = (color & 0xFF00FF00) | (color & 0xFF0000) >> 16 | (color & 0xFF) << 16;
 
@@ -653,29 +657,29 @@ public class MiscUtils
 
     public static boolean hasCustomMaxStackSize(ItemStack stack)
     {
-        int defaultStackSize = stack.getDefaultComponents().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
-        int currentStackSize = stack.getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+        int defaultStackSize = stack.getPrototype().getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
+        int currentStackSize = stack.getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
         return defaultStackSize != currentStackSize;
     }
 
-    public static boolean registerPresetFromString(CustomizeFlatLevelScreen screen, String str)
+    public static boolean registerPresetFromString(CreateFlatWorldScreen screen, String str)
     {
         Matcher matcher = MiscUtils.PATTERN_WORLD_PRESET.matcher(str);
 
         if (matcher.matches())
         {
             // TODO --> I added some code here, and added the IMixinCustomizeFlatLevelScreen
-            GeneratorOptionsHolder generatorOptionsHolder = ((IMixinCustomizeFlatLevelScreen) screen).tweakeroo_getCreateWorldParent().getWorldCreator().getGeneratorOptionsHolder();
-            DynamicRegistryManager.Immutable registryManager = generatorOptionsHolder.getCombinedRegistryManager();
-            FeatureSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
-            RegistryEntryLookup<Biome> biomeLookup = registryManager.getOrThrow(RegistryKeys.BIOME);
-            RegistryEntryLookup<StructureSet> structureLookup = registryManager.getOrThrow(RegistryKeys.STRUCTURE_SET);
-            RegistryEntryLookup<PlacedFeature> featuresLookup = registryManager.getOrThrow(RegistryKeys.PLACED_FEATURE);
-            RegistryEntryLookup<Block> blockLookup = registryManager.getOrThrow(RegistryKeys.BLOCK).withFeatureFilter(featureSet);
-            FlatChunkGeneratorConfig defaultConfig = FlatChunkGeneratorConfig.getDefaultConfig(biomeLookup, structureLookup, featuresLookup);
-            FlatChunkGeneratorConfig currentConfig = screen.getConfig();
-            RegistryEntry.Reference<Biome> referenceEntry = biomeLookup.getOrThrow(BiomeKeys.PLAINS);
-            RegistryEntry.Reference<Biome> biomeEntry = referenceEntry;
+            WorldCreationContext generatorOptionsHolder = ((IMixinCustomizeFlatLevelScreen) screen).tweakeroo_getCreateWorldParent().getUiState().getSettings();
+            RegistryAccess.Frozen registryManager = generatorOptionsHolder.worldgenLoadContext();
+            FeatureFlagSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
+            HolderGetter<Biome> biomeLookup = registryManager.lookupOrThrow(Registries.BIOME);
+            HolderGetter<StructureSet> structureLookup = registryManager.lookupOrThrow(Registries.STRUCTURE_SET);
+            HolderGetter<PlacedFeature> featuresLookup = registryManager.lookupOrThrow(Registries.PLACED_FEATURE);
+            HolderGetter<Block> blockLookup = registryManager.lookupOrThrow(Registries.BLOCK).filterFeatures(featureSet);
+            FlatLevelGeneratorSettings defaultConfig = FlatLevelGeneratorSettings.getDefault(biomeLookup, structureLookup, featuresLookup);
+            FlatLevelGeneratorSettings currentConfig = screen.settings();
+            Holder.Reference<Biome> referenceEntry = biomeLookup.getOrThrow(Biomes.PLAINS);
+            Holder.Reference<Biome> biomeEntry = referenceEntry;
 
             String name = matcher.group("name");
             String blocksString = matcher.group("blocks");
@@ -685,10 +689,10 @@ public class MiscUtils
 
             try
             {
-                Optional<RegistryKey<Biome>> optBiome = Optional.ofNullable(Identifier.tryParse(biomeName)).map((biomeId) ->
-                                                                                                                        RegistryKey.of(RegistryKeys.BIOME, biomeId));
+                Optional<ResourceKey<Biome>> optBiome = Optional.ofNullable(Identifier.tryParse(biomeName)).map((biomeId) ->
+                                                                                                                        ResourceKey.create(Registries.BIOME, biomeId));
 
-                biomeEntry = optBiome.flatMap(biomeLookup::getOptional).orElse(referenceEntry);
+                biomeEntry = optBiome.flatMap(biomeLookup::get).orElse(referenceEntry);
             }
             catch (Exception ignore)
             {
@@ -704,7 +708,7 @@ public class MiscUtils
 
             try
             {
-                Optional<RegistryEntry.Reference<Item>> opt = Registries.ITEM.getEntry(Identifier.of(iconItemName));
+                Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(Identifier.parse(iconItemName));
                 if (opt.isPresent())
                 {
                     item = opt.get().value();
@@ -720,7 +724,7 @@ public class MiscUtils
                 return false;
             }
 
-            List<FlatChunkGeneratorLayer> layers = MiscTweaks.parseBlockString(blocksString);
+            List<FlatLayerInfo> layers = MiscTweaks.parseBlockString(blocksString);
 
             if (layers == null)
             {
@@ -728,7 +732,7 @@ public class MiscUtils
                 return false;
             }
 
-            FlatChunkGeneratorConfig newConfig = defaultConfig.with(layers, defaultConfig.getStructureOverrides(), biomeEntry);
+            FlatLevelGeneratorSettings newConfig = defaultConfig.withBiomeAndLayers(layers, defaultConfig.structureOverrides(), biomeEntry);
 
             //new PresetsScreen.SuperflatPresetsListWidget.SuperflatPresetEntry(null);
             //addPreset(Text.translatable(name), item, biome, ImmutableSet.of(), false, false, layers);
@@ -772,7 +776,7 @@ public class MiscUtils
         {
             this.lastIntValue = lastIntValue;
             this.lastDoubleValue = -1;
-            this.lastActive = Util.getMeasuringTimeNano();
+            this.lastActive = Util.getNanos();
             this.active = true;
         }
 
@@ -780,7 +784,7 @@ public class MiscUtils
         {
             this.lastDoubleValue = lastDoubleValue;
             this.lastIntValue = -1;
-            this.lastActive = Util.getMeasuringTimeNano();
+            this.lastActive = Util.getNanos();
             this.active = true;
         }
 
@@ -808,7 +812,7 @@ public class MiscUtils
         {
             this.lastIntValue = -1;
             this.lastDoubleValue = -1;
-            this.lastActive = Util.getMeasuringTimeNano();
+            this.lastActive = Util.getNanos();
             this.active = false;
         }
     }
