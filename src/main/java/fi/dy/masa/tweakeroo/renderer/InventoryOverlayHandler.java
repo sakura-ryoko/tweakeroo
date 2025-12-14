@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.interfaces.IInventoryOverlayHandler;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
+import fi.dy.masa.malilib.mixin.entity.IMixinAbstractNautilus;
 import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
 import fi.dy.masa.malilib.render.*;
 import fi.dy.masa.malilib.util.EntityUtils;
@@ -31,6 +32,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.nautilus.AbstractNautilus;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -438,6 +440,10 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         {
             inv = ((IMixinAbstractHorseEntity) entity).malilib_getHorseInventory();
         }
+        else if (entity instanceof AbstractNautilus)
+        {
+            inv = ((IMixinAbstractNautilus) entity).malilib_getNautilusInventory();
+        }
         else if (entity instanceof Piglin)
         {
             inv = ((IMixinPiglinEntity) entity).malilib_getInventory();
@@ -454,7 +460,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 	            data.contains(NbtKeys.ITEMS, Constants.NBT.TAG_LIST) &&
 	            data.getList(NbtKeys.ITEMS).size() > 1)
             {
-                if (entity instanceof AbstractHorse)
+                if (entity instanceof AbstractHorse || entity instanceof AbstractNautilus)
                 {
                     inv2 = InventoryUtils.getDataInventoryHorseFix(data, -1, entity.registryAccess());
                 }
