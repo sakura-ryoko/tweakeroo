@@ -19,7 +19,7 @@ public class MixinClientCommonNetworkHandler
         {
             DataManager.getInstance().setHasCarpetServer(true);
         }
-        else if (packet.payload().type().id().equals(DataManager.SERVUX_LITEMATIC_DATA))
+        else if (packet.payload().type().id().getNamespace().equals("servux"))
         {
             DataManager.getInstance().setHasServuxServer(true);
         }

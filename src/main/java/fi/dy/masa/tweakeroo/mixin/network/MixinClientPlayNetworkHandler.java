@@ -78,6 +78,18 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
         }
     }
 
+    /**
+     * Copied From Tweak Fork by Andrew54757
+     */
+    @Inject(method = "handleBlockEvent", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_onBlockEvent(ClientboundBlockEventPacket clientboundBlockEventPacket, CallbackInfo ci)
+    {
+        if (Configs.Disable.DISABLE_CLIENT_BLOCK_EVENTS.getBooleanValue())
+        {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "handleCustomPayload", at = @At("HEAD"))
     private void tweakeroo_onCustomPayload(CustomPacketPayload payload, CallbackInfo ci)
     {
@@ -85,7 +97,7 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
         {
             DataManager.getInstance().setHasCarpetServer(true);
         }
-        else if (payload.type().id().equals(DataManager.SERVUX_LITEMATIC_DATA))
+        else if (payload.type().id().getNamespace().equals("servux"))
         {
             DataManager.getInstance().setHasServuxServer(true);
         }

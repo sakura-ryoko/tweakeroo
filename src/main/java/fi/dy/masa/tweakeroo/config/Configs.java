@@ -389,6 +389,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_BEACON_BEAM_RENDERING   = new ConfigBooleanHotkeyed("disableBeaconBeamRendering",           false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BLOCK_BREAK_PARTICLES   = new ConfigBooleanHotkeyed("disableBlockBreakingParticles",        false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BLOCK_BREAK_COOLDOWN    = new ConfigBooleanHotkeyed("disableBlockBreakCooldown",            false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_CLIENT_BLOCK_EVENTS     = new ConfigBooleanHotkeyed("disableClientBlockEvents",             false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_DOUBLE_TAP_SPRINT       = new ConfigBooleanHotkeyed("disableDoubleTapSprint",               false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BOSS_BAR                = new ConfigBooleanHotkeyed("disableBossBar",                       false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_BOSS_FOG                = new ConfigBooleanHotkeyed("disableBossFog",                       false, "").apply(DISABLE_KEY);
@@ -437,6 +438,7 @@ public class Configs implements IConfigHandler
                 DISABLE_BEACON_BEAM_RENDERING,
                 DISABLE_BLOCK_BREAK_PARTICLES,
                 DISABLE_BLOCK_BREAK_COOLDOWN,
+                DISABLE_CLIENT_BLOCK_EVENTS,
                 DISABLE_DOUBLE_TAP_SPRINT,
                 DISABLE_BOSS_BAR,
                 DISABLE_BOSS_FOG,
