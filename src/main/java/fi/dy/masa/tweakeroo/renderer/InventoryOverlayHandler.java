@@ -237,6 +237,11 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         {
             Entity entity = ((EntityHitResult) trace).getEntity();
 
+            if (cameraEntity.getUuid().equals(entity.getUuid()))
+            {
+                return null;
+            }
+
             if (world instanceof ServerWorld)
             {
                 entity = world.getEntityById(entity.getId());
@@ -460,11 +465,11 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             {
                 if (entity instanceof AbstractHorseEntity)
                 {
-                    inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, inv.size(), entity.getRegistryManager());
+                    inv2 = InventoryUtils.getNbtInventoryHorseFix(nbt, -1, entity.getRegistryManager());
                 }
                 else
                 {
-                    inv2 = InventoryUtils.getNbtInventory(nbt, inv.size(), entity.getRegistryManager());
+                    inv2 = InventoryUtils.getNbtInventory(nbt, -1, entity.getRegistryManager());
                 }
 
                 inv = null;
