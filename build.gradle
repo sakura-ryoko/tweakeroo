@@ -103,3 +103,21 @@ jar {
 		rename { "${it}_${base.archivesName}"}
 	}
 }
+
+tasks.publish.dependsOn build
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			// add all the jars that should be included when publishing to maven
+			//artifact(jar)             { builtBy remapJar }
+			artifactId = base.archivesName.get()
+			from components.java
+		}
+	}
+
+	repositories {
+		maven {
+			url = "$projectDir/../../CommonMaven"
+		}
+	}
+}
