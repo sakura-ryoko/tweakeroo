@@ -22,12 +22,14 @@ public abstract class MixinHeldItemRenderer
             target = "Lnet/minecraft/client/player/LocalPlayer;getItemSwapScale(F)F"))
     public float tweakeroo_redirectedGetCooledAttackStrength(LocalPlayer player, float adjustTicks)
     {
-        return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : player.getAttackStrengthScale(adjustTicks);
+        return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : player.getItemSwapScale(adjustTicks);
     }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_preventOffhandRendering(AbstractClientPlayer player, float tickProgress, float pitch,
-												   InteractionHand hand, float swingProgress, ItemStack item,
+    private void tweakeroo_preventOffhandRendering(AbstractClientPlayer player,
+                                                   float tickProgress, float pitch,
+												   InteractionHand hand,
+												   float swingProgress, ItemStack item,
 												   float equipProgress, PoseStack matrices,
 												   SubmitNodeCollector orderedRenderCommandQueue,
 												   int light, CallbackInfo ci)

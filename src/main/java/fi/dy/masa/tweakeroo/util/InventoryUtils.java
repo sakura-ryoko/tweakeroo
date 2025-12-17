@@ -56,7 +56,7 @@ public class InventoryUtils
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
-    private static boolean needsCache = false;
+//    private static boolean needsCache = false;
 
     public static void setToolSwitchableSlots(String configStr)
     {
