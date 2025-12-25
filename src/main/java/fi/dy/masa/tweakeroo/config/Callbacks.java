@@ -12,6 +12,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.gui.GuiCameraPresetEditor;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
@@ -58,6 +59,7 @@ public class Callbacks
         FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> CameraEntity.setCameraState(cfg.getBooleanValue(), null));
         FeatureToggle.TWEAK_HOLD_ATTACK.setValueChangeCallback(new FeatureCallbackHold(mc.options.attackKey));
         FeatureToggle.TWEAK_HOLD_USE.setValueChangeCallback(new FeatureCallbackHold(mc.options.useKey));
+        Configs.Generic.ENTITY_DATA_SYNC.setValueChangeCallback((config) -> EntityDataManager.getInstance().onEntityDataSyncToggled(config));
 
         IHotkeyCallback callbackGeneric = new KeyCallbackHotkeysGeneric(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackHotkeyWithMessage(mc);
