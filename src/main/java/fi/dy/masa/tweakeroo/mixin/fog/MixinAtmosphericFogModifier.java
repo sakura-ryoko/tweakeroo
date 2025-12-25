@@ -17,12 +17,14 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public class MixinAtmosphericFogModifier
 {
     @Inject(method = "applyStartEndModifier", at = @At("RETURN"))
-    private void tweakeroo_redirectAtmosphericFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void tweakeroo_redirectAtmosphericFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance,
+                                                  RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_ATMOSPHERIC_FOG.getBooleanValue())
         {
-            data.environmentalStart = data.cloudEnd - 4.0F;
-            data.environmentalEnd = data.cloudEnd;
+            float limit = data.cloudEnd;
+            data.environmentalStart = limit - 4.0F;
+            data.environmentalEnd = limit;
         }
     }
 }

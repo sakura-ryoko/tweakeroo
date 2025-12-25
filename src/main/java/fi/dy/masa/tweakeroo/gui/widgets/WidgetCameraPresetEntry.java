@@ -136,124 +136,109 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		}
 	}
 
-	private static class ButtonListener implements IButtonActionListener
-	{
-		private final Type type;
-		private final WidgetCameraPresetEntry widget;
-
-		public ButtonListener(Type type, WidgetCameraPresetEntry widget)
+	private record ButtonListener(Type type, WidgetCameraPresetEntry widget) implements IButtonActionListener
 		{
-			this.type = type;
-			this.widget = widget;
-		}
-
-		@Override
-		public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-		{
-			if (this.widget.preset == null) return;
-			MinecraftClient mc = MinecraftClient.getInstance();
-
-			if (this.type == Type.RECALL)
+			@Override
+			public void actionPerformedWithButton(ButtonBase button, int mouseButton)
 			{
-				CameraPreset preset = this.widget.preset;
-
-				if (mc.world != null && mc.world.getRegistryKey().getValue().equals(preset.getDim()))
+				if (this.widget.preset == null)
 				{
-					if (CameraUtils.recallPreset(preset, mc))
+					return;
+				}
+				MinecraftClient mc = MinecraftClient.getInstance();
+
+				if (this.type == Type.RECALL)
+				{
+					CameraPreset preset = this.widget.preset;
+
+					if (mc.world != null && mc.world.getRegistryKey().getValue().equals(preset.getDim()))
 					{
-						InfoUtils.showGuiMessage(Message.MessageType.INFO, 2500, "tweakeroo.message.free_cam.preset_recalled",
-						                         FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(),
-						                         String.format("%02d", preset.getId()), preset.getName());
+						if (CameraUtils.recallPreset(preset, mc))
+						{
+							InfoUtils.showGuiMessage(Message.MessageType.INFO, 2500, "tweakeroo.message.free_cam.preset_recalled",
+							                         FeatureToggle.TWEAK_FREE_CAMERA.getPrettyName(),
+							                         String.format("%02d", preset.getId()), preset.getName());
+						}
+						else
+						{
+							InfoUtils.showGuiMessage(Message.MessageType.WARNING, "tweakeroo.message.free_cam.preset_matches_camera",
+							                         String.format("%02d", preset.getId()));
+						}
 					}
 					else
 					{
-						InfoUtils.showGuiMessage(Message.MessageType.WARNING, "tweakeroo.message.free_cam.preset_matches_camera",
-						                         String.format("%02d", preset.getId()));
+						InfoUtils.showGuiMessage(Message.MessageType.ERROR, "tweakeroo.message.free_cam.preset_wrong_dimension",
+						                         String.format("%02d", preset.getId()), preset.getName());
 					}
 				}
-				else
+				else if (this.type == Type.RENAME)
 				{
-					InfoUtils.showGuiMessage(Message.MessageType.ERROR, "tweakeroo.message.free_cam.preset_wrong_dimension",
-					                         String.format("%02d", preset.getId()), preset.getName());
+					String title = "tweakeroo.gui.title.camera_preset_rename";
+					String name = this.widget.preset.getName();
+					PresetRenamer renamer = new PresetRenamer(this.widget.preset, this.widget);
+					GuiBase.openGui(new GuiTextInputFeedback(60, title, name, this.widget.parent.getPresetEditorGui(), renamer));
 				}
-			}
-			else if (this.type == Type.RENAME)
-			{
-				String title = "tweakeroo.gui.title.camera_preset_rename";
-				String name = this.widget.preset.getName();
-				PresetRenamer renamer = new PresetRenamer(this.widget.preset, this.widget);
-				GuiBase.openGui(new GuiTextInputFeedback(60, title, name, this.widget.parent.getPresetEditorGui(), renamer));
-			}
-			else if (this.type == Type.SET_HERE)
-			{
-				if (mc.getCameraEntity() != null)
+				else if (this.type == Type.SET_HERE)
 				{
-					Entity camera = mc.getCameraEntity();
-					this.widget.preset.setPos(camera.getPos(), camera.getYaw(), camera.getPitch());
-					CameraPresetManager.getInstance().update(this.widget.preset);
+					if (mc.getCameraEntity() != null)
+					{
+						Entity camera = mc.getCameraEntity();
+						this.widget.preset.setPos(camera.getPos(), camera.getYaw(), camera.getPitch());
+						CameraPresetManager.getInstance().update(this.widget.preset);
+						this.widget.parent.refreshEntries();
+					}
+				}
+				else if (this.type == Type.REMOVE)
+				{
+					CameraPresetManager.getInstance().remove(this.widget.preset.getId());
 					this.widget.parent.refreshEntries();
 				}
 			}
-			else if (this.type == Type.REMOVE)
+
+			public enum Type
 			{
-				CameraPresetManager.getInstance().remove(this.widget.preset.getId());
+				RECALL("tweakeroo.gui.button.preset_entry.recall"),
+				RENAME("tweakeroo.gui.button.preset_entry.rename"),
+				SET_HERE("tweakeroo.gui.button.preset_entry.set_here"),
+				REMOVE("tweakeroo.gui.button.preset_entry.remove"),
+				;
+
+				private final String translationKey;
+
+				Type(String translationKey)
+				{
+					this.translationKey = translationKey;
+				}
+
+				public String getTranslationKey()
+				{
+					return this.translationKey;
+				}
+
+				public String getDisplayName(Object... args)
+				{
+					return StringUtils.translate(this.getTranslationKey(), args);
+				}
+			}
+		}
+
+	private record PresetRenamer(CameraPreset preset, WidgetCameraPresetEntry widget) implements IStringConsumerFeedback
+		{
+			@Override
+			public boolean setString(String string)
+			{
+				if (string.isEmpty())
+				{
+					string = "Preset " + this.preset.getId();
+				}
+
+				String newName = CameraUtils.fixPresetName(string);
+				boolean result = this.preset.renamePreset(newName, this.widget.parent);
+
+				CameraPresetManager.getInstance().update(this.preset);
 				this.widget.parent.refreshEntries();
+
+				return result;
 			}
 		}
-
-		public enum Type
-		{
-			RECALL      ("tweakeroo.gui.button.preset_entry.recall"),
-			RENAME      ("tweakeroo.gui.button.preset_entry.rename"),
-			SET_HERE    ("tweakeroo.gui.button.preset_entry.set_here"),
-			REMOVE      ("tweakeroo.gui.button.preset_entry.remove"),
-			;
-
-			private final String translationKey;
-
-			Type(String translationKey)
-			{
-				this.translationKey = translationKey;
-			}
-
-			public String getTranslationKey()
-			{
-				return this.translationKey;
-			}
-
-			public String getDisplayName(Object... args)
-			{
-				return StringUtils.translate(this.getTranslationKey(), args);
-			}
-		}
-	}
-
-	private static class PresetRenamer implements IStringConsumerFeedback
-	{
-		private final WidgetCameraPresetEntry widget;
-		private final CameraPreset preset;
-
-		public PresetRenamer(CameraPreset preset, WidgetCameraPresetEntry widget)
-		{
-			this.widget = widget;
-			this.preset = preset;
-		}
-
-		@Override
-		public boolean setString(String string)
-		{
-			if (string.isEmpty())
-			{
-				string = "Preset "+this.preset.getId();
-			}
-
-			String newName = CameraUtils.fixPresetName(string);
-			boolean result = this.preset.renamePreset(newName, this.widget.parent);
-
-			CameraPresetManager.getInstance().update(this.preset);
-			this.widget.parent.refreshEntries();
-
-			return result;
-		}
-	}
 }

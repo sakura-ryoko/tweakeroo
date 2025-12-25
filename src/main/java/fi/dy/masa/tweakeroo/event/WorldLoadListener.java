@@ -3,7 +3,6 @@ package fi.dy.masa.tweakeroo.event;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -19,11 +18,11 @@ import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 public class WorldLoadListener implements IWorldLoadListener
@@ -53,7 +52,7 @@ public class WorldLoadListener implements IWorldLoadListener
 
         if (worldAfter != null)
         {
-            ServerDataSyncer.getInstance().onWorldPre();
+            EntityDataManager.getInstance().onWorldPre();
         }
     }
 
@@ -61,7 +60,7 @@ public class WorldLoadListener implements IWorldLoadListener
     public void onWorldLoadPost(@Nullable ClientWorld worldBefore, @Nullable ClientWorld worldAfter, MinecraftClient mc)
     {
         DataManager.getInstance().reset(worldAfter == null);
-        ServerDataSyncer.getInstance().reset(worldAfter == null);
+        EntityDataManager.getInstance().reset(worldAfter == null);
 
         if (worldBefore == null)
         {
@@ -78,8 +77,6 @@ public class WorldLoadListener implements IWorldLoadListener
                 Configs.Internal.DARKNESS_SCALE_VALUE_ORIGINAL.setDoubleValue(mc.options.getDarknessEffectScale().getValue());
                 mc.options.getDarknessEffectScale().setValue(Configs.Generic.DARKNESS_SCALE_OVERRIDE_VALUE.getDoubleValue());
             }
-
-            InventoryUtils.clearCache();
         }
 
         // Logging in to a world or changing dimensions or respawning
@@ -91,8 +88,8 @@ public class WorldLoadListener implements IWorldLoadListener
 			}
 
 //	        this.readStoredDataPerDimension();
-            ServerDataSyncer.getInstance().onWorldJoin();
-            InventoryUtils.startCache();
+	        EntityDataManager.getInstance().onWorldJoin();
+	        CachedTagManager.startCache();
         }
         else
         {

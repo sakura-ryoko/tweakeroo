@@ -69,7 +69,7 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 		int posX = this.getBrowserWidth() - 22;
 		posX -= ButtonListener.Type.CLEAR.getDisplayName().length() + 15;
 		posX -= this.createButton(posX, y, -1, ButtonListener.Type.CLEAR) + 4;
-		posX -= ButtonListener.Type.CREATE.getDisplayName().length() + 15;;
+		posX -= ButtonListener.Type.CREATE.getDisplayName().length() + 15;
 		posX -= this.createButton(posX, y, -1, ButtonListener.Type.CREATE) + 4;
 		y += 22;
 	}
@@ -140,17 +140,8 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 		CameraPresetManager.getInstance().setSelectedPreset(old == entry ? null : entry);
 	}
 
-	private static class ButtonListener implements IButtonActionListener
+	private record ButtonListener(Type type, GuiCameraPresetEditor parent) implements IButtonActionListener
 	{
-		private final GuiCameraPresetEditor parent;
-		private final Type type;
-
-		public ButtonListener(Type type, GuiCameraPresetEditor parent)
-		{
-			this.type = type;
-			this.parent = parent;
-		}
-
 		@Override
 		public void actionPerformedWithButton(ButtonBase button, int mouseButton)
 		{
@@ -181,7 +172,7 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 					RegistryKey<World> dimKey = mc.world.getRegistryKey();
 
 					final int id = CameraPresetManager.getInstance().getNextId(-1);
-					String name = "Preset "+id;
+					String name = "Preset " + id;
 					CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getPos(), camera.getYaw(), camera.getPitch());
 
 					if (CameraUtils.addPreset(newPreset))
@@ -205,9 +196,9 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 
 		public enum Type
 		{
-			SHOW    ("tweakeroo.gui.button.preset_gui.show"),
-			CLEAR   ("tweakeroo.gui.button.preset_gui.clear"),
-			CREATE  ("tweakeroo.gui.button.preset_gui.create"),
+			SHOW("tweakeroo.gui.button.preset_gui.show"),
+			CLEAR("tweakeroo.gui.button.preset_gui.clear"),
+			CREATE("tweakeroo.gui.button.preset_gui.create"),
 			;
 
 			private final String translationKey;

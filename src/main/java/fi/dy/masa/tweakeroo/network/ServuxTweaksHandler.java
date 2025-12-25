@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.network.IClientPayloadData;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.network.PacketSplitter;
 import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 
 @Environment(EnvType.CLIENT)
 public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IPluginClientPlayHandler<T>
@@ -77,13 +77,13 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
         {
             case PACKET_S2C_METADATA ->
             {
-                if (ServerDataSyncer.getInstance().receiveServuxMetadata(packet.getCompound()))
+                if (EntityDataManager.getInstance().receiveServuxMetadata(packet.getCompound()))
                 {
                     this.servuxRegistered = true;
                 }
             }
-            case PACKET_S2C_BLOCK_NBT_RESPONSE_SIMPLE -> ServerDataSyncer.getInstance().handleBlockEntityData(packet.getPos(), packet.getCompound(), null);
-            case PACKET_S2C_ENTITY_NBT_RESPONSE_SIMPLE -> ServerDataSyncer.getInstance().handleEntityData(packet.getEntityId(), packet.getCompound());
+            case PACKET_S2C_BLOCK_NBT_RESPONSE_SIMPLE -> EntityDataManager.getInstance().handleBlockEntityData(packet.getPos(), packet.getCompound(), null);
+            case PACKET_S2C_ENTITY_NBT_RESPONSE_SIMPLE -> EntityDataManager.getInstance().handleEntityData(packet.getEntityId(), packet.getCompound());
             case PACKET_S2C_NBT_RESPONSE_DATA ->
             {
                 if (this.readingSessionKey == -1)
@@ -99,7 +99,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
                     try
                     {
                         this.readingSessionKey = -1;
-                        ServerDataSyncer.getInstance().handleBulkEntityData(fullPacket.readVarInt(), (NbtCompound) fullPacket.readNbt(NbtSizeTracker.ofUnlimitedBytes()));
+                        EntityDataManager.getInstance().handleBulkEntityData(fullPacket.readVarInt(), (NbtCompound) fullPacket.readNbt(NbtSizeTracker.ofUnlimitedBytes()));
                     }
                     catch (Exception e)
                     {
@@ -165,7 +165,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPayload> implements IP
                 Tweakeroo.debugLog("ServuxTweaksHandler#encodeClientData(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", MAX_FAILURES);
                 this.servuxRegistered = false;
                 ServuxTweaksHandler.INSTANCE.unregisterPlayReceiver();
-                ServerDataSyncer.getInstance().onPacketFailure();
+                EntityDataManager.getInstance().onPacketFailure();
             }
             else
             {
