@@ -138,17 +138,8 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 		CameraPresetManager.getInstance().setSelectedPreset(old == entry ? null : entry);
 	}
 
-	private static class ButtonListener implements IButtonActionListener
+	private record ButtonListener(Type type, GuiCameraPresetEditor parent) implements IButtonActionListener
 	{
-		private final GuiCameraPresetEditor parent;
-		private final Type type;
-
-		public ButtonListener(Type type, GuiCameraPresetEditor parent)
-		{
-			this.type = type;
-			this.parent = parent;
-		}
-
 		@Override
 		public void actionPerformedWithButton(ButtonBase button, int mouseButton)
 		{
@@ -179,7 +170,7 @@ public class GuiCameraPresetEditor  extends GuiListBase<CameraPreset, WidgetCame
 					RegistryKey<World> dimKey = mc.world.getRegistryKey();
 
 					final int id = CameraPresetManager.getInstance().getNextId(-1);
-					String name = "Preset "+id;
+					String name = "Preset " + id;
 					CameraPreset newPreset = new CameraPreset(id, name, dimKey.getValue(), camera.getEntityPos(), camera.getYaw(), camera.getPitch());
 
 					if (CameraUtils.addPreset(newPreset))

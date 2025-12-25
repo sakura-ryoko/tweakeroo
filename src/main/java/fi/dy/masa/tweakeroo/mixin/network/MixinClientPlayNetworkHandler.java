@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.DataManager;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
@@ -106,10 +106,10 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
     @Inject(method = "onCommandTree", at = @At("RETURN"))
     private void tweakeroo_onCommandTree(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        if (Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
             // when the player becomes OP, the server sends the command tree to the client
-            ServerDataSyncer.getInstance().resetOpCheck();
+            EntityDataManager.getInstance().resetOpCheck();
         }
     }
 

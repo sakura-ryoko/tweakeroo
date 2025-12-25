@@ -44,7 +44,7 @@
         "world.MixinWorld"
     ],
     "client": [
-        "MixinMinecraftClient",
+        "client.MixinMinecraftClient",
         "entity.MixinClientPlayerEntity",
         "fog.MixinAtmosphericFogModifier",
         "fog.MixinDarknessEffectFogModifier",

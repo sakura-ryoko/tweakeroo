@@ -17,7 +17,7 @@ import fi.dy.masa.malilib.util.nbt.NbtInventory;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -79,7 +79,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
     {
         if (this.syncer == null)
         {
-            this.syncer = ServerDataSyncer.getInstance();
+            this.syncer = EntityDataManager.getInstance();
         }
         
         return this.syncer;
@@ -447,6 +447,10 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         {
             inv = ((IMixinAbstractHorseEntity) entity).malilib_getHorseInventory();
         }
+//        else if (entity instanceof AbstractNautilusEntity)
+//        {
+//            inv = ((IMixinAbstractNautilus) entity).malilib_getNautilusInventory();
+//        }
         else if (entity instanceof PiglinEntity)
         {
             inv = ((IMixinPiglinEntity) entity).malilib_getInventory();

@@ -58,6 +58,10 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        	DARKNESS_SCALE_OVERRIDE_VALUE       = new ConfigDouble      ("darknessScaleOverrideValue", 0.45D, 0.0D, 1.00D).apply(GENERIC_KEY);
         public static final ConfigBoolean       	DEBUG_LOGGING                       = new ConfigBoolean     ("debugLogging", false).apply(GENERIC_KEY);
         public static final ConfigOptionList    	ELYTRA_CAMERA_INDICATOR             = new ConfigOptionList  ("elytraCameraIndicator", ActiveMode.WITH_KEY).apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed   ENTITY_DATA_SYNC                    = new ConfigBooleanHotkeyed ("entityDataSync", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed   ENTITY_DATA_SYNC_BACKUP             = new ConfigBooleanHotkeyed ("entityDataSyncBackup", false, "").apply(GENERIC_KEY);
+        public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("entityDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
+        public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("entityDataSyncCacheTimeout", 2.75f, 1.0f, 25.0f).apply(GENERIC_KEY);
         public static final ConfigDouble        	ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64).apply(GENERIC_KEY);
         public static final ConfigOptionList    	ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
         public static final ConfigInteger       	FAST_BLOCK_PLACEMENT_COUNT          = new ConfigInteger     ("fastBlockPlacementCount", 2, 1, 16).apply(GENERIC_KEY);
@@ -120,8 +124,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       	SELECTIVE_BLOCKS_HIDE_PARTICLES     = new ConfigBoolean     ("selectiveBlocksHideParticles", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       	SELECTIVE_BLOCKS_HIDE_ENTITIES      = new ConfigBoolean     ("selectiveBlocksHideEntities", false).apply(GENERIC_KEY);
         public static final ConfigBoolean       	SELECTIVE_BLOCKS_NO_HIT             = new ConfigBoolean     ("selectiveBlocksNoHit", true).apply(GENERIC_KEY);
-        public static final ConfigFloat         	SERVER_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("serverDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
-        public static final ConfigFloat         	SERVER_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("serverDataSyncCacheTimeout", 2.75f, 1.0f, 25.0f).apply(GENERIC_KEY);
         public static final ConfigInteger       	SERVER_NBT_REQUEST_RATE             = new ConfigInteger     ("serverNbtRequestRate", 2).apply(GENERIC_KEY);
 		public static final ConfigBoolean       	SHULKER_DISPLAY_BACKGROUND_COLOR    = new ConfigBoolean     ("shulkerDisplayBgColor", true).apply(GENERIC_KEY);
         public static final ConfigBoolean       	SHULKER_DISPLAY_ENDER_CHEST         = new ConfigBoolean     ("shulkerDisplayEnderChest", false).apply(GENERIC_KEY);
@@ -162,6 +164,10 @@ public class Configs implements IConfigHandler
                 CLIENT_PLACEMENT_ROTATION,
                 CLIENT_PLACEMENT_VALIDATION,
                 DEBUG_LOGGING,
+                ENTITY_DATA_SYNC,
+                ENTITY_DATA_SYNC_BACKUP,
+                ENTITY_DATA_SYNC_CACHE_REFRESH,
+                ENTITY_DATA_SYNC_CACHE_TIMEOUT,
                 FAST_LEFT_CLICK_ALLOW_TOOLS,
                 FAST_PLACEMENT_REMEMBER_ALWAYS,
                 FREE_CAMERA_PLAYER_INPUTS,
@@ -178,6 +184,7 @@ public class Configs implements IConfigHandler
                 PLACEMENT_RESTRICTION_TIED_TO_FAST,
                 POTION_WARNING_BENEFICIAL_ONLY,
                 REMEMBER_FLEXIBLE,
+                SERVER_NBT_REQUEST_RATE,
                 SHULKER_DISPLAY_BACKGROUND_COLOR,
                 SHULKER_DISPLAY_ENDER_CHEST,
                 SHULKER_DISPLAY_REQUIRE_SHIFT,
@@ -251,9 +258,6 @@ public class Configs implements IConfigHandler
                 SCAFFOLD_PLACE_DISTANCE,
                 SCAFFOLD_PLACE_VANILLA,
                 SCULK_SENSOR_PULSE_LENGTH,
-                SERVER_DATA_SYNC_CACHE_REFRESH,
-                SERVER_DATA_SYNC_CACHE_TIMEOUT,
-                SERVER_NBT_REQUEST_RATE,
                 SNAP_AIM_PITCH_STEP,
                 SNAP_AIM_THRESHOLD_PITCH,
                 SNAP_AIM_THRESHOLD_YAW,
@@ -275,7 +279,9 @@ public class Configs implements IConfigHandler
         );
 
         public static final ImmutableList<IHotkey> HOTKEYS = ImmutableList.of(
-				FREE_CAMERA_PLAYER_INPUTS,
+                ENTITY_DATA_SYNC,
+                ENTITY_DATA_SYNC_BACKUP,
+                FREE_CAMERA_PLAYER_INPUTS,
 				FREE_CAMERA_PLAYER_MOVEMENT,
 				FREE_CAMERA_SHOW_HANDS,
 				FREE_CAMERA_SHOW_HOTBAR,

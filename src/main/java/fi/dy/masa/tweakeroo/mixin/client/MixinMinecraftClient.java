@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin;
+package fi.dy.masa.tweakeroo.mixin.client;
 
 import org.jetbrains.annotations.Nullable;
 

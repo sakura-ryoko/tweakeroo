@@ -55,10 +55,10 @@ import fi.dy.masa.tweakeroo.network.ServuxTweaksHandler;
 import fi.dy.masa.tweakeroo.network.ServuxTweaksPacket;
 
 @SuppressWarnings({"deprecation"})
-public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
+public class EntityDataManager implements IClientTickHandler, IDataSyncer
 {
-    private static final ServerDataSyncer INSTANCE = new ServerDataSyncer();
-    public static ServerDataSyncer getInstance()
+    private static final EntityDataManager INSTANCE = new EntityDataManager();
+    public static EntityDataManager getInstance()
     {
         return INSTANCE;
     }
@@ -102,7 +102,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         return this.clientWorld;
     }
 
-    public ServerDataSyncer()
+    public EntityDataManager()
     {
         this.mc = MinecraftClient.getInstance();
     }
@@ -116,7 +116,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         if (now - this.serverTickTime > 50)
         {
             // In this block, we do something every server tick
-            if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            if (!Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
             {
                 this.serverTickTime = now;
                 if (!DataManager.getInstance().hasIntegratedServer() && this.hasServuxServer())
@@ -125,7 +125,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
                     HANDLER.unregisterPlayReceiver();
                 }
 
-                if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+                if (!Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
                 {
                     // Expire cached NBT and clear pending Queue if both are disabled
                     if (!this.pendingBlockEntitiesQueue.isEmpty())
@@ -271,7 +271,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     public long getCacheRefresh()
     {
-        long result = (long) (MathHelper.clamp(Configs.Generic.SERVER_DATA_SYNC_CACHE_REFRESH.getFloatValue(), 0.05f, 1.0f) * 1000L);
+        long result = (long) (MathHelper.clamp(Configs.Generic.ENTITY_DATA_SYNC_CACHE_REFRESH.getFloatValue(), 0.05f, 1.0f) * 1000L);
         long clamp = (this.getCacheTimeout() / 2);
 
         return Math.min(result, clamp);
@@ -280,8 +280,8 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     private long getCacheTimeout()
     {
         // Increase cache timeout when in Backup Mode.
-        int modifier = FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue() ? 5 : 1;
-        return (long) (MathHelper.clamp((Configs.Generic.SERVER_DATA_SYNC_CACHE_TIMEOUT.getFloatValue() * modifier), 0.25f, 15.0f) * 1000L);
+        int modifier = Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue() ? 5 : 1;
+        return (long) (MathHelper.clamp((Configs.Generic.ENTITY_DATA_SYNC_CACHE_TIMEOUT.getFloatValue() * modifier), 1.0f, 50.0f) * 1000L);
     }
 
     private void tickCache(long nowTime)
@@ -374,7 +374,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     public boolean hasBackupStatus()
     {
-        return FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue() && this.hasOpStatus;
+        return Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue() && this.hasOpStatus;
     }
 
     public void setServuxVersion(String ver)
@@ -440,7 +440,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
     public void requestMetadata()
     {
         if (!DataManager.getInstance().hasIntegratedServer() &&
-            FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
         {
             NbtCompound nbt = new NbtCompound();
             nbt.putString("version", Reference.MOD_STRING);
@@ -456,7 +456,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             Tweakeroo.debugLog("tweaksDataChannel: received METADATA from Servux");
             this.checkTweaksConfigs(nbt);
 
-            if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+            if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
             {
                 if (nbt.getInt("version", -1) != ServuxTweaksPacket.PROTOCOL_VERSION)
                 {
@@ -505,7 +505,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             // Refresh at 25%
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
+                (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > this.getCacheRefresh())
                 {
@@ -524,7 +524,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         else if (world.getBlockState(pos).getBlock() instanceof BlockEntityProvider)
         {
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
+                (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 this.pendingBlockEntitiesQueue.add(pos);
             }
@@ -565,7 +565,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
         {
             // Refresh at 25%
             if (!DataManager.getInstance().hasIntegratedServer() &&
-                (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
+                (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue()))
             {
                 if (System.currentTimeMillis() - this.entityCache.get(entityId).getLeft() > this.getCacheRefresh())
                 {
@@ -583,7 +583,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             return this.entityCache.get(entityId).getRight();
         }
         if (!DataManager.getInstance().hasIntegratedServer() &&
-            (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue()))
+            (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue()))
         {
             this.pendingEntitiesQueue.add(entityId);
         }
@@ -702,7 +702,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
         }
 
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
             this.requestBlockEntity(world, pos);
         }
@@ -754,7 +754,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
             }
         }
 
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue() || FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
             this.requestEntity(world, entityId);
         }
@@ -764,7 +764,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     private void requestQueryBlockEntity(BlockPos pos)
     {
-        if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        if (!Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
             return;
         }
@@ -780,7 +780,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     private void requestQueryEntityData(int entityId)
     {
-        if (!FeatureToggle.TWEAK_SERVER_DATA_SYNC_BACKUP.getBooleanValue())
+        if (!Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
             return;
         }
@@ -796,7 +796,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     private void requestServuxBlockEntityData(BlockPos pos)
     {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
         {
             HANDLER.encodeClientData(ServuxTweaksPacket.BlockEntityRequest(pos));
         }
@@ -804,7 +804,7 @@ public class ServerDataSyncer implements IClientTickHandler, IDataSyncer
 
     private void requestServuxEntityData(int entityId)
     {
-        if (FeatureToggle.TWEAK_SERVER_DATA_SYNC.getBooleanValue())
+        if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
         {
             HANDLER.encodeClientData(ServuxTweaksPacket.EntityRequest(entityId));
         }

@@ -18,7 +18,8 @@ import net.minecraft.util.math.BlockPos;
 public class MixinLavaFogModifier
 {
     @Inject(method = "applyStartEndModifier", at = @At("RETURN"))
-    private void tweakeroo_redirectLavaFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void tweakeroo_redirectLavaFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance,
+                                           RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_LAVA_VISIBILITY.getBooleanValue())
         {

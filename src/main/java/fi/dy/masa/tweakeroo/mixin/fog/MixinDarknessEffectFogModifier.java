@@ -17,7 +17,8 @@ import net.minecraft.util.math.BlockPos;
 public class MixinDarknessEffectFogModifier
 {
     @Inject(method = "applyStartEndModifier", at = @At("RETURN"))
-    private void tweakeroo_redirectDarknessFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void tweakeroo_redirectDarknessFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientWorld world, float viewDistance,
+                                               RenderTickCounter tickCounter, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_DARKNESS_VISIBILITY.getBooleanValue())
         {

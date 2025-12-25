@@ -13,7 +13,7 @@ import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.data.ServerDataSyncer;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -141,7 +141,7 @@ public class RenderHandler implements IRenderer
 
                 if (player != null)
                 {
-                    Pair<Entity, NbtCompound> pair = ServerDataSyncer.getInstance().requestEntity(world, player.getId());
+                    Pair<Entity, NbtCompound> pair = EntityDataManager.getInstance().requestEntity(world, player.getId());
                     EnderChestInventory inv;
 
                     if (pair != null && pair.getRight() != null && pair.getRight().contains(NbtKeys.ENDER_ITEMS))

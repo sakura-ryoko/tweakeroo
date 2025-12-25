@@ -136,21 +136,15 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		}
 	}
 
-	private static class ButtonListener implements IButtonActionListener
+	private record ButtonListener(Type type, WidgetCameraPresetEntry widget) implements IButtonActionListener
 	{
-		private final Type type;
-		private final WidgetCameraPresetEntry widget;
-
-		public ButtonListener(Type type, WidgetCameraPresetEntry widget)
-		{
-			this.type = type;
-			this.widget = widget;
-		}
-
 		@Override
 		public void actionPerformedWithButton(ButtonBase button, int mouseButton)
 		{
-			if (this.widget.preset == null) return;
+			if (this.widget.preset == null)
+			{
+				return;
+			}
 			MinecraftClient mc = MinecraftClient.getInstance();
 
 			if (this.type == Type.RECALL)
@@ -203,10 +197,10 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 
 		public enum Type
 		{
-			RECALL      ("tweakeroo.gui.button.preset_entry.recall"),
-			RENAME      ("tweakeroo.gui.button.preset_entry.rename"),
-			SET_HERE    ("tweakeroo.gui.button.preset_entry.set_here"),
-			REMOVE      ("tweakeroo.gui.button.preset_entry.remove"),
+			RECALL("tweakeroo.gui.button.preset_entry.recall"),
+			RENAME("tweakeroo.gui.button.preset_entry.rename"),
+			SET_HERE("tweakeroo.gui.button.preset_entry.set_here"),
+			REMOVE("tweakeroo.gui.button.preset_entry.remove"),
 			;
 
 			private final String translationKey;
@@ -228,23 +222,14 @@ public class WidgetCameraPresetEntry extends WidgetListEntryBase<CameraPreset>
 		}
 	}
 
-	private static class PresetRenamer implements IStringConsumerFeedback
+	private record PresetRenamer(CameraPreset preset, WidgetCameraPresetEntry widget) implements IStringConsumerFeedback
 	{
-		private final WidgetCameraPresetEntry widget;
-		private final CameraPreset preset;
-
-		public PresetRenamer(CameraPreset preset, WidgetCameraPresetEntry widget)
-		{
-			this.widget = widget;
-			this.preset = preset;
-		}
-
 		@Override
 		public boolean setString(String string)
 		{
 			if (string.isEmpty())
 			{
-				string = "Preset "+this.preset.getId();
+				string = "Preset " + this.preset.getId();
 			}
 
 			String newName = CameraUtils.fixPresetName(string);
