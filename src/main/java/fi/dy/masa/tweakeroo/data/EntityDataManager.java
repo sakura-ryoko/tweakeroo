@@ -36,6 +36,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.datafixers.util.Either;
+import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
 import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
@@ -439,6 +440,16 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
     public void onWorldJoin()
     {
         // NO-OP
+    }
+
+    public void onEntityDataSyncToggled(ConfigBoolean config)
+    {
+        if (this.hasInValidServux)
+        {
+            this.reset(true);
+        }
+
+        // Do something?
     }
 
     public void requestMetadata()
