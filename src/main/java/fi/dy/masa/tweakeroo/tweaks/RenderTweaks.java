@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
-
-import fi.dy.masa.malilib.render.RenderUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -31,6 +29,7 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
@@ -48,9 +47,9 @@ import fi.dy.masa.tweakeroo.world.FakeWorld;
  */
 public class RenderTweaks
 {
-    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_BLACKLIST = new ConcurrentHashMap<Long, ListMapEntry>();
-    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_WHITELIST = new ConcurrentHashMap<Long, ListMapEntry>();
-    private static final ConcurrentHashMap<Long, ListMapEntry> CACHED_LIST = new ConcurrentHashMap<Long, ListMapEntry>();
+    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_BLACKLIST = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, ListMapEntry> SELECTIVE_WHITELIST = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, ListMapEntry> CACHED_LIST = new ConcurrentHashMap<>();
 
     public static final int PASSTHROUGH = 1024;
 
