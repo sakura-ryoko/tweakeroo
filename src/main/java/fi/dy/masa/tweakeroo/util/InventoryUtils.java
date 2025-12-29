@@ -1102,6 +1102,13 @@ public class InventoryUtils
         }
     }
 
+    // todo for easier forwards porting when the `ArmorItem` disappears
+    private static boolean checkChestSlot(ItemStack stack)
+    {
+//        return stack.getItem() instanceof ArmorItem && EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
+        return EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
+    }
+
     public static void swapElytraAndChestPlate(@Nullable Player player)
     {
         if (player == null || GuiUtils.getCurrentScreen() != null)
@@ -1112,10 +1119,7 @@ public class InventoryUtils
         AbstractContainerMenu container = player.containerMenu;
         ItemStack currentStack = player.getItemBySlot(EquipmentSlot.CHEST);
 
-        Predicate<ItemStack> stackFilterChestPlate = (s) -> EquipmentUtils.matchArmorSlot(s, EquipmentSlot.CHEST);
-                //s.getItem() instanceof ArmorItem &&
-                //((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
-                //s.get(DataComponentTypes.EQUIPPABLE).slot() == EquipmentSlot.CHEST;
+        Predicate<ItemStack> stackFilterChestPlate = (s) -> checkChestSlot(s);
 
         if (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack))
         {
