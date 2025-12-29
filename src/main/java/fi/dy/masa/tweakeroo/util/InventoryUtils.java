@@ -18,10 +18,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -1097,6 +1094,12 @@ public class InventoryUtils
         }
     }
 
+    // todo for easier forwards porting when the `ArmorItem` disappears
+    private static boolean checkChestSlot(ItemStack stack)
+    {
+        return stack.getItem() instanceof ArmorItem && ((ArmorItem) stack.getItem()).getSlotType() == EquipmentSlot.CHEST;
+    }
+
     public static void swapElytraAndChestPlate(@Nullable PlayerEntity player)
     {
         if (player == null || GuiUtils.getCurrentScreen() != null)
@@ -1107,9 +1110,7 @@ public class InventoryUtils
         ScreenHandler container = player.currentScreenHandler;
         ItemStack currentStack = player.getEquippedStack(EquipmentSlot.CHEST);
 
-        Predicate<ItemStack> stackFilterChestPlate = (s) -> EquipmentUtils.matchArmorSlot(s, EquipmentSlot.CHEST);
-                //s.getItem() instanceof ArmorItem &&
-                //((ArmorItem) s.getItem()).getSlotType() == EquipmentSlot.CHEST;
+        Predicate<ItemStack> stackFilterChestPlate = (s) -> checkChestSlot(s);
 
         if (currentStack.isEmpty() || stackFilterChestPlate.test(currentStack))
         {
