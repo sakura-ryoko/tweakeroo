@@ -156,6 +156,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigDouble			ZOOM_FOV_DIFFERENCE                 = new ConfigDouble      ("zoomFovDifference", 5, 0.01, 359.99).apply(GENERIC_KEY);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
@@ -277,7 +278,8 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_SILK_TOUCH_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
-                ZOOM_RESET_FOV_ON_ACTIVATE
+                ZOOM_RESET_FOV_ON_ACTIVATE,
+                ZOOM_FOV_DIFFERENCE
         );
 
         public static final ImmutableList<@NotNull IHotkey> HOTKEYS = ImmutableList.of(
