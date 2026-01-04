@@ -2,10 +2,13 @@ package fi.dy.masa.tweakeroo.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import com.sun.jna.platform.win32.COM.IUnknown;
 import net.minecraft.client.Minecraft;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.world.TickRateManager;
 import org.jetbrains.annotations.NotNull;
 
 import fi.dy.masa.malilib.config.*;
@@ -429,6 +432,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_VILLAGER_TRADE_LOCKING  = new ConfigBooleanClient  ("disableVillagerTradeLocking",          false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_WALL_UNSPRINT           = new ConfigBooleanHotkeyed("disableWallUnsprint",                  false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_WORLD_VIEW_BOB          = new ConfigBooleanHotkeyed("disableWorldViewBob",                  false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_TICKRATE_PLAYER_SLOWDOWN= new ConfigBooleanHotkeyed("disableTickRatePlayerSlowdown",        false, "").apply(DISABLE_KEY);
 
         public static final ImmutableList<@NotNull IHotkeyTogglable> OPTIONS = ImmutableList.of(
                 DISABLE_ARMOR_STAND_RENDERING,
@@ -477,7 +481,8 @@ public class Configs implements IConfigHandler
                 DISABLE_TILE_ENTITY_TICKING,
                 DISABLE_VILLAGER_TRADE_LOCKING,
                 DISABLE_WALL_UNSPRINT,
-                DISABLE_WORLD_VIEW_BOB
+                DISABLE_WORLD_VIEW_BOB,
+                DISABLE_TICKRATE_PLAYER_SLOWDOWN
         );
     }
 
@@ -491,6 +496,7 @@ public class Configs implements IConfigHandler
 //        public static final ConfigDouble        SNAP_AIM_LAST_PITCH                 = new ConfigDouble      ("snapAimLastPitch", 0, -135, 135).apply(INTERNAL_KEY);
 //        public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
         public static final ConfigInteger       SHULKER_MAX_STACK_SIZE              = new ConfigInteger     ("shulkerMaxStackSize", 64, 1, 99).apply(INTERNAL_KEY);
+        public static final ConfigFloat       REAL_TICK_RATE                        = new ConfigFloat       ("realTickRate", 20.0f, 1.0f, 10000.0f).apply(INTERNAL_KEY);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
                 DARKNESS_SCALE_VALUE_ORIGINAL,
@@ -498,7 +504,8 @@ public class Configs implements IConfigHandler
                 GAMMA_VALUE_ORIGINAL,
                 HOTBAR_SCROLL_CURRENT_ROW,
                 SLIME_BLOCK_SLIPPERINESS_ORIGINAL,
-                SHULKER_MAX_STACK_SIZE
+                SHULKER_MAX_STACK_SIZE,
+                REAL_TICK_RATE
         );
     }
 
@@ -532,6 +539,8 @@ public class Configs implements IConfigHandler
                 ConfigUtils.readConfigBase(root, "Lists", Configs.Lists.OPTIONS);
                 ConfigUtils.readHotkeyToggleOptions(root, "DisableHotkeys", "DisableToggles", Disable.OPTIONS);
                 ConfigUtils.readHotkeyToggleOptions(root, "TweakHotkeys", "TweakToggles", FeatureToggle.VALUES);
+
+                Internal.REAL_TICK_RATE.setFloatValue(Internal.REAL_TICK_RATE.getDefaultFloatValue());
 
                 //Tweakeroo.debugLog("loadFromFile(): Successfully loaded config file '{}'.", configFile.toAbsolutePath());
             }
@@ -617,6 +626,9 @@ public class Configs implements IConfigHandler
             ConfigUtils.writeConfigBase(root, "Lists", Configs.Lists.OPTIONS);
             ConfigUtils.writeHotkeyToggleOptions(root, "DisableHotkeys", "DisableToggles", Disable.OPTIONS);
             ConfigUtils.writeHotkeyToggleOptions(root, "TweakHotkeys", "TweakToggles", FeatureToggle.VALUES);
+
+            JsonObject internal = root.get("Internal").getAsJsonObject();
+            internal.remove("realTickRate");
 
             JsonUtils.writeJsonToFileAsPath(root, dir.resolve(CONFIG_FILE_NAME));
         }

@@ -26,8 +26,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -36,9 +39,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Callbacks
 {
+    private static final Logger log = LoggerFactory.getLogger(Callbacks.class);
     public static boolean skipWorldRendering;
 
     public static void init(Minecraft mc)
@@ -151,6 +157,7 @@ public class Callbacks
                 (cfg) ->
                         CachedTagManager.parseSilkTouchOverride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
         );
+        Configs.Disable.DISABLE_TICKRATE_PLAYER_SLOWDOWN.setValueChangeCallback(new TickRateYeetToggle());
     }
 
 	public static class FeatureCallbackF3Toggle implements IValueChangeCallback<IConfigBoolean>
@@ -333,6 +340,22 @@ public class Callbacks
             else
             {
                 ((IMixinAbstractBlock) Blocks.SLIME_BLOCK).setFriction((float) Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.getDoubleValue());
+            }
+        }
+    }
+    private static class TickRateYeetToggle implements IValueChangeCallback<ConfigBoolean> {
+        @Override
+        public void onValueChanged(ConfigBoolean config) {
+            Minecraft mc = Minecraft.getInstance();
+            ClientLevel level = mc.level;
+            if (level == null) return;
+
+            TickRateManager manager = level.tickRateManager();
+
+            if (config.getBooleanValue()) {
+                if (manager.tickrate() < 20) manager.setTickRate(20);
+            } else {
+                manager.setTickRate(Configs.Internal.REAL_TICK_RATE.getFloatValue());
             }
         }
     }
