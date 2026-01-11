@@ -11,6 +11,15 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 
+/**
+ * I do NOT like making this many changes to Vanilla functionality;
+ * but due to how other mods are designed; this makes this much effort
+ * necessary to maintain the `tweakGammaOverride` value; without
+ * being overridden too easily whenever they try to "reset" the
+ * vanilla values; such as with Sodium, for example.
+ * -
+ * @param <T>
+ */
 @Mixin(value = OptionInstance.class, priority = 1010)
 public abstract class MixinOptionInstance<T>
 {
