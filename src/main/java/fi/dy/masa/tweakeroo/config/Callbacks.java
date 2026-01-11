@@ -1,9 +1,27 @@
 package fi.dy.masa.tweakeroo.config;
 
-import fi.dy.masa.malilib.config.options.ConfigDouble;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
+import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.TickRateManager;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
+import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.*;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
@@ -21,30 +39,9 @@ import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.*;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
-import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
-import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.TickRateManager;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Callbacks
 {
-    private static final Logger log = LoggerFactory.getLogger(Callbacks.class);
     public static boolean skipWorldRendering;
 
     public static void init(Minecraft mc)
@@ -343,19 +340,28 @@ public class Callbacks
             }
         }
     }
-    private static class TickRateYeetToggle implements IValueChangeCallback<ConfigBoolean> {
+
+    public static class TickRateYeetToggle implements IValueChangeCallback<ConfigBoolean>
+    {
         @Override
-        public void onValueChanged(ConfigBoolean config) {
+        public void onValueChanged(ConfigBoolean config)
+        {
             Minecraft mc = Minecraft.getInstance();
             ClientLevel level = mc.level;
             if (level == null) return;
 
             TickRateManager manager = level.tickRateManager();
 
-            if (config.getBooleanValue()) {
-                if (manager.tickrate() < 20) manager.setTickRate(20);
-            } else {
-                manager.setTickRate(Configs.Internal.REAL_TICK_RATE.getFloatValue());
+            if (config.getBooleanValue())
+			{
+                if (manager.tickrate() < 20)
+                {
+	                manager.setTickRate(20);
+                }
+            }
+			else
+			{
+                manager.setTickRate(MiscUtils.realTickRate);
             }
         }
     }

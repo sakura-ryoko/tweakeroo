@@ -3,11 +3,13 @@ package fi.dy.masa.tweakeroo.event;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -88,6 +90,7 @@ public class WorldLoadListener implements IWorldLoadListener
 //	        this.readStoredDataPerDimension();
             EntityDataManager.getInstance().onWorldJoin();
 			CachedTagManager.startCache();
+	        MiscUtils.setRealTickRate();
         }
         else
         {
