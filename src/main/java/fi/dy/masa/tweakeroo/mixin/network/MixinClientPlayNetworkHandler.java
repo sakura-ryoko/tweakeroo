@@ -21,7 +21,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -232,5 +234,24 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
     private void tweakeroo_onChunkRenderDistanceCenterInject(ClientboundSetChunkCacheCenterPacket packet, CallbackInfo ci)
     {
         RenderTweaks.getFakeWorld().getChunkSource().setChunkMapCenter(packet.getX(), packet.getZ());
+    }
+
+    @ModifyArgs(method = "handleTickingState",
+                at = @At(value = "INVOKE",
+                         target = "Lnet/minecraft/world/TickRateManager;setTickRate(F)V"
+                )
+    )
+    private void tweakeroo_stopPlayerSlowdown(Args args)
+    {
+        float tickRate = args.get(0);
+        MiscUtils.setTickRate(tickRate);
+
+        if (Configs.Disable.DISABLE_TICKRATE_PLAYER_SLOWDOWN.getBooleanValue())
+        {
+            if (tickRate < 20.0f)
+            {
+                args.set(0, 20.0f);
+            }
+        }
     }
 }

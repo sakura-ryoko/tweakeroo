@@ -63,6 +63,7 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.position.PositionUtils;
+import fi.dy.masa.malilib.util.time.TickUtils;
 import fi.dy.masa.malilib.util.time.TimeFormat;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -97,6 +98,8 @@ public class MiscUtils
 //    private static PostKeyAction lastPeriodicUseValue;
 //    private static PostKeyAction lastPeriodicHoldAttackValue;
 //    private static PostKeyAction lastPeriodicHoldUseValue;
+
+    public static float realTickRate;
 
     public static void handlePlayerDeceleration()
     {
@@ -648,6 +651,16 @@ public class MiscUtils
         {
             InfoUtils.showGuiOrInGameMessage(Message.MessageType.ERROR, "Failed to write image to file: " + fileOut.toAbsolutePath());
         }
+    }
+
+    public static void setRealTickRate()
+    {
+        realTickRate = TickUtils.getTickRate();
+    }
+
+    public static void setTickRate(float value)
+    {
+        realTickRate = value;
     }
 
     public static boolean isShulkerBox(ItemStack stack)

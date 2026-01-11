@@ -2,11 +2,12 @@ package fi.dy.masa.tweakeroo.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.minecraft.client.Minecraft;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.client.Minecraft;
 
 import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.config.options.*;
@@ -428,6 +429,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_SKY_DARKNESS            = new ConfigBooleanHotkeyed("disableSkyDarkness",                   false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_SLIME_BLOCK_SLOWDOWN    = new ConfigBooleanHotkeyed("disableSlimeBlockSlowdown",            false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_STATUS_EFFECT_HUD       = new ConfigBooleanHotkeyed("disableStatusEffectHud",               false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_TICKRATE_PLAYER_SLOWDOWN= new ConfigBooleanHotkeyed("disableTickRatePlayerSlowdown",        false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_TILE_ENTITY_RENDERING   = new ConfigBooleanHotkeyed("disableTileEntityRendering",           false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_TILE_ENTITY_TICKING     = new ConfigBooleanClient  ("disableTileEntityTicking",             false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_VILLAGER_TRADE_LOCKING  = new ConfigBooleanClient  ("disableVillagerTradeLocking",          false, "").apply(DISABLE_KEY);
@@ -477,6 +479,7 @@ public class Configs implements IConfigHandler
                 DISABLE_SKY_DARKNESS,
                 DISABLE_SLIME_BLOCK_SLOWDOWN,
                 DISABLE_STATUS_EFFECT_HUD,
+                DISABLE_TICKRATE_PLAYER_SLOWDOWN,
                 DISABLE_TILE_ENTITY_RENDERING,
                 DISABLE_TILE_ENTITY_TICKING,
                 DISABLE_VILLAGER_TRADE_LOCKING,
@@ -536,7 +539,6 @@ public class Configs implements IConfigHandler
                 ConfigUtils.readConfigBase(root, "Lists", Configs.Lists.OPTIONS);
                 ConfigUtils.readHotkeyToggleOptions(root, "DisableHotkeys", "DisableToggles", Disable.OPTIONS);
                 ConfigUtils.readHotkeyToggleOptions(root, "TweakHotkeys", "TweakToggles", FeatureToggle.VALUES);
-
                 //Tweakeroo.debugLog("loadFromFile(): Successfully loaded config file '{}'.", configFile.toAbsolutePath());
             }
         }
