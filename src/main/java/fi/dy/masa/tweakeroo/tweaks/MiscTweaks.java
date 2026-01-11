@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import java.util.*;
 import java.util.function.Consumer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
@@ -376,6 +377,10 @@ public class MiscTweaks
         }
     }
 
+    /**
+     * I don't like this.  Let's just keep using the ugly Vanilla value change warnings instead.
+     */
+    @ApiStatus.Experimental
     public enum GammaOverrideValue implements OptionInstance.SliderableValueSet<Double>
     {
         INSTANCE;
