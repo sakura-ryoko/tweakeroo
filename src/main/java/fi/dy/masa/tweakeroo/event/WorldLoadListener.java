@@ -22,6 +22,7 @@ import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
+import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
@@ -64,6 +65,8 @@ public class WorldLoadListener implements IWorldLoadListener
 
         if (worldBefore == null)
         {
+	        MiscTweaks.setKeybindStates();
+
             if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
             {
                 FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);

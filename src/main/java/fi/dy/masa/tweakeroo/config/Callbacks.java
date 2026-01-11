@@ -180,11 +180,6 @@ public class Callbacks
 			{
 				profile.setStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugScreenEntryStatus.ALWAYS_ON);
 			}
-			else if (!enable &&
-					profile.getStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugScreenEntryStatus.IN_OVERLAY)
-			{
-				profile.setStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugScreenEntryStatus.IN_OVERLAY);
-			}
 		}
 	}
 

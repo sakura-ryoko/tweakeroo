@@ -3,6 +3,8 @@ package fi.dy.masa.tweakeroo.tweaks;
 import javax.annotation.Nullable;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,7 +17,11 @@ import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import java.util.*;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.Codec;
+
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigInteger;
 import fi.dy.masa.malilib.gui.Message;
@@ -32,8 +38,8 @@ public class MiscTweaks
     public static final EntityRestriction ENTITY_TYPE_ATTACK_RESTRICTION = new EntityRestriction();
     public static final PotionRestriction POTION_RESTRICTION = new PotionRestriction();
 
-    private static final KeybindState KEY_STATE_ATTACK = new KeybindState(Minecraft.getInstance().options.keyAttack, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoAttack());
-    private static final KeybindState KEY_STATE_USE = new KeybindState(Minecraft.getInstance().options.keyUse, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoItemUse());
+    private static KeybindState KEY_STATE_ATTACK;
+    private static KeybindState KEY_STATE_USE;
 
     private static int potionWarningTimer;
 
@@ -348,6 +354,54 @@ public class MiscTweaks
         catch (Exception e)
         {
             return null;
+        }
+    }
+
+    public static void setKeybindStates()
+    {
+        Options opts = Minecraft.getInstance().options;
+
+	    KEY_STATE_ATTACK = new KeybindState(opts.keyAttack, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoAttack());
+	    KEY_STATE_USE = new KeybindState(opts.keyUse, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoItemUse());
+    }
+
+    public static void onVanillaGammaChange(Double previous, Double newValue)
+    {
+        Tweakeroo.debugLog("onVanillaGammaChange: [{}] -> [{}]", previous, newValue);
+
+        if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
+        {
+            FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
+            MiscUtils.toggleGammaOverrideWithMessage();
+        }
+    }
+
+    public enum GammaOverrideValue implements OptionInstance.SliderableValueSet<Double>
+    {
+        INSTANCE;
+
+        @Override
+        public double toSliderValue(Double value)
+        {
+            return value;
+        }
+
+        @Override
+        public Double fromSliderValue(double value)
+        {
+            return value;
+        }
+
+        @Override
+        public @NonNull Optional<Double> validateValue(Double value)
+        {
+            return value >= 0.0 && value <= 32.0 ? Optional.of(value) : Optional.empty();
+        }
+
+        @Override
+        public @NonNull Codec<Double> codec()
+        {
+            return Codec.withAlternative(Codec.doubleRange(0.0, 32.0), Codec.BOOL, boolean_ -> boolean_ ? 32.0 : 0.0);
         }
     }
 }

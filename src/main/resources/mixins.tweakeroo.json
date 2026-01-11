@@ -76,6 +76,7 @@
         "network.MixinDataQueryHandler",
         "option.IMixinSimpleOption",
         "option.MixinGameOptions",
+        "option.MixinOptionInstance",
         "render.MixinBeaconBlockEntityRenderer",
         "render.MixinBlockEntityRenderManager",
         "render.MixinEntityRenderManager",

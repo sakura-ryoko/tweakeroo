@@ -9,4 +9,7 @@ public interface IMixinSimpleOption<T>
 {
     @Accessor("value")
     void tweakeroo_setValueWithoutCheck(T value);
+
+    @Accessor("value")
+    T tweakeroo_getValueWithoutCheck();
 }
