@@ -155,6 +155,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", false, "").apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
+        public static final ConfigDouble			ZOOM_FOV_DIFFERENCE                 = new ConfigDouble      ("zoomFovDifference", 1, 0.01, 359.99).apply(GENERIC_KEY);
+        public static final ConfigDouble            ZOOM_FOV_DIFFERENCE_CTRL            = new ConfigDouble      ("zoomFovDifferenceCtrl", 5, 0, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
@@ -277,6 +279,8 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_SILK_TOUCH_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
+                ZOOM_FOV_DIFFERENCE,
+                ZOOM_FOV_DIFFERENCE_CTRL,
                 ZOOM_RESET_FOV_ON_ACTIVATE
         );
 
