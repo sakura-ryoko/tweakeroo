@@ -29,6 +29,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -99,7 +100,7 @@ public class MiscUtils
 //    private static PostKeyAction lastPeriodicHoldAttackValue;
 //    private static PostKeyAction lastPeriodicHoldUseValue;
 
-    public static float realTickRate;
+    public static float realTickRate = 20.0f;
 
     public static void handlePlayerDeceleration()
     {
