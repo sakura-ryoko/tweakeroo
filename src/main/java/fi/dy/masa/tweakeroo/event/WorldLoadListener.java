@@ -28,7 +28,7 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
-    @Override
+	@Override
     public void onWorldLoadImmutable(RegistryAccess.Frozen immutable)
     {
         RenderTweaks.setDynamicRegistryManager(immutable);
@@ -93,11 +93,12 @@ public class WorldLoadListener implements IWorldLoadListener
 //	        this.readStoredDataPerDimension();
             EntityDataManager.getInstance().onWorldJoin();
 			CachedTagManager.startCache();
-	        MiscUtils.setRealTickRate();
+			MiscUtils.setRealTickRate();
         }
         else
         {
             Configs.Internal.SHULKER_MAX_STACK_SIZE.resetToDefault();
+			MiscUtils.setTickRate(MiscUtils.DEFAULT_TICK_RATE);
         }
     }
 

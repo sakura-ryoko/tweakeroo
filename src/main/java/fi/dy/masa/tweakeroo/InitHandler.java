@@ -13,10 +13,7 @@ import fi.dy.masa.tweakeroo.config.Callbacks;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
-import fi.dy.masa.tweakeroo.event.ClientTickHandler;
-import fi.dy.masa.tweakeroo.event.InputHandler;
-import fi.dy.masa.tweakeroo.event.RenderHandler;
-import fi.dy.masa.tweakeroo.event.WorldLoadListener;
+import fi.dy.masa.tweakeroo.event.*;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import net.minecraft.client.Minecraft;
 

@@ -248,9 +248,9 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
 
         if (Configs.Disable.DISABLE_TICKRATE_PLAYER_SLOWDOWN.getBooleanValue())
         {
-            if (tickRate < 20.0f)
+            if (tickRate < MiscUtils.DEFAULT_TICK_RATE)
             {
-                args.set(0, 20.0f);
+                args.set(0, MiscUtils.DEFAULT_TICK_RATE);
             }
         }
     }
