@@ -93,6 +93,7 @@ public class WorldLoadListener implements IWorldLoadListener
 //	        this.readStoredDataPerDimension();
             EntityDataManager.getInstance().onWorldJoin();
 			CachedTagManager.startCache();
+			MiscUtils.setRealTickRate();
         }
         else
         {

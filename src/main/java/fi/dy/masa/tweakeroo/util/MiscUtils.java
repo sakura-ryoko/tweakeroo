@@ -29,7 +29,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -100,7 +99,10 @@ public class MiscUtils
 //    private static PostKeyAction lastPeriodicHoldAttackValue;
 //    private static PostKeyAction lastPeriodicHoldUseValue;
 
-    public static float realTickRate = 20.0f;
+    public static final float DEFAULT_TICK_RATE = 20.0F;
+    public static final float MIN_TICK_RATE = 1.0F;
+    public static final float MAX_TICK_RATE = 10000.0F;
+    private static float realTickRate = -1.0f;
 
     public static void handlePlayerDeceleration()
     {
@@ -656,12 +658,27 @@ public class MiscUtils
 
     public static void setRealTickRate()
     {
-        realTickRate = TickUtils.getTickRate();
+        setTickRate(TickUtils.getTickRate());
     }
 
     public static void setTickRate(float value)
     {
-        realTickRate = value;
+        realTickRate = Math.clamp(value, MIN_TICK_RATE, MAX_TICK_RATE);
+    }
+
+    public static float getRealTickRate()
+    {
+        if (realTickRate < MIN_TICK_RATE || realTickRate > MAX_TICK_RATE)
+        {
+            setRealTickRate();
+
+            if (realTickRate < MIN_TICK_RATE || realTickRate > MAX_TICK_RATE)
+            {
+                realTickRate = DEFAULT_TICK_RATE;
+            }
+        }
+
+        return realTickRate;
     }
 
     public static boolean isShulkerBox(ItemStack stack)
