@@ -25,10 +25,14 @@ import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
-    @Override
+	private static final Logger log = LoggerFactory.getLogger(WorldLoadListener.class);
+
+	@Override
     public void onWorldLoadImmutable(RegistryAccess.Frozen immutable)
     {
         RenderTweaks.setDynamicRegistryManager(immutable);
@@ -98,6 +102,7 @@ public class WorldLoadListener implements IWorldLoadListener
         else
         {
             Configs.Internal.SHULKER_MAX_STACK_SIZE.resetToDefault();
+			MiscUtils.setTickRate(20.0f);
         }
     }
 

@@ -15,7 +15,6 @@ import fi.dy.masa.tweakeroo.data.DataManager;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.event.*;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
-import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.minecraft.client.Minecraft;
 
 public class InitHandler implements IInitializationHandler
@@ -49,7 +48,5 @@ public class InitHandler implements IInitializationHandler
 
 	    ClientCommandHandler.INSTANCE.registerCommand(new FcCommand());
         Callbacks.init(Minecraft.getInstance());
-
-        ClientLoginConnectionEvents.DISCONNECT.register(new LoginDisconnectListener());
     }
 }
