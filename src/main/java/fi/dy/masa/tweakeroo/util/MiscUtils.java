@@ -73,6 +73,7 @@ import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinCommandBlockExecutor;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
+import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.mixin.screen.IMixinCustomizeFlatLevelScreen;
 import fi.dy.masa.tweakeroo.mixin.world.IMixinClientWorld;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
@@ -781,12 +782,38 @@ public class MiscUtils
     }
 
 	public static void toggleGammaOverrideWithMessage()
+    {
+        toggleGammaOverrideWithMessage(false);
+    }
+
+    public static void toggleGammaOverrideWithMessage(boolean disableCallback)
 	{
 		boolean orig = FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue();
 
 		if (!orig)
 		{
-			FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(true);
+            // Do the same thing as the Key Callback, just without the Warning messages
+            if (disableCallback)
+            {
+                Minecraft mc = Minecraft.getInstance();
+                double gamma = Configs.Generic.GAMMA_OVERRIDE_VALUE.getDoubleValue();
+
+                FeatureToggle.TWEAK_GAMMA_OVERRIDE.setEnabledNoCallback();
+                Configs.Internal.GAMMA_VALUE_ORIGINAL.setDoubleValue(mc.options.gamma().get());
+
+                @SuppressWarnings("unchecked")
+                IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) mc.options.gamma();
+
+                if (opt != null)
+                {
+                    opt.tweakeroo_setValueWithoutCheck(gamma);
+                }
+            }
+            else
+            {
+                FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(true);
+            }
+
 			InfoUtils.printBooleanConfigToggleMessage(FeatureToggle.TWEAK_GAMMA_OVERRIDE.getPrettyName(), true);
 		}
 		else

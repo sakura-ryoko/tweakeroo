@@ -2,31 +2,13 @@ package fi.dy.masa.tweakeroo.event;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.render.GuiContext;
-import fi.dy.masa.malilib.util.ActiveMode;
-import fi.dy.masa.malilib.util.InventoryUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.data.tag.CompoundData;
-import fi.dy.masa.malilib.util.nbt.NbtInventory;
-import fi.dy.masa.malilib.util.nbt.NbtKeys;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.data.EntityDataManager;
-import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
-import fi.dy.masa.tweakeroo.renderer.RenderUtils;
-import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +20,25 @@ import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.render.GuiContext;
+import fi.dy.masa.malilib.util.ActiveMode;
+import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.data.tag.CompoundData;
+import fi.dy.masa.malilib.util.data.tag.ListData;
+import fi.dy.masa.malilib.util.nbt.NbtInventory;
+import fi.dy.masa.malilib.util.nbt.NbtKeys;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.config.Hotkeys;
+import fi.dy.masa.tweakeroo.data.EntityDataManager;
+import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
+import fi.dy.masa.tweakeroo.renderer.RenderUtils;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 
 public class RenderHandler implements IRenderer
 {
@@ -169,11 +170,11 @@ public class RenderHandler implements IRenderer
 	                {
 		                try (NbtInventory nbtInv = NbtInventory.fromInventory(inv))
 		                {
-			                ListTag list = nbtInv.toNbtList(world.registryAccess());
-			                CompoundTag nbt = new CompoundTag();
+                            CompoundData data = new CompoundData();
+			                ListData list = nbtInv.toDataList(world.registryAccess());
 
-			                nbt.put(NbtKeys.ENDER_ITEMS, list);
-			                fi.dy.masa.malilib.render.RenderUtils.renderNbtItemsPreview(ctx, stack, nbt, x, y, false);
+                            data.put(NbtKeys.ENDER_ITEMS, list);
+			                fi.dy.masa.malilib.render.RenderUtils.renderDataItemsPreview(ctx, stack, data, x, y, false);
 		                }
 		                catch (Exception ignored) { }
 	                }

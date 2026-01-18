@@ -10,6 +10,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.TickRateManager;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -23,6 +24,7 @@ import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.hotkeys.*;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.render.InventoryOverlayScreen;
@@ -236,7 +238,14 @@ public class Callbacks
 
             if (config.getBooleanValue())
             {
-                Configs.Internal.GAMMA_VALUE_ORIGINAL.setDoubleValue(this.mc.options.gamma().get());
+				if (this.mc.player != null && this.mc.player.hasEffect(MobEffects.NIGHT_VISION))
+				{
+					// Warn Only; Do not change because the
+					// Night Vision status persists while it's being removed.
+					InfoUtils.showInGameMessage(Message.MessageType.WARNING, "tweakeroo.message.gamma_override.night_vision_warn");
+				}
+
+	            Configs.Internal.GAMMA_VALUE_ORIGINAL.setDoubleValue(this.mc.options.gamma().get());
                 gamma = Configs.Generic.GAMMA_OVERRIDE_VALUE.getDoubleValue();
             }
             else

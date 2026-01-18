@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import fi.dy.masa.malilib.gui.Message;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
@@ -86,39 +88,44 @@ public abstract class MixinLivingEntity extends Entity
 	@Inject(method = "onEffectAdded", at = @At("HEAD"))
 	private void tweakeroo$onStatusEffectApplied(MobEffectInstance effect, Entity source, CallbackInfo ci)
 	{
+		if (!this.level().isClientSide()) return;
+
 		if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue() &&
 			effect.getEffect() == MobEffects.NIGHT_VISION)
 		{
-			MiscUtils.toggleGammaOverrideWithMessage();
+			InfoUtils.showInGameMessage(Message.MessageType.WARNING, "tweakeroo.message.gamma_override.night_vision_warn");
+//			MiscUtils.toggleGammaOverrideWithMessage();
 			this.wasGammaOverriden = true;
 		}
 	}
 
-	@Inject(method = "onEffectUpdated", at = @At("HEAD"))
-	private void tweakeroo$onStatusEffectUpgraded(MobEffectInstance effect, boolean reapplyEffect, Entity source, CallbackInfo ci)
-	{
-		if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue() &&
-			effect.getEffect() == MobEffects.NIGHT_VISION)
-		{
-			MiscUtils.toggleGammaOverrideWithMessage();
-			this.wasGammaOverriden = true;
-		}
-	}
+//	@Inject(method = "onEffectUpdated", at = @At("HEAD"))
+//	private void tweakeroo$onStatusEffectUpgraded(MobEffectInstance effect, boolean reapplyEffect, Entity source, CallbackInfo ci)
+//	{
+//		if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue() &&
+//			effect.getEffect() == MobEffects.NIGHT_VISION)
+//		{
+//			InfoUtils.showInGameMessage(Message.MessageType.WARNING, "tweakeroo.message.gamma_override.night_vision_warn");
+////			MiscUtils.toggleGammaOverrideWithMessage();
+//			this.wasGammaOverriden = true;
+//		}
+//	}
 
-	@Inject(method = "onEffectsRemoved", at = @At("HEAD"))
+	@Inject(method = "onEffectsRemoved", at = @At("TAIL"))
 	private void tweakeroo$onStatusEffectRemoved(Collection<MobEffectInstance> effects, CallbackInfo ci)
 	{
-		if (this.wasGammaOverriden)
+		if (this.wasGammaOverriden || FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
 		{
 			for (MobEffectInstance entry : effects)
 			{
 				if (entry.getEffect() == MobEffects.NIGHT_VISION)
 				{
-					if (!FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
+					if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
 					{
-						MiscUtils.toggleGammaOverrideWithMessage();
+						FeatureToggle.TWEAK_GAMMA_OVERRIDE.setDisabledNoCallback();
 					}
 
+					MiscUtils.toggleGammaOverrideWithMessage(true);
 					this.wasGammaOverriden = false;
 					break;
 				}
