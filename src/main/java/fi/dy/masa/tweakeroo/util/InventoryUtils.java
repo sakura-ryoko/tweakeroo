@@ -23,6 +23,7 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -573,6 +574,18 @@ public class InventoryUtils
             }
         }
 
+        if (Configs.Generic.TOOL_SWAP_GLASS_USES_PICKAXE_FIRST.getBooleanValue() && isGlassBlock(state))
+        {
+            if (EquipmentUtils.isPickAxe(testedStack))
+            {
+                return applyGlassUsesPickaxeFirst(testedStack, previousTool);
+            }
+            else if (EquipmentUtils.isPickAxe(previousTool))
+            {
+                return false;
+            }
+        }
+
         if (!testedStack.isEmpty() && isMisc &&
             Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && CachedTagManager.isNeedsShears(state) &&
             testedStack.isOf(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
@@ -604,6 +617,28 @@ public class InventoryUtils
         return EquipmentUtils.isCorrectTool(testedStack, state);
     }
 
+    private static boolean isGlassBlock(BlockState state)
+    {
+        return state.isIn(BlockTags.IMPERMEABLE) ||
+               state.isOf(Blocks.GLASS_PANE) ||
+               state.isOf(Blocks.BLACK_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.BLUE_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.BROWN_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.CYAN_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.GRAY_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.GREEN_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.LIGHT_GRAY_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.LIME_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.MAGENTA_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.ORANGE_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.PINK_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.PURPLE_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.RED_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.YELLOW_STAINED_GLASS_PANE) ||
+               state.isOf(Blocks.WHITE_STAINED_GLASS_PANE);
+    }
+
     // Even though an Axe is the "Correct tool" for Bamboo, a Sword is preferred
     private static boolean applyBambooNeedsSwordFirst(ItemStack testedStack, ItemStack previousTool)
     {
@@ -623,6 +658,26 @@ public class InventoryUtils
         }
 
         return true;
+    }
+
+    // Prefer Silk Touch, then Pickaxe, for glass blocks and panes
+    private static boolean applyGlassUsesPickaxeFirst(ItemStack testedStack, ItemStack previousTool)
+    {
+        final boolean testSilk = EquipmentUtils.hasSilkTouch(testedStack);
+        final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
+        final boolean testPickaxe = EquipmentUtils.isPickAxe(testedStack);
+        final boolean prevPickaxe = EquipmentUtils.isPickAxe(previousTool);
+        final int testRank = (testSilk ? 2 : 0) + (testPickaxe ? 1 : 0);
+        final int prevRank = (prevSilk ? 2 : 0) + (prevPickaxe ? 1 : 0);
+
+        if (testRank != prevRank)
+        {
+            return testRank > prevRank;
+        }
+
+        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
+        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+        return mats && enchants;
     }
 
     // Use shears if block needs shears.  Do this before needs_silk_touch, because
