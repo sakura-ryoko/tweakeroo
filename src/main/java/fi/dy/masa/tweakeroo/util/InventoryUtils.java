@@ -12,6 +12,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
@@ -36,7 +37,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.lang3.tuple.Pair;
-import fi.dy.masa.malilib.data.CachedBlockTags;
+import fi.dy.masa.malilib.data.CachedTagUtils;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -573,6 +574,20 @@ public class InventoryUtils
             }
         }
 
+        if (Configs.Generic.TOOL_SWAP_GLASS_USES_PICKAXE_FIRST.getBooleanValue() && isGlassBlock(state))
+        {
+            boolean testPickaxe = EquipmentUtils.isPickAxe(testedStack);
+            boolean prevPickaxe = EquipmentUtils.isPickAxe(previousTool);
+            boolean silkFirst = Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue();
+            boolean testSilk = silkFirst && EquipmentUtils.hasSilkTouch(testedStack);
+            boolean prevSilk = silkFirst && EquipmentUtils.hasSilkTouch(previousTool);
+
+            if (testPickaxe || prevPickaxe || testSilk || prevSilk)
+            {
+                return applyGlassUsesPickaxeFirst(testedStack, previousTool);
+            }
+        }
+
         if (!testedStack.isEmpty() && isMisc &&
             Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && CachedTagManager.isNeedsShears(state) &&
             testedStack.is(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
@@ -604,6 +619,13 @@ public class InventoryUtils
         return EquipmentUtils.isCorrectTool(testedStack, state);
     }
 
+    private static boolean isGlassBlock(BlockState state)
+    {
+        boolean isGlassPane = CachedTagUtils.matchBlockTag(fi.dy.masa.malilib.data.CachedTagManager.GLASS_PANES_KEY, state);
+        boolean isGlass = state.is(BlockTags.IMPERMEABLE);
+        return isGlass || isGlassPane;
+    }
+
     // Even though an Axe is the "Correct tool" for Bamboo, a Sword is preferred
     private static boolean applyBambooNeedsSwordFirst(ItemStack testedStack, ItemStack previousTool)
     {
@@ -623,6 +645,31 @@ public class InventoryUtils
         }
 
         return true;
+    }
+
+    // Prefer Silk Touch or Pickaxe first on glass depending on TOOL_SWAP_SILK_TOUCH_FIRST
+    private static boolean applyGlassUsesPickaxeFirst(ItemStack testedStack, ItemStack previousTool)
+    {
+        final boolean testSilk = EquipmentUtils.hasSilkTouch(testedStack);
+        final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
+        final boolean testPickaxe = EquipmentUtils.isPickAxe(testedStack);
+        final boolean prevPickaxe = EquipmentUtils.isPickAxe(previousTool);
+        final boolean silkFirst = Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue();
+        final int testRank = silkFirst
+                ? (testSilk ? 2 : 0) + (testPickaxe ? 1 : 0)
+                : (testPickaxe ? 2 : 0) + (testSilk ? 1 : 0);
+        final int prevRank = silkFirst
+                ? (prevSilk ? 2 : 0) + (prevPickaxe ? 1 : 0)
+                : (prevPickaxe ? 2 : 0) + (prevSilk ? 1 : 0);
+
+        if (testRank != prevRank)
+        {
+            return testRank > prevRank;
+        }
+
+        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
+        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+        return mats && enchants;
     }
 
     // Use shears if block needs shears.  Do this before needs_silk_touch, because

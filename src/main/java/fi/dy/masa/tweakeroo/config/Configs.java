@@ -149,6 +149,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_PREFER_SILK_TOUCH			= new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_BAMBOO_USES_SWORD_FIRST	= new ConfigBooleanHotkeyed ("toolSwapBambooUsesSwordFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_GLASS_USES_PICKAXE_FIRST	= new ConfigBooleanHotkeyed ("toolSwapGlassUsesPickaxeFirst", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_NEEDS_SHEARS_FIRST		= new ConfigBooleanHotkeyed ("toolSwapNeedsShearsFirst", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_FIRST			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_ORES			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
@@ -274,6 +275,7 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
                 TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
+                TOOL_SWAP_GLASS_USES_PICKAXE_FIRST,
                 TOOL_SWAP_NEEDS_SHEARS_FIRST,
                 TOOL_SWAP_SILK_TOUCH_FIRST,
                 TOOL_SWAP_SILK_TOUCH_ORES,
@@ -295,6 +297,7 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
                 TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
+                TOOL_SWAP_GLASS_USES_PICKAXE_FIRST,
                 TOOL_SWAP_NEEDS_SHEARS_FIRST,
                 TOOL_SWAP_SILK_TOUCH_FIRST,
                 TOOL_SWAP_SILK_TOUCH_ORES,
