@@ -954,6 +954,7 @@
     "tweakeroo.message.free_cam.preset_renamed": "Preset renamed: §a%s§r ('§c%s§r' -> '§a%s§r')",
     "tweakeroo.message.free_cam.preset_updated": "Preset updated: §a%s§r",
     "tweakeroo.message.free_cam.preset_wrong_dimension": "§cPreset [§b#%s, %s§r§c] is not in the same dimension.§r",
+    "tweakeroo.message.gamma_override.night_vision_warn": "Gamma Override does not work while Night Vision is active",
     "tweakeroo.message.potion_effects_running_out": "§6警告：%s 種藥水效果將於 %s 秒後消失！！§r",
     "tweakeroo.message.repair_mode.swapped_repairable_item_to_slot": "將可修復的物品移至第 %s 格中",
     "tweakeroo.message.set_after_clicker_count_to": "將快速點擊的次數修改為 %s",

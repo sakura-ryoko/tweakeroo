@@ -954,6 +954,7 @@
     "tweakeroo.message.free_cam.preset_renamed": "Preset renamed: §a%s§r ('§c%s§r' -> '§a%s§r')",
     "tweakeroo.message.free_cam.preset_updated": "Preset updated: §a%s§r",
     "tweakeroo.message.free_cam.preset_wrong_dimension": "§cPreset [§b#%s, %s§r§c] is not in the same dimension.§r",
+    "tweakeroo.message.gamma_override.night_vision_warn": "Gamma Override does not work while Night Vision is active",
     "tweakeroo.message.potion_effects_running_out": "§6!! WARNING - %s potion effect(s) about to run out in %s seconds !!§r",
     "tweakeroo.message.repair_mode.swapped_repairable_item_to_slot": "Swapped a repairable item to %s slot",
     "tweakeroo.message.set_after_clicker_count_to": "Set After Clicker count to %s",

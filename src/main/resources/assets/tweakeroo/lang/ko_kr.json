@@ -954,6 +954,7 @@
     "tweakeroo.message.free_cam.preset_renamed": "프리셋 이름 수정됨: §a%s§r ('§c%s§r' -> '§a%s§r')",
     "tweakeroo.message.free_cam.preset_updated": "프리셋 업데이트됨: §a%s§r",
     "tweakeroo.message.free_cam.preset_wrong_dimension": "§c프리셋 [§b#%s, %s§r§c] 은(는) 같은 차원에 있지 않습니다.§r",
+    "tweakeroo.message.gamma_override.night_vision_warn": "Gamma Override does not work while Night Vision is active",
     "tweakeroo.message.potion_effects_running_out": "§6!! 경고 - %s 포션 효과(들)이 %s 초 후에 소멸됩니다 !!§r",
     "tweakeroo.message.repair_mode.swapped_repairable_item_to_slot": "수리 가능한 아이템이 %s 슬롯으로 스왑되었습니다.",
     "tweakeroo.message.set_after_clicker_count_to": "클리커 이후 카운트를 %s(으)로 설정합니다.",
