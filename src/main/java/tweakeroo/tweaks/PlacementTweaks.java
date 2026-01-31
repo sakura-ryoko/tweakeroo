@@ -1037,7 +1037,7 @@ public class PlacementTweaks
             {
                 if (prop instanceof PropertyDirection)
                 {
-                    return ((PropertyDirection) prop).getAllowedValues().contains(facing);
+                    return ((PropertyDirection) prop).getAllowedValues().contains(facing.getVanillaDirection());
                 }
             }
         }
