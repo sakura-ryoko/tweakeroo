@@ -83,6 +83,7 @@
         "render.MixinExplosionEmitterParticle",
         "render.MixinGameRenderer",
         "render.MixinGameRenderer_ViewBob",
+        "render.MixinGui",
         "render.MixinHeldItemRenderer",
         "render.MixinMobSpawnerBlockEntityRenderer",
         "render.MixinParticleManager",

@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.gui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
@@ -11,13 +12,14 @@ import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.IConfigGuiAllTab;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
 
-public class GuiConfigs extends GuiConfigsBase
+public class GuiConfigs extends GuiConfigsBase implements IConfigGuiAllTab
 {
     // If you have an add-on mod, you can append stuff to these GUI lists by re-assigning a new list to it.
     // I'd recommend using your own config handler for the config serialization to/from config files.
@@ -43,6 +45,7 @@ public class GuiConfigs extends GuiConfigsBase
 
         for (ConfigGuiTab tab : ConfigGuiTab.values())
         {
+            if (!this.useAllTab() && tab == ConfigGuiTab.ALL) continue;
             x += this.createButton(x, y, -1, tab);
         }
     }
@@ -80,7 +83,8 @@ public class GuiConfigs extends GuiConfigsBase
     @Override
     protected boolean useKeybindSearch()
     {
-        return GuiConfigs.tab == ConfigGuiTab.TWEAKS ||
+        return GuiConfigs.tab == ConfigGuiTab.ALL ||
+               GuiConfigs.tab == ConfigGuiTab.TWEAKS ||
                GuiConfigs.tab == ConfigGuiTab.GENERIC_HOTKEYS ||
                GuiConfigs.tab == ConfigGuiTab.DISABLES;
     }
@@ -91,7 +95,11 @@ public class GuiConfigs extends GuiConfigsBase
         List<? extends IConfigBase> configs;
         ConfigGuiTab tab = GuiConfigs.tab;
 
-        if (tab == ConfigGuiTab.GENERIC)
+        if (tab == ConfigGuiTab.ALL && this.useAllTab())
+        {
+            return this.getAllConfigs();
+        }
+        else if (tab == ConfigGuiTab.GENERIC)
         {
             configs = Configs.Generic.OPTIONS;
         }
@@ -128,29 +136,45 @@ public class GuiConfigs extends GuiConfigsBase
         return new BooleanHotkeyGuiWrapper(config.getName(), config, config.getKeybind());
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    @Override
+    public boolean useAllTab()
     {
-        private final GuiConfigs parent;
-        private final ConfigGuiTab tab;
+        return true;
+    }
 
-        public ButtonListener(ConfigGuiTab tab, GuiConfigs parent)
-        {
-            this.tab = tab;
-            this.parent = parent;
-        }
+    @Override
+    public List<ConfigOptionWrapper> getAllConfigs()
+    {
+        List<ConfigOptionWrapper> configs = new ArrayList<>();
 
+        configs.addAll(ConfigOptionWrapper.createFor(Configs.Generic.OPTIONS));
+        configs.addAll(ConfigOptionWrapper.createFor(Configs.Fixes.OPTIONS));
+        configs.addAll(ConfigOptionWrapper.createFor(Configs.Lists.OPTIONS));
+        configs.addAll(ConfigOptionWrapper.createFor(YEET_LIST));
+        configs.addAll(ConfigOptionWrapper.createFor(TWEAK_LIST.stream().map(this::wrapConfig).toList()));
+        configs.addAll(ConfigOptionWrapper.createFor(Hotkeys.HOTKEY_LIST));
+
+        return configs;
+    }
+
+    private record ButtonListener(ConfigGuiTab tab, GuiConfigs parent) implements IButtonActionListener
+    {
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             GuiConfigs.tab = this.tab;
             this.parent.reCreateListWidget(); // apply the new config width
-            this.parent.getListWidget().resetScrollbarPosition();
+            if (this.parent.getListWidget() != null)
+            {
+                this.parent.getListWidget().resetScrollbarPosition();
+            }
             this.parent.initGui();
         }
     }
 
     public enum ConfigGuiTab
     {
+        ALL             (IConfigGuiAllTab.getTranslationKey()),
         GENERIC         ("tweakeroo.gui.button.config_gui.generic"),
         FIXES           ("tweakeroo.gui.button.config_gui.fixes"),
         LISTS           ("tweakeroo.gui.button.config_gui.lists"),

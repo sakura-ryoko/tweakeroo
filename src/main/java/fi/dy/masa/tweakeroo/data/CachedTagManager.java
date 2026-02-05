@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class CachedTagManager
 {
 	public static final CachedTagKey SILK_TOUCH_OVERRIDE_KEY    = new CachedTagKey(Reference.MOD_ID, "silk_touch_override");
+	public static final CachedTagKey NEEDS_PICKAXE_KEY          = new CachedTagKey(Reference.MOD_ID, "needs_pickaxe");
 	public static final CachedTagKey NEEDS_SHEARS_KEY           = new CachedTagKey(Reference.MOD_ID, "needs_shears");
 	public static final CachedTagKey NEEDS_SILK_TOUCH_KEY       = new CachedTagKey(Reference.MOD_ID, "needs_silk_touch");
 	public static final CachedTagKey ORE_BLOCKS_KEY             = new CachedTagKey(Reference.MOD_ID, "ore_blocks");
@@ -27,9 +28,39 @@ public class CachedTagManager
     {
         clearCache();
 
+	    CachedBlockTags.getInstance().build(NEEDS_PICKAXE_KEY, buildNeedsPickaxeCache());
 		CachedBlockTags.getInstance().build(NEEDS_SHEARS_KEY, buildNeedsShearsCache());
 		CachedBlockTags.getInstance().build(NEEDS_SILK_TOUCH_KEY, buildNeedsSilkTouchCache());
 		CachedBlockTags.getInstance().build(ORE_BLOCKS_KEY, buildOreBlocksCache());
+	}
+
+	private static List<String> buildNeedsPickaxeCache()
+	{
+		List<String> list = new ArrayList<>();
+
+		list.add("#"+BlockTags.IMPERMEABLE.location().toString());
+		// No Glass Pane block tag in Vanilla
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BLACK_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BLUE_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BROWN_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CYAN_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.GRAY_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.GREEN_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.LIGHT_GRAY_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.LIME_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.MAGENTA_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.ORANGE_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.PINK_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.PURPLE_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.RED_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.YELLOW_STAINED_GLASS_PANE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.WHITE_STAINED_GLASS_PANE).toString());
+		// Others?
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BEACON).toString());
+
+		return list;
 	}
 
 	private static List<String> buildNeedsShearsCache()
@@ -159,6 +190,11 @@ public class CachedTagManager
 		CachedBlockTags.getInstance().clearEntry(NEEDS_SILK_TOUCH_KEY);
 		CachedBlockTags.getInstance().clearEntry(ORE_BLOCKS_KEY);
     }
+
+	public static boolean isNeedsPickaxe(BlockState state)
+	{
+		return CachedBlockTags.getInstance().match(NEEDS_PICKAXE_KEY, state);
+	}
 
 	public static boolean isNeedsShears(BlockState state)
 	{

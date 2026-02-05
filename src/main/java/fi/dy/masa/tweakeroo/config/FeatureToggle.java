@@ -3,12 +3,12 @@ package fi.dy.masa.tweakeroo.config;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigBoolean;
-import fi.dy.masa.malilib.config.IConfigNotifiable;
-import fi.dy.masa.malilib.config.IHotkeyTogglable;
+import fi.dy.masa.malilib.config.IEnumBooleanHotkey;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 
-public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfigBoolean>
+public enum FeatureToggle implements IEnumBooleanHotkey
 {
     TWEAK_ACCURATE_BLOCK_PLACEMENT  ("tweakAccurateBlockPlacement",         false, ""),
     TWEAK_AFTER_CLICKER             ("tweakAfterClicker",                   false, "",    KeybindSettings.INGAME_BOTH),
@@ -130,6 +130,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     private boolean valueBoolean;
     private IValueChangeCallback<IConfigBoolean> callback;
     private boolean dirty = false;
+    private Pair<Boolean, String> lastBooleanHotkey;
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey)
     {
@@ -240,6 +241,7 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
         this.translatedName = translatedName;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBooleanConfigWithMessage(this));
+        this.updateLastBooleanHotkeyValue();
     }
 
     @Override
@@ -333,12 +335,14 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public void markDirty()
     {
+        this.getKeybind().markDirty();
         this.dirty = true;
     }
 
     @Override
     public void markClean()
     {
+        this.getKeybind().markClean();
         this.dirty = false;
     }
 
@@ -372,6 +376,21 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public void setValueFromString(String value)
     {
+        this.updateLastBooleanHotkeyValue();
+        boolean oldValue = this.valueBoolean;
+
+        switch (value)
+        {
+            case "true" -> this.valueBoolean = true;
+            case "false" -> this.valueBoolean = false;
+            default -> {}
+        }
+
+        if (oldValue != this.valueBoolean)
+        {
+            this.markClean();
+            this.onValueChanged();
+        }
     }
 
     @Override
@@ -410,16 +429,39 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public void setBooleanValue(boolean value)
     {
+        this.updateLastBooleanHotkeyValue();
         boolean oldValue = this.valueBoolean;
         this.valueBoolean = value;
 
         if (oldValue != this.valueBoolean)
         {
+            this.markClean();
             this.onValueChanged();
         }
     }
 
-	/**
+    @Override
+    public void toggleBooleanValue()
+    {
+        this.updateLastBooleanHotkeyValue();
+        this.valueBoolean = !this.valueBoolean;
+        this.markClean();
+        this.onValueChanged();
+    }
+
+    @Override
+    public boolean getLastBooleanValue()
+    {
+        return this.lastBooleanHotkey.getLeft();
+    }
+
+    @Override
+    public void updateLastBooleanValue()
+    {
+        this.updateLastBooleanHotkeyValue();
+    }
+
+    /**
 	 * Toggle ON without triggering a callback (Free Cam Preset Recall)
 	 */
 	public void setEnabledNoCallback()
@@ -453,13 +495,47 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public void resetToDefault()
     {
+        this.updateLastBooleanHotkeyValue();
         boolean oldValue = this.valueBoolean;
         this.valueBoolean = this.defaultValueBoolean;
 
         if (oldValue != this.valueBoolean)
         {
+            this.markClean();
             this.onValueChanged();
         }
+    }
+
+    @Override
+    public Pair<Boolean, String> getBooleanHotkeyValue()
+    {
+        return Pair.of(this.valueBoolean, this.keybind.getStringValue());
+    }
+
+    @Override
+    public Pair<Boolean, String> getDefaultBooleanHotkeyValue()
+    {
+        return Pair.of(this.defaultValueBoolean, this.keybind.getDefaultStringValue());
+    }
+
+    @Override
+    public void setBooleanHotkeyValue(Pair<Boolean, String> value)
+    {
+        this.updateLastBooleanHotkeyValue();
+        this.setBooleanValue(value.getLeft());
+        this.getKeybind().setValueFromString(value.getRight());
+    }
+
+    @Override
+    public Pair<Boolean, String> getLastBooleanHotkeyValue()
+    {
+        return this.lastBooleanHotkey;
+    }
+
+    @Override
+    public void updateLastBooleanHotkeyValue()
+    {
+        this.lastBooleanHotkey = Pair.of(this.valueBoolean, this.keybind.getStringValue());
     }
 
     @Override
@@ -471,15 +547,37 @@ public enum FeatureToggle implements IHotkeyTogglable, IConfigNotifiable<IConfig
     @Override
     public void setValueFromJsonElement(JsonElement element)
     {
+        final boolean oldBool = this.valueBoolean;
+        final String oldKeybind = this.keybind.getStringValue();
+
         try
         {
             if (element.isJsonPrimitive())
             {
-                this.setBooleanValue(element.getAsBoolean());
+                boolean temp = element.getAsBoolean();
+                this.valueBoolean = temp;       // This seems redundant, but this makes it safer from corruption
             }
             else
             {
                 Tweakeroo.LOGGER.warn("Failed to set config value for '{}' from the JSON element '{}'", this.getName(), element);
+            }
+
+            if (oldBool != this.valueBoolean ||
+                    oldKeybind != null && !oldKeybind.equals(this.keybind.getStringValue()) ||
+                    this.isDirty())
+            {
+                this.markClean();
+
+                if (!this.getLastBooleanHotkeyValue().equals(this.getBooleanHotkeyValue()))
+                {
+//                    Tweakeroo.LOGGER.error("[TWEAKS/{}]: setValueFromJsonElement(): LV: [{}], OV: [{}], NV: [{}]", this.getName(),
+//                                           this.getLastBooleanHotkeyValue().toString(),
+//                                           Pair.of(oldBool, oldKeybind).toString(),
+//                                           this.getBooleanHotkeyValue().toString()
+//                    );
+
+                    this.onValueChanged();
+                }
             }
         }
         catch (Exception e)

@@ -27,7 +27,7 @@ public abstract class MixinGameRenderer
 {
     @Shadow @Final private Minecraft minecraft;
     @Shadow public abstract void updateCamera(DeltaTracker deltaTracker);
-
+    @Shadow @Final private Camera mainCamera;
     @Unique private float realYaw;
     @Unique private float realPitch;
 
@@ -71,6 +71,11 @@ public abstract class MixinGameRenderer
     @Inject(method = "renderLevel", at = @At("RETURN"))
     private void tweakeroo_overrideRenderViewEntityPost(DeltaTracker deltaTracker, CallbackInfo ci)
     {
+        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
+        {
+            this.minecraft.getDebugOverlay().render3dCrosshair(this.mainCamera);
+        }
+
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
             Entity entity = this.minecraft.getCameraEntity();

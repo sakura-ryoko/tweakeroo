@@ -3,9 +3,6 @@ package fi.dy.masa.tweakeroo.config;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
-import net.minecraft.client.gui.components.debug.DebugScreenEntryList;
-import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -49,7 +46,7 @@ public class Callbacks
 
     public static void init(Minecraft mc)
     {
-		FeatureToggle.TWEAK_F3_CURSOR.setValueChangeCallback(new FeatureCallbackF3Toggle(FeatureToggle.TWEAK_F3_CURSOR, mc));
+//		FeatureToggle.TWEAK_F3_CURSOR.setValueChangeCallback(new FeatureCallbackF3Toggle(FeatureToggle.TWEAK_F3_CURSOR, mc));
         FeatureToggle.TWEAK_GAMMA_OVERRIDE.setValueChangeCallback(new FeatureCallbackGamma(FeatureToggle.TWEAK_GAMMA_OVERRIDE, mc));
         FeatureToggle.TWEAK_DARKNESS_VISIBILITY.setValueChangeCallback(new FeatureCallbackDarkness(FeatureToggle.TWEAK_DARKNESS_VISIBILITY, mc));
         Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.setValueChangeCallback(new FeatureCallbackSlime(Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN));
@@ -160,31 +157,31 @@ public class Callbacks
         Configs.Disable.DISABLE_TICKRATE_PLAYER_SLOWDOWN.setValueChangeCallback(new TickRateYeetToggle());
     }
 
-	public static class FeatureCallbackF3Toggle implements IValueChangeCallback<IConfigBoolean>
-	{
-		private final Minecraft mc;
-
-		public FeatureCallbackF3Toggle(FeatureToggle feature, Minecraft mc)
-		{
-			this.mc = mc;
-			this.applyValue(mc.debugEntries, feature.getBooleanValue());
-		}
-
-		@Override
-		public void onValueChanged(IConfigBoolean config)
-		{
-			this.applyValue(this.mc.debugEntries, config.getBooleanValue());
-		}
-
-		private void applyValue(DebugScreenEntryList profile, boolean enable)
-		{
-			if (enable &&
-					profile.getStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugScreenEntryStatus.ALWAYS_ON)
-			{
-				profile.setStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugScreenEntryStatus.ALWAYS_ON);
-			}
-		}
-	}
+//	public static class FeatureCallbackF3Toggle implements IValueChangeCallback<IConfigBoolean>
+//	{
+//		private final Minecraft mc;
+//
+//		public FeatureCallbackF3Toggle(FeatureToggle feature, Minecraft mc)
+//		{
+//			this.mc = mc;
+//			this.applyValue(mc.debugEntries, feature.getBooleanValue());
+//		}
+//
+//		@Override
+//		public void onValueChanged(IConfigBoolean config)
+//		{
+//			this.applyValue(this.mc.debugEntries, config.getBooleanValue());
+//		}
+//
+//		private void applyValue(DebugScreenEntryList profile, boolean enable)
+//		{
+//			if (enable &&
+//					profile.getStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR) != DebugScreenEntryStatus.ALWAYS_ON)
+//			{
+//				profile.setStatus(DebugScreenEntries.THREE_DIMENSIONAL_CROSSHAIR, DebugScreenEntryStatus.ALWAYS_ON);
+//			}
+//		}
+//	}
 
     public static class FeatureCallbackHold implements IValueChangeCallback<IConfigBoolean>
     {
@@ -368,7 +365,7 @@ public class Callbacks
 			{
 				final float tickRate = Math.clamp(MiscUtils.getRealTickRate(), MiscUtils.MIN_TICK_RATE, MiscUtils.MAX_TICK_RATE);
 
-				Tweakeroo.LOGGER.error("TickRateYeetToggle: Tick rate: {}", tickRate);
+				Tweakeroo.debugLog("[Debug] TickRateYeetToggle: Tick rate: {}", tickRate);
                 manager.setTickRate(tickRate);
             }
         }
