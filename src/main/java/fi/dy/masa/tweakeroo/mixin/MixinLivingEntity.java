@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +25,7 @@ public abstract class MixinLivingEntity extends Entity
     }
 
     @Redirect(method = "travel", at = @At(value = "FIELD", ordinal = 1,
-            target = "Lnet/minecraft/world/World;isClient:Z"))
+                                          target = "Lnet/minecraft/world/World;isClient:Z", opcode = Opcodes.GETFIELD))
     private boolean fixElytraLanding(World world)
     {
         return world.isClient && (Configs.Fixes.ELYTRA_FIX.getBooleanValue() == false || ((Object) this instanceof ClientPlayerEntity) == false);

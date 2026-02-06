@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +18,7 @@ import fi.dy.masa.tweakeroo.renderer.RenderUtils;
 public abstract class MixinBackgroundRenderer
 {
     @Inject(method = "applyFog(Lnet/minecraft/client/render/Camera;I)V", require = 0,
-            slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/tag/FluidTags;LAVA:Lnet/minecraft/tag/Tag;")),
+            slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/tag/FluidTags;LAVA:Lnet/minecraft/tag/Tag;", opcode = Opcodes.GETSTATIC)),
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;fogDensity(F)V",
                      ordinal = 0, shift = At.Shift.AFTER))
     private void onSetupLavaFog(Camera camera, int startCoords, CallbackInfo ci)

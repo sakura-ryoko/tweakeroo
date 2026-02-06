@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -60,7 +61,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Inject(method = "tickMovement", at = @At(value = "FIELD",
-                target = "Lnet/minecraft/entity/player/PlayerAbilities;allowFlying:Z", ordinal = 1))
+                                              target = "Lnet/minecraft/entity/player/PlayerAbilities;allowFlying:Z", ordinal = 1, opcode = org.objectweb.asm.Opcodes.GETFIELD))
     private void overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
@@ -73,7 +74,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Redirect(method = "tickMovement", at = @At(value = "FIELD",
-                target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z"))
+                                                target = "Lnet/minecraft/client/network/ClientPlayerEntity;horizontalCollision:Z", opcode = org.objectweb.asm.Opcodes.GETFIELD))
     private boolean overrideCollidedHorizontally(ClientPlayerEntity player)
     {
         if (Configs.Disable.DISABLE_WALL_UNSPRINT.getBooleanValue())
@@ -112,8 +113,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     }
 
     @Redirect(method = "tickMovement", at = @At(
-                value = "FIELD", ordinal = 1,
-                target = "Lnet/minecraft/entity/player/PlayerAbilities;allowFlying:Z"))
+            value = "FIELD", ordinal = 1,
+            target = "Lnet/minecraft/entity/player/PlayerAbilities;allowFlying:Z", opcode = org.objectweb.asm.Opcodes.GETFIELD))
     private boolean preventFlyStateToggle(PlayerAbilities abilities)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() && FeatureToggle.TWEAK_FREE_CAMERA_MOTION.getBooleanValue())

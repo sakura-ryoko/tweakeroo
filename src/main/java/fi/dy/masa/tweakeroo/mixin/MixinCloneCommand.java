@@ -10,7 +10,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 @Mixin(value = CloneCommand.class, priority = 999)
 public abstract class MixinCloneCommand
 {
-    @ModifyConstant(method = "execute", constant = @Constant(intValue = 32768), require = 0)
+    @ModifyConstant(method = "execute", constant = @Constant(intValue = 32768), require = 0, remap = false)
     private static int getBlockCountLimit(int original)
     {
         if (FeatureToggle.TWEAK_FILL_CLONE_LIMIT.getBooleanValue())

@@ -1,6 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
-import org.spongepowered.asm.lib.Opcodes;
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -15,9 +16,9 @@ public abstract class MixinUpdateStructureBlockC2SPacket
 {
     @ModifyConstant(method = "read",
             slice = @Slice(from = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
-                                      target = "Lnet/minecraft/server/network/packet/UpdateStructureBlockC2SPacket;offset:Lnet/minecraft/util/math/BlockPos;"),
+                                      target = "Lnet/minecraft/network/packet/c2s/play/UpdateStructureBlockC2SPacket;offset:Lnet/minecraft/util/math/BlockPos;"),
                            to   = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
-                                      target = "Lnet/minecraft/server/network/packet/UpdateStructureBlockC2SPacket;mirror:Lnet/minecraft/util/BlockMirror;")),
+                                      target = "Lnet/minecraft/network/packet/c2s/play/UpdateStructureBlockC2SPacket;mirror:Lnet/minecraft/util/BlockMirror;")),
             constant = @Constant(intValue = 32), require = 0)
     private int overrideStructureBlockSizeLimit(int original)
     {

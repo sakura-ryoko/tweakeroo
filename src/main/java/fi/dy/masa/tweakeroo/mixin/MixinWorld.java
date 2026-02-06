@@ -3,6 +3,8 @@ package fi.dy.masa.tweakeroo.mixin;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,7 +31,7 @@ public abstract class MixinWorld
 
     @Shadow
     @Final
-    private List<BlockEntity> unloadedBlockEntities;
+    protected List<BlockEntity> unloadedBlockEntities;
 
     @Inject(method = "tickEntity(Ljava/util/function/Consumer;Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void preventEntityTicking(Consumer<Entity> consumer, Entity entityIn, CallbackInfo ci)
@@ -53,7 +55,7 @@ public abstract class MixinWorld
     }
 
     @Inject(method = "tickBlockEntities",
-            at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;unloadedBlockEntities:Ljava/util/List;", ordinal = 0))
+            at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;unloadedBlockEntities:Ljava/util/List;", ordinal = 0, opcode = Opcodes.GETFIELD))
     private void optimizedTileEntityRemoval(CallbackInfo ci)
     {
         if (Configs.Fixes.TILE_UNLOAD_OPTIMIZATION.getBooleanValue())

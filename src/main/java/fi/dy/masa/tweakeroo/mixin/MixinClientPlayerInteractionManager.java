@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -83,7 +85,7 @@ public abstract class MixinClientPlayerInteractionManager
 
     @Inject(method = "attackBlock",
             slice = @Slice(from = @At(value = "FIELD", ordinal = 0,
-                                      target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;breakingBlock:Z")),
+                                      target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;breakingBlock:Z", opcode = Opcodes.GETFIELD)),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getBlockState(" +
                                                 "Lnet/minecraft/util/math/BlockPos;" +
                                                 ")Lnet/minecraft/block/BlockState;", ordinal = 0))

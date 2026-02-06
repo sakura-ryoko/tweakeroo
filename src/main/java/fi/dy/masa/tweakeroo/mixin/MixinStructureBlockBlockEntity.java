@@ -3,6 +3,8 @@ package fi.dy.masa.tweakeroo.mixin;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -30,9 +32,9 @@ public abstract class MixinStructureBlockBlockEntity extends BlockEntity
 
     @ModifyConstant(method = "fromTag",
                     slice = @Slice(from = @At(value = "FIELD",
-                                              target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;offset:Lnet/minecraft/util/math/BlockPos;"),
+                                              target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;offset:Lnet/minecraft/util/math/BlockPos;", opcode = Opcodes.PUTFIELD),
                                    to = @At(value = "FIELD",
-                                            target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;size:Lnet/minecraft/util/math/BlockPos;")),
+                                            target = "Lnet/minecraft/block/entity/StructureBlockBlockEntity;size:Lnet/minecraft/util/math/BlockPos;", opcode = Opcodes.PUTFIELD)),
                     constant = @Constant(intValue = 32), require = 0)
     private int overrideMaxSize(int original)
     {

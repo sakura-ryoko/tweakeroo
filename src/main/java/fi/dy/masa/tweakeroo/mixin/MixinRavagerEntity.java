@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -10,8 +12,8 @@ import fi.dy.masa.tweakeroo.config.Configs;
 public abstract class MixinRavagerEntity
 {
     @Redirect(method = "tickMovement", at = @At(
-                value = "FIELD",
-                target = "Lnet/minecraft/entity/mob/RavagerEntity;horizontalCollision:Z"))
+            value = "FIELD",
+            target = "Lnet/minecraft/entity/mob/RavagerEntity;horizontalCollision:Z", opcode = Opcodes.GETFIELD))
     private boolean fixDontBreakBlocksOnClient(RavagerEntity entity)
     {
         if (Configs.Fixes.RAVAGER_CLIENT_BLOCK_BREAK_FIX.getBooleanValue())

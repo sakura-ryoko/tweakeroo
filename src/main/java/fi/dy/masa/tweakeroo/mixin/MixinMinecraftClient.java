@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -137,7 +139,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
     }
 
     @Redirect(method = "drawProfilerResults", require = 0, allow = 5, at = @At(value = "FIELD",
-                        target = "Lnet/minecraft/util/profiler/ProfilerTiming;name:Ljava/lang/String;"))
+                                                                               target = "Lnet/minecraft/util/profiler/ProfilerTiming;name:Ljava/lang/String;", opcode = Opcodes.GETFIELD))
     private String fixProfilerSectionDisplayName(ProfilerTiming timing)
     {
         // ProfileResultImpl switched to using '\u001e', which looks horrible when printed, so return back to the old dot

@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -17,9 +19,9 @@ public abstract class MixinExplosion
               slice = @Slice(
                             from = @At("HEAD"),
                             to = @At(value = "FIELD",
-                                     target = "Lnet/minecraft/world/explosion/Explosion;affectedBlocks:Ljava/util/List;")),
+                                     target = "Lnet/minecraft/world/explosion/Explosion;affectedBlocks:Ljava/util/List;", opcode = Opcodes.GETFIELD)),
               at = @At(value = "FIELD",
-                       target = "Lnet/minecraft/particle/ParticleTypes;EXPLOSION_EMITTER:Lnet/minecraft/particle/DefaultParticleType;"))
+                       target = "Lnet/minecraft/particle/ParticleTypes;EXPLOSION_EMITTER:Lnet/minecraft/particle/DefaultParticleType;", opcode = Opcodes.GETSTATIC))
     private DefaultParticleType redirectSpawnParticles()
     {
         if (FeatureToggle.TWEAK_EXPLOSION_REDUCED_PARTICLES.getBooleanValue())

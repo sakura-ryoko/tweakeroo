@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import org.objectweb.asm.Opcodes;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +25,7 @@ public abstract class MixinInGameHud extends DrawableHelper
     @Shadow private int scaledWidth;
 
     @Inject(method = "renderCrosshair", at = @At(value = "FIELD",
-                target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z", ordinal = 0), cancellable = true)
+                                                 target = "Lnet/minecraft/client/options/GameOptions;debugEnabled:Z", ordinal = 0, opcode = Opcodes.GETFIELD), cancellable = true)
     private void overrideCursorRender(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
