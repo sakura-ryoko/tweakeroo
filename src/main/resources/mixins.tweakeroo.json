@@ -17,7 +17,6 @@
         "block.MixinSculkSensor",
         "block.MixinSignBlockEntity",
         "block.MixinSlimeBlock",
-        "block.MixinStructureBlockBlockEntity",
         "entity.MixinBatEntity",
         "entity.MixinBlockAttachedEntity",
         "entity.MixinEntity",
@@ -40,7 +39,6 @@
         "world.IMixinChunkLightProvider",
         "world.MixinLightingProvider",
         "world.MixinServerChunkLoadingManager",
-        "world.MixinUpdateStructureBlockC2SPacket",
         "world.MixinWorld"
     ],
     "client": [

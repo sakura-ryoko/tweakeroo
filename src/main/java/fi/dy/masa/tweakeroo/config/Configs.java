@@ -142,7 +142,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        	SNAP_AIM_THRESHOLD_PITCH            = new ConfigDouble      ("snapAimThresholdPitch", 1.5).apply(GENERIC_KEY);
         public static final ConfigDouble        	SNAP_AIM_THRESHOLD_YAW              = new ConfigDouble      ("snapAimThresholdYaw", 5.0).apply(GENERIC_KEY);
         public static final ConfigDouble        	SNAP_AIM_YAW_STEP                   = new ConfigDouble      ("snapAimYawStep", 45, 0, 360).apply(GENERIC_KEY);
-        public static final ConfigInteger       	STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
+//        public static final ConfigInteger       	STRUCTURE_BLOCK_MAX_SIZE            = new ConfigInteger     ("structureBlockMaxSize", 128, 1, 256).apply(GENERIC_KEY);
         public static final ConfigString        	TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
         public static final ConfigString        	TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
 	    public static final ConfigBooleanHotkeyed	TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK= new ConfigBooleanHotkeyed ("toolSwapAllowUnenchantedToBreak", false, "").apply(GENERIC_KEY);
@@ -268,7 +268,7 @@ public class Configs implements IConfigHandler
                 SNAP_AIM_THRESHOLD_PITCH,
                 SNAP_AIM_THRESHOLD_YAW,
                 SNAP_AIM_YAW_STEP,
-                STRUCTURE_BLOCK_MAX_SIZE,
+//                STRUCTURE_BLOCK_MAX_SIZE,
                 TOOL_SWITCHABLE_SLOTS,
                 TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK,
                 TOOL_SWITCH_IGNORED_SLOTS,
