@@ -1,6 +1,7 @@
 {
     "required": true,
     "package": "fi.dy.masa.tweakeroo.mixin",
+    "plugin": "fi.dy.masa.tweakeroo.compat.mixin.TweakerooMixinConfigPlugin",
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
@@ -17,6 +18,7 @@
         "block.MixinSculkSensor",
         "block.MixinSignBlockEntity",
         "block.MixinSlimeBlock",
+        "block.MixinStructureBlockBlockEntity",
         "entity.MixinBatEntity",
         "entity.MixinBlockAttachedEntity",
         "entity.MixinEntity",
@@ -39,6 +41,7 @@
         "world.IMixinChunkLightProvider",
         "world.MixinLightingProvider",
         "world.MixinServerChunkLoadingManager",
+        "network.MixinUpdateStructureBlockC2SPacket",
         "world.MixinWorld"
     ],
     "client": [

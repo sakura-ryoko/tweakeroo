@@ -13,6 +13,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(value = ServerGamePacketListenerImpl.class, priority = 1005)
 public class MixinServerPlayNetworkHandler
 {
+    // WrapOperation is safer than Redirect here
     @WrapOperation(method = "handleUseItemOn",
                    at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/phys/Vec3;subtract(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))

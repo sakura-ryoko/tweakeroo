@@ -15,7 +15,9 @@ import net.minecraft.world.level.LevelAccessor;
 @Mixin(Bat.class)
 public abstract class MixinBatEntity
 {
-    @Inject(method = "checkBatSpawnRules(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)Z", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "checkBatSpawnRules(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)Z",
+            at = @At("HEAD"),
+            cancellable = true)
     private static void tweakeroo_disableBatSpawning(EntityType<Bat> type,
                                                      LevelAccessor world,
                                                      EntitySpawnReason spawnReason,
