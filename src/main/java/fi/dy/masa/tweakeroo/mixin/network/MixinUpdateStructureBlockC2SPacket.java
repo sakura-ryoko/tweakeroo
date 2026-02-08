@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Slice;
 
-import fi.dy.masa.tweakeroo.compat.mixin.ModIds;
+import fi.dy.masa.malilib.compat.ModIds;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
