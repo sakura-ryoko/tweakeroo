@@ -312,12 +312,14 @@ public class Configs implements IConfigHandler
         //public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false).apply(FIXES_KEY);
         public static final ConfigBoolean MAC_HORIZONTAL_SCROLL             = new ConfigBoolean("macHorizontalScroll", false).apply(FIXES_KEY);
         public static final ConfigBoolean RAVAGER_CLIENT_BLOCK_BREAK_FIX    = new ConfigBoolean("ravagerClientBlockBreakFix", false).apply(FIXES_KEY);
+        public static final ConfigBoolean ACKNOWLEDGE_NIGHT_VISION_WARNING  = new ConfigBoolean("acknowledgeNightVisionWarning", false).apply(FIXES_KEY);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
                 STACKABLE_SHULKERS_IN_HOPPER_FIX,
                 //ELYTRA_FIX,
                 MAC_HORIZONTAL_SCROLL,
-                RAVAGER_CLIENT_BLOCK_BREAK_FIX
+                RAVAGER_CLIENT_BLOCK_BREAK_FIX,
+                ACKNOWLEDGE_NIGHT_VISION_WARNING
         );
     }
 

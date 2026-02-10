@@ -93,7 +93,11 @@ public abstract class MixinLivingEntity extends Entity
 		if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue() &&
 			effect.getEffect() == MobEffects.NIGHT_VISION)
 		{
-			InfoUtils.showInGameMessage(Message.MessageType.WARNING, "tweakeroo.message.gamma_override.night_vision_warn");
+			if (!Configs.Fixes.ACKNOWLEDGE_NIGHT_VISION_WARNING.getBooleanValue())
+			{
+				InfoUtils.showInGameMessage(Message.MessageType.WARNING, "tweakeroo.message.gamma_override.night_vision_warn");
+			}
+
 //			MiscUtils.toggleGammaOverrideWithMessage();
 			this.wasGammaOverriden = true;
 		}
