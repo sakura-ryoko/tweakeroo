@@ -312,14 +312,12 @@ public class Configs implements IConfigHandler
         //public static final ConfigBoolean ELYTRA_FIX                        = new ConfigBoolean("elytraFix", false).apply(FIXES_KEY);
         public static final ConfigBoolean MAC_HORIZONTAL_SCROLL             = new ConfigBoolean("macHorizontalScroll", false).apply(FIXES_KEY);
         public static final ConfigBoolean RAVAGER_CLIENT_BLOCK_BREAK_FIX    = new ConfigBoolean("ravagerClientBlockBreakFix", false).apply(FIXES_KEY);
-        public static final ConfigBoolean ACKNOWLEDGE_NIGHT_VISION_WARNING  = new ConfigBoolean("acknowledgeNightVisionWarning", false).apply(FIXES_KEY);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
                 STACKABLE_SHULKERS_IN_HOPPER_FIX,
                 //ELYTRA_FIX,
                 MAC_HORIZONTAL_SCROLL,
-                RAVAGER_CLIENT_BLOCK_BREAK_FIX,
-                ACKNOWLEDGE_NIGHT_VISION_WARNING
+                RAVAGER_CLIENT_BLOCK_BREAK_FIX
         );
     }
 
@@ -503,6 +501,7 @@ public class Configs implements IConfigHandler
 //        public static final ConfigDouble        SNAP_AIM_LAST_PITCH                 = new ConfigDouble      ("snapAimLastPitch", 0, -135, 135).apply(INTERNAL_KEY);
 //        public static final ConfigDouble        SNAP_AIM_LAST_YAW                   = new ConfigDouble      ("snapAimLastYaw", 0, 0, 360).apply(INTERNAL_KEY);
         public static final ConfigInteger       SHULKER_MAX_STACK_SIZE              = new ConfigInteger     ("shulkerMaxStackSize", 64, 1, 99).apply(INTERNAL_KEY);
+        public static final ConfigBoolean       SILENCE_NIGHT_VISION_WARN           = new ConfigBoolean     ("silenceNightVisionWarning", false);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
                 DARKNESS_SCALE_VALUE_ORIGINAL,
@@ -510,7 +509,8 @@ public class Configs implements IConfigHandler
                 GAMMA_VALUE_ORIGINAL,
                 HOTBAR_SCROLL_CURRENT_ROW,
                 SLIME_BLOCK_SLIPPERINESS_ORIGINAL,
-                SHULKER_MAX_STACK_SIZE
+                SHULKER_MAX_STACK_SIZE,
+                SILENCE_NIGHT_VISION_WARN
         );
     }
 
