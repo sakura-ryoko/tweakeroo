@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
  * The "Moonrise" mod breaks this mixin.
  */
 @Mixin(value = ChunkMap.class, priority = 990)
-public abstract class MixinServerChunkLoadingManager
+public abstract class MixinChunkMap
 {
     @Inject(method = "saveChunksEagerly",
             cancellable = true,

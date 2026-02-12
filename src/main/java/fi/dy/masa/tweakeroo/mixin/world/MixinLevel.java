@@ -18,7 +18,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 
 @Mixin(Level.class)
-public abstract class MixinWorld
+public abstract class MixinLevel
 {
     @Shadow @Final private boolean isClientSide;
 

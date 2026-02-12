@@ -8,7 +8,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.client.renderer.blockentity.SpawnerRenderer;
 
 @Mixin(SpawnerRenderer.class)
-public abstract class MixinMobSpawnerBlockEntityRenderer
+public abstract class MixinSpawnerRenderer
 {
     @Inject(method = "submitEntityInSpawner(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;FFLnet/minecraft/client/renderer/state/CameraRenderState;)V",
             at = @At("HEAD"), cancellable = true)

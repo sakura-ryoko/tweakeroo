@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.resources.Identifier;
 
 @Mixin(BeaconRenderer.class)
-public abstract class MixinBeaconBlockEntityRenderer
+public abstract class MixinBeaconRenderer
 {
     @Inject(method = "submitBeaconBeam(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/resources/Identifier;FFIIIFF)V",
             at = @At("HEAD"), cancellable = true)

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = Gui.class, priority = 1001)
+@Mixin(value = Gui.class, priority = 990)
 public class MixinGui
 {
 	@Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)

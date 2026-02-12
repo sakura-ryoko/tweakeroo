@@ -1,7 +1,9 @@
-package fi.dy.masa.tweakeroo.mixin.network;
+package fi.dy.masa.tweakeroo.mixin.easyplace;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.phys.Vec3;
@@ -10,8 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(value = ServerGamePacketListenerImpl.class, priority = 1005)
-public class MixinServerPlayNetworkHandler
+@Mixin(value = ServerGamePacketListenerImpl.class, priority = 990)
+@Restriction(conflict = @Condition(value = "litematica"))
+public class MixinServerGamePacketListenerImpl_easyPlace
 {
     // WrapOperation is safer than Redirect here
     @WrapOperation(method = "handleUseItemOn",

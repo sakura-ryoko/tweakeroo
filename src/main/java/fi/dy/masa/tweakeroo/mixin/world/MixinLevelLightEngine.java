@@ -14,7 +14,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @Mixin(LevelLightEngine.class)
-public abstract class MixinLightingProvider
+public abstract class MixinLevelLightEngine
 {
     @Shadow @Final @Nullable private LightEngine<?, ?> blockEngine;
 

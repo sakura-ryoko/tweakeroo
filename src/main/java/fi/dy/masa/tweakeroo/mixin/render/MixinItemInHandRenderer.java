@@ -1,9 +1,11 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -15,14 +17,14 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemInHandRenderer.class)
-public abstract class MixinHeldItemRenderer
+public abstract class MixinItemInHandRenderer
 {
-    @Redirect(method = "tick()V", at = @At(
+    @WrapOperation(method = "tick()V", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/player/LocalPlayer;getItemSwapScale(F)F"))
-    public float tweakeroo_redirectedGetCooledAttackStrength(LocalPlayer player, float adjustTicks)
+    public float tweakeroo_redirectedGetCooledAttackStrength(LocalPlayer instance, float v, Operation<Float> original)
     {
-        return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : player.getItemSwapScale(adjustTicks);
+        return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : instance.getItemSwapScale(v);
     }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)

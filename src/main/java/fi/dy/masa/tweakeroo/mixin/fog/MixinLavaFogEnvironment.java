@@ -11,22 +11,23 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
-import net.minecraft.client.renderer.fog.environment.WaterFogEnvironment;
+import net.minecraft.client.renderer.fog.environment.LavaFogEnvironment;
 
-@Mixin(WaterFogEnvironment.class)
-public class MixinWaterFogModifier
+@Mixin(LavaFogEnvironment.class)
+public class MixinLavaFogEnvironment
 {
     @Inject(method = "setupFog", at = @At("RETURN"))
-    private void tweakeroo_redirectWaterFog(FogData data, Camera camera, ClientLevel clientWorld, float f, DeltaTracker renderTickCounter, CallbackInfo ci)
+    private void tweakeroo_redirectLavaFog(FogData data, Camera camera, ClientLevel clientWorld, float f,
+                                           DeltaTracker renderTickCounter, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_WATER_VISIBILITY.getBooleanValue())
+        if (FeatureToggle.TWEAK_LAVA_VISIBILITY.getBooleanValue())
         {
-            if (data.environmentalStart > 0.0F)
+            if (data.environmentalStart == 0.25F)
             {
-                data.environmentalStart = -8.0F;
+                data.environmentalStart = 0.0F;
             }
 
-            final float adjusted = RenderUtils.calculateLiquidFogDistance(camera.entity(), data.environmentalEnd, true);
+            final float adjusted = RenderUtils.calculateLiquidFogDistance(camera.entity(), data.environmentalEnd, false);
 
             if (data.environmentalEnd != adjusted)
             {

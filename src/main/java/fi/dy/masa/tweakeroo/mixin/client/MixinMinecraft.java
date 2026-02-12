@@ -28,7 +28,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
 
 @Mixin(Minecraft.class)
-public abstract class MixinMinecraftClient implements IMinecraftClientInvoker
+public abstract class MixinMinecraft implements IMinecraftClientInvoker
 {
     @Shadow @Nullable public LocalPlayer player;
     @Shadow @Nullable public ClientLevel level;

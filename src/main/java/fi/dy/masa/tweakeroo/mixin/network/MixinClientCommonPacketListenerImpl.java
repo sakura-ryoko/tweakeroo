@@ -10,7 +10,7 @@ import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 
 @Mixin(ClientCommonPacketListenerImpl.class)
-public class MixinClientCommonNetworkHandler
+public class MixinClientCommonPacketListenerImpl
 {
     @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"))
     private void tweakeroo_onCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci)

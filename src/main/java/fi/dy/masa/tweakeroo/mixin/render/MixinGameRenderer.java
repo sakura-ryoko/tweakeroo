@@ -22,7 +22,7 @@ import fi.dy.masa.tweakeroo.config.Hotkeys;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
-@Mixin(value = GameRenderer.class, priority = 1001)
+@Mixin(value = GameRenderer.class, priority = 990)
 public abstract class MixinGameRenderer
 {
     @Shadow @Final private Minecraft minecraft;

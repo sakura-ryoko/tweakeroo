@@ -18,9 +18,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientLevel.class)
-public abstract class MixinClientWorld extends Level
+public abstract class MixinClientLevel extends Level
 {
-    private MixinClientWorld(WritableLevelData properties,
+    private MixinClientLevel(WritableLevelData properties,
                              ResourceKey<Level> registryRef,
                              RegistryAccess registryManager,
                              Holder<DimensionType> dimension,

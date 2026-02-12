@@ -34,12 +34,12 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 @Mixin(ClientPacketListener.class)
-public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketListenerImpl
+public abstract class MixinClientPacketListener extends ClientCommonPacketListenerImpl
 {
     @Shadow private ClientLevel level;
     @Shadow private int serverSimulationDistance;
 
-    protected MixinClientPlayNetworkHandler(Minecraft client, Connection connection, CommonListenerCookie connectionState)
+    protected MixinClientPacketListener(Minecraft client, Connection connection, CommonListenerCookie connectionState)
     {
         super(client, connection, connectionState);
     }

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WeatherEffectRenderer.class)
-public class MixinWeatherRendering
+public class MixinWeatherEffectRenderer
 {
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_cancelWeatherRender(Level world, int ticks, float tickProgress, Vec3 vec3d,

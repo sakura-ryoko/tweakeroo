@@ -17,7 +17,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 /**
  * Separated out for Iris compatibility by adjusting the Mixin Priority
  */
-@Mixin(value = GameRenderer.class, priority = 999)
+@Mixin(value = GameRenderer.class, priority = 1001)
 @Restriction(conflict = @Condition(value = ModIds.iris))
 public abstract class MixinGameRenderer_ViewBob
 {

@@ -1,4 +1,7 @@
-package fi.dy.masa.tweakeroo.mixin.item;
+package fi.dy.masa.tweakeroo.mixin.easyplace;
+
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,10 +17,11 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(BlockItem.class)
-public abstract class MixinBlockItem extends Item
+@Mixin(value = BlockItem.class, priority = 990)
+@Restriction(conflict = @Condition(value = "litematica"))
+public abstract class MixinBlockItem_easyPlace extends Item
 {
-    private MixinBlockItem(Item.Properties builder)
+    private MixinBlockItem_easyPlace(Item.Properties builder)
     {
         super(builder);
     }

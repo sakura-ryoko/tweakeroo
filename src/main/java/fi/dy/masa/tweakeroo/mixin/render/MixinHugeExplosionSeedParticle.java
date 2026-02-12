@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(HugeExplosionSeedParticle.class)
-public class MixinExplosionEmitterParticle extends NoRenderParticle
+public class MixinHugeExplosionSeedParticle extends NoRenderParticle
 {
-    protected MixinExplosionEmitterParticle(ClientLevel clientWorld, double d, double e, double f)
+    protected MixinHugeExplosionSeedParticle(ClientLevel clientWorld, double d, double e, double f)
     {
         super(clientWorld, d, e, f);
     }

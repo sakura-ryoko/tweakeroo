@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screens.PresetFlatWorldScreen;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(PresetFlatWorldScreen.class)
-public abstract class MixinPresetsScreen
+public abstract class MixinPresetFlatWorldScreen
 {
     //@Shadow @Final private static RegistryKey<Biome> BIOME_KEY;
     //@Shadow @Final private CustomizeFlatLevelScreen parent;

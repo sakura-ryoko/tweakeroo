@@ -1,5 +1,8 @@
 package fi.dy.masa.tweakeroo.mixin.fog;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 
@@ -12,10 +15,10 @@ import net.minecraft.util.Mth;
 @Mixin(FogRenderer.class)
 public class MixinFogRenderer
 {
-    @Redirect(method = "computeFogColor",
+    @WrapOperation(method = "computeFogColor",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;voidDarknessOnsetRange()F"))
-    private float tweakeroo_disableSkyDarkness(ClientLevel.ClientLevelData instance)
+    private float tweakeroo_disableSkyDarkness(ClientLevel.ClientLevelData instance, Operation<Float> original)
     {
         return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : instance.voidDarknessOnsetRange();
     }
@@ -38,10 +41,10 @@ public class MixinFogRenderer
         return constant;
     }
 
-    @Redirect(method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lorg/joml/Vector4f;",
-            at = @At(value = "INVOKE",
+    @WrapOperation(method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lorg/joml/Vector4f;",
+                   at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/util/Mth;clamp(FFF)F"))
-    private float tweakeroo_tweakRenderDistanceFog_StartDiff(float value, float min, float max)
+    private float tweakeroo_tweakRenderDistanceFog_StartDiff(float value, float min, float max, Operation<Float> original)
     {
         if (Configs.Disable.DISABLE_RENDER_DISTANCE_FOG.getBooleanValue())
         {

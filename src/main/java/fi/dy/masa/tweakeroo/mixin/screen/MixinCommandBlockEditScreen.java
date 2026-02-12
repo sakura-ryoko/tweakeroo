@@ -26,7 +26,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 @Mixin(CommandBlockEditScreen.class)
-public abstract class MixinCommandBlockScreen extends AbstractCommandBlockEditScreen
+public abstract class MixinCommandBlockEditScreen extends AbstractCommandBlockEditScreen
 {
     @Shadow @Final private CommandBlockEntity autoCommandBlock;
     @Shadow private CycleButton<CommandBlockEntity.Mode> modeButton;

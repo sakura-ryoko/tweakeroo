@@ -8,7 +8,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 
 @Mixin(SectionRenderDispatcher.RenderSection.class)
-public abstract class MixinChunkBuilder_BuiltChunk
+public abstract class MixinSectionRenderDispatcher_RenderSection_edges
 {
     @Inject(method = "doesChunkExistAt", at = @At("HEAD"), cancellable = true)
     private void allowEdgeChunksToRender(long l, CallbackInfoReturnable<Boolean> cir)

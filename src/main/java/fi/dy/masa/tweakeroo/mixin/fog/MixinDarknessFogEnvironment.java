@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.DarknessFogEnvironment;
 
 @Mixin(DarknessFogEnvironment.class)
-public class MixinDarknessEffectFogModifier
+public class MixinDarknessFogEnvironment
 {
     @Inject(method = "setupFog", at = @At("RETURN"))
     private void tweakeroo_redirectDarknessFog(FogData data, Camera camera, ClientLevel clientWorld, float f,

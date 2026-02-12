@@ -8,7 +8,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 
 @Mixin(SectionRenderDispatcher.RenderSection.class)
-public abstract class MixinBuiltChunk
+public abstract class MixinSectionRenderDispatcher_RenderSection_disable
 {
     @Inject(method = "setDirty(Z)V", at = @At("HEAD"), cancellable = true)
     private void disableChunkReRenders(boolean important, CallbackInfo ci)

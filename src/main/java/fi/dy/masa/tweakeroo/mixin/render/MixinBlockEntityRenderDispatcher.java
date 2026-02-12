@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 @Mixin(BlockEntityRenderDispatcher.class)
-public abstract class MixinBlockEntityRenderManager
+public abstract class MixinBlockEntityRenderDispatcher
 {
     @Inject(method = "tryExtractRenderState(Lnet/minecraft/world/level/block/entity/BlockEntity;FLnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)Lnet/minecraft/client/renderer/blockentity/state/BlockEntityRenderState;",
 			at = @At("HEAD"), cancellable = true)

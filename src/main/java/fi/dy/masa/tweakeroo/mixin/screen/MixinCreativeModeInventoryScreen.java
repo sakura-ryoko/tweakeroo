@@ -12,9 +12,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 @Mixin(CreativeModeInventoryScreen.class)
-public abstract class MixinCreativeInventoryScreen extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu>
+public abstract class MixinCreativeModeInventoryScreen extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu>
 {
-    private MixinCreativeInventoryScreen(CreativeModeInventoryScreen.ItemPickerMenu screenHandler, Inventory playerInventory, Component text)
+    private MixinCreativeModeInventoryScreen(CreativeModeInventoryScreen.ItemPickerMenu screenHandler, Inventory playerInventory, Component text)
     {
         super(screenHandler, playerInventory, text);
     }

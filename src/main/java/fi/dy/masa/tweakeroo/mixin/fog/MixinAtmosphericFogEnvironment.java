@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.AtmosphericFogEnvironment;
 
 @Mixin(AtmosphericFogEnvironment.class)
-public class MixinAtmosphericFogModifier
+public class MixinAtmosphericFogEnvironment
 {
     @Inject(method = "setupFog", at = @At("RETURN"))
     private void tweakeroo_redirectAtmosphericFog(FogData data, Camera camera, ClientLevel clientWorld, float f,

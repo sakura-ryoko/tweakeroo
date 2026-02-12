@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ParticleEngine.class)
-public abstract class MixinParticleManager
+public abstract class MixinParticleEngine
 {
     @Inject(method = "add(Lnet/minecraft/client/particle/Particle;)V", at = @At("HEAD"), cancellable = true)
     private void disableAllParticles(Particle effect, CallbackInfo ci)

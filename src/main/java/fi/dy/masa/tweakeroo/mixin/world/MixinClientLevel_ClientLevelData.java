@@ -9,7 +9,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.LevelHeightAccessor;
 
 @Mixin(ClientLevel.ClientLevelData.class)
-public class MixinClientWorld_Properties
+public class MixinClientLevel_ClientLevelData
 {
     @Inject(method = "getHorizonHeight", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_overrideSkyDarknessHeight(LevelHeightAccessor world, CallbackInfoReturnable<Double> cir)

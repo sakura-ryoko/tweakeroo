@@ -11,7 +11,7 @@ import net.minecraft.client.DebugQueryHandler;
 import net.minecraft.nbt.CompoundTag;
 
 @Mixin(DebugQueryHandler.class)
-public class MixinDataQueryHandler
+public class MixinDebugQueryHandler
 {
     @Inject(
             method = "handleResponse",

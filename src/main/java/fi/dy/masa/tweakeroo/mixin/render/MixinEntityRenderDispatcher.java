@@ -21,7 +21,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 
 @Mixin(EntityRenderDispatcher.class)
-public abstract class MixinEntityRenderManager
+public abstract class MixinEntityRenderDispatcher
 {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void onShouldRender(Entity entityIn, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
