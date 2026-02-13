@@ -146,15 +146,17 @@ public class Configs implements IConfigHandler
         public static final ConfigString        	TOOL_SWITCHABLE_SLOTS               = new ConfigString      ("toolSwitchableSlots", "1-9").apply(GENERIC_KEY);
         public static final ConfigString        	TOOL_SWITCH_IGNORED_SLOTS           = new ConfigString      ("toolSwitchIgnoredSlots", "").apply(GENERIC_KEY);
 	    public static final ConfigBooleanHotkeyed	TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK= new ConfigBooleanHotkeyed ("toolSwapAllowUnenchantedToBreak", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed	TOOL_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed	TOOL_SWAP_PREFER_SILK_TOUCH			= new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("toolSwapBetterEnchants", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_PREFER_FORTUNE_OVERRIDE	= new ConfigBooleanHotkeyed ("toolSwapPreferFortuneOverride", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_PREFER_SILK_TOUCH			= new ConfigBooleanHotkeyed ("toolSwapPreferSilkTouch", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_BAMBOO_USES_SWORD_FIRST	= new ConfigBooleanHotkeyed ("toolSwapBambooUsesSwordFirst", true, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_LEAVES_USES_HOE_FIRST	    = new ConfigBooleanHotkeyed ("toolSwapLeavesUsesHoeFirst", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_NEEDS_SHEARS_FIRST		= new ConfigBooleanHotkeyed ("toolSwapNeedsShearsFirst", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_NEEDS_PICKAXE_FIRST		= new ConfigBooleanHotkeyed ("toolSwapNeedsPickaxeFirst", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_FIRST			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_ORES			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_OVERRIDE		= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
-        public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", true, "").apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigDouble			ZOOM_FOV_DIFFERENCE                 = new ConfigDouble      ("zoomFovDifference", 1, 0.01, 359.99).apply(GENERIC_KEY);
@@ -273,8 +275,10 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK,
                 TOOL_SWITCH_IGNORED_SLOTS,
                 TOOL_SWAP_BETTER_ENCHANTS,
+                TOOL_SWAP_PREFER_FORTUNE_OVERRIDE,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
                 TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
+                TOOL_SWAP_LEAVES_USES_HOE_FIRST,
                 TOOL_SWAP_NEEDS_SHEARS_FIRST,
                 TOOL_SWAP_NEEDS_PICKAXE_FIRST,
                 TOOL_SWAP_SILK_TOUCH_FIRST,
@@ -295,8 +299,10 @@ public class Configs implements IConfigHandler
 				FREE_CAMERA_SHOW_HANDS,
 				FREE_CAMERA_SHOW_HOTBAR,
                 TOOL_SWAP_BETTER_ENCHANTS,
+                TOOL_SWAP_PREFER_FORTUNE_OVERRIDE,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
                 TOOL_SWAP_BAMBOO_USES_SWORD_FIRST,
+                TOOL_SWAP_LEAVES_USES_HOE_FIRST,
                 TOOL_SWAP_NEEDS_SHEARS_FIRST,
                 TOOL_SWAP_NEEDS_PICKAXE_FIRST,
                 TOOL_SWAP_SILK_TOUCH_FIRST,

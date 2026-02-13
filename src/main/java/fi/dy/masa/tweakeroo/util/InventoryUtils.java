@@ -12,6 +12,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
@@ -574,39 +575,74 @@ public class InventoryUtils
             }
         }
 
-        if (!testedStack.isEmpty() && isMisc &&
-            Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() && CachedTagManager.isNeedsShears(state) &&
-            testedStack.is(Items.SHEARS) && !EquipmentUtils.isCorrectTool(testedStack, state))
+        if (!testedStack.isEmpty())
         {
-            boolean test = applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
-            //LOGGER.error("applyNeedsShearsFirst: result: {}", test);
-			return test;
-        }
-
-        if (!testedStack.isEmpty() && isTool && !isMisc &&
-            Configs.Generic.TOOL_SWAP_NEEDS_PICKAXE_FIRST.getBooleanValue() && CachedTagManager.isNeedsPickaxe(state) &&
-            EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isCorrectTool(testedStack, state))
-        {
-            boolean test = applyNeedsPickaxeFirst(testedStack, previousTool, state, isMisc, true);
-            //LOGGER.error("applyNeedsPickaxeFirst: result: {}", test);
-            return test;
-        }
-
-        if (!testedStack.isEmpty() && isTool)
-        {
-			if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && CachedTagManager.isNeedsSilkTouch(state)) ||
-				(Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()  && CachedTagManager.isOreBlock(state) &&
-				EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
-			{
-                boolean test = applySilkTouchFirst(testedStack, previousTool, state, isMisc);
-                //LOGGER.error("applySilkTouchFirst:B: result: {}", test);
-				return test;
-            }
-            else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && CachedTagManager.isSilkTouchOverride(state))
+            if (Configs.Generic.TOOL_SWAP_LEAVES_USES_HOE_FIRST.getBooleanValue() &&
+                state.is(BlockTags.LEAVES))
             {
-                boolean test =applySilkTouchFirst(testedStack, previousTool, state, isMisc);
-                //LOGGER.error("applySilkTouchFirst:C: result: {}", test);
-				return test;
+                if (EquipmentUtils.isHoe(testedStack))
+                {
+                    boolean test = applyLeavesNeedsHoeFirst(testedStack, previousTool, state, true);
+                    //LOGGER.error("applyLeavesNeedsHoeFirst: result: {}", test);
+                    return test;
+                }
+                else if (EquipmentUtils.isHoe(previousTool))
+                {
+                    //LOGGER.error("applyLeavesNeedsHoeFirst: prev-hoe --> FALSE");
+                    return false;
+                }
+            }
+
+            if (Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() &&
+                CachedTagManager.isNeedsShears(state) &&
+                !EquipmentUtils.isCorrectTool(testedStack, state))
+            {
+                if (testedStack.is(Items.SHEARS))
+                {
+                    boolean test = applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
+                    //LOGGER.error("applyNeedsShearsFirst: result: {}", test);
+                    return test;
+                }
+                else if (previousTool.is(Items.SHEARS))
+                {
+                    //LOGGER.error("applyNeedsShearsFirst: prev-shears --> FALSE ");
+                    return false;
+                }
+            }
+
+            if (Configs.Generic.TOOL_SWAP_NEEDS_PICKAXE_FIRST.getBooleanValue() &&
+                CachedTagManager.isNeedsPickaxe(state) &&
+                !EquipmentUtils.isCorrectTool(testedStack, state))
+            {
+                if (EquipmentUtils.isPickAxe(testedStack))
+                {
+                    boolean test = applyNeedsPickaxeFirst(testedStack, previousTool, state, true);
+                    //LOGGER.error("applyNeedsPickaxeFirst: result: {}", test);
+                    return test;
+                }
+                else if (EquipmentUtils.isPickAxe(previousTool))
+                {
+                    //LOGGER.error("applyNeedsPickaxeFirst: prev-pick --> FALSE");
+                    return false;
+                }
+            }
+
+            if (!Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
+            {
+                if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && CachedTagManager.isNeedsSilkTouch(state)) ||
+                    (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue() && CachedTagManager.isOreBlock(state) &&
+                     EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
+                {
+                    boolean test = applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+                    //LOGGER.error("applySilkTouchFirst:B: result: {}", test);
+                    return test;
+                }
+                else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && CachedTagManager.isSilkTouchOverride(state))
+                {
+                    boolean test = applySilkTouchFirst(testedStack, previousTool, state, isMisc);
+                    //LOGGER.error("applySilkTouchFirst:C: result: {}", test);
+                    return test;
+                }
             }
 
             boolean test = isBetterToolEach(testedStack, previousTool, state, isMisc, true);
@@ -640,6 +676,73 @@ public class InventoryUtils
         return true;
     }
 
+    // Use a Hoe on Leaves instead of Shears First; which also needs to override 'isCorrectTool()'
+    private static boolean applyLeavesNeedsHoeFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean loop)
+    {
+        final boolean hasHoe = EquipmentUtils.isHoe(testedStack);
+        final boolean prevHoe = EquipmentUtils.isHoe(previousTool);
+
+        if (!hasHoe)
+        {
+            //LOGGER.warn("  Result: false (Not a Hoe)");
+            return false;
+        }
+        else if (!prevHoe)
+        {
+            //LOGGER.warn("  Result: true (Previous Not a Hoe)");
+            return true;
+        }
+
+        final boolean preferFortune = Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue();
+        boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
+        final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousTool) : true;
+        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
+
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
+        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
+        final boolean testFortune = EquipmentUtils.hasFortune(testedStack);
+        final boolean prevFortune = EquipmentUtils.hasFortune(previousTool);
+
+        if (preferSilk && preferFortune)
+        {
+            preferSilk = false;
+        }
+
+        //LOGGER.debug("(applyLeavesNeedsHoeFirst)");
+        //LOGGER.debug("Enchant result: {}", enchants);
+        //LOGGER.debug("Mats result: {}", mats);
+        //LOGGER.debug("Has Hoe: {} / prev: {}", hasHoe, prevHoe);
+        //LOGGER.warn("Preferr Fortune Override: {}", preferFortune);
+        //LOGGER.warn("Silk Touch (Prefer: {}) -- has: {} / prev: {}", preferSilk, testSilkTouch, prevSilkTouch);
+        //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
+
+        if (testSpeed != prevSpeed)
+        {
+            // Don't check rarity here, it gives false positives
+            boolean finalResult = isBetterToolSilkOrFortuneUnequalSpeed(preferSilk, testSilkTouch, preferFortune, testFortune, mats, enchants);
+            //LOGGER.warn("  Final Result: {}", finalResult);
+            return finalResult;
+        }
+        else if (testSpeed == prevSpeed)
+        {
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(!preferSilk);
+            final boolean result = hasHoe ? (mats && enchants) : false;
+            final boolean prevResult = loop ? applyLeavesNeedsHoeFirst(previousTool, testedStack, state, false) : false;
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
+
+            //LOGGER.warn("Silk Touch Preference results: config: {} // test - {}, prev - {}", preferSilk, result, prevResult);
+
+            boolean finalResult = isBetterToolSilkOrFortune(preferSilk, testSilkTouch, prevSilkTouch, preferFortune, testFortune, prevFortune, result, prevResult);
+            //LOGGER.warn("  Final Result: {}", finalResult);
+            return finalResult;
+        }
+
+        //LOGGER.warn("  Result: Default False");
+        return false;
+    }
+
     // Use shears if block needs shears.  Do this before needs_silk_touch, because
     // the fact that an item needs shears doesn't pass the 'isCorrectTool()', and doesn't nessecarily need silk touch.
     private static boolean applyNeedsShearsFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc)
@@ -662,75 +765,77 @@ public class InventoryUtils
 
     // Use shears if block needs shears.  Do this before needs_silk_touch, because
     // the fact that an item needs shears doesn't pass the 'isCorrectTool()', and doesn't nessecarily need silk touch.
-    private static boolean applyNeedsPickaxeFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
+    private static boolean applyNeedsPickaxeFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean loop)
     {
         final boolean hasPick = EquipmentUtils.isPickAxe(testedStack);
+        final boolean prevPick = EquipmentUtils.isPickAxe(previousTool);
 
         if (!hasPick)
         {
             //LOGGER.warn("  Result: false (Not a Pickaxe)");
             return false;
         }
+        else if (!prevPick)
+        {
+            //LOGGER.warn("  Result: true (Previous Not a Pickaxe)");
+            return true;
+        }
 
-        final boolean prevPick = EquipmentUtils.isPickAxe(previousTool);
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-
-        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
-        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
-
+        // Consider the other configs for the Silk Touch final determination
+        final boolean isOre = CachedTagManager.isOreBlock(state);
+        final boolean isNeedsSilk = CachedTagManager.isNeedsSilkTouch(state);
+        final boolean isSilkOverride = CachedTagManager.isSilkTouchOverride(state);
+        final boolean preferFortune = Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue();
+        boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue() ||
+                             (isOre && Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()) ||
+                             (isNeedsSilk && Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue()) ||
+                             (isSilkOverride && Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue()) && !preferFortune;
         final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
         final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-        final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
+
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
+        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
+        final boolean testFortune = EquipmentUtils.hasFortune(testedStack);
+        final boolean prevFortune = EquipmentUtils.hasFortune(previousTool);
+
+        if (preferSilk && preferFortune)
+        {
+            preferSilk = false;
+        }
 
         //LOGGER.debug("(applyNeedsPickaxeFirst)");
         //LOGGER.debug("Enchant result: {}", enchants);
         //LOGGER.debug("Mats result: {}", mats);
-        //LOGGER.debug("Rarity result: {}", rarity);
         //LOGGER.debug("Has Pickaxe: {} / prev: {}", hasPick, prevPick);
-        //LOGGER.debug("Silk Touch has: {} / prev: {}", testSilkTouch, prevSilkTouch);
+        //LOGGER.warn("isOre: {} / isNeedsSilk: {} / isSilkOverride: {}", isOre, isNeedsSilk, isSilkOverride);
+        //LOGGER.warn("Preferr Fortune Override: {}", preferFortune);
+        //LOGGER.warn("Silk Touch (Prefer: {}) -- has: {} / prev: {}", preferSilk, testSilkTouch, prevSilkTouch);
         //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
 
-        if (testSpeed > prevSpeed)
+        if (testSpeed != prevSpeed)
         {
             // Don't check rarity here, it gives false positives
-            return hasPick ? (mats && enchants) : false;
+            boolean finalResult = isBetterToolSilkOrFortuneUnequalSpeed(preferSilk, testSilkTouch, preferFortune, testFortune, mats, enchants);
+            //LOGGER.warn("  Final Result: {}", finalResult);
+            return finalResult;
         }
         else if (testSpeed == prevSpeed)
         {
-            final boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(false);
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(!preferSilk);
             final boolean result = hasPick ? (mats && enchants) : false;
-            final boolean prevResult = loop ? applyNeedsPickaxeFirst(previousTool, testedStack, state, isMisc, false) : false;
+            final boolean prevResult = loop ? applyNeedsPickaxeFirst(previousTool, testedStack, state, false) : false;
             Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
 
             //LOGGER.warn("Silk Touch Preference results: config: {} // test - {}, prev - {}", preferSilk, result, prevResult);
 
-            // Filter out matches based on config for Silk Touch over Non-Silk Touch tools
-            // when all other checks cannot determine which one should be picked.
-            if (prevResult && result)
-            {
-                if (preferSilk)
-                {
-                    return testSilkTouch && !prevSilkTouch;
-                }
-                else
-                {
-                    if (!testSilkTouch && prevSilkTouch)
-                    {
-                        return true;
-                    }
-                    else if (testSilkTouch && !prevSilkTouch)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            //LOGGER.warn("  Result: {}", result);
-            return result;
+            boolean finalResult = isBetterToolSilkOrFortune(preferSilk, testSilkTouch, prevSilkTouch, preferFortune, testFortune, prevFortune, result, prevResult);
+            //LOGGER.warn("  Final Result: {}", finalResult);
+            return finalResult;
         }
 
+        //LOGGER.warn("  Result: Default False");
         return false;
     }
 
@@ -779,19 +884,29 @@ public class InventoryUtils
     private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
     {
         final boolean correct = EquipmentUtils.isCorrectTool(testedStack, state);
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
-        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
 
         if (!correct)
         {
             return false;
         }
 
+        final boolean preferFortune = Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue();
+        boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue() && !preferFortune;
         final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
         final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
         final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
+
+        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
+        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
+        final boolean testFortune = EquipmentUtils.hasFortune(testedStack);
+        final boolean prevFortune = EquipmentUtils.hasFortune(previousTool);
+
+        if (preferSilk && preferFortune)
+        {
+            preferSilk = false;
+        }
 
         //LOGGER.debug("(isBetterToolEach)");
         //LOGGER.debug("Enchant result: {}", enchants);
@@ -803,44 +918,105 @@ public class InventoryUtils
 
         if (testSpeed > prevSpeed)
         {
-            return isMisc ? correct : (rarity || mats) && correct;
+            if (preferSilk && testSilkTouch)
+            {
+                return isMisc ? correct : (rarity || mats) && correct;
+            }
+            else if (preferFortune && testFortune)
+            {
+                return isMisc ? correct : (rarity || mats) && correct;
+            }
+            else if (!preferSilk && !testSilkTouch)
+            {
+                return isMisc ? correct : (rarity || mats) && correct;
+            }
+            else
+            {
+                return false;
+            }
         }
         else if (testSpeed == prevSpeed)
         {
-            final boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(false);
+            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(!preferSilk);
             final boolean result = isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
             final boolean prevResult = loop ? isBetterToolEach(previousTool, testedStack, state, isMisc, false) : false;
             Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
 
-            //LOGGER.warn("Silk Touch Preference results: config: {} // test - {}, prev - {}", preferSilk, result, prevResult);
-
-            // Filter out matches based on config for Silk Touch over Non-Silk Touch tools
-            // when all other checks cannot determine which one should be picked.
-            if (prevResult && result)
-            {
-                if (preferSilk)
-                {
-                    return testSilkTouch && !prevSilkTouch;
-                }
-                else
-                {
-                    if (!testSilkTouch && prevSilkTouch)
-                    {
-                        return true;
-                    }
-                    else if (testSilkTouch && !prevSilkTouch)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            //LOGGER.warn("  Result: {}", result);
-            return result;
+            return isBetterToolSilkOrFortune(preferSilk, testSilkTouch, prevSilkTouch, preferFortune, testFortune, prevFortune, result, prevResult);
         }
 
         return false;
+    }
+
+    private static boolean isBetterToolSilkOrFortuneUnequalSpeed(boolean preferSilk, final boolean testSilkTouch,
+                                                                 final boolean preferFortune, final boolean testFortune,
+                                                                 final boolean mats, final boolean enchants)
+    {
+        if (preferSilk)
+        {
+            return testSilkTouch ? (mats && enchants) : false;
+        }
+        else if (preferFortune)
+        {
+            return testFortune ? (mats && enchants) : false;
+        }
+        else if (!preferFortune)
+        {
+            return !testFortune ? (mats && enchants) : false;
+        }
+        else if (!preferSilk)
+        {
+            return !testSilkTouch ? (mats && enchants) : false;
+        }
+
+        return false;
+    }
+
+    // Common Silk Touch / Fortune comparison logic
+    private static boolean isBetterToolSilkOrFortune(boolean preferSilk, final boolean testSilkTouch, final boolean prevSilkTouch,
+                                                     final boolean preferFortune, final boolean testFortune, final boolean prevFortune,
+                                                     final boolean result, final boolean prevResult)
+    {
+        if (preferFortune && preferSilk)
+        {
+            preferSilk = false;
+        }
+
+        if (prevResult && result)
+        {
+            if (preferSilk)
+            {
+                return testSilkTouch && !prevSilkTouch;
+            }
+            else if (preferFortune)
+            {
+                return testFortune && !prevFortune;
+            }
+            else if (!preferSilk)
+            {
+                if (!testSilkTouch && prevSilkTouch)
+                {
+                    return true;
+                }
+                else if (testSilkTouch && !prevSilkTouch)
+                {
+                    return false;
+                }
+            }
+            else if (!preferFortune)
+            {
+                if (!testFortune && prevFortune)
+                {
+                    return true;
+                }
+                else if (testFortune && !prevFortune)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return result;
     }
 
     private static boolean isBetterToolAndHasDurability(ItemStack testedStack, ItemStack previousTool, BlockState state)
