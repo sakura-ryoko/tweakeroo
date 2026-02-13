@@ -1193,6 +1193,32 @@ public class InventoryUtils
         }
     }
 
+    public static void equipBestFirework(Player player)
+    {
+        if (player == null || GuiUtils.getCurrentScreen() != null)
+        {
+            return;
+        }
+
+        AbstractContainerMenu container = player.containerMenu;
+
+        Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
+
+        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
+            if (!filter.test(testedStack)) return false;
+            if (!filter.test(previousBestMatch)) return true;
+            return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() 
+            || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
+        }, UniformInt.of(9, container.slots.size() - 1));
+
+        if (targetSlot >= 0)
+        {
+            swapItemToEquipmentSlot(player, EquipmentSlot.OFFHAND, targetSlot);
+        }
+    }
+
+    
+
     // todo for easier forwards porting when the `ArmorItem` disappears
     private static boolean checkChestSlot(ItemStack stack)
     {

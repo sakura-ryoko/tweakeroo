@@ -41,6 +41,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
 
     @Unique private float realNauseaIntensity;
     @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
+    @Unique private ItemStack autoSwitchFireworksOffhand = ItemStack.EMPTY;
 
     private MixinClientPlayerEntity(ClientLevel world, GameProfile profile)
     {
@@ -117,56 +118,85 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
             target = "Lnet/minecraft/client/player/LocalPlayer;tryToStartFallFlying()Z"))
     private void tweakeroo_onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue())
         {
             // this.checkGliding()
             if (!this.onGround() && !this.isPassenger() && this.fallFlyTicks == 0 && !this.isInLiquid() && !this.onClimbable() && !this.hasEffect(MobEffects.LEVITATION))
             {
-                if (!this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) ||
-                    this.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage() - 10)
-                {
-                    this.autoSwitchElytraChestplate = this.getItemBySlot(EquipmentSlot.CHEST);
-                    InventoryUtils.equipBestElytra(this);
+                if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue()) {
+                    if (!this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) ||
+                        this.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage() - 10)
+                    {
+                        this.autoSwitchElytraChestplate = this.getItemBySlot(EquipmentSlot.CHEST);
+                        InventoryUtils.equipBestElytra(this);
+                    }
+                }
+                if (FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue()) {
+                    if (!this.getItemBySlot(EquipmentSlot.OFFHAND).is(Items.FIREWORK_ROCKET))
+                    {
+                        this.autoSwitchFireworksOffhand = this.getItemBySlot(EquipmentSlot.OFFHAND);
+                        InventoryUtils.equipBestFirework(this);
+                    }
                 }
             }
         }
         else
         {
             // reset auto switch item if the feature is disabled.
-            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+            if(!FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue()) {
+                
+            }
+            if(!FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue()) {
+                this.autoSwitchFireworksOffhand = ItemStack.EMPTY;
+            }
         }
     }
 
     @Inject(method = "onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V", at = @At("RETURN"))
     private void tweakeroo_onStopFlying(EntityDataAccessor<?> data, CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue())
         {
             if (DATA_SHARED_FLAGS_ID.equals(data) && this.wasFallFlying)
             {
                 if (!this.isFallFlying() && this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA))
                 {
-                    if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.is(Items.ELYTRA))
-                    {
-                        if (this.inventoryMenu.getCarried().isEmpty())
+                    if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue()) {
+                        if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.is(Items.ELYTRA))
                         {
-                            int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchElytraChestplate, true, false);
-
-                            if (targetSlot >= 0)
+                            if (this.inventoryMenu.getCarried().isEmpty())
                             {
-                                InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
-                                this.autoSwitchElytraChestplate = ItemStack.EMPTY;
-                            } else {
-                                // cached item not found, try to swap to the default chest plate.
-                                InventoryUtils.swapElytraAndChestPlate(this);
-                                this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                                int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchElytraChestplate, true, false);
+
+                                if (targetSlot >= 0)
+                                {
+                                    InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
+                                    this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                                } else {
+                                    // cached item not found, try to swap to the default chest plate.
+                                    InventoryUtils.swapElytraAndChestPlate(this);
+                                    this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        // if cached previous item is empty, try to swap back to the default chest plate.
-                        InventoryUtils.swapElytraAndChestPlate(this);
+                        else
+                        {
+                            // if cached previous item is empty, try to swap back to the default chest plate.
+                            InventoryUtils.swapElytraAndChestPlate(this);
+                        }
+                        if (!this.autoSwitchFireworksOffhand.isEmpty() && !this.autoSwitchFireworksOffhand.is(Items.FIREWORK_ROCKET))
+                        {
+                            if (this.inventoryMenu.getCarried().isEmpty())
+                            {
+                                int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchFireworksOffhand, true, false);
+
+                                if (targetSlot >= 0)
+                                {
+                                    InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.OFFHAND, targetSlot);
+                                    this.autoSwitchFireworksOffhand = ItemStack.EMPTY;
+                                }
+                            }
+                        }
                     }
                 }
             }
