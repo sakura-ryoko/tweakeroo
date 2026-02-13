@@ -27,6 +27,7 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     TWEAK_ANGEL_BLOCK               ("tweakAngelBlock",                     false, ""),
     TWEAK_AREA_SELECTOR             ("tweakAreaSelector",                   false, ""),
     TWEAK_AUTO_SWITCH_ELYTRA        ("tweakAutoSwitchElytra",               false, ""),
+    TWEAK_AUTO_SWITCH_FIREWORKS     ("tweakAutoSwitchFireworks",            false, ""),
     TWEAK_BLOCK_REACH_OVERRIDE      ("tweakBlockReachOverride",             false, true,  ""),
     TWEAK_BLOCK_TYPE_BREAK_RESTRICTION("tweakBlockTypeBreakRestriction",    false, ""),
     TWEAK_BREAKING_GRID             ("tweakBreakingGrid",                   false, "",    KeybindSettings.INGAME_BOTH),
