@@ -47,6 +47,11 @@ public abstract class MixinGameRenderer
         {
             cir.setReturnValue((float) Configs.Generic.ZOOM_FOV.getDoubleValue());
         }
+        else if (FeatureToggle.TWEAK_SPYGLASS_USES_TWEAK_ZOOM.getBooleanValue() &&
+                 this.minecraft.player != null && this.minecraft.player.isScoping())
+        {
+            cir.setReturnValue((float) Configs.Generic.ZOOM_FOV.getDoubleValue());
+        }
     }
 
     @Inject(method = "renderLevel", at = @At(

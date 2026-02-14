@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -59,6 +60,7 @@ public class InventoryUtils
     private static final List<Integer> TOOL_SWITCHABLE_SLOTS = new ArrayList<>();
     private static final List<Integer> TOOL_SWITCH_IGNORED_SLOTS = new ArrayList<>();
     private static final HashMap<EntityType<?>, HashSet<Item>> WEAPON_MAPPING = new HashMap<>();
+    private static int lastSpyglassSlot = -1;
 
     public static void setToolSwitchableSlots(String configStr)
     {
@@ -1828,6 +1830,45 @@ public class InventoryUtils
                     }
                 }
             }
+        }
+    }
+
+    public static void swapSpyglassToHand()
+    {
+        Minecraft mc  = Minecraft.getInstance();
+        Player player = mc.player;
+        if (player == null) return;
+        AbstractContainerMenu container = player.containerMenu;
+
+        int slotNumber = findSlotWithItem(container, Items.SPYGLASS.getDefaultInstance(), true, true);
+
+        if (slotNumber != -1)
+        {
+            lastSpyglassSlot = slotNumber;
+            swapItemToHand(player, player.getUsedItemHand(), slotNumber);
+
+            if (!mc.options.keyUse.isDown())
+            {
+                mc.options.keyUse.setDown(true);
+            }
+        }
+    }
+
+    public static void returnSpyglassToInventory()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
+        if (player == null) return;
+
+        if (lastSpyglassSlot != -1)
+        {
+            if (mc.options.keyUse.isDown())
+            {
+                mc.options.keyUse.setDown(false);
+            }
+
+            swapItemToHand(player, player.getUsedItemHand(), lastSpyglassSlot);
+            lastSpyglassSlot = -1;
         }
     }
 }

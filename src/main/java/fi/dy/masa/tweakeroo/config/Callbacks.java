@@ -115,6 +115,7 @@ public class Callbacks
         Hotkeys.SIT_DOWN_NEARBY_PETS.getKeybind().setCallback((a, k) -> MiscUtils.commandNearbyPets(true));
         Hotkeys.STAND_UP_NEARBY_PETS.getKeybind().setCallback((a, k) -> MiscUtils.commandNearbyPets(false));
         Hotkeys.SWAP_ELYTRA_CHESTPLATE.getKeybind().setCallback(callbackGeneric);
+	    Hotkeys.SWAP_SPYGLASS_AND_ACTIVATE.getKeybind().setCallback(callbackGeneric);
         Hotkeys.TOGGLE_AP_PROTOCOL.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.ACCURATE_PLACEMENT_PROTOCOL));
         Hotkeys.TOGGLE_GRAB_CURSOR.getKeybind().setCallback(callbackGeneric);
         Hotkeys.TOOL_PICK.getKeybind().setCallback(callbackGeneric);
@@ -732,6 +733,24 @@ public class Callbacks
                     //InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_off",
                     //String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
                 }
+            }
+            else if (key == Hotkeys.SWAP_SPYGLASS_AND_ACTIVATE.getKeybind() &&
+		             FeatureToggle.TWEAK_SPYGLASS_USES_TWEAK_ZOOM.getBooleanValue())
+            {
+	            if (action == KeyAction.PRESS)
+	            {
+//		            InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_on",
+//		            String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+		            InventoryUtils.swapSpyglassToHand();
+					MiscUtils.onSpyglassZoomActivated();
+	            }
+	            else
+	            {
+		            MiscUtils.onSpyglassZoomDeactivated();
+		            InventoryUtils.returnSpyglassToInventory();
+//		            InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_activate_off",
+//		            String.format("%s%.1f%s", GuiBase.TXT_GREEN, Configs.Generic.ZOOM_FOV.getDoubleValue(), GuiBase.TXT_RST));
+	            }
             }
             else if (key == Hotkeys.INVENTORY_PREVIEW_TOGGLE_SCREEN.getKeybind())
             {

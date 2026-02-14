@@ -88,6 +88,7 @@ public class MiscUtils
     private static final Date DATE = new Date();
     private static double mouseSensitivity = -1.0F;
     private static boolean zoomActive;
+    private static boolean spyglassZoomActive;
 
 //    private static boolean periodicAttackActive;
 //    private static boolean periodicUseActive;
@@ -95,6 +96,7 @@ public class MiscUtils
 //    private static boolean periodicHoldUseActive;
 
     private static PostKeyAction lastZoomValue;
+    private static PostKeyAction lastSpyglassValue;
 //    private static PostKeyAction lastPeriodicAttackValue;
 //    private static PostKeyAction lastPeriodicUseValue;
 //    private static PostKeyAction lastPeriodicHoldAttackValue;
@@ -226,7 +228,7 @@ public class MiscUtils
             if (lastZoomValue != null && lastZoomValue.isActive())
             {
                 if (lastZoomValue.getLastDoubleValue() != Configs.Generic.ZOOM_FOV.getDoubleValue() &&
-                        Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
+                    Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
                 {
                     Configs.Generic.ZOOM_FOV.setDoubleValue(lastZoomValue.getLastDoubleValue());
                 }
@@ -238,6 +240,55 @@ public class MiscUtils
             Minecraft.getInstance().levelRenderer.needsUpdate();
 
             zoomActive = false;
+        }
+    }
+
+    public static boolean isSpyglassZoomActive()
+    {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return FeatureToggle.TWEAK_SPYGLASS_USES_TWEAK_ZOOM.getBooleanValue() &&
+               player != null && player.isScoping();
+    }
+
+    public static void checkSpyglassZoomStatus()
+    {
+        if (spyglassZoomActive && isSpyglassZoomActive() == false)
+        {
+            onSpyglassZoomDeactivated();
+        }
+    }
+
+    public static void onSpyglassZoomActivated()
+    {
+        if (Configs.Generic.ZOOM_ADJUST_MOUSE_SENSITIVITY.getBooleanValue())
+        {
+            setMouseSensitivityForZoom();
+            lastSpyglassValue = new PostKeyAction(Configs.Generic.ZOOM_FOV.getDoubleValue());
+        }
+
+        spyglassZoomActive = true;
+    }
+
+    public static void onSpyglassZoomDeactivated()
+    {
+        if (spyglassZoomActive)
+        {
+            resetMouseSensitivityForZoom();
+            if (lastSpyglassValue != null && lastSpyglassValue.isActive())
+            {
+                if (lastSpyglassValue.getLastDoubleValue() != Configs.Generic.ZOOM_FOV.getDoubleValue() &&
+                    Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
+                {
+                    Configs.Generic.ZOOM_FOV.setDoubleValue(lastSpyglassValue.getLastDoubleValue());
+                }
+
+                lastSpyglassValue.setActionHandled();
+            }
+
+            // Refresh the rendered chunks when exiting zoom mode
+            Minecraft.getInstance().levelRenderer.needsUpdate();
+
+            spyglassZoomActive = false;
         }
     }
 

@@ -17,6 +17,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.item.BlockItem;
@@ -132,6 +133,8 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && dWheel != 0)
         {
+            Minecraft mc = Minecraft.getInstance();
+            LocalPlayer player = mc.player;
             String preGreen = GuiBase.TXT_GREEN;
             String rst = GuiBase.TXT_RST;
 
@@ -264,6 +267,23 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 return true;
             }
+            else if (FeatureToggle.TWEAK_SPYGLASS_USES_TWEAK_ZOOM.getBooleanValue() &&
+                     !FeatureToggle.TWEAK_ZOOM.getKeybind().isKeybindHeld() &&
+                     player != null && player.isScoping())
+            {
+                double diff = GuiBase.isCtrlDown() ?
+                              Configs.Generic.ZOOM_FOV_DIFFERENCE_CTRL.getDoubleValue() :
+                              Configs.Generic.ZOOM_FOV_DIFFERENCE.getDoubleValue();
+
+                double newValue = Configs.Generic.ZOOM_FOV.getDoubleValue() + (dWheel < 0 ? diff : -diff);
+                Configs.Generic.ZOOM_FOV.setDoubleValue(newValue);
+
+                String strValue = String.format("%s%.1f%s", preGreen, Configs.Generic.ZOOM_FOV.getDoubleValue(), rst);
+                InfoUtils.printActionbarMessage("tweakeroo.message.set_zoom_fov_to", strValue);
+
+                return true;
+            }
+
 //            else if (FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind().isKeybindHeld())
 //            {
 //                int newValue = Configs.Generic.PERIODIC_ATTACK_INTERVAL.getIntegerValue() + (dWheel > 0 ? 1 : -1);

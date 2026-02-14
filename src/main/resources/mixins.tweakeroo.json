@@ -40,6 +40,7 @@
         "item.MixinItem",
         "item.MixinItemGroup",
         "item.MixinItemStack",
+        "item.MixinSpyglassItem",
         "network.MixinServerboundSetStructureBlockPacket",
         "world.IMixinChunkLightProvider",
         "world.MixinChunkMap",

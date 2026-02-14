@@ -106,6 +106,7 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     TWEAK_SNAP_AIM_LOCK             ("tweakSnapAimLock",                    false, ""),
     TWEAK_SNEAK_1_15_2              ("tweakSneak_1.15.2",                   false, "","tweakeroo.config.feature_toggle.comment.tweakSneak_1_15_2", "tweakeroo.config.feature_toggle.prettyName.tweakSneak_1_15_2", "tweakeroo.config.feature_toggle.name.tweakSneak_1_15_2"),
     TWEAK_SPECTATOR_TELEPORT        ("tweakSpectatorTeleport",              false, ""),
+    TWEAK_SPYGLASS_USES_TWEAK_ZOOM  ("tweakSpyglassUsesTweakZoom",          false, ""),
     TWEAK_STRUCTURE_BLOCK_LIMIT     ("tweakStructureBlockLimit",            false, true, ""),
     TWEAK_SWAP_ALMOST_BROKEN_TOOLS  ("tweakSwapAlmostBrokenTools",          false, ""),
     TWEAK_TAB_COMPLETE_COORDINATE   ("tweakTabCompleteCoordinate",          false, ""),
