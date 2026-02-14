@@ -125,6 +125,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
                 if (!this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) ||
                     this.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage() - 10)
                 {
+                    this.autoSwitchElytraChestplate = this.getItemBySlot(EquipmentSlot.CHEST).copy();
                     InventoryUtils.equipBestElytra(this);
                 }
             }
@@ -154,8 +155,14 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
                             if (targetSlot >= 0)
                             {
                                 InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
-                                this.autoSwitchElytraChestplate = ItemStack.EMPTY;
                             }
+                            else
+                            {
+                                // cached item not found, try to swap to the default chest plate.
+                                InventoryUtils.swapElytraAndChestPlate(this);
+                            }
+
+                            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
                         }
                     }
                     else
