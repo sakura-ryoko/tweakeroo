@@ -1383,16 +1383,18 @@ public class InventoryUtils
 
         Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
 
-        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
+        int slotNumber = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
             if (!filter.test(testedStack)) return false;
             if (!filter.test(previousBestMatch)) return true;
             return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() 
             || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
         }, UniformInt.of(9, container.slots.size() - 1));
+        InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
-        if (targetSlot >= 0)
+
+        if (slotNumber >= 0)
         {
-            swapItemToEquipmentSlot(player, EquipmentSlot.OFFHAND, targetSlot);
+            swapItemToHand(player, hand, slotNumber);
         }
     }
 
@@ -1518,7 +1520,7 @@ public class InventoryUtils
         return slot == (36 + Inventory.getSelectionSize());
     }
 
-    private static void swapItemToHand(Player player, InteractionHand hand, int slotNumber)
+    public static void swapItemToHand(Player player, InteractionHand hand, int slotNumber)
     {
         AbstractContainerMenu container = player.containerMenu;
 
