@@ -12,10 +12,7 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.config.options.*;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.util.ActiveMode;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.MessageOutputType;
+import fi.dy.masa.malilib.util.*;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -156,6 +153,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_FIRST			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_ORES			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_OVERRIDE		= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
+        public static final ConfigOptionList    	UTILITY_HAND_SLOT                   = new ConfigOptionList  ("utilityHandSlot", HandSlot.MAIN_HAND).apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", true, "").apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
         public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
@@ -201,6 +199,7 @@ public class Configs implements IConfigHandler
                 SNAP_AIM_INDICATOR,
                 SNAP_AIM_ONLY_CLOSE_TO_ANGLE,
                 SNAP_AIM_PITCH_OVERSHOOT,
+                UTILITY_HAND_SLOT,
                 ZOOM_ADJUST_MOUSE_SENSITIVITY,
 
                 AREA_SELECTION_USE_ALL,

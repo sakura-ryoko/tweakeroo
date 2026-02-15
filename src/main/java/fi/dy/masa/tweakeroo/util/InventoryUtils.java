@@ -42,6 +42,7 @@ import fi.dy.masa.malilib.data.CachedBlockTags;
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.HandSlot;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.log.AnsiLogger;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -1839,13 +1840,14 @@ public class InventoryUtils
         Player player = mc.player;
         if (player == null) return;
         AbstractContainerMenu container = player.containerMenu;
+        InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
         int slotNumber = findSlotWithItem(container, Items.SPYGLASS.getDefaultInstance(), true, true);
 
         if (slotNumber != -1)
         {
             lastSpyglassSlot = slotNumber;
-            swapItemToHand(player, player.getUsedItemHand(), slotNumber);
+            swapItemToHand(player, hand, slotNumber);
 
             if (!mc.options.keyUse.isDown())
             {
@@ -1859,6 +1861,7 @@ public class InventoryUtils
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null) return;
+        InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
         if (lastSpyglassSlot != -1)
         {
@@ -1867,7 +1870,7 @@ public class InventoryUtils
                 mc.options.keyUse.setDown(false);
             }
 
-            swapItemToHand(player, player.getUsedItemHand(), lastSpyglassSlot);
+            swapItemToHand(player, hand, lastSpyglassSlot);
             lastSpyglassSlot = -1;
         }
     }
