@@ -65,10 +65,11 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 				if (FeatureToggle.TWEAK_AUTO_SWITCH_ROCKETS.getBooleanValue())
 				{
 					EquipmentSlot handSlot = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue()).asEquipmentSlot();
+
 					if (!this.getItemBySlot(handSlot).is(Items.FIREWORK_ROCKET))
 					{
 						this.autoSwitchFireworkHand = this.getItemBySlot(handSlot).copy();
-						InventoryUtils.equipBestFirework(this);
+						InventoryUtils.equipBestFlightRockets(this);
 					}
 					else
 					{
@@ -93,25 +94,15 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 		{
 			if (DATA_SHARED_FLAGS_ID.equals(data) && this.wasFallFlying && !this.isFallFlying())
 			{
-				if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue()) {
+				if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
+				{
 					if (this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA))
 					{
 						if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.is(Items.ELYTRA))
 						{
 							if (this.inventoryMenu.getCarried().isEmpty())
 							{
-								int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchElytraChestplate, true, false);
-
-								if (targetSlot >= 0)
-								{
-									InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
-								}
-								else
-								{
-									// cached item not found, try to swap to the default chest plate.
-									InventoryUtils.swapElytraAndChestPlate(this);
-								}
-
+								InventoryUtils.swapElytraFromChest(this, this.autoSwitchElytraChestplate);
 								this.autoSwitchElytraChestplate = ItemStack.EMPTY;
 							}
 						}
@@ -132,13 +123,7 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 						{
 							if (this.inventoryMenu.getCarried().isEmpty())
 							{
-								int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchFireworkHand, true, false);
-
-								if (targetSlot >= 0)
-								{
-									InventoryUtils.swapItemToHand(this, hand, targetSlot);
-								}
-
+								InventoryUtils.swapFlightRocketsFromHand(this, hand, this.autoSwitchFireworkHand);
 								this.autoSwitchFireworkHand = ItemStack.EMPTY;
 							}
 						}
