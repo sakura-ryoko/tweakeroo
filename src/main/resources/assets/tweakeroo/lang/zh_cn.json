@@ -512,7 +512,7 @@
     "tweakeroo.config.generic.comment.rememberFlexibleFromClick": "启用后，只要按住使用键（右键），\n灵活放置状态将从首个放置方块开始保持。\n无需持续按住所有灵活功能激活键即可快速放置同朝向方块。",
     "tweakeroo.config.generic.comment.renderLimitItem": "每帧渲染的物品实体最大数量。\n-1为默认值（禁用此限制）。",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "每帧渲染的经验球实体最大数量。\n-1为默认值（禁用此限制）。",
-    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "启用“§d自动切换烟花火箭(tweakAutoSwitchRockets)§r”\n以允许将带有爆炸效果的烟花用作飞行火箭",
+    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "允许在使用“§d自动切换烟花火箭(tweakAutoSwitchRockets)§r”时\n将烟花用作带爆炸效果的飞行火箭",
     "tweakeroo.config.generic.comment.scaffoldPlaceDistance": "“像脚手架一样放方块（tweakScaffoldPlace）”功能的玩家的最大操作距离。\n由 Andrew54757 在 TweakFork 下撰写",
     "tweakeroo.config.generic.comment.scaffoldPlaceVanilla": "开启后，（放置的）延伸方向仅由玩家方向决定。\n由 Andrew54757 在 TweakFork 下撰写",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "启用“幽匿感测体脉冲时长（sculkSensorPulseLength）”时，\n幽匿感测体的脉冲时长。",
