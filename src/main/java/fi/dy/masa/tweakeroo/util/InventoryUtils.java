@@ -1380,15 +1380,19 @@ public class InventoryUtils
         }
 
         AbstractContainerMenu container = player.containerMenu;
-
         Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
 
-        int slotNumber = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
-            if (!filter.test(testedStack)) return false;
-            if (!filter.test(previousBestMatch)) return true;
-            return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() 
-            || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
-        }, UniformInt.of(9, container.slots.size() - 1));
+        int slotNumber = findSlotWithBestItemMatch(
+                container, (testedStack, previousBestMatch) ->
+                {
+                    if (!filter.test(testedStack)) return false;
+                    if (!filter.test(previousBestMatch)) return true;
+                    return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration()
+                    || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
+                },
+                UniformInt.of(9, container.slots.size() - 1)
+        );
+
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
 
@@ -1397,8 +1401,6 @@ public class InventoryUtils
             swapItemToHand(player, hand, slotNumber);
         }
     }
-
-    
 
     // todo for easier forwards porting when the `ArmorItem` disappears
     private static boolean checkChestSlot(ItemStack stack)
