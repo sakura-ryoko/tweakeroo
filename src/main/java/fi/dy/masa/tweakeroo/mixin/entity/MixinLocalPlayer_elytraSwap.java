@@ -43,7 +43,7 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 	)
 	private void tweakeroo_onFallFlyingCheckChestSlot(CallbackInfo ci)
 	{
-		if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue())
+		if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_ROCKETS.getBooleanValue())
 		{
 			// this.checkGliding()
 			if (!this.onGround() && !this.isPassenger() && this.fallFlyTicks == 0 && !this.isInLiquid() && !this.onClimbable() && !this.hasEffect(MobEffects.LEVITATION))
@@ -62,7 +62,7 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 						this.autoSwitchElytraChestplate = ItemStack.EMPTY;
 					}
 				}
-				if (FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue())
+				if (FeatureToggle.TWEAK_AUTO_SWITCH_ROCKETS.getBooleanValue())
 				{
 					EquipmentSlot handSlot = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue()).asEquipmentSlot();
 					if (!this.getItemBySlot(handSlot).is(Items.FIREWORK_ROCKET))
@@ -89,7 +89,7 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 	@Inject(method = "onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V", at = @At("RETURN"))
 	private void tweakeroo_onStopFlying(EntityDataAccessor<?> data, CallbackInfo ci)
 	{
-		if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue())
+		if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_ROCKETS.getBooleanValue())
 		{
 			if (DATA_SHARED_FLAGS_ID.equals(data) && this.wasFallFlying && !this.isFallFlying())
 			{
@@ -122,7 +122,7 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 						}
 					}
 				}
-				if (FeatureToggle.TWEAK_AUTO_SWITCH_FIREWORKS.getBooleanValue())
+				if (FeatureToggle.TWEAK_AUTO_SWITCH_ROCKETS.getBooleanValue())
 				{
 					InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
