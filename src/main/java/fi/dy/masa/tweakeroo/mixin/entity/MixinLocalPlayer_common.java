@@ -14,35 +14,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.InventoryUtils;
+
 import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.HangingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
-@Mixin(value = LocalPlayer.class, priority = 1001)
-public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
+@Mixin(value = LocalPlayer.class)
+public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
 {
     @Shadow public ClientInput input;
     @Shadow protected int sprintTriggerTime;
     @Shadow public float oPortalEffectIntensity;
     @Shadow public float portalEffectIntensity;
-    @Shadow private boolean wasFallFlying;
 
     @Unique private float realNauseaIntensity;
-    @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
 
-    private MixinClientPlayerEntity(ClientLevel world, GameProfile profile)
+    private MixinLocalPlayer_common(ClientLevel world, GameProfile profile)
     {
         super(world, profile);
     }
@@ -109,69 +103,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayer
         if (Configs.Disable.DISABLE_DOUBLE_TAP_SPRINT.getBooleanValue())
         {
             this.sprintTriggerTime = 0;
-        }
-    }
-
-    @Inject(method = "aiStep",
-            at = @At(value = "INVOKE", shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/client/player/LocalPlayer;tryToStartFallFlying()Z"))
-    private void tweakeroo_onFallFlyingCheckChestSlot(CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
-        {
-            // this.checkGliding()
-            if (!this.onGround() && !this.isPassenger() && this.fallFlyTicks == 0 && !this.isInLiquid() && !this.onClimbable() && !this.hasEffect(MobEffects.LEVITATION))
-            {
-                if (!this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) ||
-                    this.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage() - 10)
-                {
-                    this.autoSwitchElytraChestplate = this.getItemBySlot(EquipmentSlot.CHEST).copy();
-                    InventoryUtils.equipBestElytra(this);
-                }
-            }
-        }
-        else
-        {
-            // reset auto switch item if the feature is disabled.
-            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
-        }
-    }
-
-    @Inject(method = "onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V", at = @At("RETURN"))
-    private void tweakeroo_onStopFlying(EntityDataAccessor<?> data, CallbackInfo ci)
-    {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
-        {
-            if (DATA_SHARED_FLAGS_ID.equals(data) && this.wasFallFlying)
-            {
-                if (!this.isFallFlying() && this.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA))
-                {
-                    if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.is(Items.ELYTRA))
-                    {
-                        if (this.inventoryMenu.getCarried().isEmpty())
-                        {
-                            int targetSlot = InventoryUtils.findSlotWithItem(this.inventoryMenu, this.autoSwitchElytraChestplate, true, false);
-
-                            if (targetSlot >= 0)
-                            {
-                                InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
-                            }
-                            else
-                            {
-                                // cached item not found, try to swap to the default chest plate.
-                                InventoryUtils.swapElytraAndChestPlate(this);
-                            }
-
-                            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
-                        }
-                    }
-                    else
-                    {
-                        // if cached previous item is empty, try to swap back to the default chest plate.
-                        InventoryUtils.swapElytraAndChestPlate(this);
-                    }
-                }
-            }
         }
     }
 

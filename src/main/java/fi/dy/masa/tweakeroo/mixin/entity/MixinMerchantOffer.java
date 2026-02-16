@@ -11,7 +11,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.world.item.trading.MerchantOffer;
 
 @Mixin(MerchantOffer.class)
-public abstract class MixinTradeOffer
+public abstract class MixinMerchantOffer
 {
     @Shadow @Mutable @Final private int maxUses;
 

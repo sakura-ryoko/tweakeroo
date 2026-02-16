@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -38,13 +37,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.lang3.tuple.Pair;
-import fi.dy.masa.malilib.data.CachedBlockTags;
+
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.HandSlot;
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.log.AnsiLogger;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -1369,6 +1367,83 @@ public class InventoryUtils
         if (targetSlot >= 0)
         {
             swapItemToEquipmentSlot(player, EquipmentSlot.CHEST, targetSlot);
+        }
+    }
+
+    public static void equipBestFlightRockets(Player player)
+    {
+        if (player == null || GuiUtils.getCurrentScreen() != null)
+        {
+            return;
+        }
+
+        AbstractContainerMenu container = player.containerMenu;
+        Predicate<ItemStack> filter;
+
+        if (Configs.Generic.ROCKET_SWAP_ALLOW_EXPLOSIONS.getBooleanValue())
+        {
+            // Allows the player to Auto Swap any fireworks
+            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
+        }
+        else
+        {
+            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET) && s.get(DataComponents.FIREWORKS).explosions().isEmpty();
+        }
+
+        int slotNumber = findSlotWithBestItemMatch(
+                container, (testedStack, previousBestMatch) ->
+                {
+                    if (!filter.test(testedStack)) return false;
+                    if (!filter.test(previousBestMatch)) return true;
+                    return  testedStack.get(DataComponents.FIREWORKS).flightDuration() >  previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() ||
+                           (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() &&
+                            testedStack.getCount() > previousBestMatch.getCount());
+                },
+                UniformInt.of(9, container.slots.size() - 1)
+        );
+
+        InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
+
+        if (slotNumber >= 0)
+        {
+            swapItemToHand(player, hand, slotNumber);
+        }
+    }
+
+    public static void swapFlightRocketsFromHand(Player player, InteractionHand hand, ItemStack stackReference)
+    {
+        if (player == null || GuiUtils.getCurrentScreen() != null)
+        {
+            return;
+        }
+
+        AbstractContainerMenu container = player.containerMenu;
+        int targetSlot = InventoryUtils.findSlotWithItem(container, stackReference, true, false);
+
+        if (targetSlot >= 0)
+        {
+            swapItemToHand(player, hand, targetSlot);
+        }
+    }
+
+    public static void swapElytraFromChest(Player player, ItemStack stackReference)
+    {
+        if (player == null || GuiUtils.getCurrentScreen() != null)
+        {
+            return;
+        }
+
+        AbstractContainerMenu container = player.containerMenu;
+        int targetSlot = findSlotWithItem(container, stackReference, true, false);
+
+        if (targetSlot >= 0)
+        {
+            swapItemToEquipmentSlot(player, EquipmentSlot.CHEST, targetSlot);
+        }
+        else
+        {
+            // cached item not found, try to swap to the default chest plate.
+            swapElytraAndChestPlate(player);
         }
     }
 
