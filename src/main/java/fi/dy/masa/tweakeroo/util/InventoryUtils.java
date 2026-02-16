@@ -1378,7 +1378,17 @@ public class InventoryUtils
         }
 
         AbstractContainerMenu container = player.containerMenu;
-        Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
+        Predicate<ItemStack> filter;
+
+        if (Configs.Generic.ROCKET_SWAP_ALLOW_EXPLOSIONS.getBooleanValue())
+        {
+            // Allows the player to Auto Swap any fireworks
+            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
+        }
+        else
+        {
+            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET) && s.get(DataComponents.FIREWORKS).explosions().isEmpty();
+        }
 
         int slotNumber = findSlotWithBestItemMatch(
                 container, (testedStack, previousBestMatch) ->

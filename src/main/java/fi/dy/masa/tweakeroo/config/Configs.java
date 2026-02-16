@@ -117,6 +117,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       	REMEMBER_FLEXIBLE                   = new ConfigBoolean     ("rememberFlexibleFromClick", true).apply(GENERIC_KEY);
         public static final ConfigInteger       	RENDER_LIMIT_ITEM                   = new ConfigInteger     ("renderLimitItem", -1, -1, 10000).apply(GENERIC_KEY);
         public static final ConfigInteger       	RENDER_LIMIT_XP_ORB                 = new ConfigInteger     ("renderLimitXPOrb", -1, -1, 10000).apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed  	ROCKET_SWAP_ALLOW_EXPLOSIONS        = new ConfigBooleanHotkeyed("rocketSwapAllowExplosions", false, "").apply(GENERIC_KEY);
         public static final ConfigInteger       	SCAFFOLD_PLACE_DISTANCE             = new ConfigInteger     ("scaffoldPlaceDistance", 5, 1, 20).apply(GENERIC_KEY);
         public static final ConfigBoolean       	SCAFFOLD_PLACE_VANILLA              = new ConfigBoolean     ("scaffoldPlaceVanilla", false).apply(GENERIC_KEY);
         public static final ConfigInteger       	SCULK_SENSOR_PULSE_LENGTH           = new ConfigInteger     ("sculkSensorPulseLength", 40, 0, 10000).apply(GENERIC_KEY);
@@ -210,6 +211,7 @@ public class Configs implements IConfigHandler
                 ENTITY_TYPE_ATTACK_RESTRICTION_WARN,
                 PLACEMENT_RESTRICTION_MODE,
                 HOTBAR_SWAP_OVERLAY_ALIGNMENT,
+                ROCKET_SWAP_ALLOW_EXPLOSIONS,
                 SELECTIVE_BLOCKS_TRACK_PISTONS,
                 SELECTIVE_BLOCKS_HIDE_PARTICLES,
                 SELECTIVE_BLOCKS_HIDE_ENTITIES,
@@ -297,6 +299,7 @@ public class Configs implements IConfigHandler
 				FREE_CAMERA_PLAYER_MOVEMENT,
 				FREE_CAMERA_SHOW_HANDS,
 				FREE_CAMERA_SHOW_HOTBAR,
+                ROCKET_SWAP_ALLOW_EXPLOSIONS,
                 TOOL_SWAP_BETTER_ENCHANTS,
                 TOOL_SWAP_PREFER_FORTUNE_OVERRIDE,
                 TOOL_SWAP_PREFER_SILK_TOUCH,
