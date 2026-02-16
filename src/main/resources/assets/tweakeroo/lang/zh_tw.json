@@ -512,7 +512,7 @@
     "tweakeroo.config.generic.comment.rememberFlexibleFromClick": "如果啟用，在按住使用鍵（右鍵點擊）後，§6[方塊靈活放置]§r 狀態將從第一個放置的方塊開始記住朝向。\n不需要一直按住 §6[方塊靈活放置]§r 的快捷鍵即可將所有方塊快速放置在同一方向",
     "tweakeroo.config.generic.comment.renderLimitItem": "設定 §6[限制實體繪製]§r 功能對§e掉落物§f的最大繪製數量。\n填寫 -1 代表不限制數量，即停用此限制",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "設定 §6[限制實體繪製]§r 功能對§e經驗球§f的最大繪製數量。\n填寫 -1 代表不限制數量，即停用此限制",
-    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "Enable '§dtweakAutoSwitchRockets§r' to allow using\nFireworks with Explosions as Flight Rockets",
+    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "Enable to allow using Fireworks with Explosions\nas Flight Rockets while using '§dtweakAutoSwitchRockets§r'",
     "tweakeroo.config.generic.comment.scaffoldPlaceDistance": "Maximum operational distance from the player for the 'tweakScaffoldPlace' tweak.\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.generic.comment.scaffoldPlaceVanilla": "When enabled, extend direction is only set by player direction.\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "啟用 §6[調整伏聆植物脈衝距離]§r 時，該數值為伏聆植物發出的脈衝長度。（單位：遊戲刻）",

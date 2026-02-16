@@ -512,7 +512,7 @@
     "tweakeroo.config.generic.comment.rememberFlexibleFromClick": "If enabled, then the Flexible Block Placement status\nwill be remembered from the first placed block,\nas long as the use key (right click) is held down.\nBasically you don't have to keep holding all the flexible\nactivation keys to fast place all the blocks in the same orientation.",
     "tweakeroo.config.generic.comment.renderLimitItem": "Maximum number of item entities rendered per frame.\nUse -1 for normal behaviour, ie. to disable this limit.",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "Maximum number of XP orb entities rendered per frame.\nUse -1 for normal behaviour, ie. to disable this limit.",
-    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "Enable '§dtweakAutoSwitchRockets§r' to allow using\nFireworks with Explosions as Flight Rockets",
+    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "Enable to allow using Fireworks with Explosions\nas Flight Rockets while using '§dtweakAutoSwitchRockets§r'",
     "tweakeroo.config.generic.comment.scaffoldPlaceDistance": "Maximum operational distance from the player for the 'tweakScaffoldPlace' tweak.\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.generic.comment.scaffoldPlaceVanilla": "When enabled, extend direction is only set by player direction.\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "The pulse length for Sculk Sensors, if the 'tweakSculkPulseLength' tweak is enabled.",

@@ -512,7 +512,7 @@
     "tweakeroo.config.generic.comment.rememberFlexibleFromClick": "활성화된 경우, 사용 키(오른쪽 클릭)를 누르고 있는 동안,\n유연한 블록 설치 상태가 첫 번째로 설치한 블록 상태를 기억합니다.\n기본적으로 모든 블록을 같은 방향으로 빠르게 설치하기 위해\n모든 유연한 활성화 키를 계속 누르고 있을 필요는 없습니다.",
     "tweakeroo.config.generic.comment.renderLimitItem": "프레임당 렌더링 되는 아이템 엔티티의 최대 수입니다.\n일반적으로 -1을 사용합니다. 즉, 이 한계를 비활성화합니다.",
     "tweakeroo.config.generic.comment.renderLimitXPOrb": "프레임당 렌더링 되는 경험치 구슬 엔티티의 최대 수입니다.\n일반적으로 -1을 사용합니다. 즉, 이 한계를 비활성화합니다.",
-    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "Enable '§dtweakAutoSwitchRockets§r' to allow using\nFireworks with Explosions as Flight Rockets",
+    "tweakeroo.config.generic.comment.rocketSwapAllowExplosions": "Enable to allow using Fireworks with Explosions\nas Flight Rockets while using '§dtweakAutoSwitchRockets§r'",
     "tweakeroo.config.generic.comment.scaffoldPlaceDistance": "'트윅 비계 설치' 트윅 사용 시 플레이어로부터 최대 작업 거리입니다.\nAndrew54757가 TweakFork에서 작성했습니다.",
     "tweakeroo.config.generic.comment.scaffoldPlaceVanilla": "활성화된 경우, 확장 방향이 플레이어의 방향에 의해 결정됩니다.\nAndrew54757가 TweakFork에서 작성했습니다.",
     "tweakeroo.config.generic.comment.sculkSensorPulseLength": "'트윅 스컬크 펄스 길이' 트윅이 활성화된 경우 스컬크 센서가 감지하는 펄스 거리입니다.",
