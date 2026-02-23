@@ -49,6 +49,7 @@
     ],
     "client": [
         "client.MixinMinecraft",
+        "entity.MixinAbstractClientPlayer",
         "entity.MixinLocalPlayer_common",
         "entity.MixinLocalPlayer_elytraSwap",
         "fog.MixinAtmosphericFogEnvironment",

@@ -23,7 +23,7 @@
     "tweakeroo.config.disable.comment.disableFallingBlockEntityRendering": "If enabled, then falling block entities won't be rendered at all",
     "tweakeroo.config.disable.comment.disableFireOverlay": "Prevents the fire texture from rendering on screen\nwhen the player is on fire",
     "tweakeroo.config.disable.comment.disableFirstPersonEffectParticles": "Removes the potion effect particles/swirlies in first person\n(from the player itself)",
-    "tweakeroo.config.disable.comment.disableFreezeOverlay": "Prevents the freezing vignette/frost effect from rendering\nwhen the player is inside powder snow",
+    "tweakeroo.config.disable.comment.disableFreezeOverlay": "Prevents the freezing vignette/frost effect and FOV change\nfrom rendering when the player is inside powder snow",
     "tweakeroo.config.disable.comment.disableInventoryEffectRendering": "Removes the potion effect rendering from the inventory GUIs",
     "tweakeroo.config.disable.comment.disableItemSwitchRenderCooldown": "If true, then there won't be any cooldown/equip animation\nwhen switching the held item or using the item.",
     "tweakeroo.config.disable.comment.disableMobSpawnerMobRendering": "Removes the entity rendering from mob spawners",
