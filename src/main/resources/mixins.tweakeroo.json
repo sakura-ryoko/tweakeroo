@@ -91,6 +91,7 @@
         "render.MixinHugeExplosionSeedParticle",
         "render.MixinItemInHandRenderer",
         "render.MixinParticleEngine",
+        "render.MixinScreenEffectRenderer",
         "render.MixinSpawnerRenderer",
         "render.MixinWeatherEffectRenderer",
         "render.MixinWindow",

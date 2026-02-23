@@ -3,11 +3,14 @@ package fi.dy.masa.tweakeroo.mixin.render;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(value = Gui.class, priority = 990)
@@ -20,5 +23,18 @@ public class MixinGui
 		{
 			ci.cancel();
 		}
+	}
+
+	@Redirect(method = "renderCameraOverlays",
+			  at = @At(value = "INVOKE",
+					   target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))
+	private int tweakeroo$disableFreezeOverlay(LocalPlayer player)
+	{
+		if (Configs.Disable.DISABLE_FREEZE_OVERLAY.getBooleanValue())
+		{
+			return 0;
+		}
+
+		return player.getTicksFrozen();
 	}
 }
