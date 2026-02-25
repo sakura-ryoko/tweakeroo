@@ -558,12 +558,10 @@ public class InventoryUtils
             // Use correct tool if we have it
             if (EquipmentUtils.isCorrectTool(testedStack, state) && !EquipmentUtils.isCorrectTool(previousTool, state))
             {
-                Tweakeroo.debugLog("Correct tool: swapping; {} is correct for {}, but {} is not", testedStack, state, previousTool);
                 return true;
             }
             if (!EquipmentUtils.isCorrectTool(testedStack, state) && EquipmentUtils.isCorrectTool(previousTool, state))
             {
-                Tweakeroo.debugLog("Correct tool: keeping; {} is not correct for {}, but {} is", testedStack, state, previousTool);
                 return false;
             }
             return null;
@@ -574,7 +572,6 @@ public class InventoryUtils
             if (!(EquipmentUtils.isAnyTool(previousTool) || EquipmentUtils.isSword(previousTool)))
             {
                 boolean isAnyTool = EquipmentUtils.isAnyTool(testedStack) || EquipmentUtils.isSword(testedStack);
-                Tweakeroo.debugLog("Any tool: swapping; {} is a tool but {} is not", testedStack, previousTool);
                 return isAnyTool;
             }
             return null;
@@ -586,12 +583,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.isSword(testedStack) && !EquipmentUtils.isSword(previousTool))
                 {
-                    Tweakeroo.debugLog("Sword on bamboo: swapping; {} is a sword but {} is not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.isSword(testedStack) && EquipmentUtils.isSword(previousTool))
                 {
-                    Tweakeroo.debugLog("Sword on bamboo: keeping; {} is not a sword but {} is", testedStack, previousTool);
                     return false;
                 }
             }
@@ -604,12 +599,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.isHoe(testedStack) && !EquipmentUtils.isHoe(previousTool))
                 {
-                    Tweakeroo.debugLog("Hoe on leaves: swapping; {} is a hoe but {} is not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.isHoe(testedStack) && EquipmentUtils.isHoe(previousTool))
                 {
-                    Tweakeroo.debugLog("Hoe on leaves: keeping; {} is not a hoe but {} is", testedStack, previousTool);
                     return false;
                 }
             }
@@ -622,12 +615,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.isShears(testedStack) && !EquipmentUtils.isShears(previousTool))
                 {
-                    Tweakeroo.debugLog("Shears on needs_shears: swapping; {} is shears but {} is not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.isShears(testedStack) && EquipmentUtils.isShears(previousTool))
                 {
-                    Tweakeroo.debugLog("Shears on needs_shears: keeping; {} is not shears but {} is", testedStack, previousTool);
                     return false;
                 }
             }
@@ -640,12 +631,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isPickAxe(previousTool))
                 {
-                    Tweakeroo.debugLog("Pickaxe on needs_pickaxe: swapping; {} is a pickaxe but {} is not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isPickAxe(previousTool))
                 {
-                    Tweakeroo.debugLog("Pickaxe on needs_pickaxe: keeping; {} is not a pickaxe but {} is", testedStack, previousTool);
                     return false;
                 }
             }
@@ -656,12 +645,10 @@ public class InventoryUtils
             // Use fortune if we have it
             if (EquipmentUtils.hasFortune(testedStack) && !EquipmentUtils.hasFortune(previousTool))
             {
-                Tweakeroo.debugLog("Fortune: swapping; {} has fortune but {} does not", testedStack, previousTool);
                 return true;
             }
             if (!EquipmentUtils.hasFortune(testedStack) && EquipmentUtils.hasFortune(previousTool))
             {
-                Tweakeroo.debugLog("Fortune: keeping; {} does not have fortune but {} does", testedStack, previousTool);
                 return false;
             }
             return null;
@@ -671,12 +658,10 @@ public class InventoryUtils
             // Use silk touch if we have it
             if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
             {
-                Tweakeroo.debugLog("Silk touch: swapping; {} has silk touch but {} does not", testedStack, previousTool);
                 return true;
             }
             if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
             {
-                Tweakeroo.debugLog("Silk touch: keeping; {} does not have silk touch but {} does", testedStack, previousTool);
                 return false;
             }
             return null;
@@ -688,12 +673,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
                 {
-                    Tweakeroo.debugLog("Silk touch first: swapping; {} has silk touch but {} does not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
                 {
-                    Tweakeroo.debugLog("Silk touch first: keeping; {} does not have silk touch but {} does", testedStack, previousTool);
                     return false;
                 }
             }
@@ -706,12 +689,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
                 {
-                    Tweakeroo.debugLog("Silk touch ores: swapping; {} has silk touch but {} does not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
                 {
-                    Tweakeroo.debugLog("Silk touch ores: keeping; {} does not have silk touch but {} does", testedStack, previousTool);
                     return false;
                 }
             }
@@ -724,12 +705,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
                 {
-                    Tweakeroo.debugLog("Silk touch override: swapping; {} has silk touch but {} does not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
                 {
-                    Tweakeroo.debugLog("Silk touch override: keeping; {} does not have silk touch but {} does", testedStack, previousTool);
                     return false;
                 }
             }
@@ -742,12 +721,10 @@ public class InventoryUtils
             {
                 if (EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isPickAxe(previousTool))
                 {
-                    Tweakeroo.debugLog("Pickaxe override: swapping; {} is a pickaxe but {} is not", testedStack, previousTool);
                     return true;
                 }
                 if (!EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isPickAxe(previousTool))
                 { 
-                    Tweakeroo.debugLog("Pickaxe override: keeping; {} is not a pickaxe but {} is", testedStack, previousTool);
                     return false;
                 }
             }
@@ -757,12 +734,10 @@ public class InventoryUtils
         {
             if (hasBetterToolEnchantments(testedStack, previousTool))
             {
-                Tweakeroo.debugLog("Better enchantments: swapping; {} has better enchantments than {}", testedStack, previousTool);
                 return true;
             }
             if (hasBetterToolEnchantments(previousTool, testedStack))
             {
-                Tweakeroo.debugLog("Better enchantments: keeping; {} has better enchantments than {}", previousTool, testedStack);
                 return false;
             }
             return null;
@@ -775,12 +750,10 @@ public class InventoryUtils
 
             if (testedWeight > prevWeight)
             {
-                Tweakeroo.debugLog("Better material: swapping; {} has better material than {}", testedStack, previousTool);
                 return true;
             }
             if (prevWeight < testedWeight)
             {
-                Tweakeroo.debugLog("Better material: keeping; {} has better material than {}", previousTool, testedStack);
                 return false;
             }
             return null;
@@ -793,12 +766,10 @@ public class InventoryUtils
 
             if (testedWeight > prevWeight)
             {
-                Tweakeroo.debugLog("Better rarity: swapping; {} has better rarity than {}", testedStack, previousTool);
                 return true;
             }
             if (prevWeight < testedWeight)
             {
-                Tweakeroo.debugLog("Better rarity: keeping; {} has better rarity than {}", previousTool, testedStack);
                 return false;
             }
             return null;
@@ -811,12 +782,10 @@ public class InventoryUtils
 
             if (testedSpeed > prevSpeed)
             {
-                Tweakeroo.debugLog("Faster tool: swapping; {} is faster than {}", testedStack, previousTool);
                 return true;
             }
             if (testedSpeed < prevSpeed)
             {
-                Tweakeroo.debugLog("Faster tool: keeping; {} is faster than {}", previousTool, testedStack);
                 return false;
             }
             return null;
@@ -825,73 +794,103 @@ public class InventoryUtils
         {
             return () ->
             {
-                if (r1.get() != null && r2.get() != null)
+                Boolean r1Result = r1.get();
+                if (r1Result == null || r1Result)
                 {
-                    return r1.get() && r2.get();
+                    return r2.get();
                 }
                 return null;
             };
         };
-        List<Supplier<Boolean>> rules = new ArrayList<Supplier<Boolean>>();
-        rules.add(anyToolRule);
+
+        Map<String,Supplier<Boolean>> ruleMap = Map.ofEntries(
+            Map.entry("correctTool", correctToolRule),
+            Map.entry("anyTool", anyToolRule),
+            Map.entry("swordOnBamboo", swordOnBambooRule),
+            Map.entry("hoeOnLeaves", hoeOnLeavesRule),
+            Map.entry("shearsOnNeedsShears", shearsOnNeedsShearsRule),
+            Map.entry("pickaxeOnNeedsPickaxe", pickaxeOnNeedsPickaxeRule),
+            Map.entry("useFortune", combineRules.apply(correctToolRule, useFortuneRule)),
+            Map.entry("useSilkTouch", combineRules.apply(correctToolRule, useSilkTouchRule)),
+            Map.entry("silkTouchFirst", silkTouchFirstRule),
+            Map.entry("silkTouchOres", silkTouchOresRule),
+            Map.entry("silkTouchOverride", silkTouchOverrideRule),
+            Map.entry("pickaxeOverride", pickaxeOverrideRule),
+            Map.entry("betterEnchantments", betterEnchantRule),
+            Map.entry("betterMaterial", betterMaterialRule),
+            Map.entry("betterRarity", betterRarityRule),
+            Map.entry("fasterTool", fasterTool)
+        );
+
+        List<String> rules = new ArrayList<String>();
+        rules.add("anyTool");
         if (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue())
         {
-            rules.add(swordOnBambooRule);
+            rules.add("swordOnBamboo");
         }
         if (Configs.Generic.TOOL_SWAP_LEAVES_USES_HOE_FIRST.getBooleanValue())
         {
-            rules.add(hoeOnLeavesRule);
+            rules.add("hoeOnLeaves");
         }
         if (Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue())
         {
-            rules.add(shearsOnNeedsShearsRule);
+            rules.add("shearsOnNeedsShears");
         }
         if (Configs.Generic.TOOL_SWAP_NEEDS_PICKAXE_FIRST.getBooleanValue())
         {
-            rules.add(pickaxeOnNeedsPickaxeRule);
+            rules.add("pickaxeOnNeedsPickaxe");
         }
         if (Configs.Generic.TOOL_SWAP_PICKAXE_OVERRIDE.getBooleanValue())
         {
-            rules.add(pickaxeOverrideRule);
+            rules.add("pickaxeOverride");
         }
         if (Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
         {
             // Get the correct tool and then find the fortune version if there is one
-            rules.add(combineRules.apply(correctToolRule, useFortuneRule));
+            rules.add("useFortune");
         }
         if (Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue())
         {
             // Get the correct tool and then find the silk touch version if there is one
-            rules.add(combineRules.apply(correctToolRule, useSilkTouchRule));
+            rules.add("useSilkTouch");
         }
+
         // For silk touch flags use the wrong silk touch tool over the right non-silk touch
         if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue())
         {
-            rules.add(silkTouchFirstRule);
+            rules.add("silkTouchFirst");
         }
         if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue())
         {
-            rules.add(silkTouchOresRule);
+            rules.add("silkTouchOres");
         }
         if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue())
         {
-            rules.add(silkTouchOverrideRule);
+            rules.add("silkTouchOverride");
         }
-        rules.add(correctToolRule);
+
+        
+        rules.add("correctTool");
         if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
         {
-            rules.add(betterEnchantRule);
+            rules.add("betterEnchantments");
         }
-        rules.add(fasterTool);
-        rules.add(betterMaterialRule);
-        rules.add(betterRarityRule);
-        Tweakeroo.debugLog("Comparing current tool {} to {}", previousTool, testedStack);
-        for (Supplier<Boolean> rule : rules)
+        rules.add("fasterTool");
+        rules.add("betterMaterial");
+        rules.add("betterRarity");
+        List<String> testedRules = new ArrayList<>();
+        for (String ruleName : rules)
         {
+            testedRules.add(ruleName);
+            Supplier<Boolean> rule = ruleMap.get(ruleName);
             Boolean result = rule.get();
 
             if (result != null)
             {
+                if(result)
+                {
+                    Tweakeroo.debugLog("ToolSwap {}\nCompare {}[{}] to {}[{}]", String.join("->", testedRules), previousTool,previousTool.getEnchantments(), testedStack, testedStack.getEnchantments());
+                }
                 return result;
             }
         }
