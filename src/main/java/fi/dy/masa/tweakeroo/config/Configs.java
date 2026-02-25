@@ -419,7 +419,9 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed       DISABLE_ENTITY_RENDERING        = new ConfigBooleanHotkeyed("disableEntityRendering",               false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_ENTITY_TICKING          = new ConfigBooleanClient  ("disableEntityTicking",                 false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_FALLING_BLOCK_RENDER    = new ConfigBooleanHotkeyed("disableFallingBlockEntityRendering",   false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_FIRE_OVERLAY            = new ConfigBooleanHotkeyed("disableFireOverlay",                   false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_FP_EFFECT_PARTICLES     = new ConfigBooleanHotkeyed("disableFirstPersonEffectParticles",    false, "").apply(DISABLE_KEY);
+        public static final ConfigBooleanHotkeyed       DISABLE_FREEZE_OVERLAY          = new ConfigBooleanHotkeyed("disableFreezeOverlay",                 false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_INVENTORY_EFFECTS       = new ConfigBooleanHotkeyed("disableInventoryEffectRendering",      false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_ITEM_SWITCH_COOLDOWN    = new ConfigBooleanHotkeyed("disableItemSwitchRenderCooldown",      false, "").apply(DISABLE_KEY);
         public static final ConfigBooleanHotkeyed       DISABLE_MOB_SPAWNER_MOB_RENDER  = new ConfigBooleanHotkeyed("disableMobSpawnerMobRendering",        false, "").apply(DISABLE_KEY);
@@ -469,7 +471,9 @@ public class Configs implements IConfigHandler
                 DISABLE_ENTITY_RENDERING,
                 DISABLE_ENTITY_TICKING,
                 DISABLE_FALLING_BLOCK_RENDER,
+                DISABLE_FIRE_OVERLAY,
                 DISABLE_FP_EFFECT_PARTICLES,
+                DISABLE_FREEZE_OVERLAY,
                 DISABLE_INVENTORY_EFFECTS,
                 DISABLE_ITEM_SWITCH_COOLDOWN,
                 DISABLE_MOB_SPAWNER_MOB_RENDER,

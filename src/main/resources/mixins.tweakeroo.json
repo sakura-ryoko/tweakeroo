@@ -49,6 +49,7 @@
     ],
     "client": [
         "client.MixinMinecraft",
+        "entity.MixinAbstractClientPlayer",
         "entity.MixinLocalPlayer_common",
         "entity.MixinLocalPlayer_elytraSwap",
         "fog.MixinAtmosphericFogEnvironment",
@@ -91,6 +92,7 @@
         "render.MixinHugeExplosionSeedParticle",
         "render.MixinItemInHandRenderer",
         "render.MixinParticleEngine",
+        "render.MixinScreenEffectRenderer",
         "render.MixinSpawnerRenderer",
         "render.MixinWeatherEffectRenderer",
         "render.MixinWindow",
