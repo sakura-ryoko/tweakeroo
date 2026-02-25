@@ -574,6 +574,84 @@ public class InventoryUtils
             }
             return null;
         };
+        Supplier<Boolean> anyPickaxeRule = () ->
+        {
+            // Any tool is better than no tool
+            if (EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isPickAxe(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isPickAxe(previousTool))
+            {
+                return false;
+            }
+            return null;
+        };
+        Supplier<Boolean> anyFortunePickaxeRule = () ->
+        {
+            // Any tool is better than no tool
+            if (EquipmentUtils.isFortunePickaxe(testedStack) && !EquipmentUtils.isFortunePickaxe(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.isFortunePickaxe(testedStack) && EquipmentUtils.isFortunePickaxe(previousTool))
+            {
+                return false;
+            }
+            return null;
+        };
+        Supplier<Boolean> anySilkPickaxeRule = () ->
+        {
+            // Any tool is better than no tool
+            if (EquipmentUtils.isSilkPickaxe(testedStack) && !EquipmentUtils.isSilkPickaxe(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.isSilkPickaxe(testedStack) && EquipmentUtils.isSilkPickaxe(previousTool))
+            {
+                return false;
+            }
+            return null;
+        };
+        Supplier<Boolean> anyHoeRule = () ->
+        {
+            // Any tool is better than no tool
+            if (EquipmentUtils.isHoe(testedStack) && !EquipmentUtils.isHoe(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.isHoe(testedStack) && EquipmentUtils.isHoe(previousTool))
+            {
+                return false;
+            }
+            return null;
+        };
+        Supplier<Boolean> anyFortuneHoeRule = () ->
+        {
+            // Any tool is better than no tool
+            if (EquipmentUtils.isFortuneHoe(testedStack) && !EquipmentUtils.isFortuneHoe(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.isFortuneHoe(testedStack) && EquipmentUtils.isFortuneHoe(previousTool))
+            {
+                return false;
+            }
+            return null;
+        };
+        Supplier<Boolean> anySilkHoeRule = () ->
+        {
+            // Any tool is better than no tool
+            if (EquipmentUtils.isSilkHoe(testedStack) && !EquipmentUtils.isSilkHoe(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.isSilkHoe(testedStack) && EquipmentUtils.isSilkHoe(previousTool))
+            {
+                return false;
+            }
+            return null;
+        };
         Supplier<Boolean> swordOnBambooRule = () ->
         {
             // Any sword is better than no sword for bamboo.
@@ -711,6 +789,38 @@ public class InventoryUtils
             }
             return null;
         };
+        Supplier<Boolean> betterMaterialRule = () ->
+        {
+            // If the new tool has a better material
+            int testedWeight = getMaterialWeight(testedStack);
+            int prevWeight = getMaterialWeight(previousTool);
+
+            if (testedWeight > prevWeight)
+            {
+                return true;
+            }
+            if (prevWeight < testedWeight)
+            {
+                return false;
+            }
+            return null;
+        };
+        Supplier<Boolean> betterRarityRule = () ->
+        {
+            // If the new tool has better rarity
+            int testedWeight = getRarityWeight(testedStack);
+            int prevWeight = getRarityWeight(previousTool);
+
+            if (testedWeight > prevWeight)
+            {
+                return true;
+            }
+            if (prevWeight < testedWeight)
+            {
+                return false;
+            }
+            return null;
+        };
         Supplier<Boolean> fasterTool = () ->
         {
             // If the new tool is faster, use it
@@ -736,6 +846,15 @@ public class InventoryUtils
         if (Configs.Generic.TOOL_SWAP_LEAVES_USES_HOE_FIRST.getBooleanValue())
         {
             rules.add(hoeOnLeavesRule);
+
+            if (Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
+            {
+                rules.add(anyFortuneHoeRule);
+            }
+            else if (Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue())
+            {
+                rules.add(anySilkHoeRule);
+            }
         }
         if (Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue())
         {
@@ -744,12 +863,23 @@ public class InventoryUtils
         if (Configs.Generic.TOOL_SWAP_NEEDS_PICKAXE_FIRST.getBooleanValue())
         {
             rules.add(pickaxeOnNeedsPickaxeRule);
+//            rules.add(betterRarityRule);
+
+            if (Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
+            {
+                rules.add(anyFortunePickaxeRule);
+            }
+            else if (Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue())
+            {
+                rules.add(anySilkPickaxeRule);
+            }
         }
         if (Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
         {
             // Get the correct tool and then find the fortune version if there is one
             rules.add(correctToolRule);
             rules.add(useFortuneRule);
+//            rules.add(betterRarityRule);
         }
         else
         {
@@ -762,17 +892,20 @@ public class InventoryUtils
             if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue())
             {
                 rules.add(silkTouchOresRule);
+                rules.add(anySilkPickaxeRule);
             }
             if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue())
             {
                 rules.add(silkTouchOverrideRule);
             }
+//            rules.add(betterRarityRule);
             rules.add(correctToolRule);
         }
         if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
         {
             rules.add(betterEnchantRule);
         }
+        rules.add(betterMaterialRule);
         rules.add(fasterTool);
         for (Supplier<Boolean> rule : rules)
         {

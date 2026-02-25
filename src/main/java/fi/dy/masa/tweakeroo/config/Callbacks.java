@@ -28,7 +28,6 @@ import fi.dy.masa.malilib.render.InventoryOverlayScreen;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.tweakeroo.Reference;
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
@@ -366,7 +365,7 @@ public class Callbacks
 			{
 				final float tickRate = Math.clamp(MiscUtils.getRealTickRate(), MiscUtils.MIN_TICK_RATE, MiscUtils.MAX_TICK_RATE);
 
-				Tweakeroo.debugLog("[Debug] TickRateYeetToggle: Tick rate: {}", tickRate);
+//				Tweakeroo.debugLog("[Debug] TickRateYeetToggle: Tick rate: {}", tickRate);
                 manager.setTickRate(tickRate);
             }
         }
