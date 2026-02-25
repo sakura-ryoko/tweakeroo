@@ -869,7 +869,7 @@ public class InventoryUtils
             rules.add("silkTouchOverride");
         }
 
-        
+
         rules.add("correctTool");
         if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
         {
@@ -877,7 +877,7 @@ public class InventoryUtils
         }
         rules.add("fasterTool");
         rules.add("betterMaterial");
-        rules.add("betterRarity");
+        // rules.add("betterRarity");
         List<String> testedRules = new ArrayList<>();
         for (String ruleName : rules)
         {
