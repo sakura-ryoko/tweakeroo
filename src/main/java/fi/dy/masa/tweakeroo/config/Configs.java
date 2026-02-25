@@ -154,6 +154,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_FIRST			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchFirst", true, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_ORES			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_OVERRIDE		= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
+        public static final ConfigBooleanHotkeyed	TOOL_SWAP_PICKAXE_OVERRIDE		    = new ConfigBooleanHotkeyed ("toolSwapPickaxeOverride", false, "").apply(GENERIC_KEY);
         public static final ConfigOptionList    	UTILITY_HAND_SLOT                   = new ConfigOptionList  ("utilityHandSlot", HandSlot.MAIN_HAND).apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", true, "").apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
@@ -285,6 +286,7 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_SILK_TOUCH_FIRST,
                 TOOL_SWAP_SILK_TOUCH_ORES,
                 TOOL_SWAP_SILK_TOUCH_OVERRIDE,
+                TOOL_SWAP_PICKAXE_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
                 ZOOM_FOV_DIFFERENCE,
@@ -310,6 +312,7 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_SILK_TOUCH_FIRST,
                 TOOL_SWAP_SILK_TOUCH_ORES,
                 TOOL_SWAP_SILK_TOUCH_OVERRIDE,
+                TOOL_SWAP_PICKAXE_OVERRIDE,
                 WEAPON_SWAP_BETTER_ENCHANTS
         );
     }
@@ -352,6 +355,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList HAND_RESTOCK_LIST_TYPE             = new ConfigOptionList("handRestockListType", ListType.NONE).apply(LISTS_KEY);
         public static final ConfigStringList HAND_RESTOCK_BLACKLIST             = new ConfigStringList("handRestockBlackList", ImmutableList.of("minecraft:bucket", "minecraft:lava_bucket", "minecraft:water_bucket")).apply(LISTS_KEY);
         public static final ConfigStringList HAND_RESTOCK_WHITELIST             = new ConfigStringList("handRestockWhiteList", ImmutableList.of()).apply(LISTS_KEY);
+        public static final ConfigStringList PICKAXE_OVERRIDE                   = new ConfigStringList("pickaxeOverride", ImmutableList.of()).apply(LISTS_KEY);
         public static final ConfigOptionList POTION_WARNING_LIST_TYPE           = new ConfigOptionList("potionWarningListType", ListType.NONE).apply(LISTS_KEY);
         public static final ConfigStringList POTION_WARNING_BLACKLIST           = new ConfigStringList("potionWarningBlackList", ImmutableList.of("minecraft:hunger", "minecraft:mining_fatigue", "minecraft:nausea", "minecraft:poison", "minecraft:slowness", "minecraft:weakness")).apply(LISTS_KEY);
         public static final ConfigStringList POTION_WARNING_WHITELIST           = new ConfigStringList("potionWarningWhiteList", ImmutableList.of("minecraft:fire_resistance", "minecraft:invisibility", "minecraft:water_breathing")).apply(LISTS_KEY);
@@ -385,6 +389,7 @@ public class Configs implements IConfigHandler
                 HAND_RESTOCK_LIST_TYPE,
                 HAND_RESTOCK_BLACKLIST,
                 HAND_RESTOCK_WHITELIST,
+                PICKAXE_OVERRIDE,
                 POTION_WARNING_BLACKLIST,
                 POTION_WARNING_WHITELIST,
                 REPAIR_MODE_SLOTS,
@@ -566,6 +571,7 @@ public class Configs implements IConfigHandler
         InventoryUtils.setToolSwitchableSlots(Generic.TOOL_SWITCHABLE_SLOTS.getStringValue());
         InventoryUtils.setToolSwitchIgnoreSlots(Generic.TOOL_SWITCH_IGNORED_SLOTS.getStringValue());
         CachedTagManager.parseSilkTouchOverride(Lists.SILK_TOUCH_OVERRIDE.getStrings());
+        CachedTagManager.parsePickaxeOverride(Lists.PICKAXE_OVERRIDE.getStrings());
         InventoryUtils.setRepairModeSlots(Lists.REPAIR_MODE_SLOTS.getStrings());
         InventoryUtils.setUnstackingItems(Lists.UNSTACKING_ITEMS.getStrings());
         InventoryUtils.setWeaponMapping(Lists.ENTITY_WEAPON_MAPPING.getStrings());

@@ -777,6 +777,22 @@ public class InventoryUtils
             }
             return null;
         };
+        Supplier<Boolean> pickaxeOverrideRule = () ->
+        {
+            // Use a pick axe if it's on the Override list
+            if (CachedTagManager.isPickaxeOverride(state))
+            {
+                if (EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isPickAxe(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isPickAxe(previousTool))
+                {
+                    return false;
+                }
+            }
+            return null;
+        };
         Supplier<Boolean> betterEnchantRule = () ->
         {
             if (hasSameOrBetterToolEnchantments(testedStack, previousTool))
@@ -873,6 +889,10 @@ public class InventoryUtils
             {
                 rules.add(anySilkPickaxeRule);
             }
+        }
+        if (Configs.Generic.TOOL_SWAP_PICKAXE_OVERRIDE.getBooleanValue())
+        {
+            rules.add(pickaxeOverrideRule);
         }
         if (Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
         {

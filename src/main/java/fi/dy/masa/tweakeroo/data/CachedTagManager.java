@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class CachedTagManager
 {
 	public static final CachedTagKey SILK_TOUCH_OVERRIDE_KEY    = new CachedTagKey(Reference.MOD_ID, "silk_touch_override");
+	public static final CachedTagKey PICKAXE_OVERRIDE_KEY       = new CachedTagKey(Reference.MOD_ID, "pickaxe_override");
 	public static final CachedTagKey NEEDS_PICKAXE_KEY          = new CachedTagKey(Reference.MOD_ID, "needs_pickaxe");
 	public static final CachedTagKey NEEDS_SHEARS_KEY           = new CachedTagKey(Reference.MOD_ID, "needs_shears");
 	public static final CachedTagKey NEEDS_SILK_TOUCH_KEY       = new CachedTagKey(Reference.MOD_ID, "needs_silk_touch");
@@ -183,9 +184,31 @@ public class CachedTagManager
 		CachedBlockTags.getInstance().build(SILK_TOUCH_OVERRIDE_KEY, configStrs);
 	}
 
+	public static void parsePickaxeOverride(List<String> configStrs)
+	{
+		if (Minecraft.getInstance().level == null)
+		{
+			return;
+		}
+
+		if (configStrs.isEmpty())
+		{
+			if (Configs.Generic.TOOL_SWAP_PICKAXE_OVERRIDE.getBooleanValue())
+			{
+				Tweakeroo.LOGGER.error("parsePickaxeOverride: Config List '{}' is empty.", Configs.Lists.PICKAXE_OVERRIDE.getName());
+			}
+
+			return;
+		}
+
+		CachedBlockTags.getInstance().clearEntry(PICKAXE_OVERRIDE_KEY);
+		CachedBlockTags.getInstance().build(PICKAXE_OVERRIDE_KEY, configStrs);
+	}
+
 	private static void clearCache()
     {
         CachedBlockTags.getInstance().clearEntry(SILK_TOUCH_OVERRIDE_KEY);
+	    CachedBlockTags.getInstance().clearEntry(PICKAXE_OVERRIDE_KEY);
 		CachedBlockTags.getInstance().clearEntry(NEEDS_SHEARS_KEY);
 		CachedBlockTags.getInstance().clearEntry(NEEDS_SILK_TOUCH_KEY);
 		CachedBlockTags.getInstance().clearEntry(ORE_BLOCKS_KEY);
@@ -214,5 +237,10 @@ public class CachedTagManager
 	public static boolean isSilkTouchOverride(BlockState state)
 	{
 		return CachedBlockTags.getInstance().match(SILK_TOUCH_OVERRIDE_KEY, state);
+	}
+
+	public static boolean isPickaxeOverride(BlockState state)
+	{
+		return CachedBlockTags.getInstance().match(PICKAXE_OVERRIDE_KEY, state);
 	}
 }

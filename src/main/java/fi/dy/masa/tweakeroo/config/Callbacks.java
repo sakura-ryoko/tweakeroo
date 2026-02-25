@@ -154,6 +154,10 @@ public class Callbacks
                 (cfg) ->
                         CachedTagManager.parseSilkTouchOverride(Configs.Lists.SILK_TOUCH_OVERRIDE.getStrings())
         );
+	    Configs.Generic.TOOL_SWAP_PICKAXE_OVERRIDE.setValueChangeCallback(
+			    (cfg) ->
+					    CachedTagManager.parsePickaxeOverride(Configs.Lists.PICKAXE_OVERRIDE.getStrings())
+	    );
         Configs.Disable.DISABLE_TICKRATE_PLAYER_SLOWDOWN.setValueChangeCallback(new TickRateYeetToggle());
     }
 
