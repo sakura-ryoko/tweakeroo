@@ -54,8 +54,7 @@ import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
 public class InventoryUtils
 {
-    // private static final AnsiLogger LOGGER = new AnsiLogger(InventoryUtils.class,
-    // true, true);
+//    private static final AnsiLogger LOGGER = new AnsiLogger(InventoryUtils.class, true, true);
     private static final List<EquipmentSlot> REPAIR_MODE_SLOTS = new ArrayList<>();
     private static final List<Integer> REPAIR_MODE_SLOT_NUMBERS = new ArrayList<>();
     private static final HashSet<Item> UNSTACKING_ITEMS = new HashSet<>();
@@ -97,7 +96,9 @@ public class InventoryUtils
                     int slotStart = Integer.parseInt(matcher.group("start")) - 1;
                     int slotEnd = Integer.parseInt(matcher.group("end")) - 1;
 
-                    if (slotStart <= slotEnd && Inventory.isHotbarSlot(slotStart) && Inventory.isHotbarSlot(slotEnd))
+                    if (slotStart <= slotEnd &&
+                        Inventory.isHotbarSlot(slotStart) &&
+                        Inventory.isHotbarSlot(slotEnd))
                     {
                         for (int slotNum = slotStart; slotNum <= slotEnd; ++slotNum)
                         {
@@ -133,7 +134,7 @@ public class InventoryUtils
         {
             try
             {
-                // Item item = Registries.ITEM.get(Identifier.tryParse(name));
+                //Item item = Registries.ITEM.get(Identifier.tryParse(name));
                 Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(Identifier.tryParse(name));
 
                 if (opt.isPresent() && opt.get().value() != Items.AIR)
@@ -156,17 +157,17 @@ public class InventoryUtils
         for (String name : names)
         {
             EquipmentSlot type = switch (name)
-            {
-                case "mainhand" -> EquipmentSlot.MAINHAND;
-                case "offhand" -> EquipmentSlot.OFFHAND;
-                case "head" -> EquipmentSlot.HEAD;
-                case "chest" -> EquipmentSlot.CHEST;
-                case "legs" -> EquipmentSlot.LEGS;
-                case "feet" -> EquipmentSlot.FEET;
-                default -> null;
-            };
+			{
+				case "mainhand" -> EquipmentSlot.MAINHAND;
+				case "offhand" -> EquipmentSlot.OFFHAND;
+				case "head" -> EquipmentSlot.HEAD;
+				case "chest" -> EquipmentSlot.CHEST;
+				case "legs" -> EquipmentSlot.LEGS;
+				case "feet" -> EquipmentSlot.FEET;
+				default -> null;
+			};
 
-            if (type != null)
+			if (type != null)
             {
                 REPAIR_MODE_SLOTS.add(type);
 
@@ -212,9 +213,7 @@ public class InventoryUtils
                             continue;
                         }
                     }
-                    catch (Exception ignore)
-                    {
-                    }
+                    catch (Exception ignore) {}
 
                     Tweakeroo.LOGGER.warn("Unable to find item to use as weapon: '{}'", itemId);
                 }
@@ -238,9 +237,7 @@ public class InventoryUtils
                             continue;
                         }
                     }
-                    catch (Exception ignore)
-                    {
-                    }
+                    catch (Exception ignore) {}
 
                     Tweakeroo.LOGGER.warn("Unable to find entity: '{}'", entity_id);
                 }
@@ -250,7 +247,8 @@ public class InventoryUtils
 
     private static boolean isConfiguredRepairSlot(int slotNum, Player player)
     {
-        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) && (slotNum - 36) == player.getInventory().getSelectedSlot())
+        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
+            (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return true;
         }
@@ -259,45 +257,46 @@ public class InventoryUtils
     }
 
     /**
-     * Returns the equipment type for the given slot number, assuming that the slot
-     * number is for the player's main inventory container
+     * Returns the equipment type for the given slot number,
+     * assuming that the slot number is for the player's main inventory container
      */
     @Nullable
     private static EquipmentSlot getEquipmentTypeForSlot(int slotNum, Player player)
     {
-        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) && (slotNum - 36) == player.getInventory().getSelectedSlot())
+        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
+            (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return EquipmentSlot.MAINHAND;
         }
 
-        return switch (slotNum)
-        {
-            case 45 -> EquipmentSlot.OFFHAND;
-            case 5 -> EquipmentSlot.HEAD;
-            case 6 -> EquipmentSlot.CHEST;
-            case 7 -> EquipmentSlot.LEGS;
-            case 8 -> EquipmentSlot.FEET;
-            default -> null;
-        };
-    }
+		return switch (slotNum)
+		{
+			case 45 -> EquipmentSlot.OFFHAND;
+			case 5 -> EquipmentSlot.HEAD;
+			case 6 -> EquipmentSlot.CHEST;
+			case 7 -> EquipmentSlot.LEGS;
+			case 8 -> EquipmentSlot.FEET;
+			default -> null;
+		};
+	}
 
     /**
-     * Returns the slot number for the given equipment type in the player's
-     * inventory container
+     * Returns the slot number for the given equipment type
+     * in the player's inventory container
      */
     private static int getSlotNumberForEquipmentType(EquipmentSlot type, @Nullable Player player)
     {
-        return switch (type)
-        {
-            case MAINHAND -> player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
-            case OFFHAND -> 45;
-            case HEAD -> 5;
-            case CHEST -> 6;
-            case LEGS -> 7;
-            case FEET -> 8;
-            default -> -1;
-        };
-    }
+		return switch (type)
+		{
+			case MAINHAND -> player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
+			case OFFHAND -> 45;
+			case HEAD -> 5;
+			case CHEST -> 6;
+			case LEGS -> 7;
+			case FEET -> 8;
+			default -> -1;
+		};
+	}
 
     public static void swapHotbarWithInventoryRow(Player player, int row)
     {
@@ -337,8 +336,13 @@ public class InventoryUtils
         ItemStack stackHand = player.getItemInHand(hand);
         int threshold = Configs.Generic.HAND_RESTOCK_PRE_THRESHOLD.getIntegerValue();
 
-        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() && Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() && stackHand.isEmpty() == false && stackHand.getCount() <= threshold && stackHand.getMaxStackSize() > threshold
-                && PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) && player.containerMenu == player.inventoryMenu && player.containerMenu.getCarried().isEmpty())
+        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
+            Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() &&
+            stackHand.isEmpty() == false &&
+            stackHand.getCount() <= threshold && stackHand.getMaxStackSize() > threshold &&
+            PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) &&
+            player.containerMenu == player.inventoryMenu &&
+            player.containerMenu.getCarried().isEmpty())
         {
             Minecraft mc = Minecraft.getInstance();
             AbstractContainerMenu container = player.inventoryMenu;
@@ -402,12 +406,13 @@ public class InventoryUtils
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
 
-        if (player != null && mc.level != null && !TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
+        if (player != null && mc.level != null &&
+			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             AbstractContainerMenu container = player.inventoryMenu;
             ItemPickerTest test;
 
-            // Ignore the MACE weapon when equipped. Do not swap.
+            // Ignore the MACE weapon when equipped.  Do not swap.
             if (player.getMainHandItem().is(Items.MACE))
             {
                 return;
@@ -521,7 +526,8 @@ public class InventoryUtils
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
 
-        if (player != null && mc.level != null && !TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
+        if (player != null && mc.level != null &&
+			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             BlockState state = mc.level.getBlockState(pos);
             AbstractContainerMenu container = player.inventoryMenu;
@@ -877,7 +883,7 @@ public class InventoryUtils
         return false;
     }
 
-    static boolean isBetterToolAndHasDurability(ItemStack testedStack, ItemStack previousTool, BlockState state)
+    private static boolean isBetterToolAndHasDurability(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
         return hasEnoughDurability(testedStack) && isBetterTool(testedStack, previousTool, state);
     }
@@ -892,24 +898,12 @@ public class InventoryUtils
         // Because using the Vanilla methods, doesn't seem to work right.
         switch (stack.getRarity())
         {
-            case EPIC -> {
-                return 4;
-            }
-            case RARE -> {
-                return 3;
-            }
-            case UNCOMMON -> {
-                return 2;
-            }
-            case COMMON -> {
-                return 1;
-            }
-            case null -> {
-                return -1;
-            }
-            default -> {
-                return 0;
-            }
+            case EPIC -> { return 4; }
+            case RARE -> { return 3; }
+            case UNCOMMON -> { return 2; }
+            case COMMON -> { return 1; }
+            case null -> { return -1; }
+            default -> { return 0; }
         }
     }
 
@@ -922,31 +916,24 @@ public class InventoryUtils
     {
         String itemType = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-        if (itemType.contains("netherite"))
-            return 6;
-        if (itemType.contains("diamond"))
-            return 5;
-        if (itemType.contains("iron"))
-            return 4;
-        if (itemType.contains("copper"))
-            return 3;
-        if (itemType.contains("stone"))
-            return 2;
-        if (itemType.contains("gold"))
-            return 1;
-        if (itemType.contains("wood"))
-            return 0;
+        if (itemType.contains("netherite")) return 6;
+        if (itemType.contains("diamond")) return 5;
+        if (itemType.contains("iron")) return 4;
+	    if (itemType.contains("copper")) return 3;
+        if (itemType.contains("stone")) return 2;
+        if (itemType.contains("gold")) return 1;
+        if (itemType.contains("wood")) return 0;
 
         return -1;
     }
 
     /**
-     * Creates a total additive value of the essential Enchantment Levels. If one of
-     * them does not contain the same Enchantment; then the level should be -1, and
-     * will reduce its total weighted value; But if the enchantment level is better,
-     * then the weight is +1, and adds to it's value. The same Enchantment Level
-     * would then be a 0; and has no weighted change. The result is then in favor
-     * for the testedStack if the total weight is > 0.
+     * Creates a total additive value of the essential Enchantment Levels.
+     * If one of them does not contain the same Enchantment;
+     * then the level should be -1, and will reduce its total weighted value;
+     * But if the enchantment level is better, then the weight is +1, and adds to it's value.
+     * The same Enchantment Level would then be a 0; and has no weighted change.
+     * The result is then in favor for the testedStack if the total weight is > 0.
      */
     private static boolean hasBetterToolEnchantments(ItemStack testedStack, ItemStack previousTool)
     {
@@ -1078,7 +1065,8 @@ public class InventoryUtils
 
         for (int slotNumber : slotNumbers)
         {
-            if (slotNumber >= 0 && slotNumber <= maxSlot && !container.getSlot(slotNumber).hasItem())
+            if (slotNumber >= 0 && slotNumber <= maxSlot &&
+				!container.getSlot(slotNumber).hasItem())
             {
                 return slotNumber;
             }
@@ -1099,7 +1087,8 @@ public class InventoryUtils
 
     private static int getMinDurability(ItemStack stack)
     {
-        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() || (Configs.Generic.TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK.getBooleanValue() && !stack.isEnchanted()))
+        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() ||
+	        (Configs.Generic.TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK.getBooleanValue() && !stack.isEnchanted()))
         {
             return 0;
         }
@@ -1108,7 +1097,8 @@ public class InventoryUtils
 
         // For items with low maximum durability, use 8% as the threshold,
         // if the configured durability threshold is over that.
-        if (stack.getMaxDamage() <= 100 && minDurability <= 20 && (double) minDurability / (double) stack.getMaxDamage() > 0.08)
+        if (stack.getMaxDamage() <= 100 && minDurability <= 20 &&
+            (double) minDurability / (double) stack.getMaxDamage() > 0.08)
         {
             minDurability = (int) Math.ceil(stack.getMaxDamage() * 0.08);
         }
@@ -1168,7 +1158,10 @@ public class InventoryUtils
 
         ItemStack stack = player.getItemBySlot(type);
 
-        if (stack.isEmpty() == false && (stack.isDamageableItem() == false || stack.isDamaged() == false || EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
+        if (stack.isEmpty() == false &&
+            (stack.isDamageableItem() == false ||
+             stack.isDamaged() == false ||
+            EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
         {
             Slot slot = player.containerMenu.getSlot(slotNum);
             int slotRepairableItem = findRepairableItemNotInRepairableSlot(slot, player);
@@ -1195,7 +1188,9 @@ public class InventoryUtils
                 ItemStack stack = slot.getItem();
 
                 // Don't take items from the current hotbar slot
-                if ((slot.index - 36) != player.getInventory().getSelectedSlot() && stack.isDamageableItem() && stack.isDamaged() && targetSlot.mayPlace(stack) && EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
+                if ((slot.index - 36) != player.getInventory().getSelectedSlot() &&
+                    stack.isDamageableItem() && stack.isDamaged() && targetSlot.mayPlace(stack) &&
+                    EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
                 {
                     return slot.index;
                 }
@@ -1214,14 +1209,13 @@ public class InventoryUtils
 
         AbstractContainerMenu container = player.containerMenu;
 
-        Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER) && s.getDamageValue() < s.getMaxDamage() - 10;
+        Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.ELYTRA) &&
+                s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER) &&
+                s.getDamageValue() < s.getMaxDamage() - 10;
 
-        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
-        {
-            if (!filter.test(testedStack))
-                return false;
-            if (!filter.test(previousBestMatch))
-                return true;
+        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
+            if (!filter.test(testedStack)) return false;
+            if (!filter.test(previousBestMatch)) return true;
             if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return true;
@@ -1252,22 +1246,24 @@ public class InventoryUtils
         if (Configs.Generic.ROCKET_SWAP_ALLOW_EXPLOSIONS.getBooleanValue())
         {
             // Allows the player to Auto Swap any fireworks
-            filter = (s) -> s.getItem().equals(Items.FIREWORK_ROCKET);
+            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
         }
         else
         {
-            filter = (s) -> s.getItem().equals(Items.FIREWORK_ROCKET) && s.get(DataComponents.FIREWORKS).explosions().isEmpty();
+            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET) && s.get(DataComponents.FIREWORKS).explosions().isEmpty();
         }
 
-        int slotNumber = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
-        {
-            if (!filter.test(testedStack))
-                return false;
-            if (!filter.test(previousBestMatch))
-                return true;
-            return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration()
-                    || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
-        }, UniformInt.of(9, container.slots.size() - 1));
+        int slotNumber = findSlotWithBestItemMatch(
+                container, (testedStack, previousBestMatch) ->
+                {
+                    if (!filter.test(testedStack)) return false;
+                    if (!filter.test(previousBestMatch)) return true;
+                    return  testedStack.get(DataComponents.FIREWORKS).flightDuration() >  previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() ||
+                           (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() &&
+                            testedStack.getCount() > previousBestMatch.getCount());
+                },
+                UniformInt.of(9, container.slots.size() - 1)
+        );
 
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
@@ -1317,8 +1313,7 @@ public class InventoryUtils
     // todo for easier forwards porting when the `ArmorItem` disappears
     private static boolean checkChestSlot(ItemStack stack)
     {
-        // return stack.getItem() instanceof ArmorItem &&
-        // EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
+//        return stack.getItem() instanceof ArmorItem && EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
         return EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
     }
 
@@ -1342,12 +1337,9 @@ public class InventoryUtils
         {
             Predicate<ItemStack> finalFilter = (s) -> stackFilterChestPlate.test(s) && s.getDamageValue() < s.getMaxDamage() - 10;
 
-            int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
-            {
-                if (!finalFilter.test(testedStack))
-                    return false;
-                if (!finalFilter.test(previousBestMatch))
-                    return true;
+            int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
+                if (!finalFilter.test(testedStack)) return false;
+                if (!finalFilter.test(previousBestMatch)) return true;
                 if (getArmorAndArmorToughnessValue(previousBestMatch, 1, EquipmentSlotGroup.CHEST) < getArmorAndArmorToughnessValue(testedStack, 1, EquipmentSlotGroup.CHEST))
                 {
                     return true;
@@ -1368,12 +1360,11 @@ public class InventoryUtils
 
     private static double getArmorAndArmorToughnessValue(ItemStack stack, double base, EquipmentSlotGroup slot)
     {
-        final double[] total =
-        { base };
+        final double[] total = {base};
 
-        stack.forEachModifier(slot, (entry, modifier, consumer) ->
-        {
-            if (entry.unwrapKey().orElseThrow() == Attributes.ARMOR || entry.unwrapKey().orElseThrow() == Attributes.ARMOR_TOUGHNESS)
+        stack.forEachModifier(slot, (entry, modifier, consumer) -> {
+            if (entry.unwrapKey().orElseThrow() == Attributes.ARMOR
+                || entry.unwrapKey().orElseThrow() == Attributes.ARMOR_TOUGHNESS)
             {
                 switch (modifier.operation())
                 {
@@ -1397,10 +1388,9 @@ public class InventoryUtils
 
     /**
      *
-     * Finds a slot with an identical item than <b>stackReference</b>, ignoring the
-     * durability of damageable items. Does not allow crafting or armor slots or the
-     * offhand slot in the ContainerPlayer container.
-     * 
+     * Finds a slot with an identical item than <b>stackReference</b>, ignoring the durability
+     * of damageable items. Does not allow crafting or armor slots or the offhand slot
+     * in the ContainerPlayer container.
      * @return the slot number, or -1 if none were found
      */
     public static int findSlotWithItem(AbstractContainerMenu container, ItemStack stackReference, boolean allowHotbar, boolean reverse)
@@ -1414,7 +1404,9 @@ public class InventoryUtils
         {
             Slot slot = container.slots.get(slotNum);
 
-            if ((isPlayerInv == false || fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false)) && (allowHotbar || isHotbarSlot(slot) == false) && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqualIgnoreDurability(slot.getItem(), stackReference))
+            if ((isPlayerInv == false || fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false)) &&
+                (allowHotbar || isHotbarSlot(slot) == false) &&
+                fi.dy.masa.malilib.util.InventoryUtils.areStacksEqualIgnoreDurability(slot.getItem(), stackReference))
             {
                 return slot.index;
             }
@@ -1534,8 +1526,10 @@ public class InventoryUtils
             }
 
             /*
-             * if ((stack.getItem() instanceof MiningToolItem) == false) { nonTool =
-             * currentHotbarSlot; }
+            if ((stack.getItem() instanceof MiningToolItem) == false)
+            {
+                nonTool = currentHotbarSlot;
+            }
              */
             if (EquipmentUtils.isRegularTool(stack) == false)
             {
@@ -1552,7 +1546,7 @@ public class InventoryUtils
                 return hotbarSlot;
             }
 
-            // if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
+            //if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
             if (nonTool == -1 && EquipmentUtils.isRegularTool(stack) == false)
             {
                 nonTool = hotbarSlot;
@@ -1574,9 +1568,11 @@ public class InventoryUtils
             ItemStack stackSlot = slot.getItem();
 
             // Only accept regular inventory slots (no crafting, armor slots, or offhand)
-            if (fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false) && ItemStack.isSameItem(stackSlot, stackReference) && stackSlot.getMaxDamage() - stackSlot.getDamageValue() >= minDurabilityLeft &&
-            // hasSameOrBetterToolEnchantments(stackReference, stackSlot))
-                    hasSameIshEnchantments(stackReference, stackSlot))
+            if (fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false) &&
+                ItemStack.isSameItem(stackSlot, stackReference) &&
+                stackSlot.getMaxDamage() - stackSlot.getDamageValue() >= minDurabilityLeft &&
+                //hasSameOrBetterToolEnchantments(stackReference, stackSlot))
+                hasSameIshEnchantments(stackReference, stackSlot))
             {
                 return slot.index;
             }
@@ -1704,7 +1700,9 @@ public class InventoryUtils
 
     public static boolean canUnstackingItemNotFitInInventory(ItemStack stack, Player player)
     {
-        if (FeatureToggle.TWEAK_ITEM_UNSTACKING_PROTECTION.getBooleanValue() && stack.getCount() > 1 && UNSTACKING_ITEMS.contains(stack.getItem()))
+        if (FeatureToggle.TWEAK_ITEM_UNSTACKING_PROTECTION.getBooleanValue() &&
+            stack.getCount() > 1 &&
+            UNSTACKING_ITEMS.contains(stack.getItem()))
         {
             if (fi.dy.masa.malilib.util.InventoryUtils.findEmptySlotInPlayerInventory(player.inventoryMenu, false, false) == -1)
             {
@@ -1719,7 +1717,7 @@ public class InventoryUtils
 
     public static void switchToPickedBlock()
     {
-        Minecraft mc = Minecraft.getInstance();
+        Minecraft mc  = Minecraft.getInstance();
         Player player = mc.player;
         Level world = mc.level;
 
@@ -1738,15 +1736,22 @@ public class InventoryUtils
             BlockState stateTargeted = world.getBlockState(pos);
             ItemStack stack = ((IMixinAbstractBlock) stateTargeted.getBlock()).tweakeroo_getPickStack(world, pos, stateTargeted, false);
 
-            if (stack.isEmpty() == false && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandItem()) == false)
+            if (stack.isEmpty() == false &&
+                fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandItem()) == false)
             {
                 AbstractContainerMenu container = player.containerMenu;
                 Inventory inventory = player.getInventory();
                 /*
-                 * if (isCreative) { TileEntity te = world.getTileEntity(pos);
-                 * 
-                 * if (te != null) { mc.storeTEInStack(stack, te); } }
-                 */
+                if (isCreative)
+                {
+                    TileEntity te = world.getTileEntity(pos);
+
+                    if (te != null)
+                    {
+                        mc.storeTEInStack(stack, te);
+                    }
+                }
+                */
 
                 if (isCreative)
                 {
@@ -1755,7 +1760,7 @@ public class InventoryUtils
                 }
                 else
                 {
-                    // player.getInventory().getSlotFor(stack);
+                    //player.getInventory().getSlotFor(stack);
                     int slotNumber = fi.dy.masa.malilib.util.InventoryUtils.findSlotWithItem(container, stack, true);
 
                     if (slotNumber != -1)
@@ -1769,10 +1774,9 @@ public class InventoryUtils
 
     public static void swapSpyglassToHand()
     {
-        Minecraft mc = Minecraft.getInstance();
+        Minecraft mc  = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null)
-            return;
+        if (player == null) return;
         AbstractContainerMenu container = player.containerMenu;
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
@@ -1794,8 +1798,7 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null)
-            return;
+        if (player == null) return;
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
         if (lastSpyglassSlot != -1)
