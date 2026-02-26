@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.tweakeroo.config.Configs;
 
+import java.util.Arrays;
+
 public class Tweakeroo implements ModInitializer
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_ID);
@@ -24,6 +26,11 @@ public class Tweakeroo implements ModInitializer
         if (Configs.Generic.DEBUG_LOGGING.getBooleanValue())
         {
             Tweakeroo.LOGGER.info(msg, args);
+
+            if (Boolean.getBoolean("tweakeroo.debug.stdout"))
+            {
+                System.out.println("[TweakerooDebug] " + msg + " | args=" + Arrays.toString(args));
+            }
         }
     }
 }
