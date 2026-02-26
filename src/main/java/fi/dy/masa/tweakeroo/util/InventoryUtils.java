@@ -813,7 +813,7 @@ public class InventoryUtils
             Map.entry("useFortune", combineRules.apply(correctToolRule, useFortuneRule)),
             Map.entry("useSilkTouch", combineRules.apply(correctToolRule, useSilkTouchRule)),
             Map.entry("silkTouchFirst", silkTouchFirstRule),
-            Map.entry("silkTouchOres", silkTouchOresRule),
+            Map.entry("silkTouchOres", combineRules.apply(correctToolRule, silkTouchOresRule)),
             Map.entry("silkTouchOverride", silkTouchOverrideRule),
             Map.entry("pickaxeOverride", pickaxeOverrideRule),
             Map.entry("betterEnchantments", betterEnchantRule),
