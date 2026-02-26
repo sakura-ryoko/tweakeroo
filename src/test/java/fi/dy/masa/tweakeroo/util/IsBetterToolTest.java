@@ -207,8 +207,8 @@ class IsBetterToolTest
     }
 
     /**
-     * Best possible diamond hoe WITHOUT Silk Touch (for hoe + silk touch
-     * preference tests).
+     * Best possible diamond hoe WITHOUT Silk Touch (for hoe + silk touch preference
+     * tests).
      */
     private static ItemStack diamondHoeNoSilkTouch()
     {
@@ -392,7 +392,8 @@ class IsBetterToolTest
                             "silkTouchFirst: diamond pick (no ST) can't beat wooden pick+ST on ender chest")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_SILK_TOUCH_FIRST"), withEnchant(new ItemStack(Items.WOODEN_AXE), Enchantments.SILK_TOUCH, 1), new ItemStack(Items.DIAMOND_PICKAXE), enderChest, true,
                             "silkTouchFirst: wooden axe+ST beats diamond pick on ender chest (standalone, wrong tool still wins)")),
-                    Arguments.of(new ConfigTestCase(configToolSwap(), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), enderChest, true, "silkTouchFirst OFF: diamond pick beats wooden pick+ST on ender chest (ST ignored, material wins)")),
+                    Arguments.of(
+                            new ConfigTestCase(configToolSwap(), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), enderChest, true, "silkTouchFirst OFF: diamond pick beats wooden pick+ST on ender chest (ST ignored, material wins)")),
 
                     // ================================================================
                     // silkTouchOres — ST tool beats non-ST on ore blocks.
@@ -408,7 +409,8 @@ class IsBetterToolTest
                     // Standalone rule (NOT combined with correctTool), so wrong tool
                     // type with ST still wins.
                     // ================================================================
-                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_SILK_TOUCH_OVERRIDE"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), diamondPickNoSilkTouch(), stone, true, "silkTouchOverride: wooden pick+ST beats diamond pick+Fort+Mend+Unbreak on stone")),
+                    Arguments.of(
+                            new ConfigTestCase(configToolSwap("TOOL_SWAP_SILK_TOUCH_OVERRIDE"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), diamondPickNoSilkTouch(), stone, true, "silkTouchOverride: wooden pick+ST beats diamond pick+Fort+Mend+Unbreak on stone")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_SILK_TOUCH_OVERRIDE"), withEnchant(new ItemStack(Items.WOODEN_AXE), Enchantments.SILK_TOUCH, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true,
                             "silkTouchOverride: wooden axe+ST beats diamond pick on stone (standalone, wrong tool still wins)")),
                     Arguments.of(new ConfigTestCase(configToolSwap(), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), stone, true, "silkTouchOverride OFF: diamond pick beats wooden pick+ST on stone (ST ignored, material wins)")),
@@ -427,11 +429,14 @@ class IsBetterToolTest
                     // betterEnchantments — tool with more enchantments wins when enabled
                     // (hasBetterToolEnchantments checks: MENDING, UNBREAKING, EFFICIENCY, FORTUNE)
                     // ================================================================
-                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.EFFICIENCY, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true, "betterEnchants: wooden pick+Eff I beats unenchanted diamond pick on stone")),
+                    Arguments.of(
+                            new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.EFFICIENCY, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true, "betterEnchants: wooden pick+Eff I beats unenchanted diamond pick on stone")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.MENDING, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true, "betterEnchants: wooden pick+Mending beats unenchanted diamond pick")),
-                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.UNBREAKING, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true, "betterEnchants: wooden pick+Unbreaking I beats unenchanted diamond pick")),
+                    Arguments.of(
+                            new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.UNBREAKING, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true, "betterEnchants: wooden pick+Unbreaking I beats unenchanted diamond pick")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.FORTUNE, 1), new ItemStack(Items.DIAMOND_PICKAXE), stone, true, "betterEnchants: wooden pick+Fortune I beats unenchanted diamond pick")),
-                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.EFFICIENCY, 1), stone, false, "betterEnchants: unenchanted diamond pick can't beat wooden pick+Eff I")),
+                    Arguments
+                            .of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BETTER_ENCHANTS"), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.EFFICIENCY, 1), stone, false, "betterEnchants: unenchanted diamond pick can't beat wooden pick+Eff I")),
                     Arguments.of(new ConfigTestCase(configToolSwap(), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.IRON_PICKAXE), Enchantments.EFFICIENCY, 5), stone, true, "betterEnchants OFF: diamond pick beats iron pick+Eff V (enchants ignored, material wins)")),
 
                     // ================================================================
@@ -493,7 +498,8 @@ class IsBetterToolTest
                             "fortune>silk: wooden pick+Fortune I beats diamond pick+ST on ore (fortune fires first)")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_FORTUNE_OVERRIDE", "TOOL_SWAP_PREFER_SILK_TOUCH"), diamondPickNoFortune(), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.FORTUNE, 1), coalOre, false,
                             "fortune>silk: diamond pick+ST can't beat wooden pick+Fortune on ore (fortune fires first)")),
-                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_SILK_TOUCH"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), diamondPickNoSilkTouch(), coalOre, true, "silk-only: wooden pick+ST beats diamond pick+Fortune on ore (no fortune config)")),
+                    Arguments.of(
+                            new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_SILK_TOUCH"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), diamondPickNoSilkTouch(), coalOre, true, "silk-only: wooden pick+ST beats diamond pick+Fortune on ore (no fortune config)")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_FORTUNE_OVERRIDE"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.FORTUNE, 1), diamondPickNoFortune(), stone, true, "fortune-only: wooden pick+Fortune I beats diamond pick+ST on stone")),
 
                     // ================================================================
@@ -540,7 +546,8 @@ class IsBetterToolTest
                     // ================================================================
                     // Multi-config interactions
                     // ================================================================
-                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_LEAVES_USES_HOE_FIRST", "TOOL_SWAP_NEEDS_SHEARS_FIRST"), new ItemStack(Items.WOODEN_HOE), new ItemStack(Items.SHEARS), oakLeaves, true, "combined: hoeOnLeaves fires before shearsFirst — wooden hoe beats shears on leaves")),
+                    Arguments
+                            .of(new ConfigTestCase(configToolSwap("TOOL_SWAP_LEAVES_USES_HOE_FIRST", "TOOL_SWAP_NEEDS_SHEARS_FIRST"), new ItemStack(Items.WOODEN_HOE), new ItemStack(Items.SHEARS), oakLeaves, true, "combined: hoeOnLeaves fires before shearsFirst — wooden hoe beats shears on leaves")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_BAMBOO_USES_SWORD_FIRST"), new ItemStack(Items.STONE_SWORD), new ItemStack(Items.GOLDEN_SWORD), bamboo, true, "combined: swordOnBamboo then betterMaterial — stone sword (mat 2) beats gold sword (mat 1)")),
                     Arguments.of(new ConfigTestCase(configToolSwap(), new ItemStack(Items.WOODEN_HOE), new ItemStack(Items.DIAMOND_AXE), oakLeaves, true, "combined: without hoe config, hoe still wins via correctTool on leaves")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_FORTUNE_OVERRIDE", "TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.FORTUNE, 1), diamondPickNoFortune(), coalOre, true,
@@ -550,6 +557,20 @@ class IsBetterToolTest
                             "combined: wooden pick+ST beats diamond pick+Fort III+Mend+Unbreak III on ender chest (stFirst fires first)")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PICKAXE_OVERRIDE", "TOOL_SWAP_SILK_TOUCH_OVERRIDE"), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), new ItemStack(Items.DIAMOND_SWORD), stone, true,
                             "combined: pickOverride+stOverride — wooden pick+ST beats diamond sword on stone")),
+
+                    // ================================================================
+                    // Fortune level comparison — Fortune III vs Fortune I
+                    // useFortuneRule only checks hasFortune (boolean), so when both
+                    // have fortune it returns null. betterEnchants via
+                    // hasSameOrBetterEnchantment compares levels (3-1=2 > 0).
+                    // Without betterEnchants, both diamond picks are identical.
+                    // ================================================================
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_FORTUNE_OVERRIDE", "TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.FORTUNE, 3), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.FORTUNE, 1), coalOre, true,
+                            "fortuneLevel: diamond pick+Fortune III beats diamond pick+Fortune I (betterEnchants compares levels)")),
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_FORTUNE_OVERRIDE", "TOOL_SWAP_BETTER_ENCHANTS"), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.FORTUNE, 1), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.FORTUNE, 3), coalOre,
+                            false, "fortuneLevel: diamond pick+Fortune I can't beat diamond pick+Fortune III (betterEnchants compares levels)")),
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_FORTUNE_OVERRIDE"), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.FORTUNE, 3), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.FORTUNE, 1), coalOre, false,
+                            "fortuneLevel: diamond pick+Fortune III does NOT beat Fortune I without betterEnchants (no level comparison)")));
         }
         catch (Exception e)
         {
