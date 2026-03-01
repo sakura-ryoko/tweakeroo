@@ -380,6 +380,21 @@ class IsBetterToolTest
                     Arguments.of(new ConfigTestCase(configToolSwap(), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), stone, true, "useSilkTouch OFF: diamond pick beats wooden pick+ST on stone (ST ignored, material wins)")),
                     Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_SILK_TOUCH"), withEnchant(new ItemStack(Items.WOODEN_AXE), Enchantments.SILK_TOUCH, 1), new ItemStack(Items.WOODEN_PICKAXE), stone, false,
                             "useSilkTouch: wooden axe+ST can't beat wooden pick on stone (axe isn't correct tool)")),
+                    // BUG: useSilkTouch combined rule lets wrong-tool-type+ST override
+                    // correct-tool on non-silk-touch blocks like dirt.
+                    // combineRules passes through when correctTool returns true (tested
+                    // is correct), then useSilkTouchRule overrides with false because
+                    // previous has ST.
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_SILK_TOUCH"),
+                            withEnchant(withEnchant(new ItemStack(Items.DIAMOND_SHOVEL), Enchantments.EFFICIENCY, 2), Enchantments.MENDING, 1),
+                            withEnchant(withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.SILK_TOUCH, 1), Enchantments.UNBREAKING, 2),
+                            dirt, true,
+                            "useSilkTouch: diamond shovel+Eff II+Mend should beat diamond pick+ST+Unbreak II on dirt (shovel is correct tool, dirt doesn't need ST)")),
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_PREFER_SILK_TOUCH"),
+                            withEnchant(withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.SILK_TOUCH, 1), Enchantments.UNBREAKING, 2),
+                            withEnchant(withEnchant(new ItemStack(Items.DIAMOND_SHOVEL), Enchantments.EFFICIENCY, 2), Enchantments.MENDING, 1),
+                            dirt, false,
+                            "useSilkTouch: diamond pick+ST+Unbreak II should not beat diamond shovel+Eff II+Mend on dirt (pick is wrong tool for dirt)")),
 
                     // ================================================================
                     // silkTouchFirst — ST tool beats non-ST on needs-silk-touch blocks.
@@ -394,6 +409,10 @@ class IsBetterToolTest
                             "silkTouchFirst: wooden axe+ST beats diamond pick on ender chest (standalone, wrong tool still wins)")),
                     Arguments.of(
                             new ConfigTestCase(configToolSwap(), new ItemStack(Items.DIAMOND_PICKAXE), withEnchant(new ItemStack(Items.WOODEN_PICKAXE), Enchantments.SILK_TOUCH, 1), enderChest, true, "silkTouchFirst OFF: diamond pick beats wooden pick+ST on ender chest (ST ignored, material wins)")),
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_SILK_TOUCH_FIRST"), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.SILK_TOUCH, 1), new ItemStack(Items.WOODEN_SHOVEL), dirt, false,
+                            "silkTouchFirst: diamond pick+ST can't beat wooden shovel on dirt (dirt not in needs-silk-touch, shovel is correct tool)")),
+                    Arguments.of(new ConfigTestCase(configToolSwap("TOOL_SWAP_SILK_TOUCH_FIRST"), new ItemStack(Items.WOODEN_SHOVEL), withEnchant(new ItemStack(Items.DIAMOND_PICKAXE), Enchantments.SILK_TOUCH, 1), dirt, true,
+                            "silkTouchFirst: wooden shovel beats diamond pick+ST on dirt (dirt not in needs-silk-touch, shovel is correct tool)")),
 
                     // ================================================================
                     // silkTouchOres — ST tool beats non-ST on ore blocks.
