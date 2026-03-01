@@ -547,6 +547,17 @@ public class InventoryUtils
 
     static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
+        Supplier<Boolean> blockHasToolTagRule = () ->
+        {
+            // If the block has no valid tool type at all (e.g. torch, flower, fire),
+            // there is no reason to switch tools — any item breaks it equally.
+            if (!state.is(BlockTags.MINEABLE_WITH_PICKAXE) && !state.is(BlockTags.MINEABLE_WITH_AXE) && !state.is(BlockTags.MINEABLE_WITH_SHOVEL) && !state.is(BlockTags.MINEABLE_WITH_HOE) && !state.is(BlockTags.SWORD_EFFICIENT) && !CachedTagManager.isPickaxeOverride(state)
+                    && !CachedTagManager.isSilkTouchOverride(state) && !CachedTagManager.isNeedsSilkTouch(state) && !CachedTagManager.isNeedsPickaxe(state) && !CachedTagManager.isNeedsShears(state) && !CachedTagManager.isOreBlock(state))
+            {
+                return false;
+            }
+            return null;
+        };
         Supplier<Boolean> correctToolRule = () ->
         {
             // Use correct tool if we have it
@@ -746,7 +757,7 @@ public class InventoryUtils
             {
                 return true;
             }
-            if (prevWeight < testedWeight)
+            if (prevWeight > testedWeight)
             {
                 return false;
             }
@@ -784,7 +795,9 @@ public class InventoryUtils
             }
             return null;
         };
-        // Combines two rules in a way that if they contradict each other, then the result is null to skip the check, but if one of them has a non-null result, then that result is used
+        // Combines two rules in a way that if they contradict each other, then the
+        // result is null to skip the check, but if one of them has a non-null result,
+        // then that result is used
         BiFunction<Supplier<Boolean>, Supplier<Boolean>, Supplier<Boolean>> combineRules = (r1, r2) ->
         {
             return () ->
@@ -801,32 +814,21 @@ public class InventoryUtils
                     {
                         return r1Result;
                     }
-                    // If the rules contradict each other, then we cannot determine which tool is better, so return null to skip this check
-                     return null;
+                    // If the rules contradict each other, then we cannot determine which tool is
+                    // better, so return null to skip this check
+                    return null;
                 }
                 return r1Result;
             };
         };
 
-        Map<String, Supplier<Boolean>> ruleMap = Map.ofEntries(
-            Map.entry("correctTool", correctToolRule), 
-            Map.entry("anyTool", anyToolRule), 
-            Map.entry("swordOnBamboo", swordOnBambooRule), 
-            Map.entry("hoeOnLeaves", hoeOnLeavesRule), 
-            Map.entry("shearsOnNeedsShears", shearsOnNeedsShearsRule),
-            Map.entry("pickaxeOnNeedsPickaxe", pickaxeOnNeedsPickaxeRule),
-            Map.entry("useFortune", combineRules.apply(correctToolRule, useFortuneRule)),
-            Map.entry("useSilkTouch", combineRules.apply(correctToolRule, useSilkTouchRule)),
-            Map.entry("silkTouchFirst", silkTouchFirstRule),
-            Map.entry("silkTouchOres", combineRules.apply(correctToolRule, silkTouchOresRule)),
-            Map.entry("silkTouchOverride", silkTouchOverrideRule), 
-            Map.entry("pickaxeOverride", pickaxeOverrideRule),
-            Map.entry("betterEnchantments", betterEnchantRule),
-            Map.entry("betterMaterial", betterMaterialRule),
-            Map.entry("betterRarity", betterRarityRule), 
-            Map.entry("fasterTool", fasterTool));
+        Map<String, Supplier<Boolean>> ruleMap = Map.ofEntries(Map.entry("blockHasToolTag", blockHasToolTagRule), Map.entry("correctTool", correctToolRule), Map.entry("anyTool", anyToolRule), Map.entry("swordOnBamboo", swordOnBambooRule), Map.entry("hoeOnLeaves", hoeOnLeavesRule),
+                Map.entry("shearsOnNeedsShears", shearsOnNeedsShearsRule), Map.entry("pickaxeOnNeedsPickaxe", pickaxeOnNeedsPickaxeRule), Map.entry("useFortune", combineRules.apply(correctToolRule, useFortuneRule)), Map.entry("useSilkTouch", combineRules.apply(correctToolRule, useSilkTouchRule)),
+                Map.entry("silkTouchFirst", silkTouchFirstRule), Map.entry("silkTouchOres", combineRules.apply(correctToolRule, silkTouchOresRule)), Map.entry("silkTouchOverride", silkTouchOverrideRule), Map.entry("pickaxeOverride", pickaxeOverrideRule),
+                Map.entry("betterEnchantments", betterEnchantRule), Map.entry("betterMaterial", betterMaterialRule), Map.entry("betterRarity", betterRarityRule), Map.entry("fasterTool", fasterTool));
 
         List<String> rules = new ArrayList<String>();
+        rules.add("blockHasToolTag");
         // rules.add("anyTool");
         if (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue())
         {
