@@ -4,9 +4,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.IDecorationEntity;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -63,7 +63,7 @@ public abstract class MixinEntityRenderDispatcher
             {
                 int max = Configs.Generic.RENDER_LIMIT_XP_ORB.getIntegerValue();
 
-                if (max >= 0 && ++Tweakeroo.renderCountXPOrbs > max)
+                if (max >= 0 && ++MiscTweaks.renderCountXPOrbs > max)
                 {
                     cir.setReturnValue(false);
                 }
@@ -75,7 +75,7 @@ public abstract class MixinEntityRenderDispatcher
             {
                 int max = Configs.Generic.RENDER_LIMIT_ITEM.getIntegerValue();
 
-                if (max >= 0 && ++Tweakeroo.renderCountItems > max)
+                if (max >= 0 && ++MiscTweaks.renderCountItems > max)
                 {
                     cir.setReturnValue(false);
                 }

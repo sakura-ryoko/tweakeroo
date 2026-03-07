@@ -1,7 +1,9 @@
 package fi.dy.masa.tweakeroo.util;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -52,7 +54,8 @@ import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
 public class InventoryUtils
 {
-//    private static final AnsiLogger LOGGER = new AnsiLogger(InventoryUtils.class, true, true);
+    // private static final AnsiLogger LOGGER = new AnsiLogger(InventoryUtils.class,
+    // true, true);
     private static final List<EquipmentSlot> REPAIR_MODE_SLOTS = new ArrayList<>();
     private static final List<Integer> REPAIR_MODE_SLOT_NUMBERS = new ArrayList<>();
     private static final HashSet<Item> UNSTACKING_ITEMS = new HashSet<>();
@@ -77,11 +80,7 @@ public class InventoryUtils
         Pattern patternRange = Pattern.compile("^(?<start>[0-9])-(?<end>[0-9])$");
 
         output.clear();
-
-        if (configStr.isBlank())
-        {
-            return;
-        }
+        if (configStr.isBlank()) { return; }
 
         for (String str : parts)
         {
@@ -94,9 +93,7 @@ public class InventoryUtils
                     int slotStart = Integer.parseInt(matcher.group("start")) - 1;
                     int slotEnd = Integer.parseInt(matcher.group("end")) - 1;
 
-                    if (slotStart <= slotEnd &&
-                        Inventory.isHotbarSlot(slotStart) &&
-                        Inventory.isHotbarSlot(slotEnd))
+                    if (slotStart <= slotEnd && Inventory.isHotbarSlot(slotStart) && Inventory.isHotbarSlot(slotEnd))
                     {
                         for (int slotNum = slotStart; slotNum <= slotEnd; ++slotNum)
                         {
@@ -132,7 +129,7 @@ public class InventoryUtils
         {
             try
             {
-                //Item item = Registries.ITEM.get(Identifier.tryParse(name));
+                // Item item = Registries.ITEM.get(Identifier.tryParse(name));
                 Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(Identifier.tryParse(name));
 
                 if (opt.isPresent() && opt.get().value() != Items.AIR)
@@ -155,17 +152,17 @@ public class InventoryUtils
         for (String name : names)
         {
             EquipmentSlot type = switch (name)
-			{
-				case "mainhand" -> EquipmentSlot.MAINHAND;
-				case "offhand" -> EquipmentSlot.OFFHAND;
-				case "head" -> EquipmentSlot.HEAD;
-				case "chest" -> EquipmentSlot.CHEST;
-				case "legs" -> EquipmentSlot.LEGS;
-				case "feet" -> EquipmentSlot.FEET;
-				default -> null;
-			};
+            {
+                case "mainhand" -> EquipmentSlot.MAINHAND;
+                case "offhand" -> EquipmentSlot.OFFHAND;
+                case "head" -> EquipmentSlot.HEAD;
+                case "chest" -> EquipmentSlot.CHEST;
+                case "legs" -> EquipmentSlot.LEGS;
+                case "feet" -> EquipmentSlot.FEET;
+                default -> null;
+            };
 
-			if (type != null)
+            if (type != null)
             {
                 REPAIR_MODE_SLOTS.add(type);
 
@@ -245,8 +242,7 @@ public class InventoryUtils
 
     private static boolean isConfiguredRepairSlot(int slotNum, Player player)
     {
-        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
-            (slotNum - 36) == player.getInventory().getSelectedSlot())
+        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) && (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return true;
         }
@@ -255,46 +251,45 @@ public class InventoryUtils
     }
 
     /**
-     * Returns the equipment type for the given slot number,
-     * assuming that the slot number is for the player's main inventory container
+     * Returns the equipment type for the given slot number, assuming that the slot
+     * number is for the player's main inventory container
      */
     @Nullable
     private static EquipmentSlot getEquipmentTypeForSlot(int slotNum, Player player)
     {
-        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) &&
-            (slotNum - 36) == player.getInventory().getSelectedSlot())
+        if (REPAIR_MODE_SLOTS.contains(EquipmentSlot.MAINHAND) && (slotNum - 36) == player.getInventory().getSelectedSlot())
         {
             return EquipmentSlot.MAINHAND;
         }
 
-		return switch (slotNum)
-		{
-			case 45 -> EquipmentSlot.OFFHAND;
-			case 5 -> EquipmentSlot.HEAD;
-			case 6 -> EquipmentSlot.CHEST;
-			case 7 -> EquipmentSlot.LEGS;
-			case 8 -> EquipmentSlot.FEET;
-			default -> null;
-		};
-	}
+        return switch (slotNum)
+        {
+            case 45 -> EquipmentSlot.OFFHAND;
+            case 5 -> EquipmentSlot.HEAD;
+            case 6 -> EquipmentSlot.CHEST;
+            case 7 -> EquipmentSlot.LEGS;
+            case 8 -> EquipmentSlot.FEET;
+            default -> null;
+        };
+    }
 
     /**
-     * Returns the slot number for the given equipment type
-     * in the player's inventory container
+     * Returns the slot number for the given equipment type in the player's
+     * inventory container
      */
     private static int getSlotNumberForEquipmentType(EquipmentSlot type, @Nullable Player player)
     {
-		return switch (type)
-		{
-			case MAINHAND -> player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
-			case OFFHAND -> 45;
-			case HEAD -> 5;
-			case CHEST -> 6;
-			case LEGS -> 7;
-			case FEET -> 8;
-			default -> -1;
-		};
-	}
+        return switch (type)
+        {
+            case MAINHAND -> player != null ? player.getInventory().getSelectedSlot() + 36 : -1;
+            case OFFHAND -> 45;
+            case HEAD -> 5;
+            case CHEST -> 6;
+            case LEGS -> 7;
+            case FEET -> 8;
+            default -> -1;
+        };
+    }
 
     public static void swapHotbarWithInventoryRow(Player player, int row)
     {
@@ -334,13 +329,8 @@ public class InventoryUtils
         ItemStack stackHand = player.getItemInHand(hand);
         int threshold = Configs.Generic.HAND_RESTOCK_PRE_THRESHOLD.getIntegerValue();
 
-        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-            Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() &&
-            stackHand.isEmpty() == false &&
-            stackHand.getCount() <= threshold && stackHand.getMaxStackSize() > threshold &&
-            PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) &&
-            player.containerMenu == player.inventoryMenu &&
-            player.containerMenu.getCarried().isEmpty())
+        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() && Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() && stackHand.isEmpty() == false && stackHand.getCount() <= threshold && stackHand.getMaxStackSize() > threshold
+            && PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) && player.containerMenu == player.inventoryMenu && player.containerMenu.getCarried().isEmpty())
         {
             Minecraft mc = Minecraft.getInstance();
             AbstractContainerMenu container = player.inventoryMenu;
@@ -404,13 +394,12 @@ public class InventoryUtils
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
 
-        if (player != null && mc.level != null &&
-			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
+        if (player != null && mc.level != null && !TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             AbstractContainerMenu container = player.inventoryMenu;
             ItemPickerTest test;
 
-            // Ignore the MACE weapon when equipped.  Do not swap.
+            // Ignore the MACE weapon when equipped. Do not swap.
             if (player.getMainHandItem().is(Items.MACE))
             {
                 return;
@@ -515,7 +504,6 @@ public class InventoryUtils
     protected static boolean matchesWeaponMapping(ItemStack stack, Entity entity)
     {
         HashSet<Item> weapons = WEAPON_MAPPING.getOrDefault(entity.getType(), WEAPON_MAPPING.get(null));
-
         return weapons != null && weapons.contains(stack.getItem());
     }
 
@@ -524,8 +512,7 @@ public class InventoryUtils
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
 
-        if (player != null && mc.level != null &&
-			!TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
+        if (player != null && mc.level != null && !TOOL_SWITCH_IGNORED_SLOTS.contains(player.getInventory().getSelectedSlot()))
         {
             BlockState state = mc.level.getBlockState(pos);
             AbstractContainerMenu container = player.inventoryMenu;
@@ -549,475 +536,382 @@ public class InventoryUtils
         }
     }
 
-    private static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
+    protected static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
-        boolean isTool = EquipmentUtils.isAnyTool(testedStack);
-        boolean isMisc = EquipmentUtils.isMiscTool(testedStack);
-//        Tweakeroo.LOGGER.error("isBetterTool(): test [{}], prev [{}], state [{}] // isTool [{}] // isMisc [{}]", testedStack.toString(), previousTool.toString(), state.toString(), isTool, isMisc);
-
-        if (previousTool.isEmpty() && isTool &&
-            (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue() && !state.is(Blocks.BAMBOO)))
+        Supplier<Boolean> blockHasToolTagRule = () ->
         {
-			//LOGGER.error("isBetterTool: (applyBambooNeedsSwordFirst) = TRUE");
-            return true;
-        }
-
-        if (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue() && state.is(Blocks.BAMBOO))
-        {
-            if (EquipmentUtils.isSword(testedStack))
+            // If the block has no valid tool type at all (e.g. torch, flower, fire),
+            // there is no reason to switch tools — any item breaks it equally.
+            if (!state.is(BlockTags.MINEABLE_WITH_PICKAXE) && !state.is(BlockTags.MINEABLE_WITH_AXE) && !state.is(BlockTags.MINEABLE_WITH_SHOVEL) && !state.is(BlockTags.MINEABLE_WITH_HOE) && !state.is(BlockTags.SWORD_EFFICIENT) && !CachedTagManager.isPickaxeOverride(state)
+                    && !CachedTagManager.isSilkTouchOverride(state) && !CachedTagManager.isNeedsSilkTouch(state) && !CachedTagManager.isNeedsPickaxe(state) && !CachedTagManager.isNeedsShears(state) && !CachedTagManager.isOreBlock(state))
             {
-                //LOGGER.warn("isBetterTool: (applyBambooNeedsSwordFirst) -> test");
-                return applyBambooNeedsSwordFirst(testedStack, previousTool);
-            }
-            else if (EquipmentUtils.isSword(previousTool))
-            {
-                //LOGGER.error("isBetterTool: (applyBambooNeedsSwordFirst) = FALSE");
                 return false;
             }
-        }
 
-        if (!testedStack.isEmpty())
+            return null;
+        };
+        Supplier<Boolean> correctToolRule = () ->
         {
-            if (Configs.Generic.TOOL_SWAP_LEAVES_USES_HOE_FIRST.getBooleanValue() &&
-                state.is(BlockTags.LEAVES))
-            {
-                if (EquipmentUtils.isHoe(testedStack))
-                {
-                    boolean test = applyLeavesNeedsHoeFirst(testedStack, previousTool, state, true);
-                    //LOGGER.error("applyLeavesNeedsHoeFirst: result: {}", test);
-                    return test;
-                }
-                else if (EquipmentUtils.isHoe(previousTool))
-                {
-                    //LOGGER.error("applyLeavesNeedsHoeFirst: prev-hoe --> FALSE");
-                    return false;
-                }
-            }
-
-            if (Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue() &&
-                CachedTagManager.isNeedsShears(state) &&
-                !EquipmentUtils.isCorrectTool(testedStack, state))
-            {
-                if (testedStack.is(Items.SHEARS))
-                {
-                    boolean test = applyNeedsShearsFirst(testedStack, previousTool, state, isMisc);
-                    //LOGGER.error("applyNeedsShearsFirst: result: {}", test);
-                    return test;
-                }
-                else if (previousTool.is(Items.SHEARS))
-                {
-                    //LOGGER.error("applyNeedsShearsFirst: prev-shears --> FALSE ");
-                    return false;
-                }
-            }
-
-            if (Configs.Generic.TOOL_SWAP_NEEDS_PICKAXE_FIRST.getBooleanValue() &&
-                CachedTagManager.isNeedsPickaxe(state) &&
-                !EquipmentUtils.isCorrectTool(testedStack, state))
-            {
-                if (EquipmentUtils.isPickAxe(testedStack))
-                {
-                    boolean test = applyNeedsPickaxeFirst(testedStack, previousTool, state, true);
-                    //LOGGER.error("applyNeedsPickaxeFirst: result: {}", test);
-                    return test;
-                }
-                else if (EquipmentUtils.isPickAxe(previousTool))
-                {
-                    //LOGGER.error("applyNeedsPickaxeFirst: prev-pick --> FALSE");
-                    return false;
-                }
-            }
-
-            if (!Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
-            {
-                if ((Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue() && CachedTagManager.isNeedsSilkTouch(state)) ||
-                    (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue() && CachedTagManager.isOreBlock(state) &&
-                     EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isCorrectTool(testedStack, state)))
-                {
-                    boolean test = applySilkTouchFirst(testedStack, previousTool, state, isMisc);
-                    //LOGGER.error("applySilkTouchFirst:B: result: {}", test);
-                    return test;
-                }
-                else if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue() && CachedTagManager.isSilkTouchOverride(state))
-                {
-                    boolean test = applySilkTouchFirst(testedStack, previousTool, state, isMisc);
-                    //LOGGER.error("applySilkTouchFirst:C: result: {}", test);
-                    return test;
-                }
-            }
-
-            boolean test = isBetterToolEach(testedStack, previousTool, state, isMisc, true);
-            //LOGGER.error("isBetterToolEach: result: {}", test);
-			return test;
-        }
-
-        boolean test = EquipmentUtils.isCorrectTool(testedStack, state);
-		//LOGGER.error("isBetterTool: (Default-Correct?) result: {}", test);
-        return test;
-    }
-
-    // Even though an Axe is the "Correct tool" for Bamboo, a Sword is preferred
-    private static boolean applyBambooNeedsSwordFirst(ItemStack testedStack, ItemStack previousTool)
-    {
-        final boolean prevSword = EquipmentUtils.isSword(previousTool);
-        final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousTool) : true;
-        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-        final boolean result = (mats) && enchants;
-
-        //LOGGER.debug("(applyBambooNeedsSwordFirst)");
-        //LOGGER.debug("Mats result: {}", mats);
-        //LOGGER.debug("Enchant result: {}", enchants);
-        //LOGGER.debug("Prev Sword: {} -> {}", prevSword, result);
-
-        if (prevSword)
-        {
-            return result;
-        }
-
-        return true;
-    }
-
-    // Use a Hoe on Leaves instead of Shears First; which also needs to override 'isCorrectTool()'
-    private static boolean applyLeavesNeedsHoeFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean loop)
-    {
-        final boolean hasHoe = EquipmentUtils.isHoe(testedStack);
-        final boolean prevHoe = EquipmentUtils.isHoe(previousTool);
-
-        if (!hasHoe)
-        {
-            //LOGGER.warn("  Result: false (Not a Hoe)");
-            return false;
-        }
-        else if (!prevHoe)
-        {
-            //LOGGER.warn("  Result: true (Previous Not a Hoe)");
-            return true;
-        }
-
-        final boolean preferFortune = Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue();
-        boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue();
-        final boolean enchants = Configs.Generic.WEAPON_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterWeaponEnchantments(testedStack, previousTool) : true;
-        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
-        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
-        final boolean testFortune = EquipmentUtils.hasFortune(testedStack);
-        final boolean prevFortune = EquipmentUtils.hasFortune(previousTool);
-
-        if (preferSilk && preferFortune)
-        {
-            preferSilk = false;
-        }
-
-        //LOGGER.debug("(applyLeavesNeedsHoeFirst)");
-        //LOGGER.debug("Enchant result: {}", enchants);
-        //LOGGER.debug("Mats result: {}", mats);
-        //LOGGER.debug("Has Hoe: {} / prev: {}", hasHoe, prevHoe);
-        //LOGGER.warn("Preferr Fortune Override: {}", preferFortune);
-        //LOGGER.warn("Silk Touch (Prefer: {}) -- has: {} / prev: {}", preferSilk, testSilkTouch, prevSilkTouch);
-        //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
-
-        if (testSpeed != prevSpeed)
-        {
-            // Don't check rarity here, it gives false positives
-            boolean finalResult = isBetterToolSilkOrFortuneUnequalSpeed(preferSilk, testSilkTouch, preferFortune, testFortune, mats, enchants);
-            //LOGGER.warn("  Final Result: {}", finalResult);
-            return finalResult;
-        }
-        else if (testSpeed == prevSpeed)
-        {
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(!preferSilk);
-            final boolean result = hasHoe ? (mats && enchants) : false;
-            final boolean prevResult = loop ? applyLeavesNeedsHoeFirst(previousTool, testedStack, state, false) : false;
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
-
-            //LOGGER.warn("Silk Touch Preference results: config: {} // test - {}, prev - {}", preferSilk, result, prevResult);
-
-            boolean finalResult = isBetterToolSilkOrFortune(preferSilk, testSilkTouch, prevSilkTouch, preferFortune, testFortune, prevFortune, result, prevResult);
-            //LOGGER.warn("  Final Result: {}", finalResult);
-            return finalResult;
-        }
-
-        //LOGGER.warn("  Result: Default False");
-        return false;
-    }
-
-    // Use shears if block needs shears.  Do this before needs_silk_touch, because
-    // the fact that an item needs shears doesn't pass the 'isCorrectTool()', and doesn't nessecarily need silk touch.
-    private static boolean applyNeedsShearsFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc)
-    {
-        if (!isMisc) return false;
-
-        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-        final boolean prevShears = previousTool.is(Items.SHEARS);
-        final boolean result = prevShears ? (testSpeed >= prevSpeed) && enchants : true;
-
-        //LOGGER.debug("(applyNeedsShearsFirst)");
-        //LOGGER.debug("Enchant result: {}", enchants);
-        //LOGGER.debug("Result: {}", result);
-        //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
-
-        return result;
-    }
-
-    // Use shears if block needs shears.  Do this before needs_silk_touch, because
-    // the fact that an item needs shears doesn't pass the 'isCorrectTool()', and doesn't nessecarily need silk touch.
-    private static boolean applyNeedsPickaxeFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean loop)
-    {
-        final boolean hasPick = EquipmentUtils.isPickAxe(testedStack);
-        final boolean prevPick = EquipmentUtils.isPickAxe(previousTool);
-
-        if (!hasPick)
-        {
-            //LOGGER.warn("  Result: false (Not a Pickaxe)");
-            return false;
-        }
-        else if (!prevPick)
-        {
-            //LOGGER.warn("  Result: true (Previous Not a Pickaxe)");
-            return true;
-        }
-
-        // Consider the other configs for the Silk Touch final determination
-        final boolean isOre = CachedTagManager.isOreBlock(state);
-        final boolean isNeedsSilk = CachedTagManager.isNeedsSilkTouch(state);
-        final boolean isSilkOverride = CachedTagManager.isSilkTouchOverride(state);
-        final boolean preferFortune = Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue();
-        boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue() ||
-                             (isOre && Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue()) ||
-                             (isNeedsSilk && Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue()) ||
-                             (isSilkOverride && Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue()) && !preferFortune;
-        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
-        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
-        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
-        final boolean testFortune = EquipmentUtils.hasFortune(testedStack);
-        final boolean prevFortune = EquipmentUtils.hasFortune(previousTool);
-
-        if (preferSilk && preferFortune)
-        {
-            preferSilk = false;
-        }
-
-        //LOGGER.debug("(applyNeedsPickaxeFirst)");
-        //LOGGER.debug("Enchant result: {}", enchants);
-        //LOGGER.debug("Mats result: {}", mats);
-        //LOGGER.debug("Has Pickaxe: {} / prev: {}", hasPick, prevPick);
-        //LOGGER.warn("isOre: {} / isNeedsSilk: {} / isSilkOverride: {}", isOre, isNeedsSilk, isSilkOverride);
-        //LOGGER.warn("Preferr Fortune Override: {}", preferFortune);
-        //LOGGER.warn("Silk Touch (Prefer: {}) -- has: {} / prev: {}", preferSilk, testSilkTouch, prevSilkTouch);
-        //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
-
-        if (testSpeed != prevSpeed)
-        {
-            // Don't check rarity here, it gives false positives
-            boolean finalResult = isBetterToolSilkOrFortuneUnequalSpeed(preferSilk, testSilkTouch, preferFortune, testFortune, mats, enchants);
-            //LOGGER.warn("  Final Result: {}", finalResult);
-            return finalResult;
-        }
-        else if (testSpeed == prevSpeed)
-        {
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(!preferSilk);
-            final boolean result = hasPick ? (mats && enchants) : false;
-            final boolean prevResult = loop ? applyNeedsPickaxeFirst(previousTool, testedStack, state, false) : false;
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
-
-            //LOGGER.warn("Silk Touch Preference results: config: {} // test - {}, prev - {}", preferSilk, result, prevResult);
-
-            boolean finalResult = isBetterToolSilkOrFortune(preferSilk, testSilkTouch, prevSilkTouch, preferFortune, testFortune, prevFortune, result, prevResult);
-            //LOGGER.warn("  Final Result: {}", finalResult);
-            return finalResult;
-        }
-
-        //LOGGER.warn("  Result: Default False");
-        return false;
-    }
-
-    // Note that this function is designed not to check the 'Correct Tool' status of a tool,
-    // but apply isBetterTool() the same as if it was, as long as it has Silk Touch.
-    private static boolean applySilkTouchFirst(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc)
-    {
-        final boolean prevSilk = EquipmentUtils.hasSilkTouch(previousTool);
-
-        if (EquipmentUtils.hasSilkTouch(testedStack))
-        {
-            final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-            final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
-            final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-            final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-
-            //LOGGER.debug("(applySilkTouchFirst)");
-            //LOGGER.debug("Mats result: {}", mats);
-            //LOGGER.debug("Rarity result: {}", rarity);
-            //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
-
-            if (testSpeed > prevSpeed)
+            // Use correct tool if we have it
+            if (EquipmentUtils.isCorrectTool(testedStack, state) && !EquipmentUtils.isCorrectTool(previousTool, state))
             {
                 return true;
             }
-            else if (testSpeed == prevSpeed)
-            {
-                return isMisc ? !prevSilk : prevSilk ? (rarity && mats) : true;
-            }
-            else if (testSpeed < prevSpeed && !prevSilk)
-            {
-                return isMisc ? true : (rarity && mats);
-            }
-        }
-        else if (prevSilk && !EquipmentUtils.hasSilkTouch(testedStack))
-        {
-            return false;
-        }
-
-		// Should default to original behavior.
-        boolean test = isBetterToolEach(testedStack, previousTool, state, isMisc, true);
-        //LOGGER.warn("applySilkTouchFirst: (Default-Correct?) result: {}", test);
-		return test;
-    }
-
-    private static boolean isBetterToolEach(ItemStack testedStack, ItemStack previousTool, BlockState state, boolean isMisc, boolean loop)
-    {
-        final boolean correct = EquipmentUtils.isCorrectTool(testedStack, state);
-
-        if (!correct)
-        {
-            return false;
-        }
-
-        final boolean preferFortune = Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue();
-        boolean preferSilk = Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue() && !preferFortune;
-        final boolean enchants = Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue() ? hasSameOrBetterToolEnchantments(testedStack, previousTool) : true;
-        final boolean mats = hasTheSameOrBetterMaterial(testedStack, previousTool);
-        final boolean rarity = hasTheSameOrBetterRarity(testedStack, previousTool);
-
-        final float testSpeed = getBaseBlockBreakingSpeed(testedStack, state);
-        final float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
-        final boolean testSilkTouch = EquipmentUtils.hasSilkTouch(testedStack);
-        final boolean prevSilkTouch = EquipmentUtils.hasSilkTouch(previousTool);
-        final boolean testFortune = EquipmentUtils.hasFortune(testedStack);
-        final boolean prevFortune = EquipmentUtils.hasFortune(previousTool);
-
-        if (preferSilk && preferFortune)
-        {
-            preferSilk = false;
-        }
-
-        //LOGGER.debug("(isBetterToolEach)");
-        //LOGGER.debug("Enchant result: {}", enchants);
-        //LOGGER.debug("Mats result: {}", mats);
-        //LOGGER.debug("Rarity result: {}", rarity);
-        //LOGGER.debug("Silk Touch result: test - {}, prev - {}", testSilkTouch, prevSilkTouch);
-        //LOGGER.debug("Speed test [{}] vs prev [{}]", testSpeed, prevSpeed);
-        //LOGGER.debug("CorrectTool result: {}", correct);
-
-        if (testSpeed > prevSpeed)
-        {
-            if (preferSilk && testSilkTouch)
-            {
-                return isMisc ? correct : (rarity || mats) && correct;
-            }
-            else if (preferFortune && testFortune)
-            {
-                return isMisc ? correct : (rarity || mats) && correct;
-            }
-            else if (!preferSilk && !testSilkTouch)
-            {
-                return isMisc ? correct : (rarity || mats) && correct;
-            }
-            else
+            if (!EquipmentUtils.isCorrectTool(testedStack, state) && EquipmentUtils.isCorrectTool(previousTool, state))
             {
                 return false;
             }
-        }
-        else if (testSpeed == prevSpeed)
-        {
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(!preferSilk);
-            final boolean result = isMisc ? enchants && correct : (rarity || mats) && enchants && correct;
-            final boolean prevResult = loop ? isBetterToolEach(previousTool, testedStack, state, isMisc, false) : false;
-            Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.setBooleanValue(preferSilk);
 
-            return isBetterToolSilkOrFortune(preferSilk, testSilkTouch, prevSilkTouch, preferFortune, testFortune, prevFortune, result, prevResult);
-        }
-
-        return false;
-    }
-
-    private static boolean isBetterToolSilkOrFortuneUnequalSpeed(boolean preferSilk, final boolean testSilkTouch,
-                                                                 final boolean preferFortune, final boolean testFortune,
-                                                                 final boolean mats, final boolean enchants)
-    {
-        if (preferSilk)
+            return null;
+        };
+        Supplier<Boolean> anyToolRule = () ->
         {
-            return testSilkTouch ? (mats && enchants) : false;
-        }
-        else if (preferFortune)
-        {
-            return testFortune ? (mats && enchants) : false;
-        }
-        else if (!preferFortune)
-        {
-            return !testFortune ? (mats && enchants) : false;
-        }
-        else if (!preferSilk)
-        {
-            return !testSilkTouch ? (mats && enchants) : false;
-        }
-
-        return false;
-    }
-
-    // Common Silk Touch / Fortune comparison logic
-    private static boolean isBetterToolSilkOrFortune(boolean preferSilk, final boolean testSilkTouch, final boolean prevSilkTouch,
-                                                     final boolean preferFortune, final boolean testFortune, final boolean prevFortune,
-                                                     final boolean result, final boolean prevResult)
-    {
-        if (preferFortune && preferSilk)
-        {
-            preferSilk = false;
-        }
-
-        if (prevResult && result)
-        {
-            if (preferSilk)
+            // Any tool is better than no tool
+            if (!(EquipmentUtils.isAnyTool(previousTool) || EquipmentUtils.isSword(previousTool)))
             {
-                return testSilkTouch && !prevSilkTouch;
+                boolean isAnyTool = EquipmentUtils.isAnyTool(testedStack) || EquipmentUtils.isSword(testedStack);
+                return isAnyTool;
             }
-            else if (preferFortune)
+
+            return null;
+        };
+        Supplier<Boolean> swordOnBambooRule = () ->
+        {
+            // Any sword is better than no sword for bamboo.
+            if (state.is(Blocks.BAMBOO))
             {
-                return testFortune && !prevFortune;
-            }
-            else if (!preferSilk)
-            {
-                if (!testSilkTouch && prevSilkTouch)
+                if (EquipmentUtils.isSword(testedStack) && !EquipmentUtils.isSword(previousTool))
                 {
                     return true;
                 }
-                else if (testSilkTouch && !prevSilkTouch)
+                if (!EquipmentUtils.isSword(testedStack) && EquipmentUtils.isSword(previousTool))
                 {
                     return false;
                 }
             }
-            else if (!preferFortune)
+
+            return null;
+        };
+        Supplier<Boolean> hoeOnLeavesRule = () ->
+        {
+            // Any hoe is better than no hoe for leaves.
+            if (state.is(BlockTags.LEAVES))
             {
-                if (!testFortune && prevFortune)
+                if (EquipmentUtils.isHoe(testedStack) && !EquipmentUtils.isHoe(previousTool))
                 {
                     return true;
                 }
-                else if (testFortune && !prevFortune)
+                if (!EquipmentUtils.isHoe(testedStack) && EquipmentUtils.isHoe(previousTool))
                 {
                     return false;
                 }
             }
+
+            return null;
+        };
+        Supplier<Boolean> shearsOnNeedsShearsRule = () ->
+        {
+            // Any shears is better than no shears for needs_shears blocks.
+            if (CachedTagManager.isNeedsShears(state))
+            {
+                if (EquipmentUtils.isShears(testedStack) && !EquipmentUtils.isShears(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.isShears(testedStack) && EquipmentUtils.isShears(previousTool))
+                {
+                    return false;
+                }
+            }
+
+            return null;
+        };
+        Supplier<Boolean> pickaxeOnNeedsPickaxeRule = () ->
+        {
+            // Any pickaxe is better than no pickaxe for needs_pickaxe blocks.
+            if (CachedTagManager.isNeedsPickaxe(state))
+            {
+                if (EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isPickAxe(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isPickAxe(previousTool))
+                {
+                    return false;
+                }
+            }
+
+            return null;
+        };
+        Supplier<Boolean> useFortuneRule = () ->
+        {
+            // Use fortune if we have it
+            if (EquipmentUtils.hasFortune(testedStack) && !EquipmentUtils.hasFortune(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.hasFortune(testedStack) && EquipmentUtils.hasFortune(previousTool))
+            {
+                return false;
+            }
+
+            return null;
+        };
+        Supplier<Boolean> useSilkTouchRule = () ->
+        {
+            // Use silk touch if we have it
+            if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
+            {
+                return true;
+            }
+            if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
+            {
+                return false;
+            }
+
+            return null;
+        };
+        Supplier<Boolean> silkTouchFirstRule = () ->
+        {
+            // Silk touch if we need it
+            if (CachedTagManager.isNeedsSilkTouch(state))
+            {
+                if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
+                {
+                    return false;
+                }
+            }
+
+            return null;
+        };
+        Supplier<Boolean> silkTouchOresRule = () ->
+        {
+            // Silk touch if we need it
+            if (CachedTagManager.isOreBlock(state))
+            {
+                if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
+                {
+                    return false;
+                }
+            }
+
+            return null;
+        };
+        Supplier<Boolean> silkTouchOverrideRule = () ->
+        {
+            // Silk touch if we need it
+            if (CachedTagManager.isSilkTouchOverride(state))
+            {
+                if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.hasSilkTouch(testedStack) && EquipmentUtils.hasSilkTouch(previousTool))
+                {
+                    return false;
+                }
+            }
+
+            return null;
+        };
+        Supplier<Boolean> pickaxeOverrideRule = () ->
+        {
+            // Use a pick axe if it's on the Override list
+            if (CachedTagManager.isPickaxeOverride(state))
+            {
+                if (EquipmentUtils.isPickAxe(testedStack) && !EquipmentUtils.isPickAxe(previousTool))
+                {
+                    return true;
+                }
+                if (!EquipmentUtils.isPickAxe(testedStack) && EquipmentUtils.isPickAxe(previousTool))
+                {
+                    return false;
+                }
+            }
+
+            return null;
+        };
+        Supplier<Boolean> betterEnchantRule = () ->
+        {
+            if (hasBetterToolEnchantments(testedStack, previousTool))
+            {
+                return true;
+            }
+            if (hasBetterToolEnchantments(previousTool, testedStack))
+            {
+                return false;
+            }
+
+            return null;
+        };
+        Supplier<Boolean> betterMaterialRule = () ->
+        {
+            // If the new tool has a better material
+            int testedWeight = getMaterialWeight(testedStack);
+            int prevWeight = getMaterialWeight(previousTool);
+
+            if (testedWeight > prevWeight)
+            {
+                return true;
+            }
+            if (prevWeight > testedWeight)
+            {
+                return false;
+            }
+
+            return null;
+        };
+        Supplier<Boolean> betterRarityRule = () ->
+        {
+            // If the new tool has better rarity
+            int testedWeight = getRarityWeight(testedStack);
+            int prevWeight = getRarityWeight(previousTool);
+
+            if (testedWeight > prevWeight)
+            {
+                return true;
+            }
+            if (prevWeight < testedWeight)
+            {
+                return false;
+            }
+
+            return null;
+        };
+        Supplier<Boolean> fasterTool = () ->
+        {
+            // If the new tool is faster, use it
+            float testedSpeed = getBaseBlockBreakingSpeed(testedStack, state);
+            float prevSpeed = getBaseBlockBreakingSpeed(previousTool, state);
+
+            if (testedSpeed > prevSpeed)
+            {
+                return true;
+            }
+            if (testedSpeed < prevSpeed)
+            {
+                return false;
+            }
+
+            return null;
+        };
+        // Combines two rules in a way that if they contradict each other, then the
+        // result is null to skip the check, but if one of them has a non-null result,
+        // then that result is used
+        BiFunction<Supplier<Boolean>, Supplier<Boolean>, Supplier<Boolean>> combineRules = (r1, r2) ->
+        {
+            return () ->
+            {
+                Boolean r1Result = r1.get();
+                Boolean r2Result = r2.get();
+
+                if (r1Result != r2Result)
+                {
+                    if (r1Result == null)
+                    {
+                        return r2Result;
+                    }
+                    if (r2Result == null)
+                    {
+                        return r1Result;
+                    }
+
+                    // If the rules contradict each other, then we cannot determine which tool is
+                    // better, so return null to skip this check
+                    return null;
+                }
+                return r1Result;
+            };
+        };
+
+        Map<String, Supplier<Boolean>> ruleMap = Map.ofEntries(Map.entry("blockHasToolTag", blockHasToolTagRule), Map.entry("correctTool", correctToolRule), Map.entry("anyTool", anyToolRule), Map.entry("swordOnBamboo", swordOnBambooRule), Map.entry("hoeOnLeaves", hoeOnLeavesRule),
+                Map.entry("shearsOnNeedsShears", shearsOnNeedsShearsRule), Map.entry("pickaxeOnNeedsPickaxe", pickaxeOnNeedsPickaxeRule), Map.entry("useFortune", combineRules.apply(correctToolRule, useFortuneRule)), Map.entry("useSilkTouch", combineRules.apply(correctToolRule, useSilkTouchRule)),
+                Map.entry("silkTouchFirst", silkTouchFirstRule), Map.entry("silkTouchOres", combineRules.apply(correctToolRule, silkTouchOresRule)), Map.entry("silkTouchOverride", silkTouchOverrideRule), Map.entry("pickaxeOverride", pickaxeOverrideRule),
+                Map.entry("betterEnchantments", betterEnchantRule), Map.entry("betterMaterial", betterMaterialRule), Map.entry("betterRarity", betterRarityRule), Map.entry("fasterTool", fasterTool));
+
+        List<String> rules = new ArrayList<String>();
+        rules.add("blockHasToolTag");
+        // rules.add("anyTool");
+        if (Configs.Generic.TOOL_SWAP_BAMBOO_USES_SWORD_FIRST.getBooleanValue())
+        {
+            rules.add("swordOnBamboo");
+        }
+        if (Configs.Generic.TOOL_SWAP_LEAVES_USES_HOE_FIRST.getBooleanValue())
+        {
+            rules.add("hoeOnLeaves");
+        }
+        if (Configs.Generic.TOOL_SWAP_NEEDS_SHEARS_FIRST.getBooleanValue())
+        {
+            rules.add("shearsOnNeedsShears");
+        }
+        if (Configs.Generic.TOOL_SWAP_NEEDS_PICKAXE_FIRST.getBooleanValue())
+        {
+            rules.add("pickaxeOnNeedsPickaxe");
+        }
+        if (Configs.Generic.TOOL_SWAP_PICKAXE_OVERRIDE.getBooleanValue())
+        {
+            rules.add("pickaxeOverride");
+        }
+        if (Configs.Generic.TOOL_SWAP_PREFER_FORTUNE_OVERRIDE.getBooleanValue())
+        {
+            // Get the correct tool and then find the fortune version if there is one
+            rules.add("useFortune");
+        }
+        if (Configs.Generic.TOOL_SWAP_PREFER_SILK_TOUCH.getBooleanValue())
+        {
+            // Get the correct tool and then find the silk touch version if there is one
+            rules.add("useSilkTouch");
         }
 
-        return result;
+        // For silk touch flags use the wrong silk touch tool over the right non-silk
+        // touch
+        if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_FIRST.getBooleanValue())
+        {
+            rules.add("silkTouchFirst");
+        }
+        if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_ORES.getBooleanValue())
+        {
+            rules.add("silkTouchOres");
+        }
+        if (Configs.Generic.TOOL_SWAP_SILK_TOUCH_OVERRIDE.getBooleanValue())
+        {
+            rules.add("silkTouchOverride");
+        }
+
+        rules.add("correctTool");
+        if (Configs.Generic.TOOL_SWAP_BETTER_ENCHANTS.getBooleanValue())
+        {
+            rules.add("betterEnchantments");
+        }
+        rules.add("betterMaterial");
+        rules.add("fasterTool");
+        // rules.add("betterRarity");
+        List<String> testedRules = new ArrayList<>();
+        for (String ruleName : rules)
+        {
+            testedRules.add(ruleName);
+            Supplier<Boolean> rule = ruleMap.get(ruleName);
+            Boolean result = rule.get();
+
+            if (result != null)
+            {
+                if (result)
+                {
+                    Tweakeroo.debugLog("ToolSwap {}\nCompare {}[{}] to {}[{}]", String.join("->", testedRules), previousTool, previousTool.getEnchantments(), testedStack, testedStack.getEnchantments());
+                }
+
+                return result;
+            }
+        }
+        return false;
     }
 
     private static boolean isBetterToolAndHasDurability(ItemStack testedStack, ItemStack previousTool, BlockState state)
@@ -1033,15 +927,15 @@ public class InventoryUtils
     private static int getRarityWeight(ItemStack stack)
     {
         // Because using the Vanilla methods, doesn't seem to work right.
-        switch (stack.getRarity())
+        return switch (stack.getRarity())
         {
-            case EPIC -> { return 4; }
-            case RARE -> { return 3; }
-            case UNCOMMON -> { return 2; }
-            case COMMON -> { return 1; }
-            case null -> { return -1; }
-            default -> { return 0; }
-        }
+            case EPIC -> 4;
+            case RARE -> 3;
+            case UNCOMMON -> 2;
+            case COMMON -> 1;
+            case null -> -1;
+            default -> 0;
+        };
     }
 
     private static boolean hasTheSameOrBetterMaterial(ItemStack testedStack, ItemStack previousTool)
@@ -1053,26 +947,33 @@ public class InventoryUtils
     {
         String itemType = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-        if (itemType.contains("netherite")) return 6;
-        if (itemType.contains("diamond")) return 5;
-        if (itemType.contains("iron")) return 4;
-	    if (itemType.contains("copper")) return 3;
-        if (itemType.contains("stone")) return 2;
-        if (itemType.contains("gold")) return 1;
-        if (itemType.contains("wood")) return 0;
+        if (itemType.contains("netherite"))
+            return 6;
+        if (itemType.contains("diamond"))
+            return 5;
+        if (itemType.contains("iron"))
+            return 4;
+        if (itemType.contains("copper"))
+            return 3;
+        if (itemType.contains("stone"))
+            return 2;
+        if (itemType.contains("gold"))
+            return 1;
+        if (itemType.contains("wood"))
+            return 0;
 
         return -1;
     }
 
     /**
-     * Creates a total additive value of the essential Enchantment Levels.
-     * If one of them does not contain the same Enchantment;
-     * then the level should be -1, and will reduce its total weighted value;
-     * But if the enchantment level is better, then the weight is +1, and adds to it's value.
-     * The same Enchantment Level would then be a 0; and has no weighted change.
-     * The result is then in favor for the testedStack if the total weight is > 0.
+     * Creates a total additive value of the essential Enchantment Levels. If one of
+     * them does not contain the same Enchantment; then the level should be -1, and
+     * will reduce its total weighted value; But if the enchantment level is better,
+     * then the weight is +1, and adds to it's value. The same Enchantment Level
+     * would then be a 0; and has no weighted change. The result is then in favor
+     * for the testedStack if the total weight is > 0.
      */
-    private static boolean hasSameOrBetterToolEnchantments(ItemStack testedStack, ItemStack previousTool)
+    private static boolean hasBetterToolEnchantments(ItemStack testedStack, ItemStack previousTool)
     {
         int count = 0;
 
@@ -1082,7 +983,7 @@ public class InventoryUtils
         count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.EFFICIENCY);
         count += EquipmentUtils.hasSameOrBetterEnchantment(testedStack, previousTool, Enchantments.FORTUNE);
 
-        return count >= 0;
+        return count > 0;
     }
 
     private static boolean hasSameOrBetterWeaponEnchantments(ItemStack testedStack, ItemStack previousTool)
@@ -1202,8 +1103,7 @@ public class InventoryUtils
 
         for (int slotNumber : slotNumbers)
         {
-            if (slotNumber >= 0 && slotNumber <= maxSlot &&
-				!container.getSlot(slotNumber).hasItem())
+            if (slotNumber >= 0 && slotNumber <= maxSlot && !container.getSlot(slotNumber).hasItem())
             {
                 return slotNumber;
             }
@@ -1224,8 +1124,7 @@ public class InventoryUtils
 
     private static int getMinDurability(ItemStack stack)
     {
-        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() ||
-	        (Configs.Generic.TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK.getBooleanValue() && !stack.isEnchanted()))
+        if (!FeatureToggle.TWEAK_SWAP_ALMOST_BROKEN_TOOLS.getBooleanValue() || (Configs.Generic.TOOL_SWAP_ALLOW_UNENCHANTED_TO_BREAK.getBooleanValue() && !stack.isEnchanted()))
         {
             return 0;
         }
@@ -1234,8 +1133,7 @@ public class InventoryUtils
 
         // For items with low maximum durability, use 8% as the threshold,
         // if the configured durability threshold is over that.
-        if (stack.getMaxDamage() <= 100 && minDurability <= 20 &&
-            (double) minDurability / (double) stack.getMaxDamage() > 0.08)
+        if (stack.getMaxDamage() <= 100 && minDurability <= 20 && (double) minDurability / (double) stack.getMaxDamage() > 0.08)
         {
             minDurability = (int) Math.ceil(stack.getMaxDamage() * 0.08);
         }
@@ -1287,18 +1185,10 @@ public class InventoryUtils
     private static void repairModeHandleSlot(Player player, EquipmentSlot type)
     {
         int slotNum = getSlotNumberForEquipmentType(type, player);
-
-        if (slotNum == -1)
-        {
-            return;
-        }
-
+        if (slotNum == -1) { return; }
         ItemStack stack = player.getItemBySlot(type);
 
-        if (stack.isEmpty() == false &&
-            (stack.isDamageableItem() == false ||
-             stack.isDamaged() == false ||
-            EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
+        if (stack.isEmpty() == false && (stack.isDamageableItem() == false || stack.isDamaged() == false || EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
         {
             Slot slot = player.containerMenu.getSlot(slotNum);
             int slotRepairableItem = findRepairableItemNotInRepairableSlot(slot, player);
@@ -1325,9 +1215,7 @@ public class InventoryUtils
                 ItemStack stack = slot.getItem();
 
                 // Don't take items from the current hotbar slot
-                if ((slot.index - 36) != player.getInventory().getSelectedSlot() &&
-                    stack.isDamageableItem() && stack.isDamaged() && targetSlot.mayPlace(stack) &&
-                    EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
+                if ((slot.index - 36) != player.getInventory().getSelectedSlot() && stack.isDamageableItem() && stack.isDamaged() && targetSlot.mayPlace(stack) && EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) > 0)
                 {
                     return slot.index;
                 }
@@ -1339,20 +1227,21 @@ public class InventoryUtils
 
     public static void equipBestElytra(Player player)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
 
-        Predicate<ItemStack> filter = (s) ->  s.getItem().equals(Items.ELYTRA) &&
-                s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER) &&
-                s.getDamageValue() < s.getMaxDamage() - 10;
+        Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER) && s.getDamageValue() < s.getMaxDamage() - 10;
 
-        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
-            if (!filter.test(testedStack)) return false;
-            if (!filter.test(previousBestMatch)) return true;
+        int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
+        {
+            if (!filter.test(testedStack))
+            {
+                return false;
+            }
+            if (!filter.test(previousBestMatch))
+            {
+                return true;
+            }
             if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return true;
@@ -1361,6 +1250,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return testedStack.getDamageValue() <= previousBestMatch.getDamageValue();
         }, UniformInt.of(9, container.slots.size() - 1));
 
@@ -1372,35 +1262,34 @@ public class InventoryUtils
 
     public static void equipBestFlightRockets(Player player)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         Predicate<ItemStack> filter;
 
         if (Configs.Generic.ROCKET_SWAP_ALLOW_EXPLOSIONS.getBooleanValue())
         {
             // Allows the player to Auto Swap any fireworks
-            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET);
+            filter = (s) -> s.getItem().equals(Items.FIREWORK_ROCKET);
         }
         else
         {
-            filter = (s) ->  s.getItem().equals(Items.FIREWORK_ROCKET) && s.get(DataComponents.FIREWORKS).explosions().isEmpty();
+            filter = (s) -> s.getItem().equals(Items.FIREWORK_ROCKET) && s.get(DataComponents.FIREWORKS).explosions().isEmpty();
         }
 
-        int slotNumber = findSlotWithBestItemMatch(
-                container, (testedStack, previousBestMatch) ->
-                {
-                    if (!filter.test(testedStack)) return false;
-                    if (!filter.test(previousBestMatch)) return true;
-                    return  testedStack.get(DataComponents.FIREWORKS).flightDuration() >  previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() ||
-                           (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() &&
-                            testedStack.getCount() > previousBestMatch.getCount());
-                },
-                UniformInt.of(9, container.slots.size() - 1)
-        );
+        int slotNumber = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
+        {
+            if (!filter.test(testedStack))
+            {
+                return false;
+            }
+            if (!filter.test(previousBestMatch))
+            {
+                return true;
+            }
+
+            return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration()
+                    || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
+        }, UniformInt.of(9, container.slots.size() - 1));
 
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
@@ -1412,11 +1301,7 @@ public class InventoryUtils
 
     public static void swapFlightRocketsFromHand(Player player, InteractionHand hand, ItemStack stackReference)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         int targetSlot = InventoryUtils.findSlotWithItem(container, stackReference, true, false);
 
@@ -1428,11 +1313,7 @@ public class InventoryUtils
 
     public static void swapElytraFromChest(Player player, ItemStack stackReference)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         int targetSlot = findSlotWithItem(container, stackReference, true, false);
 
@@ -1450,17 +1331,14 @@ public class InventoryUtils
     // todo for easier forwards porting when the `ArmorItem` disappears
     private static boolean checkChestSlot(ItemStack stack)
     {
-//        return stack.getItem() instanceof ArmorItem && EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
+        // return stack.getItem() instanceof ArmorItem &&
+        // EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
         return EquipmentUtils.matchArmorSlot(stack, EquipmentSlot.CHEST);
     }
 
     public static void swapElytraAndChestPlate(@Nullable Player player)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         ItemStack currentStack = player.getItemBySlot(EquipmentSlot.CHEST);
 
@@ -1474,9 +1352,16 @@ public class InventoryUtils
         {
             Predicate<ItemStack> finalFilter = (s) -> stackFilterChestPlate.test(s) && s.getDamageValue() < s.getMaxDamage() - 10;
 
-            int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) -> {
-                if (!finalFilter.test(testedStack)) return false;
-                if (!finalFilter.test(previousBestMatch)) return true;
+            int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
+            {
+                if (!finalFilter.test(testedStack))
+                {
+                    return false;
+                }
+                if (!finalFilter.test(previousBestMatch))
+                {
+                    return true;
+                }
                 if (getArmorAndArmorToughnessValue(previousBestMatch, 1, EquipmentSlotGroup.CHEST) < getArmorAndArmorToughnessValue(testedStack, 1, EquipmentSlotGroup.CHEST))
                 {
                     return true;
@@ -1485,6 +1370,7 @@ public class InventoryUtils
                 {
                     return false;
                 }
+
                 return EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) <= EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.PROTECTION);
             }, UniformInt.of(9, container.slots.size() - 1));
 
@@ -1497,11 +1383,12 @@ public class InventoryUtils
 
     private static double getArmorAndArmorToughnessValue(ItemStack stack, double base, EquipmentSlotGroup slot)
     {
-        final double[] total = {base};
+        final double[] total =
+        { base };
 
-        stack.forEachModifier(slot, (entry, modifier, consumer) -> {
-            if (entry.unwrapKey().orElseThrow() == Attributes.ARMOR
-                || entry.unwrapKey().orElseThrow() == Attributes.ARMOR_TOUGHNESS)
+        stack.forEachModifier(slot, (entry, modifier, consumer) ->
+        {
+            if (entry.unwrapKey().orElseThrow() == Attributes.ARMOR || entry.unwrapKey().orElseThrow() == Attributes.ARMOR_TOUGHNESS)
             {
                 switch (modifier.operation())
                 {
@@ -1525,9 +1412,10 @@ public class InventoryUtils
 
     /**
      *
-     * Finds a slot with an identical item than <b>stackReference</b>, ignoring the durability
-     * of damageable items. Does not allow crafting or armor slots or the offhand slot
-     * in the ContainerPlayer container.
+     * Finds a slot with an identical item than <b>stackReference</b>, ignoring the
+     * durability of damageable items. Does not allow crafting or armor slots or the
+     * offhand slot in the ContainerPlayer container.
+     * 
      * @return the slot number, or -1 if none were found
      */
     public static int findSlotWithItem(AbstractContainerMenu container, ItemStack stackReference, boolean allowHotbar, boolean reverse)
@@ -1541,9 +1429,7 @@ public class InventoryUtils
         {
             Slot slot = container.slots.get(slotNum);
 
-            if ((isPlayerInv == false || fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false)) &&
-                (allowHotbar || isHotbarSlot(slot) == false) &&
-                fi.dy.masa.malilib.util.InventoryUtils.areStacksEqualIgnoreDurability(slot.getItem(), stackReference))
+            if ((isPlayerInv == false || fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false)) && (allowHotbar || isHotbarSlot(slot) == false) && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqualIgnoreDurability(slot.getItem(), stackReference))
             {
                 return slot.index;
             }
@@ -1663,10 +1549,8 @@ public class InventoryUtils
             }
 
             /*
-            if ((stack.getItem() instanceof MiningToolItem) == false)
-            {
-                nonTool = currentHotbarSlot;
-            }
+             * if ((stack.getItem() instanceof MiningToolItem) == false) { nonTool =
+             * currentHotbarSlot; }
              */
             if (EquipmentUtils.isRegularTool(stack) == false)
             {
@@ -1683,7 +1567,7 @@ public class InventoryUtils
                 return hotbarSlot;
             }
 
-            //if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
+            // if (nonTool == -1 && (stack.getItem() instanceof MiningToolItem) == false)
             if (nonTool == -1 && EquipmentUtils.isRegularTool(stack) == false)
             {
                 nonTool = hotbarSlot;
@@ -1705,11 +1589,9 @@ public class InventoryUtils
             ItemStack stackSlot = slot.getItem();
 
             // Only accept regular inventory slots (no crafting, armor slots, or offhand)
-            if (fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false) &&
-                ItemStack.isSameItem(stackSlot, stackReference) &&
-                stackSlot.getMaxDamage() - stackSlot.getDamageValue() >= minDurabilityLeft &&
-                //hasSameOrBetterToolEnchantments(stackReference, stackSlot))
-                hasSameIshEnchantments(stackReference, stackSlot))
+            if (fi.dy.masa.malilib.util.InventoryUtils.isRegularInventorySlot(slot.index, false) && ItemStack.isSameItem(stackSlot, stackReference) && stackSlot.getMaxDamage() - stackSlot.getDamageValue() >= minDurabilityLeft &&
+            // hasSameOrBetterToolEnchantments(stackReference, stackSlot))
+                    hasSameIshEnchantments(stackReference, stackSlot))
             {
                 return slot.index;
             }
@@ -1786,11 +1668,7 @@ public class InventoryUtils
         for (Slot slot : container.slots)
         {
             // Inventory crafting and armor slots are not valid
-            if (slot.index < 8)
-            {
-                continue;
-            }
-
+            if (slot.index < 8) { continue; }
             ItemStack stack = slot.getItem();
 
             if (stack.getCount() < stack.getMaxStackSize() && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackReference, stack))
@@ -1837,9 +1715,7 @@ public class InventoryUtils
 
     public static boolean canUnstackingItemNotFitInInventory(ItemStack stack, Player player)
     {
-        if (FeatureToggle.TWEAK_ITEM_UNSTACKING_PROTECTION.getBooleanValue() &&
-            stack.getCount() > 1 &&
-            UNSTACKING_ITEMS.contains(stack.getItem()))
+        if (FeatureToggle.TWEAK_ITEM_UNSTACKING_PROTECTION.getBooleanValue() && stack.getCount() > 1 && UNSTACKING_ITEMS.contains(stack.getItem()))
         {
             if (fi.dy.masa.malilib.util.InventoryUtils.findEmptySlotInPlayerInventory(player.inventoryMenu, false, false) == -1)
             {
@@ -1854,15 +1730,11 @@ public class InventoryUtils
 
     public static void switchToPickedBlock()
     {
-        Minecraft mc  = Minecraft.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         Level world = mc.level;
 
-        if (player == null || world == null || player.containerMenu != player.inventoryMenu)
-        {
-            return;
-        }
-
+        if (player == null || world == null || player.containerMenu != player.inventoryMenu) { return; }
         double reach = mc.player.blockInteractionRange();
         boolean isCreative = player.isCreative();
         HitResult trace = player.pick(reach, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), false);
@@ -1873,22 +1745,15 @@ public class InventoryUtils
             BlockState stateTargeted = world.getBlockState(pos);
             ItemStack stack = ((IMixinAbstractBlock) stateTargeted.getBlock()).tweakeroo_getPickStack(world, pos, stateTargeted, false);
 
-            if (stack.isEmpty() == false &&
-                fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandItem()) == false)
+            if (stack.isEmpty() == false && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandItem()) == false)
             {
                 AbstractContainerMenu container = player.containerMenu;
                 Inventory inventory = player.getInventory();
                 /*
-                if (isCreative)
-                {
-                    TileEntity te = world.getTileEntity(pos);
-
-                    if (te != null)
-                    {
-                        mc.storeTEInStack(stack, te);
-                    }
-                }
-                */
+                 * if (isCreative) { TileEntity te = world.getTileEntity(pos);
+                 * 
+                 * if (te != null) { mc.storeTEInStack(stack, te); } }
+                 */
 
                 if (isCreative)
                 {
@@ -1897,7 +1762,7 @@ public class InventoryUtils
                 }
                 else
                 {
-                    //player.getInventory().getSlotFor(stack);
+                    // player.getInventory().getSlotFor(stack);
                     int slotNumber = fi.dy.masa.malilib.util.InventoryUtils.findSlotWithItem(container, stack, true);
 
                     if (slotNumber != -1)
@@ -1911,9 +1776,9 @@ public class InventoryUtils
 
     public static void swapSpyglassToHand()
     {
-        Minecraft mc  = Minecraft.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null) return;
+        if (player == null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
@@ -1935,7 +1800,7 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null) return;
+        if (player == null) { return; }
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
         if (lastSpyglassSlot != -1)

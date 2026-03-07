@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%level] %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="tweakeroo" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Root level="warn">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
