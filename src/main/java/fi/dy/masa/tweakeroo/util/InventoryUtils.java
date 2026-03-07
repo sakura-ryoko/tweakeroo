@@ -80,11 +80,7 @@ public class InventoryUtils
         Pattern patternRange = Pattern.compile("^(?<start>[0-9])-(?<end>[0-9])$");
 
         output.clear();
-
-        if (configStr.isBlank())
-        {
-            return;
-        }
+        if (configStr.isBlank()) { return; }
 
         for (String str : parts)
         {
@@ -212,9 +208,7 @@ public class InventoryUtils
                             continue;
                         }
                     }
-                    catch (Exception ignore)
-                    {
-                    }
+                    catch (Exception ignore) {}
 
                     Tweakeroo.LOGGER.warn("Unable to find item to use as weapon: '{}'", itemId);
                 }
@@ -238,9 +232,7 @@ public class InventoryUtils
                             continue;
                         }
                     }
-                    catch (Exception ignore)
-                    {
-                    }
+                    catch (Exception ignore) {}
 
                     Tweakeroo.LOGGER.warn("Unable to find entity: '{}'", entity_id);
                 }
@@ -338,7 +330,7 @@ public class InventoryUtils
         int threshold = Configs.Generic.HAND_RESTOCK_PRE_THRESHOLD.getIntegerValue();
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() && Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() && stackHand.isEmpty() == false && stackHand.getCount() <= threshold && stackHand.getMaxStackSize() > threshold
-                && PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) && player.containerMenu == player.inventoryMenu && player.containerMenu.getCarried().isEmpty())
+            && PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) && player.containerMenu == player.inventoryMenu && player.containerMenu.getCarried().isEmpty())
         {
             Minecraft mc = Minecraft.getInstance();
             AbstractContainerMenu container = player.inventoryMenu;
@@ -512,7 +504,6 @@ public class InventoryUtils
     protected static boolean matchesWeaponMapping(ItemStack stack, Entity entity)
     {
         HashSet<Item> weapons = WEAPON_MAPPING.getOrDefault(entity.getType(), WEAPON_MAPPING.get(null));
-
         return weapons != null && weapons.contains(stack.getItem());
     }
 
@@ -545,7 +536,7 @@ public class InventoryUtils
         }
     }
 
-    static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
+    protected static boolean isBetterTool(ItemStack testedStack, ItemStack previousTool, BlockState state)
     {
         Supplier<Boolean> blockHasToolTagRule = () ->
         {
@@ -556,6 +547,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> correctToolRule = () ->
@@ -569,6 +561,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> anyToolRule = () ->
@@ -579,6 +572,7 @@ public class InventoryUtils
                 boolean isAnyTool = EquipmentUtils.isAnyTool(testedStack) || EquipmentUtils.isSword(testedStack);
                 return isAnyTool;
             }
+
             return null;
         };
         Supplier<Boolean> swordOnBambooRule = () ->
@@ -595,6 +589,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> hoeOnLeavesRule = () ->
@@ -611,6 +606,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> shearsOnNeedsShearsRule = () ->
@@ -627,6 +623,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> pickaxeOnNeedsPickaxeRule = () ->
@@ -643,6 +640,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> useFortuneRule = () ->
@@ -656,6 +654,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> useSilkTouchRule = () ->
@@ -669,6 +668,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> silkTouchFirstRule = () ->
@@ -685,6 +685,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> silkTouchOresRule = () ->
@@ -701,6 +702,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> silkTouchOverrideRule = () ->
@@ -717,6 +719,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> pickaxeOverrideRule = () ->
@@ -733,6 +736,7 @@ public class InventoryUtils
                     return false;
                 }
             }
+
             return null;
         };
         Supplier<Boolean> betterEnchantRule = () ->
@@ -745,6 +749,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> betterMaterialRule = () ->
@@ -761,6 +766,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> betterRarityRule = () ->
@@ -777,6 +783,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         Supplier<Boolean> fasterTool = () ->
@@ -793,6 +800,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return null;
         };
         // Combines two rules in a way that if they contradict each other, then the
@@ -804,6 +812,7 @@ public class InventoryUtils
             {
                 Boolean r1Result = r1.get();
                 Boolean r2Result = r2.get();
+
                 if (r1Result != r2Result)
                 {
                     if (r1Result == null)
@@ -814,6 +823,7 @@ public class InventoryUtils
                     {
                         return r1Result;
                     }
+
                     // If the rules contradict each other, then we cannot determine which tool is
                     // better, so return null to skip this check
                     return null;
@@ -897,6 +907,7 @@ public class InventoryUtils
                 {
                     Tweakeroo.debugLog("ToolSwap {}\nCompare {}[{}] to {}[{}]", String.join("->", testedRules), previousTool, previousTool.getEnchantments(), testedStack, testedStack.getEnchantments());
                 }
+
                 return result;
             }
         }
@@ -916,27 +927,15 @@ public class InventoryUtils
     private static int getRarityWeight(ItemStack stack)
     {
         // Because using the Vanilla methods, doesn't seem to work right.
-        switch (stack.getRarity())
+        return switch (stack.getRarity())
         {
-            case EPIC -> {
-                return 4;
-            }
-            case RARE -> {
-                return 3;
-            }
-            case UNCOMMON -> {
-                return 2;
-            }
-            case COMMON -> {
-                return 1;
-            }
-            case null -> {
-                return -1;
-            }
-            default -> {
-                return 0;
-            }
-        }
+            case EPIC -> 4;
+            case RARE -> 3;
+            case UNCOMMON -> 2;
+            case COMMON -> 1;
+            case null -> -1;
+            default -> 0;
+        };
     }
 
     private static boolean hasTheSameOrBetterMaterial(ItemStack testedStack, ItemStack previousTool)
@@ -1186,12 +1185,7 @@ public class InventoryUtils
     private static void repairModeHandleSlot(Player player, EquipmentSlot type)
     {
         int slotNum = getSlotNumberForEquipmentType(type, player);
-
-        if (slotNum == -1)
-        {
-            return;
-        }
-
+        if (slotNum == -1) { return; }
         ItemStack stack = player.getItemBySlot(type);
 
         if (stack.isEmpty() == false && (stack.isDamageableItem() == false || stack.isDamaged() == false || EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
@@ -1233,11 +1227,7 @@ public class InventoryUtils
 
     public static void equipBestElytra(Player player)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
 
         Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER) && s.getDamageValue() < s.getMaxDamage() - 10;
@@ -1245,9 +1235,13 @@ public class InventoryUtils
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
         {
             if (!filter.test(testedStack))
+            {
                 return false;
+            }
             if (!filter.test(previousBestMatch))
+            {
                 return true;
+            }
             if (EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.UNBREAKING) > EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.UNBREAKING))
             {
                 return true;
@@ -1256,6 +1250,7 @@ public class InventoryUtils
             {
                 return false;
             }
+
             return testedStack.getDamageValue() <= previousBestMatch.getDamageValue();
         }, UniformInt.of(9, container.slots.size() - 1));
 
@@ -1267,11 +1262,7 @@ public class InventoryUtils
 
     public static void equipBestFlightRockets(Player player)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         Predicate<ItemStack> filter;
 
@@ -1288,9 +1279,14 @@ public class InventoryUtils
         int slotNumber = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
         {
             if (!filter.test(testedStack))
+            {
                 return false;
+            }
             if (!filter.test(previousBestMatch))
+            {
                 return true;
+            }
+
             return testedStack.get(DataComponents.FIREWORKS).flightDuration() > previousBestMatch.get(DataComponents.FIREWORKS).flightDuration()
                     || (testedStack.get(DataComponents.FIREWORKS).flightDuration() == previousBestMatch.get(DataComponents.FIREWORKS).flightDuration() && testedStack.getCount() > previousBestMatch.getCount());
         }, UniformInt.of(9, container.slots.size() - 1));
@@ -1305,11 +1301,7 @@ public class InventoryUtils
 
     public static void swapFlightRocketsFromHand(Player player, InteractionHand hand, ItemStack stackReference)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         int targetSlot = InventoryUtils.findSlotWithItem(container, stackReference, true, false);
 
@@ -1321,11 +1313,7 @@ public class InventoryUtils
 
     public static void swapElytraFromChest(Player player, ItemStack stackReference)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         int targetSlot = findSlotWithItem(container, stackReference, true, false);
 
@@ -1350,11 +1338,7 @@ public class InventoryUtils
 
     public static void swapElytraAndChestPlate(@Nullable Player player)
     {
-        if (player == null || GuiUtils.getCurrentScreen() != null)
-        {
-            return;
-        }
-
+        if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         ItemStack currentStack = player.getItemBySlot(EquipmentSlot.CHEST);
 
@@ -1371,9 +1355,13 @@ public class InventoryUtils
             int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
             {
                 if (!finalFilter.test(testedStack))
+                {
                     return false;
+                }
                 if (!finalFilter.test(previousBestMatch))
+                {
                     return true;
+                }
                 if (getArmorAndArmorToughnessValue(previousBestMatch, 1, EquipmentSlotGroup.CHEST) < getArmorAndArmorToughnessValue(testedStack, 1, EquipmentSlotGroup.CHEST))
                 {
                     return true;
@@ -1382,6 +1370,7 @@ public class InventoryUtils
                 {
                     return false;
                 }
+
                 return EquipmentUtils.getEnchantmentLevel(previousBestMatch, Enchantments.PROTECTION) <= EquipmentUtils.getEnchantmentLevel(testedStack, Enchantments.PROTECTION);
             }, UniformInt.of(9, container.slots.size() - 1));
 
@@ -1679,11 +1668,7 @@ public class InventoryUtils
         for (Slot slot : container.slots)
         {
             // Inventory crafting and armor slots are not valid
-            if (slot.index < 8)
-            {
-                continue;
-            }
-
+            if (slot.index < 8) { continue; }
             ItemStack stack = slot.getItem();
 
             if (stack.getCount() < stack.getMaxStackSize() && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackReference, stack))
@@ -1749,11 +1734,7 @@ public class InventoryUtils
         Player player = mc.player;
         Level world = mc.level;
 
-        if (player == null || world == null || player.containerMenu != player.inventoryMenu)
-        {
-            return;
-        }
-
+        if (player == null || world == null || player.containerMenu != player.inventoryMenu) { return; }
         double reach = mc.player.blockInteractionRange();
         boolean isCreative = player.isCreative();
         HitResult trace = player.pick(reach, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), false);
@@ -1797,8 +1778,7 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null)
-            return;
+        if (player == null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
@@ -1820,8 +1800,7 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null)
-            return;
+        if (player == null) { return; }
         InteractionHand hand = fi.dy.masa.malilib.util.InventoryUtils.getHandSlot((HandSlot) Configs.Generic.UTILITY_HAND_SLOT.getOptionListValue());
 
         if (lastSpyglassSlot != -1)

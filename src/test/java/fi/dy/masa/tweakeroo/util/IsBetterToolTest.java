@@ -1,14 +1,17 @@
 package fi.dy.masa.tweakeroo.util;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import fi.dy.masa.malilib.data.CachedBlockTags;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.Holder;
@@ -31,8 +34,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.*;
-import java.util.stream.Stream;
+import fi.dy.masa.malilib.data.CachedBlockTags;
+import fi.dy.masa.malilib.util.log.AnsiLogger;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * each test that expects true uses the weakest tool that should still win,
  * against the strongest tool that should still lose, isolating the specific
  * rule.
- *
+ * -
  * Rule chain order: anyTool -> [swordOnBamboo] -> [hoeOnLeaves] ->
  * [shearsOnNeedsShears] -> [pickaxeOnNeedsPickaxe] -> [pickaxeOverride] ->
  * [useFortune] -> [useSilkTouch] -> [silkTouchFirst] -> [silkTouchOres] ->
@@ -51,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("isBetterTool Method Integration Tests")
 class IsBetterToolTest
 {
+        private static final AnsiLogger LOGGER = new AnsiLogger(IsBetterToolTest.class, true, true);
         private static final Map<ResourceKey<Enchantment>, Holder<Enchantment>> ENCHANT_HOLDERS = new HashMap<>();
 
         @BeforeAll
@@ -65,7 +71,6 @@ class IsBetterToolTest
 
         // ===== BLOCK TAG BINDING =====
 
-        @SuppressWarnings("unchecked")
         private static void bindVanillaBlockTagsForTests()
         {
                 bindBlockTags(Blocks.STONE, BlockTags.MINEABLE_WITH_PICKAXE);
@@ -96,7 +101,7 @@ class IsBetterToolTest
         {
                 try
                 {
-                        var holder = block.builtInRegistryHolder();
+                        var holder = block.builtInRegistryHolder;
                         var method = holder.getClass().getDeclaredMethod("bindTags", java.util.Collection.class);
                         method.setAccessible(true);
                         method.invoke(holder, List.of(tags));
@@ -224,7 +229,7 @@ class IsBetterToolTest
         record ConfigTestCase(Map<String, Boolean> configFlags, ItemStack testedStack, ItemStack previousTool, BlockState state, boolean expectedBehavior, String description)
         {
                 @Override
-                public String toString()
+                public @NonNull String toString()
                 {
                         return this.description;
                 }
@@ -286,7 +291,7 @@ class IsBetterToolTest
                         }
                         catch (Exception e)
                         {
-                                System.out.printf("Warning: Could not set config flag %s: %s%n", entry.getKey(), e.getMessage());
+                                LOGGER.warn("Warning: Could not set config flag {}: {}", entry.getKey(), e.getMessage());
                         }
                 }
         }
@@ -619,7 +624,7 @@ class IsBetterToolTest
                 }
                 catch (Exception e)
                 {
-                        System.out.println("Failed to create test data: " + e.getMessage());
+                        LOGGER.error("Failed to create test data: {}", e.getMessage());
                         return Stream.empty();
                 }
         }

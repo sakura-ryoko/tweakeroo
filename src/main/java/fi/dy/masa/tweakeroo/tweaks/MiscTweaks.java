@@ -42,6 +42,8 @@ public class MiscTweaks
     private static KeybindState KEY_STATE_ATTACK;
     private static KeybindState KEY_STATE_USE;
 
+    public static int renderCountItems;
+    public static int renderCountXPOrbs;
     private static int potionWarningTimer;
 
     private static class KeybindState
@@ -133,8 +135,8 @@ public class MiscTweaks
         PlacementTweaks.onTick(mc);
         RenderTweaks.onTick();
         // Reset the counters after rendering each frame
-        Tweakeroo.renderCountItems = 0;
-        Tweakeroo.renderCountXPOrbs = 0;
+        renderCountItems = 0;
+        renderCountXPOrbs = 0;
     }
 
     private static void doPeriodicClicks(Minecraft mc)

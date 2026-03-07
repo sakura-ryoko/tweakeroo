@@ -3,3 +3,4 @@ accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
 accessible class net/minecraft/client/gui/Gui$ContextualInfo
 accessible class net/minecraft/client/OptionInstance$ValueSet
 accessible class net/minecraft/client/OptionInstance$SliderableValueSet
+accessible field net/minecraft/world/level/block/Block builtInRegistryHolder Lnet/minecraft/core/Holder$Reference;
