@@ -548,7 +548,7 @@ public class Configs implements IConfigHandler
 
     public static void loadFromFile()
     {
-        Path configFile = FileUtils.getConfigDirectoryAsPath().resolve(CONFIG_FILE_NAME);
+        Path configFile = FileUtils.getConfigDirectory().resolve(CONFIG_FILE_NAME);
 
         if (Files.exists(configFile) && Files.isReadable(configFile))
         {
@@ -631,7 +631,7 @@ public class Configs implements IConfigHandler
 
     public static void saveToFile()
     {
-        Path dir = FileUtils.getConfigDirectoryAsPath();
+        Path dir = FileUtils.getConfigDirectory();
 
         if (!Files.exists(dir))
         {

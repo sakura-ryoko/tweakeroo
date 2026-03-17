@@ -171,7 +171,7 @@ public class WorldLoadListener implements IWorldLoadListener
 
 	public static Path getCurrentConfigDirectory()
 	{
-		return FileUtils.getConfigDirectoryAsPath().resolve(Reference.MOD_ID);
+		return FileUtils.getConfigDirectory().resolve(Reference.MOD_ID);
 	}
 
 	private static Path getCurrentStorageFile(boolean globalData)

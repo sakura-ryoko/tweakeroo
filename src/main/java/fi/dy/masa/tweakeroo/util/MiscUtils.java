@@ -653,7 +653,7 @@ public class MiscUtils
             worldName = TimeFormat.REGULAR.formatNow();
         }
 
-        Path dir = FileUtils.getConfigDirectoryAsPath().resolve(Reference.MOD_ID).resolve("map_images").resolve(worldName);
+        Path dir = FileUtils.getConfigDirectory().resolve(Reference.MOD_ID).resolve("map_images").resolve(worldName);
 
         if (!Files.exists(dir))
         {

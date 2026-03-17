@@ -127,12 +127,16 @@ public class InventoryUtils
         {
             try
             {
-                // Item item = Registries.ITEM.get(Identifier.tryParse(name));
-                Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(Identifier.tryParse(name));
+                final Identifier id = Identifier.tryParse(name);
 
-                if (opt.isPresent() && opt.get().value() != Items.AIR)
+                if (id != null)
                 {
-                    UNSTACKING_ITEMS.add(opt.get().value());
+                    Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(id);
+
+                    if (opt.isPresent() && opt.get().value() != Items.AIR)
+                    {
+                        UNSTACKING_ITEMS.add(opt.get().value());
+                    }
                 }
             }
             catch (Exception e)
@@ -198,12 +202,17 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(Identifier.tryParse(itemId));
+                        final Identifier id = Identifier.tryParse(itemId);
 
-                        if (opt.isPresent())
+                        if (id != null)
                         {
-                            weapons.add(opt.get().value());
-                            continue;
+                            Optional<Holder.Reference<Item>> opt = BuiltInRegistries.ITEM.get(id);
+
+                            if (opt.isPresent())
+                            {
+                                weapons.add(opt.get().value());
+                                continue;
+                            }
                         }
                     }
                     catch (Exception ignore) {}
@@ -222,12 +231,17 @@ public class InventoryUtils
                 {
                     try
                     {
-                        Optional<Holder.Reference<EntityType<?>>> opt = BuiltInRegistries.ENTITY_TYPE.get(Identifier.tryParse(entity_id));
+                        final Identifier id = Identifier.tryParse(entity_id);
 
-                        if (opt.isPresent())
+                        if (id != null)
                         {
-                            WEAPON_MAPPING.computeIfAbsent(opt.get().value(), s -> new HashSet<>()).addAll(weapons);
-                            continue;
+                            Optional<Holder.Reference<EntityType<?>>> opt = BuiltInRegistries.ENTITY_TYPE.get(id);
+
+                            if (opt.isPresent())
+                            {
+                                WEAPON_MAPPING.computeIfAbsent(opt.get().value(), s -> new HashSet<>()).addAll(weapons);
+                                continue;
+                            }
                         }
                     }
                     catch (Exception ignore) {}
@@ -331,6 +345,7 @@ public class InventoryUtils
             && PlacementTweaks.canUseItemWithRestriction(PlacementTweaks.HAND_RESTOCK_RESTRICTION, stackHand) && player.containerMenu == player.inventoryMenu && player.containerMenu.getCarried().isEmpty())
         {
             Minecraft mc = Minecraft.getInstance();
+            if (mc.gameMode == null) { return; }
             AbstractContainerMenu container = player.inventoryMenu;
             int endSlot = allowHotbar ? 44 : 35;
             int currentMainHandSlot = player.getInventory().getSelectedSlot() + 36;
@@ -354,7 +369,6 @@ public class InventoryUtils
 
                     mc.gameMode.handleContainerInput(container.containerId, slot.index, button, ContainerInput.PICKUP, player);
                     mc.gameMode.handleContainerInput(container.containerId, currentSlot, 0, ContainerInput.PICKUP, player);
-
                     break;
                 }
             }
@@ -540,8 +554,17 @@ public class InventoryUtils
         {
             // If the block has no valid tool type at all (e.g. torch, flower, fire),
             // there is no reason to switch tools — any item breaks it equally.
-            if (!state.is(BlockTags.MINEABLE_WITH_PICKAXE) && !state.is(BlockTags.MINEABLE_WITH_AXE) && !state.is(BlockTags.MINEABLE_WITH_SHOVEL) && !state.is(BlockTags.MINEABLE_WITH_HOE) && !state.is(BlockTags.SWORD_EFFICIENT) && !CachedTagManager.isPickaxeOverride(state)
-                    && !CachedTagManager.isSilkTouchOverride(state) && !CachedTagManager.isNeedsSilkTouch(state) && !CachedTagManager.isNeedsPickaxe(state) && !CachedTagManager.isNeedsShears(state) && !CachedTagManager.isOreBlock(state))
+            if (!state.is(BlockTags.MINEABLE_WITH_PICKAXE) &&
+                !state.is(BlockTags.MINEABLE_WITH_AXE) &&
+                !state.is(BlockTags.MINEABLE_WITH_SHOVEL) &&
+                !state.is(BlockTags.MINEABLE_WITH_HOE) &&
+                !state.is(BlockTags.SWORD_EFFICIENT) &&
+                !CachedTagManager.isPickaxeOverride(state) &&
+                !CachedTagManager.isSilkTouchOverride(state) &&
+                !CachedTagManager.isNeedsSilkTouch(state) &&
+                !CachedTagManager.isNeedsPickaxe(state) &&
+                !CachedTagManager.isNeedsShears(state) &&
+                !CachedTagManager.isOreBlock(state))
             {
                 return false;
             }
@@ -567,8 +590,7 @@ public class InventoryUtils
             // Any tool is better than no tool
             if (!(EquipmentUtils.isAnyTool(previousTool) || EquipmentUtils.isSword(previousTool)))
             {
-                boolean isAnyTool = EquipmentUtils.isAnyTool(testedStack) || EquipmentUtils.isSword(testedStack);
-                return isAnyTool;
+	            return EquipmentUtils.isAnyTool(testedStack) || EquipmentUtils.isSword(testedStack);
             }
 
             return null;
@@ -777,7 +799,7 @@ public class InventoryUtils
             {
                 return true;
             }
-            if (prevWeight < testedWeight)
+            if (testedWeight < prevWeight)
             {
                 return false;
             }
@@ -931,8 +953,7 @@ public class InventoryUtils
             case RARE -> 3;
             case UNCOMMON -> 2;
             case COMMON -> 1;
-            case null -> -1;
-            default -> 0;
+	        default -> 0;
         };
     }
 
@@ -945,20 +966,13 @@ public class InventoryUtils
     {
         String itemType = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-        if (itemType.contains("netherite"))
-            return 6;
-        if (itemType.contains("diamond"))
-            return 5;
-        if (itemType.contains("iron"))
-            return 4;
-        if (itemType.contains("copper"))
-            return 3;
-        if (itemType.contains("stone"))
-            return 2;
-        if (itemType.contains("gold"))
-            return 1;
-        if (itemType.contains("wood"))
-            return 0;
+        if (itemType.contains("netherite")) { return 6; }
+        if (itemType.contains("diamond")) { return 5; }
+        if (itemType.contains("iron")) { return 4; }
+        if (itemType.contains("copper")) { return 3; }
+        if (itemType.contains("stone")) { return 2; }
+        if (itemType.contains("gold")) { return 1; }
+        if (itemType.contains("wood")) { return 0; }
 
         return -1;
     }
@@ -1227,7 +1241,7 @@ public class InventoryUtils
     {
         if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
-
+        @SuppressWarnings("deprecation")
         Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER.builtInRegistryHolder()) && s.getDamageValue() < s.getMaxDamage() - 10;
 
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
@@ -1458,6 +1472,7 @@ public class InventoryUtils
         if (slotNumber != -1 && container == player.inventoryMenu)
         {
             Minecraft mc = Minecraft.getInstance();
+            if (mc.gameMode == null || mc.player == null || mc.getConnection() == null) { return; }
             Inventory inventory = player.getInventory();
 
             if (hand == InteractionHand.MAIN_HAND)
@@ -1502,6 +1517,7 @@ public class InventoryUtils
     private static void swapToolToHand(int slotNumber, Minecraft mc)
     {
         Player player = mc.player;
+        if (player == null || mc.gameMode == null || mc.getConnection() == null) { return; }
 
         if (slotNumber >= 0 && player.containerMenu == player.inventoryMenu)
         {
@@ -1662,6 +1678,7 @@ public class InventoryUtils
         List<Slot> slots = new ArrayList<>();
         AbstractContainerMenu container = player.inventoryMenu;
         Minecraft mc = Minecraft.getInstance();
+        if (mc.gameMode == null) { return; }
 
         for (Slot slot : container.slots)
         {
@@ -1732,7 +1749,7 @@ public class InventoryUtils
         Player player = mc.player;
         Level world = mc.level;
 
-        if (player == null || world == null || player.containerMenu != player.inventoryMenu) { return; }
+        if (player == null || world == null || mc.gameMode == null || player.containerMenu != player.inventoryMenu) { return; }
         double reach = mc.player.blockInteractionRange();
         boolean isCreative = player.isCreative();
         HitResult trace = player.pick(reach, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), false);
