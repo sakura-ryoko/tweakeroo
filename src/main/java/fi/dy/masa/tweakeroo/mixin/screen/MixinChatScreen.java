@@ -30,8 +30,8 @@ public abstract class MixinChatScreen
         }
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void tweakeroo_restoreText(String text, boolean draft, CallbackInfo ci)
+    @Inject(method = "<init>(Ljava/lang/String;ZZ)V", at = @At("RETURN"))
+    private void tweakeroo_restoreText(String initial, boolean isDraft, boolean closeOnSubmit, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_CHAT_PERSISTENT_TEXT.getBooleanValue() &&
 			MiscUtils.getLastChatText().isEmpty() == false)
@@ -49,7 +49,7 @@ public abstract class MixinChatScreen
         MiscUtils.setLastChatText("");
     }
 
-    @ModifyConstant(method = "render", constant = @Constant(intValue = Integer.MIN_VALUE))
+    @ModifyConstant(method = "extractRenderState", constant = @Constant(intValue = Integer.MIN_VALUE))
     private int overrideChatBackgroundColor(int original)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())

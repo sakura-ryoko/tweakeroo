@@ -12,8 +12,8 @@ import net.minecraft.core.RegistryAccess;
 
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -131,7 +131,7 @@ public class WorldLoadListener implements IWorldLoadListener
 
 		if (shouldSave)
 		{
-			JsonUtils.writeJsonToFileAsPath(root, file);
+			JsonUtils.writeJsonToFile(root, file);
 		}
 	}
 
@@ -139,7 +139,7 @@ public class WorldLoadListener implements IWorldLoadListener
 //	{
 //		// Per-dimension file
 //		Path file = getCurrentStorageFile(false);
-//		JsonElement element = JsonUtils.parseJsonFileAsPath(file);
+//		JsonElement element = JsonUtils.parseJsonFile(file);
 //
 //		if (element != null && element.isJsonObject())
 //		{
@@ -156,7 +156,7 @@ public class WorldLoadListener implements IWorldLoadListener
 	{
 		// Global file
 		Path file = getCurrentStorageFile(true);
-		JsonElement element = JsonUtils.parseJsonFileAsPath(file);
+		JsonElement element = JsonUtils.parseJsonFile(file);
 
 		if (element != null && element.isJsonObject())
 		{

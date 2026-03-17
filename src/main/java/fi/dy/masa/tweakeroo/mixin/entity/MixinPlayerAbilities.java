@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 public abstract class MixinPlayerAbilities
 {
     @Inject(method = "getFlyingSpeed", at = @At("HEAD"), cancellable = true)
-    private void overrideFlySpeed(CallbackInfoReturnable<Float> cir)
+    private void tweakeroo_overrideFlySpeed(CallbackInfoReturnable<Float> cir)
     {
         Player player = Minecraft.getInstance().player;
 

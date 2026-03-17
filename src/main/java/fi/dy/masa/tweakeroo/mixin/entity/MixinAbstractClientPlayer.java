@@ -42,6 +42,5 @@ public abstract class MixinAbstractClientPlayer
 		}
 
 		return original.call(instance, attribute);
-//		return instance.getAttributeValue(attribute);
 	}
 }

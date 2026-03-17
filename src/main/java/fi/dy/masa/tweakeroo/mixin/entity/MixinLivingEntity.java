@@ -105,18 +105,6 @@ public abstract class MixinLivingEntity extends Entity
 		}
 	}
 
-//	@Inject(method = "onEffectUpdated", at = @At("HEAD"))
-//	private void tweakeroo$onStatusEffectUpgraded(MobEffectInstance effect, boolean reapplyEffect, Entity source, CallbackInfo ci)
-//	{
-//		if (FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue() &&
-//			effect.getEffect() == MobEffects.NIGHT_VISION)
-//		{
-//			InfoUtils.showInGameMessage(Message.MessageType.WARNING, "tweakeroo.message.gamma_override.night_vision_warn");
-////			MiscUtils.toggleGammaOverrideWithMessage();
-//			this.wasGammaOverriden = true;
-//		}
-//	}
-
 	@Inject(method = "onEffectsRemoved", at = @At("TAIL"))
 	private void tweakeroo$onStatusEffectRemoved(Collection<MobEffectInstance> effects, CallbackInfo ci)
 	{

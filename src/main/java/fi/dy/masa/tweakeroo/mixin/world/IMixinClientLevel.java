@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ClientLevel.class)
-public interface IMixinClientWorld
+public interface IMixinClientLevel
 {
     @Invoker("getAllMapData")
     Map<MapId, MapItemSavedData> tweakeroo_getMapStates();

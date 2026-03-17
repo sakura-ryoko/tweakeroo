@@ -46,7 +46,7 @@ public class FcCommand implements IClientCommandListener
 				if (sub.needsArgs() && list.isEmpty())
 				{
 					mc.gui.getChat()
-								.addMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
+								.addClientSystemMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
 					return true;
 				}
 
@@ -83,7 +83,7 @@ public class FcCommand implements IClientCommandListener
 
 	private boolean executeInvalid(Minecraft mc)
 	{
-		mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
+		mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
 		return true;
 	}
 
@@ -103,7 +103,7 @@ public class FcCommand implements IClientCommandListener
 			}
 			else
 			{
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_already_in_use"));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_already_in_use"));
 			}
 		}
 
@@ -136,13 +136,13 @@ public class FcCommand implements IClientCommandListener
 				}
 				else
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
 				}
 			}
 			catch (Exception err)
 			{
 				Tweakeroo.LOGGER.error("FcCommand#set(): Exception; {}", err.getLocalizedMessage());
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 			}
 		}
 
@@ -170,7 +170,7 @@ public class FcCommand implements IClientCommandListener
 				}
 				else
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX + "_not_found", String.format("%02d", id)));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX + "_not_found", String.format("%02d", id)));
 				}
 			}
 			else
@@ -189,7 +189,7 @@ public class FcCommand implements IClientCommandListener
 		catch (Exception err)
 		{
 			Tweakeroo.LOGGER.error("FcCommand#del(): Exception; {}", err.getLocalizedMessage());
-			mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+			mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 		}
 
 		return true;
@@ -219,13 +219,13 @@ public class FcCommand implements IClientCommandListener
 
 			if (list.isEmpty())
 			{
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_list_empty"));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_list_empty"));
 			}
 			else
 			{
 				for (CameraPreset entry : list)
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_list", entry.toShortString()));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_list", entry.toShortString()));
 				}
 			}
 		}
@@ -265,18 +265,18 @@ public class FcCommand implements IClientCommandListener
 				}
 				else
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX + "_not_enough_args_given"));
 				}
 			}
 			else
 			{
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX + "_not_found", String.format("%02d", id)));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX + "_not_found", String.format("%02d", id)));
 			}
 		}
 		catch (Exception err)
 		{
 			Tweakeroo.LOGGER.error("FcCommand#rename(): Exception; {}", err.getLocalizedMessage());
-			mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+			mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 		}
 
 		return true;
@@ -304,24 +304,24 @@ public class FcCommand implements IClientCommandListener
 						}
 						else
 						{
-							mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
+							mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX + "_matches_camera", String.format("%02d", preset.getId())));
 						}
 					}
 					else
 					{
-						mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
+						mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX + "_wrong_dimension", String.format("%02d", preset.getId()), preset.getName()));
 					}
 				}
 			}
 			else
 			{
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_not_found", String.format("%02d", id)));
 			}
 		}
 		catch (Exception err)
 		{
 			Tweakeroo.LOGGER.error("FcCommand#recall(): Exception; {}", err.getLocalizedMessage());
-			mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+			mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 		}
 
 		return true;
@@ -329,7 +329,7 @@ public class FcCommand implements IClientCommandListener
 
 	private boolean executeCycle(List<String> args, Minecraft mc)
 	{
-//		mc.inGameHud.getChatHud().addMessage(StringUtils.translateAsText(PREFIX+"_not_implemented", args.getFirst()));
+//		mc.inGameHud.getChatHud().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_not_implemented", args.getFirst()));
 
 		if (mc.level != null)
 		{
@@ -357,7 +357,7 @@ public class FcCommand implements IClientCommandListener
 				catch (Exception err)
 				{
 					Tweakeroo.LOGGER.error("FcCommand#cycle(): Exception; {}", err.getLocalizedMessage());
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid", args.getFirst()));
 					exception = true;
 				}
 			}
@@ -370,12 +370,12 @@ public class FcCommand implements IClientCommandListener
 				}
 				else
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.getId())));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_matches_camera", String.format("%02d", preset.getId())));
 				}
 			}
 			else if (!exception)
 			{
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_cycle_not_found"));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_cycle_not_found"));
 			}
 		}
 
@@ -394,32 +394,32 @@ public class FcCommand implements IClientCommandListener
 			{
 				String key = sub.getName();
 
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(prefix));
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(prefix+"."+key));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(prefix));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(prefix+"."+key));
 
 				if (!sub.getAlias().isEmpty())
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(prefix+"_alias", sub.getAlias().toString()));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(prefix+"_alias", sub.getAlias().toString()));
 				}
 			}
 			else
 			{
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(PREFIX+"_invalid_operation"));
 			}
 		}
 		else
 		{
-			mc.gui.getChat().addMessage(StringUtils.translateAsText(prefix));
+			mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(prefix));
 
 			for (Sub entry : Sub.values())
 			{
 				String key = entry.getName();
 
-				mc.gui.getChat().addMessage(StringUtils.translateAsText(prefix+"."+key));
+				mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(prefix+"."+key));
 
 				if (!entry.getAlias().isEmpty())
 				{
-					mc.gui.getChat().addMessage(StringUtils.translateAsText(prefix+"_alias", entry.getAlias().toString()));
+					mc.gui.getChat().addClientSystemMessage(StringUtils.translateAsText(prefix+"_alias", entry.getAlias().toString()));
 				}
 			}
 		}

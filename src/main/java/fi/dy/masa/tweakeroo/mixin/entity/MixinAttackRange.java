@@ -26,11 +26,10 @@ public class MixinAttackRange
 	)
 	private static double tweakeroo_overrideEntityAttackRange(LivingEntity instance, Holder<Attribute> holder, Operation<Double> original)
 	{
-		final double orig = instance.getAttributeValue(holder);
-		double adj = orig;
-
 		if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue())
 		{
+			final double orig = instance.getAttributeValue(holder);
+			double adj = orig;
 			final RangedAttribute attr = ((RangedAttribute) Attributes.ENTITY_INTERACTION_RANGE.value());
 			final double maxOffset = 3.0D;
 
@@ -43,8 +42,10 @@ public class MixinAttackRange
 				// Calculate a "safe" range for servers
 				adj = MathUtils.clamp(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), attr.getMinValue(), orig + maxOffset);
 			}
+
+			return adj;
 		}
 
-		return adj;
+		return original.call(instance, holder);
 	}
 }

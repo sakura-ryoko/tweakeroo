@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(LerpingBossEvent.class)
-public abstract class MixinClientBossBar extends BossEvent
+public abstract class MixinLerpingBossEvent extends BossEvent
 {
-    public MixinClientBossBar(UUID uniqueIdIn, Component nameIn, BossEvent.BossBarColor colorIn, BossEvent.BossBarOverlay styleIn)
+    public MixinLerpingBossEvent(UUID uniqueIdIn, Component nameIn, BossEvent.BossBarColor colorIn, BossEvent.BossBarOverlay styleIn)
     {
         super(uniqueIdIn, nameIn, colorIn, styleIn);
     }

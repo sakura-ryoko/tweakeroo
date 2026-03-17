@@ -14,9 +14,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 @Mixin(value = Player.class, priority = 1005)
-public abstract class MixinPlayerEntity_freeCam extends LivingEntity
+public abstract class MixinPlayer_freeCam extends LivingEntity
 {
-    protected MixinPlayerEntity_freeCam(EntityType<? extends LivingEntity> entityType_1, Level world_1)
+    protected MixinPlayer_freeCam(EntityType<? extends LivingEntity> entityType_1, Level world_1)
     {
         super(entityType_1, world_1);
     }

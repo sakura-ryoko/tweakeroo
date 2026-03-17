@@ -12,7 +12,11 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.config.options.*;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.util.*;
+import fi.dy.masa.malilib.util.ActiveMode;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.HandSlot;
+import fi.dy.masa.malilib.util.MessageOutputType;
+import fi.dy.masa.malilib.util.data.json.JsonUtils;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -548,7 +552,7 @@ public class Configs implements IConfigHandler
 
         if (Files.exists(configFile) && Files.isReadable(configFile))
         {
-            JsonElement element = JsonUtils.parseJsonFileAsPath(configFile);
+            JsonElement element = JsonUtils.parseJsonFile(configFile);
 
             if (element != null && element.isJsonObject())
             {
@@ -647,7 +651,7 @@ public class Configs implements IConfigHandler
             ConfigUtils.writeHotkeyToggleOptions(root, "DisableHotkeys", "DisableToggles", Disable.OPTIONS);
             ConfigUtils.writeHotkeyToggleOptions(root, "TweakHotkeys", "TweakToggles", FeatureToggle.VALUES);
 
-            JsonUtils.writeJsonToFileAsPath(root, dir.resolve(CONFIG_FILE_NAME));
+            JsonUtils.writeJsonToFile(root, dir.resolve(CONFIG_FILE_NAME));
         }
         else
         {

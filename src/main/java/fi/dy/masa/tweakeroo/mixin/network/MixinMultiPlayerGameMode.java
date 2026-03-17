@@ -29,7 +29,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 
 @Mixin(MultiPlayerGameMode.class)
-public abstract class MixinClientPlayerInteractionManager
+public abstract class MixinMultiPlayerGameMode
 {
     @Shadow @Final private Minecraft minecraft;
     @Shadow private int destroyDelay;
@@ -60,19 +60,19 @@ public abstract class MixinClientPlayerInteractionManager
         }
     }
 
-    @Inject(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
-            at = @At("HEAD"),
-            cancellable = true)
-    private void tweakeroo_onRightClickMouseOnEntityPre1(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
-    {
-        if (CameraUtils.shouldPreventPlayerInputs() ||
-            PlacementTweaks.onProcessRightClickPre(player, hand))
-        {
-            cir.setReturnValue(InteractionResult.PASS);
-        }
-    }
+//    @Inject(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+//            at = @At("HEAD"),
+//            cancellable = true)
+//    private void tweakeroo_onRightClickMouseOnEntityPre1(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
+//    {
+//        if (CameraUtils.shouldPreventPlayerInputs() ||
+//            PlacementTweaks.onProcessRightClickPre(player, hand))
+//        {
+//            cir.setReturnValue(InteractionResult.PASS);
+//        }
+//    }
 
-    @Inject(method = "interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
+    @Inject(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
             at = @At("HEAD"),
             cancellable = true)
     private void tweakeroo_onRightClickMouseOnEntityPre2(Player player, Entity target, EntityHitResult trace, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)

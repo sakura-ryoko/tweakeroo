@@ -14,7 +14,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(value = CloneCommands.class, priority = 999)
-public abstract class MixinCloneCommand
+public abstract class MixinCloneCommands
 {
 	@SuppressWarnings("unchecked")
     @WrapOperation(method = "clone", require = 0,
@@ -30,6 +30,6 @@ public abstract class MixinCloneCommand
             return (T) (Object) Configs.Generic.FILL_CLONE_LIMIT.getIntegerValue();
         }
 
-        return instance.get(gameRule);
+        return original.call(instance, gameRule);
     }
 }

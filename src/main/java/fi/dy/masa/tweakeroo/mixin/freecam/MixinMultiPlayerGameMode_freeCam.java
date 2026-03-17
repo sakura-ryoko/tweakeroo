@@ -10,7 +10,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 
 @Mixin(value = MultiPlayerGameMode.class, priority = 1005)
-public class MixinClientPlayerInteractionManager_freeCam
+public class MixinMultiPlayerGameMode_freeCam
 {
 	@Inject(method = "hasExperience", at = @At("RETURN"), cancellable = true)
 	private void tweakeroo_disableExpLevel(CallbackInfoReturnable<Boolean> cir)

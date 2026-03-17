@@ -42,6 +42,7 @@ public class MiscTweaks
     private static KeybindState KEY_STATE_ATTACK;
     private static KeybindState KEY_STATE_USE;
 
+    public static boolean skipAlLRendering = false;
     public static int renderCountItems;
     public static int renderCountXPOrbs;
     private static int potionWarningTimer;

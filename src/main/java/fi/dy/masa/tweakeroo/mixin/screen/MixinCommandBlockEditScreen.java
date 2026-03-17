@@ -1,8 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.screen;
 
 import java.util.Collections;
-import javax.annotation.Nonnull;
-import net.minecraft.client.gui.GuiGraphics;
+
+import org.jspecify.annotations.NonNull;
+
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -137,19 +139,19 @@ public abstract class MixinCommandBlockEditScreen extends AbstractCommandBlockEd
     }
 
     @Override
-    public void render(@Nonnull GuiGraphics drawContext, int mouseX, int mouseY, float partialTicks)
+    public void extractRenderState(final @NonNull GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a)
     {
-        super.render(drawContext, mouseX, mouseY, partialTicks);
+        super.extractRenderState(graphics, mouseX, mouseY, a);
 
         if (this.textFieldName != null)
         {
-            this.textFieldName.render(drawContext, mouseX, mouseY, partialTicks);
+            this.textFieldName.extractRenderState(graphics, mouseX, mouseY, a);
         }
 
         if (this.buttonUpdateExec != null && this.buttonUpdateExec.isHovered())
         {
             String hover = "tweakeroo.gui.button.misc.command_block.hover.update_execution";
-            RenderUtils.drawHoverText(GuiContext.fromGuiGraphics(drawContext), mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)));
+            RenderUtils.drawHoverText(GuiContext.fromGuiGraphics(graphics), mouseX, mouseY, Collections.singletonList(StringUtils.translate(hover)));
         }
     }
 

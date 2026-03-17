@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(LightEngine.class)
-public interface IMixinChunkLightProvider
+public interface IMixinLightEngine
 {
     @Accessor("chunkSource")
     LightChunkGetter tweakeroo_getChunkProvider();

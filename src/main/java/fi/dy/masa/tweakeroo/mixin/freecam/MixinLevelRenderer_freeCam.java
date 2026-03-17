@@ -1,11 +1,13 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
 import org.objectweb.asm.Opcodes;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,16 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
-import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 
 @Mixin(value = LevelRenderer.class, priority = 1005)
-public abstract class MixinWorldRenderer_freeCam
+public abstract class MixinLevelRenderer_freeCam
 {
     @Shadow private int lastCameraSectionX;
     @Shadow private int lastCameraSectionZ;
@@ -33,11 +28,11 @@ public abstract class MixinWorldRenderer_freeCam
     @Unique private int lastUpdatePosX;
     @Unique private int lastUpdatePosZ;
 
-    @Inject(method = "renderLevel", at = @At(value = "INVOKE_STRING",
-                                        target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=cullTerrain"))
-    private void tweakeroo_preSetupTerrain(GraphicsResourceAllocator allocator, DeltaTracker tickCounter, boolean renderBlockOutline,
-                                           Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2,
-                                           GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci)
+    @Inject(method = "update",
+            at = @At(value = "INVOKE_STRING",
+                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+                     args = "ldc=cullTerrain"))
+    private void tweakeroo_preSetupTerrain(Camera camera, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -45,11 +40,11 @@ public abstract class MixinWorldRenderer_freeCam
         }
     }
 
-    @Inject(method = "renderLevel", at = @At(value = "INVOKE_STRING",
-                                        target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=compileSections"))
-    private void tweakeroo_postSetupTerrain(GraphicsResourceAllocator allocator, DeltaTracker tickCounter, boolean renderBlockOutline,
-                                            Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2,
-                                            GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci)
+    @Inject(method = "update",
+            at = @At(value = "INVOKE_STRING",
+                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+                     args = "ldc=compileSections"))
+    private void tweakeroo_postSetupTerrain(Camera camera, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }

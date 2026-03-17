@@ -24,6 +24,5 @@ public abstract class MixinScreenEffectRenderer
         }
 
         return original.call(instance);
-//        return player.isOnFire();
     }
 }

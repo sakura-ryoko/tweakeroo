@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(value = ItemInHandRenderer.class, priority = 1005)
-public abstract class MixinHeldItemRenderer_freeCam
+public abstract class MixinItemInHandRenderer_freeCam
 {
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
             at = @At("HEAD"), cancellable = true)

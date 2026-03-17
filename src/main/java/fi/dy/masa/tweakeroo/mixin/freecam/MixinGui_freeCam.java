@@ -1,6 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
-import fi.dy.masa.tweakeroo.config.Configs;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,15 +13,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.world.entity.player.Player;
 
 @Mixin(value = Gui.class, priority = 1005)
-public abstract class MixinInGameHud_freeCam
+public abstract class MixinGui_freeCam
 {
     @Shadow @Final private Minecraft minecraft;
 
@@ -32,8 +32,8 @@ public abstract class MixinInGameHud_freeCam
         }
     }
 
-    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
-    public void tweakeroo_overrideHotbarRendering(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci)
+    @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
+    public void tweakeroo_overrideHotbarRendering(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci)
 	{
 		// This turns off rendering of the hotbar
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -43,8 +43,8 @@ public abstract class MixinInGameHud_freeCam
         }
     }
 
-	@Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideHeldItemTooltipRendering(GuiGraphics context, CallbackInfo ci)
+	@Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideHeldItemTooltipRendering(GuiGraphicsExtractor graphics, CallbackInfo ci)
 	{
 		// This turns off rendering of the item "tooltips" when selecting hotbar items
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -55,8 +55,8 @@ public abstract class MixinInGameHud_freeCam
 		}
 	}
 
-	@Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideStatusBarRendering1(GuiGraphics context, CallbackInfo ci)
+	@Inject(method = "extractPlayerHealth", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideStatusBarRendering1(GuiGraphicsExtractor graphics, CallbackInfo ci)
 	{
 		// This turns off all status bars
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&
@@ -66,8 +66,8 @@ public abstract class MixinInGameHud_freeCam
 		}
 	}
 
-	@Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
-	public void tweakeroo_overrideStatusBarRendering2(GuiGraphics context, CallbackInfo ci)
+	@Inject(method = "extractVehicleHealth", at = @At("HEAD"), cancellable = true)
+	public void tweakeroo_overrideStatusBarRendering2(GuiGraphicsExtractor graphics, CallbackInfo ci)
 	{
 		// This turns off the "mount health" status bar
 		if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue() &&

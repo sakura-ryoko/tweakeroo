@@ -213,8 +213,8 @@ public abstract class MixinClientPacketListener extends ClientCommonPacketListen
     @Inject(method = "handleForgetLevelChunk", at = @At("RETURN"))
     private void tweakeroo_onUnloadChunkInject(ClientboundForgetLevelChunkPacket packet, CallbackInfo ci)
     {
-        int i = packet.pos().x;
-        int j = packet.pos().z;
+        int i = packet.pos().x();
+        int j = packet.pos().z();
         RenderTweaks.unloadFakeChunk(i, j);
     }
 

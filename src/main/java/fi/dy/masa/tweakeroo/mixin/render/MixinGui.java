@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,8 +18,8 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 @Mixin(value = Gui.class, priority = 990)
 public class MixinGui
 {
-	@Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-	private void tweakeroo$disableVanillaCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci)
+	@Inject(method = "extractCrosshair", at = @At("HEAD"), cancellable = true)
+	private void tweakeroo$disableVanillaCrosshair(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci)
 	{
 		if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
 		{
@@ -27,7 +27,7 @@ public class MixinGui
 		}
 	}
 
-	@WrapOperation(method = "renderCameraOverlays",
+	@WrapOperation(method = "extractCameraOverlays",
 	               at = @At(value = "INVOKE",
 					   target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))
 	private int tweakeroo$disableFreezeOverlay(LocalPlayer instance, Operation<Integer> original)
@@ -38,6 +38,5 @@ public class MixinGui
 		}
 
 		return original.call(instance);
-//		return instance.getTicksFrozen();
 	}
 }

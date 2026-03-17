@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+import org.joml.Matrix4fStack;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,13 +26,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.BlockHitResult;
-import fi.dy.masa.malilib.render.RenderUtils;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction;
@@ -121,9 +120,8 @@ public class RenderTweaks
 
     }
 
-    public static void render(Matrix4f posMatrix, Matrix4f projMatrix, ProfilerFiller profiler)
+    public static void render(ProfilerFiller profiler, Minecraft mc)
     {
-        Minecraft mc = Minecraft.getInstance();
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
 
@@ -143,7 +141,7 @@ public class RenderTweaks
 
             if (FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDER_OUTLINE.getBooleanValue())
             {
-                renderLists(posMatrix, projMatrix, profiler);
+                renderLists(profiler, mc);
             }
             if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
             {
@@ -152,7 +150,7 @@ public class RenderTweaks
                     RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, false);
                 }
 
-                renderSelection(posMatrix, projMatrix, profiler, AREA_SELECTION);
+                renderSelection(profiler, mc, AREA_SELECTION);
             }
 
             globalStack.popMatrix();
@@ -160,11 +158,10 @@ public class RenderTweaks
         }
     }
 
-    private static void renderLists(Matrix4f posMatrix, Matrix4f projMatrix, ProfilerFiller profiler)
+    private static void renderLists(ProfilerFiller profiler, Minecraft mc)
     {
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
-        Minecraft mc = Minecraft.getInstance();
 
         profiler.push("lists");
         for (ListMapEntry entry : SELECTIVE_BLACKLIST.values())
@@ -309,7 +306,7 @@ public class RenderTweaks
     }
 
     // From litematica
-    public static void renderSelection(Matrix4f posMatrix, Matrix4f projMatrix, ProfilerFiller profiler, Selection selection)
+    public static void renderSelection(ProfilerFiller profiler, Minecraft mc, Selection selection)
     {
 
         BlockPos pos1 = selection.pos1;
@@ -322,8 +319,6 @@ public class RenderTweaks
         float lineWidthBlockBox = 2f;
         float lineWidthArea = 1.5f;
 
-        Minecraft mc = Minecraft.getInstance();
-
         profiler.push("selection");
 
         if (pos1 != null && pos2 != null)
@@ -331,14 +326,14 @@ public class RenderTweaks
             if (pos1.equals(pos2) == false)
             {
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
-                RenderUtils.renderAreaSides(pos1, pos2, sideColor, posMatrix, false);
+                RenderUtils.renderAreaSides(pos1, pos2, sideColor, false);
                 RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
                 RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
             }
             else
             {
                 RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, posMatrix, false);
+                                                          colorOverlapping, false);
             }
         }
         else
@@ -623,9 +618,9 @@ public class RenderTweaks
 
             BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-            for (int cx = center.x - radius; cx <= center.x + radius; cx++)
+            for (int cx = center.x() - radius; cx <= center.x() + radius; cx++)
             {
-                for (int cz = center.z - radius; cz <= center.z + radius; cz++)
+                for (int cz = center.z() - radius; cz <= center.z() + radius; cz++)
                 {
 
                     LevelChunk chunk = (LevelChunk) mc.level.getChunkSource().getChunk(cx, cz, ChunkStatus.FULL,

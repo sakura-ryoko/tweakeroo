@@ -17,10 +17,10 @@ import fi.dy.masa.malilib.util.position.PositionUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(ClientSuggestionProvider.class)
-public abstract class MixinClientCommandSource
+public abstract class MixinClientSuggestionProvider
 {
     @Inject(method = "getRelevantCoordinates", at = @At("HEAD"), cancellable = true)
-    private void onGetBlockPositionSuggestions(CallbackInfoReturnable<Collection<SharedSuggestionProvider.TextCoordinates>> cir)
+    private void tweakeroo_onGetBlockPositionSuggestions(CallbackInfoReturnable<Collection<SharedSuggestionProvider.TextCoordinates>> cir)
     {
         Minecraft mc = Minecraft.getInstance();
 
@@ -34,7 +34,7 @@ public abstract class MixinClientCommandSource
     }
 
     @Inject(method = "getAbsoluteCoordinates", at = @At("HEAD"), cancellable = true)
-    private void onGetPositionSuggestions(CallbackInfoReturnable<Collection<SharedSuggestionProvider.TextCoordinates>> cir)
+    private void tweakeroo_onGetPositionSuggestions(CallbackInfoReturnable<Collection<SharedSuggestionProvider.TextCoordinates>> cir)
     {
         Minecraft mc = Minecraft.getInstance();
 

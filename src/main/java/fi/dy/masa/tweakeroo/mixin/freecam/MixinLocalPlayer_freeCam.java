@@ -14,7 +14,6 @@ import fi.dy.masa.tweakeroo.util.CameraEntity;
 import fi.dy.masa.tweakeroo.util.CameraUtils;
 import fi.dy.masa.tweakeroo.util.DummyMovementInput;
 
-import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.ClientInput;
@@ -22,14 +21,14 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 
 @Mixin(value = LocalPlayer.class, priority = 1005)
-public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlayer
+public abstract class MixinLocalPlayer_freeCam extends AbstractClientPlayer
 {
     @Shadow public ClientInput input;
 
     @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
     @Unique private ClientInput realInput;
 
-    private MixinClientPlayerEntity_freeCam(ClientLevel world, GameProfile profile)
+    private MixinLocalPlayer_freeCam(ClientLevel world, GameProfile profile)
     {
         super(world, profile);
     }

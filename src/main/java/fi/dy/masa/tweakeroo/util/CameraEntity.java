@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.chat.ChatAbilities;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -35,7 +36,7 @@ public class CameraEntity extends LocalPlayer
                          ClientPacketListener netHandler, StatsCounter stats,
                          ClientRecipeBook recipeBook, Input input, boolean sprinting)
     {
-        super(mc, world, netHandler, stats, recipeBook, input, sprinting);
+        super(mc, world, netHandler, stats, recipeBook, input, sprinting, ChatAbilities.NO_RESTRICTIONS);
     }
 
     @Override

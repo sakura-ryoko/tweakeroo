@@ -23,7 +23,7 @@ public class MixinHopperBlockEntity
             method = "inventoryFull",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I")
     )
-    private int modifyShulkerMaxCount(ItemStack instance, Operation<Integer> original)
+    private int tweakeroo_modifyShulkerMaxCount(ItemStack instance, Operation<Integer> original)
     {
         if (Configs.Fixes.STACKABLE_SHULKERS_IN_HOPPER_FIX.getBooleanValue())
         {
@@ -37,7 +37,7 @@ public class MixinHopperBlockEntity
             method = "isFullContainer",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I")
     )
-    private static int modifyShulkerMaxCountStatic(ItemStack instance, Operation<Integer> original)
+    private static int tweakeroo_modifyShulkerMaxCountStatic(ItemStack instance, Operation<Integer> original)
     {
         if (Configs.Fixes.STACKABLE_SHULKERS_IN_HOPPER_FIX.getBooleanValue())
         {

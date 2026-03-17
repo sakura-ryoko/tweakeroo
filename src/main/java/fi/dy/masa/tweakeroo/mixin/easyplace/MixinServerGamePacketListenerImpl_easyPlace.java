@@ -25,6 +25,6 @@ public class MixinServerGamePacketListenerImpl_easyPlace
             return Vec3.ZERO;
         }
 
-        return instance.subtract(vec3);
+        return original.call(instance, vec3);
     }
 }

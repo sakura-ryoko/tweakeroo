@@ -75,7 +75,7 @@ import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
 import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
 import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.mixin.screen.IMixinCustomizeFlatLevelScreen;
-import fi.dy.masa.tweakeroo.mixin.world.IMixinClientWorld;
+import fi.dy.masa.tweakeroo.mixin.world.IMixinClientLevel;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 
 public class MiscUtils
@@ -479,7 +479,7 @@ public class MiscUtils
         style = style.withClickEvent(new ClickEvent.SuggestCommand(coords));
         style = style.withHoverEvent(new HoverEvent.ShowText(Component.literal(coords)));
         message.setStyle(style);
-        mc.gui.getChat().addMessage(message);
+        mc.gui.getChat().addClientSystemMessage(message);
         Tweakeroo.LOGGER.info(str);
     }
 
@@ -576,11 +576,12 @@ public class MiscUtils
     {
 		if (mc.gameMode == null) return;
         InteractionHand hand = InteractionHand.MAIN_HAND;
-        InteractionResult actionResult = mc.gameMode.interactAt(player, entity, new EntityHitResult(entity), hand);
+        EntityHitResult hitResult = new EntityHitResult(entity);
+        InteractionResult actionResult = mc.gameMode.interact(player, entity, hitResult, hand);
 
         if (actionResult.consumesAction() == false)
         {
-            actionResult = mc.gameMode.interact(player, entity, hand);
+            actionResult = mc.gameMode.interact(player, entity, hitResult, hand);
         }
 
         if (actionResult instanceof InteractionResult.Success success)
@@ -643,7 +644,7 @@ public class MiscUtils
             return true;
         }
 
-        Map<MapId, MapItemSavedData> data = ((IMixinClientWorld) mc.level).tweakeroo_getMapStates();
+        Map<MapId, MapItemSavedData> data = ((IMixinClientLevel) mc.level).tweakeroo_getMapStates();
         String worldName = StringUtils.getWorldOrServerName();
 
         if (worldName == null)

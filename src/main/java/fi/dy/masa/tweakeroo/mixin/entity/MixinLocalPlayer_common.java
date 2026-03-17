@@ -1,21 +1,11 @@
 package fi.dy.masa.tweakeroo.mixin.entity;
 
+import java.util.function.Predicate;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.objectweb.asm.Opcodes;
 
 import com.mojang.authlib.GameProfile;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-
-import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -25,6 +15,16 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.HangingEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(value = LocalPlayer.class)
 public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
@@ -78,17 +78,17 @@ public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
         }
     }
 
-    @Redirect(method = "shouldStopRunSprinting", at = @At(value = "FIELD",
-													   target = "Lnet/minecraft/client/player/LocalPlayer;horizontalCollision:Z",
-													   opcode = Opcodes.GETFIELD))
-    private boolean tweakeroo_overrideCollidedHorizontally(LocalPlayer player)
+    @WrapOperation(method = "shouldStopRunSprinting", at = @At(value = "FIELD",
+                                                               target = "Lnet/minecraft/client/player/LocalPlayer;horizontalCollision:Z",
+                                                               opcode = Opcodes.GETFIELD))
+    private boolean tweakeroo_overrideCollidedHorizontally(LocalPlayer instance, Operation<Boolean> original)
     {
         if (Configs.Disable.DISABLE_WALL_UNSPRINT.getBooleanValue())
         {
             return false;
         }
 
-        return player.horizontalCollision;
+        return original.call(instance);
     }
 
     @Inject(method = "aiStep",

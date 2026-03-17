@@ -21,7 +21,7 @@ public class MixinPistonBlock
 {
     @Environment(EnvType.CLIENT)
     @Inject(method = "triggerEvent", at = @At("HEAD"))
-    private void onSyncedBlockEventInject(BlockState state, Level world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> ci)
+    private void tweakeroo_onSyncedBlockEventInject(BlockState state, Level world, BlockPos pos, int type, int data, CallbackInfoReturnable<Boolean> ci)
     {
         if (!world.isClientSide())
         {

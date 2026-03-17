@@ -36,6 +36,7 @@ import fi.dy.masa.tweakeroo.gui.GuiConfigs;
 import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
 import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
+import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 import fi.dy.masa.tweakeroo.util.*;
 
@@ -123,7 +124,7 @@ public class Callbacks
         Hotkeys.AREA_SELECTION_ADD_TO_LIST.getKeybind().setCallback(callbackGeneric);
         Hotkeys.AREA_SELECTION_REMOVE_FROM_LIST.getKeybind().setCallback(callbackGeneric);
 
-        Hotkeys.SKIP_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
+//        Hotkeys.SKIP_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.SKIP_WORLD_RENDERING.getKeybind().setCallback(callbackMessage);
 
         Configs.Generic.TOOL_SWITCHABLE_SLOTS.setValueChangeCallback((cfg) -> InventoryUtils.setToolSwitchableSlots(cfg.getStringValue()));
@@ -387,16 +388,18 @@ public class Callbacks
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
-            if (key == Hotkeys.SKIP_ALL_RENDERING.getKeybind())
-            {
-                this.mc.noRender = !this.mc.noRender;
-
-                String pre = mc.noRender ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-                String status = StringUtils.translate("tweakeroo.message.value." + (this.mc.noRender ? "on" : "off"));
-                String message = StringUtils.translate("tweakeroo.message.toggled", "Skip All Rendering", pre + status + GuiBase.TXT_RST);
-                InfoUtils.printActionbarMessage(message);
-            }
-            else if (key == Hotkeys.SKIP_WORLD_RENDERING.getKeybind())
+			// TODO -- They removed the old boolean -- This is cursed now.
+//            if (key == Hotkeys.SKIP_ALL_RENDERING.getKeybind())
+//            {
+//	            MiscTweaks.skipAlLRendering = !MiscTweaks.skipAlLRendering;
+//
+//                String pre = MiscTweaks.skipAlLRendering ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+//                String status = StringUtils.translate("tweakeroo.message.value." + (MiscTweaks.skipAlLRendering ? "on" : "off"));
+//                String message = StringUtils.translate("tweakeroo.message.toggled", "Skip All Rendering", pre + status + GuiBase.TXT_RST);
+//                InfoUtils.printActionbarMessage(message);
+//            }
+//            else
+			if (key == Hotkeys.SKIP_WORLD_RENDERING.getKeybind())
             {
                 skipWorldRendering = !skipWorldRendering;
 

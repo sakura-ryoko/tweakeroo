@@ -1,21 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.jetbrains.annotations.Nullable;
 
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.blaze3d.platform.InputConstants;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
-import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
-import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
-import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -26,6 +15,19 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
+import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft implements IMinecraftClientInvoker
@@ -59,7 +61,7 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
     }
 
     @Inject(method = "runTick", at = @At("RETURN"))
-    private void onGameLoop(boolean renderWorld, CallbackInfo ci)
+    private void tweakeroo_onGameLoop(boolean renderWorld, CallbackInfo ci)
     {
         if (this.player != null && this.level != null)
         {
@@ -71,7 +73,7 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
-    private void onLeftClickMouse(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_onLeftClickMouse(CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
         {
@@ -85,7 +87,7 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
-    private void onRightClickMouse(CallbackInfo ci)
+    private void tweakeroo_onRightClickMouse(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
         {
@@ -101,7 +103,7 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
             @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z")
     })
-    private void onLeftClickMousePre(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_onLeftClickMousePre(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePre();
     }
@@ -109,25 +111,22 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
     @Inject(method = "startAttack", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
-    private void onLeftClickMousePost(CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_onLeftClickMousePost(CallbackInfoReturnable<Boolean> cir)
     {
         PlacementTweaks.onLeftClickMousePost();
     }
 
-    @Redirect(method = "startUseItem()V", at = @At(
+    @WrapOperation(method = "startUseItem()V", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
-    private InteractionResult onProcessRightClickBlock(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            InteractionHand hand,
-            BlockHitResult hitResult)
+    private InteractionResult tweakeroo_onProcessRightClickBlock(
+            MultiPlayerGameMode instance, LocalPlayer player, InteractionHand hand, BlockHitResult blockHit, Operation<InteractionResult> original)
     {
-        return PlacementTweaks.onProcessRightClickBlock(controller, player, this.level, hand, hitResult);
+        return PlacementTweaks.onProcessRightClickBlock(instance, player, this.level, hand, blockHit);
     }
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
-    private void onProcessKeybindsPre(CallbackInfo ci)
+    private void tweakeroo_onProcessKeybindsPre(CallbackInfo ci)
     {
         if (this.screen == null)
         {

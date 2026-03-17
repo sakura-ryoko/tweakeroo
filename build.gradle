@@ -1,46 +1,51 @@
 plugins {
-	id 'fabric-loom' version '1.15-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom' version '1.15.+'
 	id 'maven-publish'
 }
 
 repositories {
-	maven {url = "https://masa.dy.fi/maven/sakura-ryoko"
-		content {includeGroupAndSubgroups("fi.dy.masa")}
-	}
+//	maven {url = "https://masa.dy.fi/maven/sakura-ryoko"
+//		content {includeGroupAndSubgroups("fi.dy.masa")}
+//	}
 	maven {url = 'https://maven.fallenbreath.me/releases'
 		content {includeGroupAndSubgroups("me.fallenbreath")}
 	}
 	maven { url = 'https://maven.terraformersmc.com/releases/'
 		content {includeGroupAndSubgroups("com.terraformersmc")}
 	}
-	maven { url = 'https://jitpack.io' }
+	maven { url = 'https://jitpack.io'
+		content {includeGroupAndSubgroups("com.github")}
+	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+//    mappings loom.officialMojangMappings()
+	implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 	implementation "com.google.code.findbugs:jsr305:3.0.2"
+//	implementation "org.jspecify:jspecify:1.0.0"
 
-	modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_out}:${project.malilib_version}"
-//	modImplementation "com.github.sakura-ryoko:malilib:${project.malilib_version}"
+//	implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_out}:${project.malilib_version}"
+	implementation "com.github.sakura-ryoko:malilib:${project.malilib_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	//include(modApi(fabricApi.module("fabric-api-base", project.fabric_api_version)))
+	compileOnly fabricApi.module("fabric-api-base", project.fabric_api_version)
+	compileOnly fabricApi.module("fabric-networking-api-v1", project.fabric_api_version)
+	compileOnly fabricApi.module("fabric-resource-loader-v1", project.fabric_api_version)
 	include(implementation("me.fallenbreath:conditional-mixin-fabric:${project.conditionalmixin_version}"))
 
-	modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
-//	modRuntimeOnly 'me.fallenbreath:mixin-auditor:0.1.0'
+	compileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
+	runtimeOnly 'me.fallenbreath:mixin-auditor:0.2.0-u'
 
 	// Test dependencies
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.1'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.1'
-	testImplementation 'org.mockito:mockito-core:5.8.0'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
-	// Fabric testing support
-	testImplementation "net.fabricmc:fabric-loader-junit:${project.fabric_loader_version}"
+//	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+//	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.1'
+//	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+//	testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.1'
+//	testImplementation 'org.mockito:mockito-core:5.8.0'
+//	testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+//	// Fabric testing support
+//	testImplementation "net.fabricmc:fabric-loader-junit:${project.fabric_loader_version}"
 }
 
 base {
@@ -56,28 +61,28 @@ base {
 loom {
     accessWidenerPath = file("src/main/resources/tweakeroo.accesswidener")
 
-//    def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
-//	// [FEATURE] MIXIN_AUDITOR
-//	runs {
-//		def auditVmArgs = [*commonVmArgs, '-DmixinAuditor.audit=true']
-//		clientMixinAudit {
-//			client()
-//			vmArgs auditVmArgs
-//			ideConfigGenerated false
-//		}
-//	}
-}
-
-test {
-	useJUnitPlatform()
-	jvmArgs '-Dtweakeroo.debug.stdout=true'
-	testLogging {
-		events "passed", "skipped", "failed"
-		exceptionFormat "short"
-		showStackTraces = false
-		showStandardStreams = false
+    def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
+	// [FEATURE] MIXIN_AUDITOR
+	runs {
+		def auditVmArgs = [*commonVmArgs, '-DmixinAuditor.audit=true']
+		clientMixinAudit {
+			client()
+			vmArgs auditVmArgs
+			ideConfigGenerated false
+		}
 	}
 }
+
+//test {
+//	useJUnitPlatform()
+//	jvmArgs '-Dtweakeroo.debug.stdout=true'
+//	testLogging {
+//		events "passed", "skipped", "failed"
+//		exceptionFormat "short"
+//		showStackTraces = false
+//		showStandardStreams = false
+//	}
+//}
 
 processResources {
 	// Exclude the GIMP image files
@@ -102,7 +107,7 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 
 	// Minecraft 1.20.5/1.21 (24w14a) upwards uses Java 21.
-	it.options.release = 21
+	it.options.release = 25
 }
 
 tasks.withType(AbstractArchiveTask).configureEach {
@@ -111,8 +116,8 @@ tasks.withType(AbstractArchiveTask).configureEach {
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.

@@ -119,7 +119,7 @@ public class FakeChunkManager extends ChunkSource
                 if (chunk != null)
                 {
                     ChunkPos chunkPos = chunk.getPos();
-                    newChunkMap.set(chunkPos.x, chunkPos.z, chunk);
+                    newChunkMap.set(chunkPos.x(), chunkPos.z(), chunk);
                 }
             }
             this.chunks = newChunkMap;
@@ -194,7 +194,7 @@ public class FakeChunkManager extends ChunkSource
             else
             {
                 ChunkPos chunkPos = chunk.getPos();
-                return chunkPos.x == x && chunkPos.z == z;
+                return chunkPos.x() == x && chunkPos.z() == z;
             }
         }
 

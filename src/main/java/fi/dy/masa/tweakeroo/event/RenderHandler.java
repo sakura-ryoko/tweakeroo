@@ -1,13 +1,17 @@
 package fi.dy.masa.tweakeroo.event;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import org.joml.Vector4f;
 
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
@@ -58,7 +62,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPostAdvanced(GuiContext ctx, float partialTicks, ProfilerFiller profiler)
+    public void onExtractInGameGuiPost(GuiContext ctx, float partialTicks, ProfilerFiller profiler)
     {
         if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() &&
             Hotkeys.HOTBAR_SWAP_BASE.getKeybind().isKeybindHeld())
@@ -192,18 +196,24 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderWorldLastAdvanced(RenderTarget fb, Matrix4f posMatrix, Matrix4f projMatrix, Frustum frustum, Camera camera, RenderBuffers buffers, ProfilerFiller profiler)
+    public void onExtractWorldLast(DeltaTracker deltaTracker, Camera camera, float ticks, ProfilerFiller profiler)
+    {
+        // TODO
+    }
+
+    @Override
+    public void onRenderWorldLast(RenderTarget fb, Matrix4fc modelViewMatrix, CameraRenderState cameraState, Frustum culling, RenderBuffers buffers, GpuBufferSlice terrainFog, Vector4f fogColor, ProfilerFiller profiler)
     {
         Minecraft mc = Minecraft.getInstance();
 
         if (mc.player != null)
         {
-            RenderTweaks.render(posMatrix, projMatrix, profiler);
-            this.renderOverlays(posMatrix, mc);
+            RenderTweaks.render(profiler, mc);
+            this.renderOverlays(profiler, mc);
         }
     }
 
-    private void renderOverlays(Matrix4f posMatrix, Minecraft mc)
+    private void renderOverlays(ProfilerFiller profiler, Minecraft mc)
     {
         Entity entity = mc.getCameraEntity();
 
@@ -223,7 +233,7 @@ public class RenderHandler implements IRenderer
                     hitResult.getBlockPos(),
                     hitResult.getDirection(),
                     hitResult.getLocation(),
-                    color, posMatrix);
+                    color);
         }
     }
 }

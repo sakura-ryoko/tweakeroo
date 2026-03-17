@@ -24,7 +24,7 @@ public abstract class MixinItemInHandRenderer
             target = "Lnet/minecraft/client/player/LocalPlayer;getItemSwapScale(F)F"))
     public float tweakeroo_redirectedGetCooledAttackStrength(LocalPlayer instance, float v, Operation<Float> original)
     {
-        return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : instance.getItemSwapScale(v);
+        return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : original.call(instance, v);
     }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)

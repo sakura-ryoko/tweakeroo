@@ -58,7 +58,7 @@ public class Hotkeys
     public static final ConfigHotkey PLACEMENT_RESTRICTION_MODE_LINE    = new ConfigHotkey("placementRestrictionModeLine",      "Z,4").apply(HOTKEY_KEY);
     public static final ConfigHotkey PLACEMENT_RESTRICTION_MODE_PLANE   = new ConfigHotkey("placementRestrictionModePlane",     "Z,1").apply(HOTKEY_KEY);
     public static final ConfigHotkey SIT_DOWN_NEARBY_PETS               = new ConfigHotkey("sitDownNearbyPets",                 "").apply(HOTKEY_KEY);
-    public static final ConfigHotkey SKIP_ALL_RENDERING                 = new ConfigHotkey("skipAllRendering",                  "").apply(HOTKEY_KEY);
+//    public static final ConfigHotkey SKIP_ALL_RENDERING                 = new ConfigHotkey("skipAllRendering",                  "").apply(HOTKEY_KEY);
     public static final ConfigHotkey SKIP_WORLD_RENDERING               = new ConfigHotkey("skipWorldRendering",                "").apply(HOTKEY_KEY);
     public static final ConfigHotkey STAND_UP_NEARBY_PETS               = new ConfigHotkey("standUpNearbyPets",                 "").apply(HOTKEY_KEY);
     public static final ConfigHotkey SWAP_ELYTRA_CHESTPLATE             = new ConfigHotkey("swapElytraChestplate",              "").apply(HOTKEY_KEY);
@@ -113,7 +113,7 @@ public class Hotkeys
             PLACEMENT_RESTRICTION_MODE_LINE,
             PLACEMENT_RESTRICTION_MODE_PLANE,
             SIT_DOWN_NEARBY_PETS,
-            SKIP_ALL_RENDERING,
+//            SKIP_ALL_RENDERING,
             SKIP_WORLD_RENDERING,
             STAND_UP_NEARBY_PETS,
             SWAP_ELYTRA_CHESTPLATE,

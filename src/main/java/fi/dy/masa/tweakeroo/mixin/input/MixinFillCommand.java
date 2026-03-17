@@ -30,6 +30,6 @@ public abstract class MixinFillCommand
             return (T) (Object) Configs.Generic.FILL_CLONE_LIMIT.getIntegerValue();
         }
 
-        return instance.get(gameRule);
+        return original.call(instance, gameRule);
     }
 }

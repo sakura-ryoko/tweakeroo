@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -25,10 +27,7 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -38,7 +37,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.apache.commons.lang3.tuple.Pair;
 
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
@@ -354,8 +352,8 @@ public class InventoryUtils
                     // stack in hand, then left click, otherwise right click to split the stack
                     int button = stackSlot.getCount() + stackHand.getCount() <= stackHand.getMaxStackSize() ? 0 : 1;
 
-                    mc.gameMode.handleInventoryMouseClick(container.containerId, slot.index, button, ClickType.PICKUP, player);
-                    mc.gameMode.handleInventoryMouseClick(container.containerId, currentSlot, 0, ClickType.PICKUP, player);
+                    mc.gameMode.handleContainerInput(container.containerId, slot.index, button, ContainerInput.PICKUP, player);
+                    mc.gameMode.handleContainerInput(container.containerId, currentSlot, 0, ContainerInput.PICKUP, player);
 
                     break;
                 }
@@ -1058,9 +1056,9 @@ public class InventoryUtils
 
         for (UniformInt range : ranges)
         {
-            int end = Math.min(max, range.getMaxValue());
+            int end = Math.min(max, range.maxInclusive());
 
-            for (int slotNumber = range.getMinValue(); slotNumber <= end; ++slotNumber)
+            for (int slotNumber = range.minInclusive(); slotNumber <= end; ++slotNumber)
             {
                 if (itemTest.test(container.getSlot(slotNumber).getItem()))
                 {
@@ -1080,9 +1078,9 @@ public class InventoryUtils
 
         for (UniformInt range : ranges)
         {
-            int end = Math.min(max, range.getMaxValue());
+            int end = Math.min(max, range.maxInclusive());
 
-            for (int slotNumber = range.getMinValue(); slotNumber <= end; ++slotNumber)
+            for (int slotNumber = range.minInclusive(); slotNumber <= end; ++slotNumber)
             {
                 Slot slot = container.getSlot(slotNumber);
 
@@ -1230,7 +1228,7 @@ public class InventoryUtils
         if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
 
-        Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER) && s.getDamageValue() < s.getMaxDamage() - 10;
+        Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER.builtInRegistryHolder()) && s.getDamageValue() < s.getMaxDamage() - 10;
 
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
         {
@@ -1473,12 +1471,12 @@ public class InventoryUtils
                 }
                 else
                 {
-                    mc.gameMode.handleInventoryMouseClick(container.containerId, slotNumber, currentHotbarSlot, ClickType.SWAP, mc.player);
+                    mc.gameMode.handleContainerInput(container.containerId, slotNumber, currentHotbarSlot, ContainerInput.SWAP, mc.player);
                 }
             }
             else if (hand == InteractionHand.OFF_HAND)
             {
-                mc.gameMode.handleInventoryMouseClick(container.containerId, slotNumber, 40, ClickType.SWAP, mc.player);
+                mc.gameMode.handleContainerInput(container.containerId, slotNumber, 40, ContainerInput.SWAP, mc.player);
             }
         }
     }
@@ -1496,9 +1494,9 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getInstance();
         AbstractContainerMenu container = player.containerMenu;
-        mc.gameMode.handleInventoryMouseClick(container.containerId, slotNum, 0, ClickType.SWAP, player);
-        mc.gameMode.handleInventoryMouseClick(container.containerId, otherSlot, 0, ClickType.SWAP, player);
-        mc.gameMode.handleInventoryMouseClick(container.containerId, slotNum, 0, ClickType.SWAP, player);
+        mc.gameMode.handleContainerInput(container.containerId, slotNum, 0, ContainerInput.SWAP, player);
+        mc.gameMode.handleContainerInput(container.containerId, otherSlot, 0, ContainerInput.SWAP, player);
+        mc.gameMode.handleContainerInput(container.containerId, slotNum, 0, ContainerInput.SWAP, player);
     }
 
     private static void swapToolToHand(int slotNumber, Minecraft mc)
@@ -1528,7 +1526,7 @@ public class InventoryUtils
                         mc.getConnection().send(new ServerboundSetCarriedItemPacket(inventory.getSelectedSlot()));
                     }
 
-                    mc.gameMode.handleInventoryMouseClick(container.containerId, slotNumber, hotbarSlot, ClickType.SWAP, mc.player);
+                    mc.gameMode.handleContainerInput(container.containerId, slotNumber, hotbarSlot, ContainerInput.SWAP, mc.player);
                 }
             }
         }
@@ -1689,13 +1687,13 @@ public class InventoryUtils
                 if (stack.getCount() < stack.getMaxStackSize())
                 {
                     // Pick up the item from slot1 and try to put it in slot2
-                    mc.gameMode.handleInventoryMouseClick(container.containerId, slot1.index, 0, ClickType.PICKUP, player);
-                    mc.gameMode.handleInventoryMouseClick(container.containerId, slot2.index, 0, ClickType.PICKUP, player);
+                    mc.gameMode.handleContainerInput(container.containerId, slot1.index, 0, ContainerInput.PICKUP, player);
+                    mc.gameMode.handleContainerInput(container.containerId, slot2.index, 0, ContainerInput.PICKUP, player);
 
                     // If the items didn't all fit, return the rest
                     if (player.getInventory().getSelectedItem().isEmpty() == false)
                     {
-                        mc.gameMode.handleInventoryMouseClick(container.containerId, slot1.index, 0, ClickType.PICKUP, player);
+                        mc.gameMode.handleContainerInput(container.containerId, slot1.index, 0, ContainerInput.PICKUP, player);
                     }
 
                     if (slot2.getItem().getCount() >= slot2.getItem().getMaxStackSize())

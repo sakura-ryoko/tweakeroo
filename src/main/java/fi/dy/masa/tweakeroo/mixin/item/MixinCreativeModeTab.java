@@ -4,7 +4,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(CreativeModeTab.class)
-public abstract class MixinItemGroup
+public abstract class MixinCreativeModeTab
 {
     /* // TODO 1.19.3+
     @Inject(method = "appendStacks", at = @At("RETURN"))

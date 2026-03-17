@@ -2,6 +2,10 @@ package fi.dy.masa.tweakeroo.data;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
+
+import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -32,10 +36,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 
-import com.mojang.datafixers.util.Either;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
 import fi.dy.masa.malilib.interfaces.IDataSyncer;
@@ -831,11 +832,11 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
 
         BlockEntity blockEntity = this.getClientWorld().getBlockEntity(pos);
 
-        if (blockEntity != null && (type == null || type.equals(BlockEntityType.getKey(blockEntity.getType()))))
+        if (blockEntity != null && (type == null || type.equals(BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType()))))
         {
             if (!nbt.contains(NbtKeys.ID))
             {
-                Identifier id = BlockEntityType.getKey(blockEntity.getType());
+                Identifier id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntity.getType());
 
                 if (id != null)
                 {
@@ -866,7 +867,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                 {
                     if (!nbt.contains(NbtKeys.ID))
                     {
-                        Identifier id = BlockEntityType.getKey(beType);
+                        Identifier id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(beType);
 
                         if (id != null)
                         {

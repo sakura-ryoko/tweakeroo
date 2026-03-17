@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(TeleportToPlayerMenuCategory.class)
-public abstract class MixinTeleportSpectatorMenu
+public abstract class MixinTeleportToPlayerMenuCategory
 {
     @Shadow @Final private static Comparator<PlayerInfo> PROFILE_ORDER;
     @Shadow @Final @Mutable private List<SpectatorMenuItem> items;

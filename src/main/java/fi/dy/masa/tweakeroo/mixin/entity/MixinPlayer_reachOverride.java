@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.AttackRange;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,11 +28,10 @@ public class MixinPlayer_reachOverride
 	)
 	private double tweakeroo_overrideBlockReachDistance(Player instance, Holder<Attribute> holder, Operation<Double> original)
 	{
-		final double orig = instance.getAttributeValue(holder);
-		double adj = orig;
-
 		if (FeatureToggle.TWEAK_BLOCK_REACH_OVERRIDE.getBooleanValue())
 		{
+			final double orig = instance.getAttributeValue(holder);
+			double adj = orig;
 			final RangedAttribute attr = ((RangedAttribute) Attributes.BLOCK_INTERACTION_RANGE.value());
 			final double maxOffset = 1.0D;
 
@@ -52,9 +52,11 @@ public class MixinPlayer_reachOverride
 					adj = MathUtils.clamp(Configs.Generic.BLOCK_REACH_DISTANCE.getDoubleValue(), attr.getMinValue(), orig + maxOffset);
 				}
 			}
+
+			return adj;
 		}
 
-		return adj;
+		return original.call(instance,  holder);
 	}
 
 	@WrapOperation(method = "entityInteractionRange",
@@ -63,11 +65,10 @@ public class MixinPlayer_reachOverride
 	)
 	private double tweakeroo_overrideEntityReachDistance(Player instance, Holder<Attribute> holder, Operation<Double> original)
 	{
-		final double orig = instance.getAttributeValue(holder);
-		double adj = orig;
-
 		if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue())
 		{
+			final double orig = instance.getAttributeValue(holder);
+			double adj = orig;
 			final RangedAttribute attr = ((RangedAttribute) Attributes.ENTITY_INTERACTION_RANGE.value());
 			final double maxOffset = 3.0D;
 
@@ -80,45 +81,52 @@ public class MixinPlayer_reachOverride
 				// Calculate a "safe" range for servers
 				adj = MathUtils.clamp(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), attr.getMinValue(), orig + maxOffset);
 			}
+
+			return adj;
 		}
 
-		return adj;
+		return original.call(instance, holder);
 	}
 
 	@WrapOperation(method = "isWithinAttackRange",
 	               at = @At(value = "INVOKE",
-	                        target = "Lnet/minecraft/world/entity/player/Player;entityAttackRange()Lnet/minecraft/world/item/component/AttackRange;"))
-	private AttackRange tweakeroo_overrideEntityAttackRangeComponent(Player instance, Operation<AttackRange> original)
+	                        target = "Lnet/minecraft/world/entity/player/Player;getAttackRangeWith(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/component/AttackRange;"))
+	private AttackRange tweakeroo_overrideEntityAttackRangeComponent(Player instance, ItemStack itemStack, Operation<AttackRange> original)
 	{
-		AttackRange comp = instance.entityAttackRange();
-		final double origDefault = comp.maxRange();
-		final double origCreative = comp.maxCreativeRange();
-
-		if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue() && comp.maxRange() < Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue())
+		if (FeatureToggle.TWEAK_ENTITY_REACH_OVERRIDE.getBooleanValue())
 		{
-			final RangedAttribute attr = ((RangedAttribute) Attributes.ENTITY_INTERACTION_RANGE.value());
-			final double maxOffset = 3.0D;
-			double adjDefault = origDefault;
-			double adjCreative = origCreative;
+			AttackRange comp = instance.getAttackRangeWith(itemStack);
+			final double origDefault = comp.maxReach();
+			final double origCreative = comp.maxCreativeReach();
 
-			if (Minecraft.getInstance().hasSingleplayerServer() || Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue() < adjDefault)
+			if (comp.maxReach() < Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue())
 			{
-				adjDefault = MathUtils.clamp(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), comp.minRange(), attr.getMaxValue());
-			}
-			else
-			{
-				// Calculate a "safe" range for servers
-				adjDefault = MathUtils.clamp(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), comp.minRange(), origDefault + maxOffset);
+				final RangedAttribute attr = ((RangedAttribute) Attributes.ENTITY_INTERACTION_RANGE.value());
+				final double maxOffset = 3.0D;
+				double adjDefault = origDefault;
+				double adjCreative = origCreative;
+
+				if (Minecraft.getInstance().hasSingleplayerServer() || Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue() < adjDefault)
+				{
+					adjDefault = MathUtils.clamp(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), comp.minReach(), attr.getMaxValue());
+				}
+				else
+				{
+					// Calculate a "safe" range for servers
+					adjDefault = MathUtils.clamp(Configs.Generic.ENTITY_REACH_DISTANCE.getDoubleValue(), comp.minReach(), origDefault + maxOffset);
+				}
+
+				if (adjDefault > adjCreative)
+				{
+					adjCreative = MathUtils.clamp(adjDefault, comp.minCreativeReach(), origCreative + maxOffset);
+				}
+
+				return new AttackRange(comp.minReach(), (float) adjDefault, comp.minCreativeReach(), (float) adjCreative, comp.hitboxMargin(), comp.mobFactor());
 			}
 
-			if (adjDefault > adjCreative)
-			{
-				adjCreative = MathUtils.clamp(adjDefault, comp.minCreativeRange(), origCreative + maxOffset);
-			}
-
-			return new AttackRange(comp.minRange(), (float) adjDefault, comp.minCreativeRange(), (float) adjCreative, comp.hitboxMargin(), comp.mobFactor());
+			return comp;
 		}
 
-		return comp;
+		return original.call(instance, itemStack);
 	}
 }

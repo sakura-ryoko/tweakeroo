@@ -23,7 +23,7 @@ public abstract class MixinLevelLightEngine
     {
         if (Configs.Disable.DISABLE_CLIENT_LIGHT_UPDATES.getBooleanValue() &&
             this.blockEngine != null &&
-            ((IMixinChunkLightProvider) this.blockEngine).tweakeroo_getChunkProvider().getLevel() == Minecraft.getInstance().level)
+            ((IMixinLightEngine) this.blockEngine).tweakeroo_getChunkProvider().getLevel() == Minecraft.getInstance().level)
         {
             ci.cancel();
         }

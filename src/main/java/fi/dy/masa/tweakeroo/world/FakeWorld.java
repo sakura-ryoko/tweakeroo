@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
@@ -25,6 +27,7 @@ import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.attribute.EnvironmentAttributeSystem;
+import net.minecraft.world.clock.ClockManager;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
@@ -277,7 +280,13 @@ public class FakeWorld extends Level
         return this.registryManager;
     }
 
-	@Override
+    @Override
+    public ClockManager clockManager()
+    {
+        return null;
+    }
+
+    @Override
 	public EnvironmentAttributeSystem environmentAttributes()
 	{
 		return null;
@@ -331,13 +340,6 @@ public class FakeWorld extends Level
     {
         // TODO Auto-generated method stub
         return FeatureFlagSet.of();
-    }
-
-    @Override
-    public float getShade(@Nonnull Direction var1, boolean var2)
-    {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
     @Override
