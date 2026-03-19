@@ -80,8 +80,8 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
     private long lastOpCheck = 0L;
 
     // Data Cache
-    private final ConcurrentHashMap<BlockPos, Pair<Long, Pair<BlockEntity, CompoundData>>> blockEntityCache = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer,  Pair<Long, Pair<Entity,      CompoundData>>> entityCache      = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<BlockPos, Pair<Long, Pair<BlockEntity, CompoundData>>> blockEntityCache = new ConcurrentHashMap<>(16, 0.9f, 1);
+    private final ConcurrentHashMap<Integer,  Pair<Long, Pair<Entity,      CompoundData>>> entityCache      = new ConcurrentHashMap<>(16, 0.9f, 1);
     private long serverTickTime = 0;
     // Requests to be executed
     private final Set<BlockPos> pendingBlockEntitiesQueue = new LinkedHashSet<>();
@@ -300,10 +300,13 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             {
                 Pair<Long, Pair<BlockEntity, CompoundData>> pair = this.blockEntityCache.get(pos);
 
-                if (nowTime - pair.getLeft() > timeout || pair.getLeft() > nowTime)
+                if (pair != null)
                 {
-                    //Tweakeroo.printDebug("entityCache: be at pos [{}] has timed out", pos.toShortString());
-                    this.blockEntityCache.remove(pos);
+                    if (nowTime - pair.getLeft() > timeout || pair.getLeft() > nowTime)
+                    {
+                        //Tweakeroo.printDebug("entityCache: be at pos [{}] has timed out", pos.toShortString());
+                        this.blockEntityCache.remove(pos);
+                    }
                 }
             }
         }
@@ -314,10 +317,13 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             {
                 Pair<Long, Pair<Entity, CompoundData>> pair = this.entityCache.get(entityId);
 
-                if (nowTime - pair.getLeft() > timeout || pair.getLeft() > nowTime)
+                if (pair != null)
                 {
-                    //Tweakeroo.printDebug("entityCache: entity Id [{}] has timed out", entityId);
-                    this.entityCache.remove(entityId);
+                    if (nowTime - pair.getLeft() > timeout || pair.getLeft() > nowTime)
+                    {
+                        //Tweakeroo.printDebug("entityCache: entity Id [{}] has timed out", entityId);
+                        this.entityCache.remove(entityId);
+                    }
                 }
             }
         }
