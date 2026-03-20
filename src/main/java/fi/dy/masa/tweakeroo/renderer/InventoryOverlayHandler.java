@@ -212,6 +212,17 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     }
                 }
 
+                if (be == null)
+                {
+                    if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
+                    {
+                        this.context = this.lastBlockEntityContext.getRight();
+                        return this.context;
+                    }
+
+                    return null;
+                }
+
                 //Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, nbt != null);
                 InventoryOverlayContext ctx = getTargetInventoryFromBlock(world, pos, be, data);
                 //dumpContext(ctx);
@@ -265,11 +276,32 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 if (pair != null)
                 {
                     data = pair.getRight();
+                    entity = pair.getLeft() != null ? pair.getLeft() : entity;
                 }
             }
 
+            if (entity != null)
+            {
+                Entity tmpEntity = world.getEntity(entity.getId());
+
+                if (tmpEntity != null)
+                {
+                    entity = tmpEntity;
+                }
+            }
+            else
+            {
+                if (this.lastEntityContext != null)
+                {
+                    this.context = this.lastEntityContext.getRight();
+                    return this.context;
+                }
+
+                return null;
+            }
+
             //Tweakeroo.LOGGER.error("getTarget(): Entity [{}] raw NBT [{}]", entity.getId(), nbt.toString());
-            InventoryOverlayContext ctx = getTargetInventoryFromEntity(world.getEntity(entity.getId()), data);
+            InventoryOverlayContext ctx = getTargetInventoryFromEntity(entity, data);
             //dumpContext(ctx);
 
             if (this.lastEntityContext != null && this.lastEntityContext.getLeft() != entity.getId())
