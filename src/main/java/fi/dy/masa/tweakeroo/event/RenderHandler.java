@@ -62,7 +62,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onExtractInGameGuiPost(GuiContext ctx, float partialTicks, ProfilerFiller profiler)
+    public void onExtractGuiOverlayPost(GuiContext ctx, float partialTicks, ProfilerFiller profiler)
     {
         if (FeatureToggle.TWEAK_HOTBAR_SWAP.getBooleanValue() &&
             Hotkeys.HOTBAR_SWAP_BASE.getKeybind().isKeybindHeld())

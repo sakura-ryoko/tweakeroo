@@ -29,6 +29,7 @@ public abstract class MixinGameRenderer
     @Shadow @Final private Minecraft minecraft;
     @Shadow @Final private Camera mainCamera;
     @Shadow @Final private GameRenderState gameRenderState;
+
     @Unique private float realYaw;
     @Unique private float realPitch;
 
@@ -41,8 +42,8 @@ public abstract class MixinGameRenderer
         }
     }
 
-    @Inject(method = "renderLevel", at = @At(value = "HEAD"))
-    private void tweakeroo_overrideRenderViewEntityPre(DeltaTracker deltaTracker, CallbackInfo ci)
+    @Inject(method = "update", at = @At(value = "HEAD"))
+    private void tweakeroo_overrideRenderViewEntityPre(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
@@ -53,14 +54,14 @@ public abstract class MixinGameRenderer
                 this.realYaw = entity.getYRot();
                 this.realPitch = entity.getXRot();
                 MiscUtils.setEntityRotations(entity, CameraUtils.getCameraYaw(), CameraUtils.getCameraPitch());
-                this.mainCamera.update(deltaTracker);
+//                this.mainCamera.update(deltaTracker);
             }
         }
     }
 
-    @Inject(method = "renderLevel", at = @At("RETURN"))
-    private void tweakeroo_overrideRenderViewEntityPost(DeltaTracker deltaTracker, CallbackInfo ci,
-                                                        @Local(name = "cameraState") CameraRenderState cameraState)
+    @Inject(method = "renderLevel", at = @At("TAIL"))
+    private void tweakeroo_onRenderLevelPost(DeltaTracker deltaTracker, CallbackInfo ci,
+                                             @Local(name = "cameraState") CameraRenderState cameraState)
     {
         if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
         {

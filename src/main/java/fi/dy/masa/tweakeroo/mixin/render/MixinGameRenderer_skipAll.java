@@ -2,6 +2,7 @@ package fi.dy.masa.tweakeroo.mixin.render;
 
 // TODO -- This is cursed
 //@Mixin(value = GameRenderer.class, priority = 1050)
+@Deprecated
 public abstract class MixinGameRenderer_skipAll
 {
 //	@Shadow @Final private GuiRenderer guiRenderer;
