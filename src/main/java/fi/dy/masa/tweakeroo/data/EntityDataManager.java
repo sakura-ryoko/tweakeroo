@@ -531,7 +531,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             {
                 if (System.currentTimeMillis() - this.blockEntityCache.get(pos).getLeft() > this.getCacheRefresh())
                 {
-                    //Tweakeroo.debugLog("requestBlockEntity: be at pos [{}] requeue at [{}] ms", pos.toShortString(), this.getCacheRefresh());
+//                    Tweakeroo.debugLog("requestBlockEntity: be at pos [{}] requeue at [{}] ms", pos.toShortString(), this.getCacheRefresh());
                     this.pendingBlockEntitiesQueue.add(pos);
                 }
             }
@@ -548,6 +548,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             if (!DataManager.getInstance().hasIntegratedServer() &&
                 (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() || Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue()))
             {
+//                Tweakeroo.debugLog("requestBlockEntity: be at pos [{}]", pos.toShortString());
                 this.pendingBlockEntitiesQueue.add(pos);
             }
 
@@ -835,6 +836,8 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
     {
         this.pendingBlockEntitiesQueue.remove(pos);
         if (nbt == null || this.getClientWorld() == null) return null;
+
+        System.out.printf("handleBlockEntityData[%s] --> %s\n", pos.toShortString(), nbt.toString());
 
         BlockEntity blockEntity = this.getClientWorld().getBlockEntity(pos);
 
