@@ -12,12 +12,12 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.DarknessFogEnvironment;
 
-@Mixin(DarknessFogEnvironment.class)
+@Mixin(value = DarknessFogEnvironment.class, priority = 900)
 public class MixinDarknessFogEnvironment
 {
     @Inject(method = "setupFog", at = @At("RETURN"))
-    private void tweakeroo_redirectDarknessFog(FogData data, Camera camera, ClientLevel clientWorld, float f,
-                                               DeltaTracker renderTickCounter, CallbackInfo ci)
+    private void tweakeroo_redirectDarknessFog(FogData fog, Camera camera, ClientLevel level, float renderDistance,
+                                               DeltaTracker deltaTracker, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_DARKNESS_VISIBILITY.getBooleanValue())
         {
@@ -31,12 +31,12 @@ public class MixinDarknessFogEnvironment
             // tends to be somewhat random and unpredictable and varies.
             // Someone could remove the fog by changing the 'adj' value higher, but
             // that would be no fun; now would it? :)
-            final float adj = data.skyEnd * 3.0F;
+            final float adj = fog.skyEnd * 3.0F;
 
-            data.environmentalStart = adj * 0.75F;
-            data.environmentalEnd = adj;
-            data.skyEnd = adj;
-            data.cloudEnd = adj;
+            fog.environmentalStart = adj * 0.75F;
+            fog.environmentalEnd = adj;
+            fog.skyEnd = adj;
+            fog.cloudEnd = adj;
         }
     }
 }

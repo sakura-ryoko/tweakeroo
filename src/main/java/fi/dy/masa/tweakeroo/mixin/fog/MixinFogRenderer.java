@@ -3,16 +3,18 @@ package fi.dy.masa.tweakeroo.mixin.fog;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
-
-import fi.dy.masa.tweakeroo.config.Configs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogRenderer;
-import net.minecraft.util.Mth;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(FogRenderer.class)
+import fi.dy.masa.malilib.util.MathUtils;
+import fi.dy.masa.tweakeroo.config.Configs;
+
+@Mixin(value = FogRenderer.class, priority = 900)
 public class MixinFogRenderer
 {
     @WrapOperation(method = "computeFogColor",
@@ -20,7 +22,7 @@ public class MixinFogRenderer
                        target = "Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;voidDarknessOnsetRange()F"))
     private float tweakeroo_disableSkyDarkness(ClientLevel.ClientLevelData instance, Operation<Float> original)
     {
-        return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : instance.voidDarknessOnsetRange();
+        return Configs.Disable.DISABLE_SKY_DARKNESS.getBooleanValue() ? 1.0F : original.call(instance);
     }
 
     @ModifyConstant(method = "setupFog",
@@ -32,7 +34,7 @@ public class MixinFogRenderer
             Minecraft mc = Minecraft.getInstance();
 
             final int viewDistance = mc.options.getEffectiveRenderDistance();
-            final float blocksDistance = Math.max(512.0F, mc.gameRenderer.getGameRenderState().optionsRenderState.renderDistance);
+            final float blocksDistance = MathUtils.max(512.0F, mc.gameRenderer.getGameRenderState().optionsRenderState.renderDistance);
 
             // 42 is the answer :)
             return (int) (blocksDistance / viewDistance);
@@ -51,6 +53,6 @@ public class MixinFogRenderer
             return min;
         }
 
-        return Mth.clamp(value, min, max);
+        return original.call(value, min, max);
     }
 }
