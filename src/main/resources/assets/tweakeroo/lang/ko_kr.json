@@ -1,5 +1,6 @@
 {
     "modmenu.descriptionTranslation.tweakeroo": "설정 가능한 다양한 클라이언트 측 트윅을 추가합니다.",
+    "tweakeroo.config.disable.comment.disableAllTerrainFog": "Disables all environmental terrain fog\n§cThis setting will be disabled if you have Sodium installed",
     "tweakeroo.config.disable.comment.disableArmorStandRendering": "모든 갑옷 거치대 엔티티 렌더링을 비활성화합니다.",
     "tweakeroo.config.disable.comment.disableAtmosphericFog": "플레이어와 렌더 거리 안개 사이에 존재하는\n모든 대기 안개를 비활성화합니다.\n§6NOTE: This setting might conflict if you have other Fog mods enabled",
     "tweakeroo.config.disable.comment.disableAxeStripping": "도끼로 원목 벗기기 기능을 비활성화합니다.",
@@ -50,6 +51,7 @@
     "tweakeroo.config.disable.comment.disableVillagerTradeLocking": "주민과의 거래량이 증가하면 최대 사용량을 늘려서\n주민의 거래가 잠기는 것을 방지합니다.",
     "tweakeroo.config.disable.comment.disableWallUnsprint": "벽에 닿아도 달리기 모드가 해제되지 않습니다.",
     "tweakeroo.config.disable.comment.disableWorldViewBob": "월드의 뷰 밥 흔들림 효과를 비활성화하지만, 손은 비활성화하지 않습니다.\n§cIris가 설치되어 있으면 이 설정은 비활성화 됩니다.",
+    "tweakeroo.config.disable.name.disableAllTerrainFog": "disableAllTerrainFog",
     "tweakeroo.config.disable.name.disableArmorStandRendering": "비활성화 갑옷 거치대 렌더링",
     "tweakeroo.config.disable.name.disableAtmosphericFog": "비활성화 대기 안개",
     "tweakeroo.config.disable.name.disableAxeStripping": "비활성화 도끼 벗기기",
@@ -947,6 +949,7 @@
     "tweakeroo.hotkeys.category.generic_hotkeys": "일반 단축키",
     "tweakeroo.hotkeys.category.tweak_toggle_hotkeys": "토글 단축키 트윅",
     "tweakeroo.label.config_comment.single_player_only": "참고: 이 기능은 싱글 플레이어에서만 완전히 작동합니다.",
+    "tweakeroo.label.config_comment.without_mod_only": "§cNote: This feature only works while '%s' is not installed.§r",
     "tweakeroo.label.placement_restriction_mode.column": "열",
     "tweakeroo.label.placement_restriction_mode.diagonal": "대각",
     "tweakeroo.label.placement_restriction_mode.face": "면",

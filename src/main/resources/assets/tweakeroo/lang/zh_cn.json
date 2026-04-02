@@ -1,5 +1,6 @@
 {
     "modmenu.descriptionTranslation.tweakeroo": "添加了一些可配置的客户端开关",
+    "tweakeroo.config.disable.comment.disableAllTerrainFog": "Disables all environmental terrain fog\n§cThis setting will be disabled if you have Sodium installed",
     "tweakeroo.config.disable.comment.disableArmorStandRendering": "禁用所有盔甲架的渲染",
     "tweakeroo.config.disable.comment.disableAtmosphericFog": "禁用玩家与渲染距离雾效之间存在的所有大气雾效。\n§6NOTE: This setting might conflict if you have other Fog mods enabled",
     "tweakeroo.config.disable.comment.disableAxeStripping": "禁用使用斧头剥离原木等方块",
@@ -50,6 +51,7 @@
     "tweakeroo.config.disable.comment.disableVillagerTradeLocking": "通过同步增加配方使用次数与最大使用次数，\n防止村民交易被永久锁定",
     "tweakeroo.config.disable.comment.disableWallUnsprint": "触碰墙壁时不会退出疾跑状态",
     "tweakeroo.config.disable.comment.disableWorldViewBob": "禁用世界视角的晃动效果（不影响手持物品晃动）\n注意：安装Iris模组时此设置可能失效",
+    "tweakeroo.config.disable.name.disableAllTerrainFog": "disableAllTerrainFog",
     "tweakeroo.config.disable.name.disableArmorStandRendering": "禁用 - 盔甲架渲染",
     "tweakeroo.config.disable.name.disableAtmosphericFog": "禁用 - 大气雾效",
     "tweakeroo.config.disable.name.disableAxeStripping": "禁用 - 斧头去皮",
@@ -947,6 +949,7 @@
     "tweakeroo.hotkeys.category.generic_hotkeys": "通用快捷键",
     "tweakeroo.hotkeys.category.tweak_toggle_hotkeys": "功能切换快捷键",
     "tweakeroo.label.config_comment.single_player_only": "§6注意：此功能仅在单机模式完全生效§r",
+    "tweakeroo.label.config_comment.without_mod_only": "§cNote: This feature only works while '%s' is not installed.§r",
     "tweakeroo.label.placement_restriction_mode.column": "列(法线方向)",
     "tweakeroo.label.placement_restriction_mode.diagonal": "对角线(叉号方形)",
     "tweakeroo.label.placement_restriction_mode.face": "点击面(固定方向表面",
