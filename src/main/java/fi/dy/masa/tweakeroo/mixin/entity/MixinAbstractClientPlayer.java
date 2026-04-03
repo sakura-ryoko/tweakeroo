@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(AbstractClientPlayer.class)
+@Mixin(value = AbstractClientPlayer.class, priority = 1001)
 public abstract class MixinAbstractClientPlayer
 {
 	@WrapOperation(method = "getFieldOfViewModifier",
