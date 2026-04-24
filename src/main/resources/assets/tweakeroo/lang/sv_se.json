@@ -231,7 +231,7 @@
     "tweakeroo.config.feature_toggle.comment.tweakServerDataSync": "Use Server Data Syncer for entities such as Shulker Boxes,\nwhich allows inventoryPreview to work on servers such as with Servux.\n§6You must be an operator of the server or install server-side\n§6mods to make the syncer work even this option is set to true.",
     "tweakeroo.config.feature_toggle.comment.tweakServerDataSyncBackup": "The Server Data Syncer can be configured to use the\nVanilla NbtQueryRequest packets when Servux is not available",
     "tweakeroo.config.feature_toggle.comment.tweakShulkerBoxDisplay": "Enables the Shulker Box contents display when hovering\nover them in an inventory and holding shift",
-    "tweakeroo.config.feature_toggle.comment.tweakSignCopy": "When enabled, placed signs will use the text from\nthe previously placed sign.\nCan be combined with tweakNoSignGui to quickly place copies\nof a sign, by enabling that tweak after making the first sign.",
+    "tweakeroo.config.feature_toggle.comment.tweakSignCopy": "When enabled, placed signs will use the text from\nthe previously placed sign.\nCan be combined with §bdisableSignGui§r to quickly place copies\nof a sign, by enabling that tweak after making the first sign.",
     "tweakeroo.config.feature_toggle.comment.tweakSnapAim": "Enabled a snap aim tweak, to make the player face to pre-set exact yaw rotations",
     "tweakeroo.config.feature_toggle.comment.tweakSnapAimLock": "Enables a snap aim lock, locking the yaw and/or pitch rotations\nto the currently snapped value",
     "tweakeroo.config.feature_toggle.comment.tweakSneak_1_15_2": "Restores the 1.15.2 sneaking behavior",
