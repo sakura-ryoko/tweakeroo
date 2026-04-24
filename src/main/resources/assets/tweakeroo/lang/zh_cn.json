@@ -231,7 +231,7 @@
     "tweakeroo.config.feature_toggle.comment.tweakServerDataSync": "使用服务器数据同步器实现潜影盒预览等功能\n需服务器安装配套模组或拥有管理员权限",
     "tweakeroo.config.feature_toggle.comment.tweakServerDataSyncBackup": "当Servux不可用时，使用原版NbtQueryRequest数据包同步",
     "tweakeroo.config.feature_toggle.comment.tweakShulkerBoxDisplay": "按住Shift悬停潜影盒时显示内容物预览",
-    "tweakeroo.config.feature_toggle.comment.tweakSignCopy": "新放置的告示牌自动复制前次文本\n配合“禁用 - 告示牌界面（disableSignGui）”可快速批量复制告示牌",
+    "tweakeroo.config.feature_toggle.comment.tweakSignCopy": "新放置的告示牌自动复制前次文本\n配合“§b禁用 - 告示牌界面（disableSignGui）”§r可快速批量复制告示牌",
     "tweakeroo.config.feature_toggle.comment.tweakSnapAim": "启用预设角度的精准视角锁定功能",
     "tweakeroo.config.feature_toggle.comment.tweakSnapAimLock": "将视角锁定至当前精准角度\n可单独锁定偏航角/俯仰角",
     "tweakeroo.config.feature_toggle.comment.tweakSneak_1_15_2": "还原1.15.2版本的潜行机制",
