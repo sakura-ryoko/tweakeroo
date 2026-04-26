@@ -6,6 +6,8 @@ import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import fi.dy.masa.malilib.MaLiLibFabricData;
+import fi.dy.masa.malilib.compat.ModIds;
 import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IEnumBooleanHotkey;
@@ -105,10 +107,10 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     TWEAK_SIGN_COPY                 ("tweakSignCopy",                       false, ""),
     TWEAK_SNAP_AIM                  ("tweakSnapAim",                        false, "",    KeybindSettings.INGAME_BOTH),
     TWEAK_SNAP_AIM_LOCK             ("tweakSnapAimLock",                    false, ""),
-    TWEAK_SNEAK_1_15_2              ("tweakSneak_1.15.2",                   false, "","tweakeroo.config.feature_toggle.comment.tweakSneak_1_15_2", "tweakeroo.config.feature_toggle.prettyName.tweakSneak_1_15_2", "tweakeroo.config.feature_toggle.name.tweakSneak_1_15_2"),
+    TWEAK_SNEAK_1_15_2              ("tweakSneak_1.15.2",                   false, "", "", "tweakeroo.config.feature_toggle.comment.tweakSneak_1_15_2", "tweakeroo.config.feature_toggle.prettyName.tweakSneak_1_15_2", "tweakeroo.config.feature_toggle.name.tweakSneak_1_15_2"),
     TWEAK_SPECTATOR_TELEPORT        ("tweakSpectatorTeleport",              false, ""),
     TWEAK_SPYGLASS_USES_TWEAK_ZOOM  ("tweakSpyglassUsesTweakZoom",          false, ""),
-    TWEAK_STRUCTURE_BLOCK_LIMIT     ("tweakStructureBlockLimit",            false, true, ""),
+    TWEAK_STRUCTURE_BLOCK_LIMIT     ("tweakStructureBlockLimit",            false, true, "", ModIds.carpet),
     TWEAK_SWAP_ALMOST_BROKEN_TOOLS  ("tweakSwapAlmostBrokenTools",          false, ""),
     TWEAK_TAB_COMPLETE_COORDINATE   ("tweakTabCompleteCoordinate",          false, ""),
     TWEAK_TOOL_SWITCH               ("tweakToolSwitch",                     false, ""),
@@ -129,6 +131,7 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     private final IKeybind keybind;
     private final boolean defaultValueBoolean;
     private final boolean singlePlayer;
+    private final String modConflict;
     private boolean valueBoolean;
     private IValueChangeCallback<IConfigBoolean> callback;
     private boolean dirty = false;
@@ -136,7 +139,15 @@ public enum FeatureToggle implements IEnumBooleanHotkey
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey)
     {
-        this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT,
+        this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT, "",
+             buildTranslateName(name, "comment"),
+             buildTranslateName(name, "prettyName"),
+             buildTranslateName(name, "name"));
+    }
+
+    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String modConflict)
+    {
+        this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT, modConflict,
                 buildTranslateName(name, "comment"),
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
@@ -144,7 +155,15 @@ public enum FeatureToggle implements IEnumBooleanHotkey
 
     FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings)
     {
-        this(name, defaultValue, false, defaultHotkey, settings,
+        this(name, defaultValue, false, defaultHotkey, settings, "",
+             buildTranslateName(name, "comment"),
+             buildTranslateName(name, "prettyName"),
+             buildTranslateName(name, "name"));
+    }
+
+    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings, String modConflict)
+    {
+        this(name, defaultValue, false, defaultHotkey, settings, modConflict,
                 buildTranslateName(name, "comment"),
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
@@ -152,87 +171,96 @@ public enum FeatureToggle implements IEnumBooleanHotkey
 
     FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey)
     {
-        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
+        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT, "",
+             buildTranslateName(name, "comment"),
+             buildTranslateName(name, "prettyName"),
+             buildTranslateName(name, "name"));
+    }
+
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String modConflict)
+    {
+        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT, modConflict,
                 buildTranslateName(name, "comment"),
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName, String translatedName)
+    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String modConflict, String comment, String prettyName, String translatedName)
     {
-        this(name, defaultValue, false, defaultHotkey,
-                comment,
-                prettyName,
-                translatedName);
+        this(name, defaultValue, false, defaultHotkey, modConflict,
+             comment,
+             prettyName,
+             translatedName);
     }
 
-    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment, String prettyName, String translatedName)
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String modConflict, String comment, String prettyName, String translatedName)
     {
-        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
+        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT, modConflict,
                 comment,
                 prettyName,
                 translatedName);
     }
 
     // Backwards Compatible constructors - START
-    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment)
+    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String modConflict, String comment)
     {
-        this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT,
+        this(name, defaultValue, false, defaultHotkey, KeybindSettings.DEFAULT, modConflict,
                 comment,
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment)
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String modConflict, String comment)
     {
-        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
+        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT, modConflict,
                 comment,
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings, String comment)
+    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, KeybindSettings settings, String modConflict, String comment)
     {
-        this(name, defaultValue, false, defaultHotkey, settings,
+        this(name, defaultValue, false, defaultHotkey, settings, modConflict,
                 comment,
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment)
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String modConflict, String comment)
     {
-        this(name, defaultValue, singlePlayer, defaultHotkey, settings,
+        this(name, defaultValue, singlePlayer, defaultHotkey, settings, modConflict,
                 comment,
                 buildTranslateName(name, "prettyName"),
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String comment, String prettyName)
+    FeatureToggle(String name, boolean defaultValue, String defaultHotkey, String modConflict, String comment, String prettyName)
     {
-        this(name, defaultValue, false, defaultHotkey,
+        this(name, defaultValue, false, defaultHotkey, modConflict,
                 comment,
                 prettyName,
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String comment, String prettyName)
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, String modConflict, String comment, String prettyName)
     {
-        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT,
+        this(name, defaultValue, singlePlayer, defaultHotkey, KeybindSettings.DEFAULT, modConflict,
                 comment,
                 prettyName,
                 buildTranslateName(name, "name"));
     }
 
-    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment, String prettyName)
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String modConflict, String comment, String prettyName)
     {
         this(name, defaultValue, singlePlayer, defaultHotkey, settings,
+                modConflict,
                 comment,
                 prettyName,
                 buildTranslateName(name, "name"));
     }
     // Backwards Compatible constructors - END
 
-    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String comment, String prettyName, String translatedName)
+    FeatureToggle(String name, boolean defaultValue, boolean singlePlayer, String defaultHotkey, KeybindSettings settings, String modConflict, String comment, String prettyName, String translatedName)
     {
         this.name = name;
         this.valueBoolean = defaultValue;
@@ -243,6 +271,7 @@ public enum FeatureToggle implements IEnumBooleanHotkey
         this.translatedName = translatedName;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey, settings);
         this.keybind.setCallback(new KeyCallbackToggleBooleanConfigWithMessage(this));
+        this.modConflict = modConflict;
         this.updateLastBooleanHotkeyValue();
     }
 
@@ -255,10 +284,14 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     @Override
     public String getName()
     {
-        if (this.singlePlayer)
-        {
-            return GuiBase.TXT_GOLD + this.name + GuiBase.TXT_RST;
-        }
+//        if (!this.modConflict.isEmpty())
+//        {
+//            return GuiBase.TXT_RED + this.name + GuiBase.TXT_RST;
+//        }
+//        else if (this.singlePlayer)
+//        {
+//            return GuiBase.TXT_GOLD + this.name + GuiBase.TXT_RST;
+//        }
 
         return this.name;
     }
@@ -268,9 +301,13 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     {
         String name = StringUtils.getTranslatedOrFallback(this.translatedName, this.name);
 
-        if (this.singlePlayer)
+        if (!this.modConflict.isEmpty() && MaLiLibFabricData.ALL_MOD_VERSIONS.containsKey(this.modConflict))
         {
-            name = GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
+            return GuiBase.TXT_RED + name + GuiBase.TXT_RST;
+        }
+        else if (this.singlePlayer)
+        {
+            return GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
         }
 
         return name;
@@ -288,7 +325,11 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     {
         String name = StringUtils.getTranslatedOrFallback(this.translatedName, this.name);
 
-        if (this.singlePlayer)
+        if (!this.modConflict.isEmpty() && MaLiLibFabricData.ALL_MOD_VERSIONS.containsKey(this.modConflict))
+        {
+            name = GuiBase.TXT_RED + name + GuiBase.TXT_RST;
+        }
+        else if (this.singlePlayer)
         {
             name = GuiBase.TXT_GOLD + name + GuiBase.TXT_RST;
         }
@@ -303,7 +344,11 @@ public enum FeatureToggle implements IEnumBooleanHotkey
 
         if (comment != null && this.singlePlayer)
         {
-            return comment + "\n" + StringUtils.translate("tweakeroo.label.config_comment.single_player_only");
+            comment = comment + "\n" + StringUtils.translate("tweakeroo.label.config_comment.single_player_only");
+        }
+        if (comment != null && !this.modConflict.isEmpty() && MaLiLibFabricData.ALL_MOD_VERSIONS.containsKey(this.modConflict))
+        {
+            comment = comment + "\n" + StringUtils.translate("tweakeroo.label.config_comment.without_mod_only", this.modConflict);
         }
 
         //System.out.printf("FeatureToggle#getComment(): comment [%s] // test [%s]\n", this.comment, comment);

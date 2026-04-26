@@ -927,8 +927,6 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         this.pendingBlockEntitiesQueue.remove(pos);
         if (data == null || this.getClientWorld() == null) return null;
 
-        System.out.printf("handleBlockEntityData[%s] --> %s\n", pos.toShortString(), nbt.toString());
-
         BlockEntity blockEntity = this.getClientWorld().getBlockEntity(pos);
 
         if (blockEntity != null && (type == null || type.equals(BlockEntityType.getKey(blockEntity.getType()))))

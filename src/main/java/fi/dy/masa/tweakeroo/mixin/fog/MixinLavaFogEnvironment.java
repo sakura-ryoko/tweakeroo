@@ -13,25 +13,25 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.LavaFogEnvironment;
 
-@Mixin(LavaFogEnvironment.class)
+@Mixin(value = LavaFogEnvironment.class, priority = 900)
 public class MixinLavaFogEnvironment
 {
     @Inject(method = "setupFog", at = @At("RETURN"))
-    private void tweakeroo_redirectLavaFog(FogData data, Camera camera, ClientLevel clientWorld, float f,
-                                           DeltaTracker renderTickCounter, CallbackInfo ci)
+    private void tweakeroo_redirectLavaFog(FogData fog, Camera camera, ClientLevel level, float renderDistance,
+                                           DeltaTracker deltaTracker, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_LAVA_VISIBILITY.getBooleanValue())
         {
-            if (data.environmentalStart == 0.25F)
+            if (fog.environmentalStart == 0.25F)
             {
-                data.environmentalStart = 0.0F;
+                fog.environmentalStart = 0.0F;
             }
 
-            final float adjusted = RenderUtils.calculateLiquidFogDistance(camera.entity(), data.environmentalEnd, false);
+            final float adjusted = RenderUtils.calculateLiquidFogDistance(camera.entity(), fog.environmentalEnd, false);
 
-            if (data.environmentalEnd != adjusted)
+            if (fog.environmentalEnd != adjusted)
             {
-                data.environmentalEnd = adjusted;
+                fog.environmentalEnd = adjusted;
             }
         }
     }
