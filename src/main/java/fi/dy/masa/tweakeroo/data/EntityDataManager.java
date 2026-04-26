@@ -945,9 +945,12 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                 this.blockEntityCache.put(pos, Pair.of(System.currentTimeMillis(), Pair.of(blockEntity, data)));
             }
 
-            NbtView view = NbtView.getReader(data, this.getClientWorld().registryAccess());
+            if (blockEntity instanceof Container)
+            {
+                NbtView view = NbtView.getReader(data, this.getClientWorld().registryAccess());
+                blockEntity.loadWithComponents(view.getReader());
+            }
 
-            blockEntity.loadWithComponents(view.getReader());
             return blockEntity;
         }
 
