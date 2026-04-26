@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.renderer;
 
+import java.util.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,7 @@ import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.data.DataBlockUtils;
 import fi.dy.masa.malilib.util.data.DataEntityUtils;
 import fi.dy.masa.malilib.util.data.tag.CompoundData;
+import fi.dy.masa.malilib.util.data.tag.ListData;
 import fi.dy.masa.malilib.util.data.tag.converter.DataConverterNbt;
 import fi.dy.masa.malilib.util.game.RayTraceUtils;
 import fi.dy.masa.malilib.util.nbt.NbtInventory;
@@ -195,6 +197,15 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
             if (blockTmp instanceof EntityBlock)
             {
+                Optional<NbtInventory> combinedInv = this.getCombinedInventory(world, pos);
+                ListData list = null;
+
+                if (combinedInv.isPresent())
+                {
+                    NbtInventory inventory = combinedInv.get();
+                    list = inventory.sorted().toDataList(world.registryAccess());
+                }
+
                 if (world instanceof ServerLevel)
                 {
                     be = world.getChunkAt(pos).getBlockEntity(pos);
@@ -202,6 +213,12 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     if (be != null)
                     {
 	                    data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
+
+                        if (list != null && !list.isEmpty())
+                        {
+                            data.remove(NbtKeys.ITEMS);
+                            data.put(NbtKeys.ITEMS, list);
+                        }
                     }
                 }
                 else
@@ -211,6 +228,12 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     if (pair != null)
                     {
                         data = pair.getRight();
+
+                        if (list != null && !list.isEmpty())
+                        {
+                            data.remove(NbtKeys.ITEMS);
+                            data.put(NbtKeys.ITEMS, list);
+                        }
                     }
                 }
 
@@ -445,6 +468,27 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         this.context = new InventoryOverlayContext(InventoryOverlay.getBestInventoryType(inv, data), inv, be != null ? be : world.getBlockEntity(pos), null, data, this.getRefreshHandler());
 
         return this.context;
+    }
+
+    public Optional<NbtInventory> getCombinedInventory(Level world, BlockPos pos)
+    {
+        Container inv;
+
+        if (world instanceof ServerLevel)
+        {
+            inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
+        }
+        else
+        {
+            inv = this.getDataSyncer().getBlockInventory(world, pos, false);
+        }
+
+        if (inv != null && inv.getContainerSize() >= NbtInventory.DEFAULT_SIZE)
+        {
+            return Optional.of(NbtInventory.fromInventory(inv));
+        }
+
+        return Optional.empty();
     }
 
     @Override
