@@ -919,9 +919,9 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         return this.handleEntityData(entityId, DataConverterNbt.fromVanillaCompound(nbt));
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
-    public BlockEntity handleBlockEntityData(BlockPos pos, CompoundData data, @javax.annotation.Nullable Identifier type)
+    public BlockEntity handleBlockEntityData(BlockPos pos, CompoundData data, @Nullable Identifier type)
     {
         this.pendingBlockEntitiesQueue.remove(pos);
         if (data == null || this.getClientWorld() == null) return null;
@@ -991,7 +991,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         return null;
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     public Entity handleEntityData(int entityId, CompoundData data)
     {
