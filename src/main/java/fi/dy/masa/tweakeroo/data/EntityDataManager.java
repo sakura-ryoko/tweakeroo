@@ -921,14 +921,12 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         return this.handleEntityData(entityId, DataConverterNbt.fromVanillaCompound(nbt));
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     public BlockEntity handleBlockEntityData(BlockPos pos, CompoundData data, @javax.annotation.Nullable Identifier type)
     {
         this.pendingBlockEntitiesQueue.remove(pos);
         if (data == null || this.getClientWorld() == null) return null;
-
-        System.out.printf("handleBlockEntityData[%s] --> %s\n", pos.toShortString(), nbt.toString());
 
         BlockEntity blockEntity = this.getClientWorld().getBlockEntity(pos);
 
