@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.block.*;
@@ -85,9 +86,9 @@ public class PlacementHandler
     /**
      * BlackList for Block States.  Entries here will be reset to their default value.
      */
-    public static final ImmutableSet<Property<?>> BLACKLISTED_PROPERTIES = ImmutableSet.of(
-            Properties.WATERLOGGED,
-            Properties.POWERED
+    public static final ImmutableMap<Property<?>, ? extends Comparable<?>> BLACKLISTED_PROPERTIES = ImmutableMap.of(
+            Properties.WATERLOGGED,       Boolean.FALSE,
+            Properties.POWERED,           Boolean.FALSE
     );
 
     public static EasyPlacementProtocol getEffectiveProtocolVersion()
@@ -200,7 +201,7 @@ public class PlacementHandler
     {
         int protocolValue = (int) (context.getHitVec().x - (double) context.getPos().getX()) - 2;
         BlockState oldState = state;
-        //System.out.printf("[PHv3] hit vec.x %s, pos.x: %s\n", context.getHitVec().getX(), context.getPos().getX());
+        //System.out.printf("[PHv3] hit vec.x %s, pos.x: %s\n", context.getHitVec().x(), context.getPos().getX());
         //System.out.printf("[PHv3] state in %s\n", state.toString());
         //System.out.printf("[PHv3] raw protocol value in: 0x%08X\n", protocolValue);
 
@@ -253,21 +254,15 @@ public class PlacementHandler
         {
             for (Property<?> p : propList)
             {
-                if ((property.isPresent() && !property.get().equals(p)) ||
-                    (property.isEmpty()) &&
-                    WHITELISTED_PROPERTIES.contains(p))
-                    //WHITELISTED_PROPERTIES.contains(p) &&
-                    //!BLACKLISTED_PROPERTIES.contains(p))
+                //System.out.printf("[PHv3] check property [%s], whitelisted [%s], blacklisted [%s]\n", p.getName(), WHITELISTED_PROPERTIES.contains(p), BLACKLISTED_PROPERTIES.containsKey(p));
 
-                /*
                 if (property.isPresent() && property.get().equals(p))
                 {
                     //System.out.printf("[PHv3] skipping prot val: 0x%08X [Property %s]\n", protocolValue, p.getName());
                     continue;
                 }
                 else if (WHITELISTED_PROPERTIES.contains(p) &&
-                        !BLACKLISTED_PROPERTIES.contains(p))
-                 */
+                        !BLACKLISTED_PROPERTIES.containsKey(p))
                 {
                     @SuppressWarnings("unchecked")
                     Property<T> prop = (Property<T>) p;
@@ -320,15 +315,15 @@ public class PlacementHandler
 
         // Strip Blacklisted properties, and use the Block's default state.
         // This needs to be done after the initial loop, or it breaks compatibility
-        for (Property<?> p : BLACKLISTED_PROPERTIES)
+        for (Property<?> p : BLACKLISTED_PROPERTIES.keySet())
         {
             if (state.contains(p))
             {
                 @SuppressWarnings("unchecked")
                 Property<T> prop = (Property<T>) p;
-                BlockState def = state.getBlock().getDefaultState();
-                state = state.with(prop, def.get(prop));
-                //System.out.printf("[PHv3] blacklisted state [%s] found, setting default value\n", prop.getName());
+//                BlockState def = state.getBlock().defaultBlockState();
+                state = state.with(prop, (T) BLACKLISTED_PROPERTIES.get(p));
+                //System.out.printf("[PHv3] blacklisted state [%s] found, setting value\n", prop.getName());
             }
         }
 
