@@ -1,5 +1,9 @@
 {
     "modmenu.descriptionTranslation.tweakeroo": "Adds a bunch of configurable client-side tweaks",
+    "tweakeroo.config.generic.comment.translationLanguage": "Set Tweakeroo's language independently of\nMinecraft's Language setting.\nRequires MaLiLib's §btranslationOverrides§r to be enabled.\nBe aware that enabling §btranslationTryBaseLanguage§r\nallows MaLiLib to override this choice.\n§eChanges only take effect after closing\n§eand re-opening the config screen.",
+    "tweakeroo.config.generic.comment.translationTryBaseLanguage": "Enable tracking MaLiLib's configured language.\nLeave this disabled to customize Tweakeroo's\nlanguage independently.\n§eYou may need to open/close this config\n§escreen for the changes to take effect.",
+    "tweakeroo.config.generic.name.translationLanguage": "translationLanguage",
+    "tweakeroo.config.generic.name.translationTryBaseLanguage": "translationTryBaseLanguage",
     "tweakeroo.config.disable.comment.disableAllTerrainFog": "Disables all environmental terrain fog\n§cThis setting will be disabled if you have Sodium installed",
     "tweakeroo.config.disable.comment.disableArmorStandRendering": "Disables all Armor Stand entity rendering",
     "tweakeroo.config.disable.comment.disableAtmosphericFog": "Disables all Atmospheric Fog that exists\nbetween the player and the Render Distance Fog.\n§6NOTE: This setting might conflict if you have other Fog mods enabled",
