@@ -26,6 +26,10 @@ public class InitHandler implements IInitializationHandler
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(
                 new ModInfo(Reference.MOD_ID, Reference.MOD_NAME, GuiConfigs::new)
         );
+        Configs.LANG.ifPresent(
+                i18nManager ->
+                        Registry.TRANSLATION_OVERRIDE_MANAGER.registerTranslationManager(Reference.MOD_ID, i18nManager)
+        );
         EntityDataManager.getInstance().onGameInit();
 
         InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());

@@ -90,6 +90,7 @@ public class WorldLoadListener implements IWorldLoadListener
 				this.readStoredDataGlobal();
 			}
 
+			Configs.checkBaseLanguage();
 //	        this.readStoredDataPerDimension();
             EntityDataManager.getInstance().onWorldJoin();
 			CachedTagManager.startCache();
