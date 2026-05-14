@@ -2,6 +2,8 @@ package fi.dy.masa.tweakeroo.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -18,6 +20,11 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.HandSlot;
 import fi.dy.masa.malilib.util.MessageOutputType;
 import fi.dy.masa.malilib.util.data.json.JsonUtils;
+import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.*;
+import fi.dy.masa.malilib.util.i18n.i18nConfig;
+import fi.dy.masa.malilib.util.i18n.i18nManager;
+import fi.dy.masa.malilib.util.i18n.i18nOption;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
@@ -33,6 +40,7 @@ import fi.dy.masa.tweakeroo.util.SnapAimMode;
 public class Configs implements IConfigHandler
 {
     private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
+    public static final Optional<i18nManager> LANG = Optional.ofNullable(i18nManager.create(Reference.MOD_ID));
 
     private static final String GENERIC_KEY = Reference.MOD_ID+".config.generic";
     private static final String FIXES_KEY = Reference.MOD_ID+".config.fixes";
@@ -160,6 +168,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_ORES			= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOres", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_SILK_TOUCH_OVERRIDE		= new ConfigBooleanHotkeyed ("toolSwapSilkTouchOverride", false, "").apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	TOOL_SWAP_PICKAXE_OVERRIDE		    = new ConfigBooleanHotkeyed ("toolSwapPickaxeOverride", false, "").apply(GENERIC_KEY);
+        public static final ConfigBoolean           TRANSLATION_TRY_BASE_LANGUAGE       = new ConfigBoolean("translationTryBaseLanguage",false).apply(GENERIC_KEY);
+        public static final ConfigOptionList        TRANSLATION_LANGUAGE                = new ConfigOptionList("translationLanguage", new i18nConfig(LANG.orElseThrow())).apply(GENERIC_KEY);
         public static final ConfigOptionList    	UTILITY_HAND_SLOT                   = new ConfigOptionList  ("utilityHandSlot", HandSlot.MAIN_HAND).apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", true, "").apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
@@ -292,6 +302,8 @@ public class Configs implements IConfigHandler
                 TOOL_SWAP_SILK_TOUCH_ORES,
                 TOOL_SWAP_SILK_TOUCH_OVERRIDE,
                 TOOL_SWAP_PICKAXE_OVERRIDE,
+                TRANSLATION_TRY_BASE_LANGUAGE,
+                TRANSLATION_LANGUAGE,
                 WEAPON_SWAP_BETTER_ENCHANTS,
                 ZOOM_FOV,
                 ZOOM_FOV_DIFFERENCE,
@@ -576,6 +588,8 @@ public class Configs implements IConfigHandler
             Tweakeroo.LOGGER.error("loadFromFile(): Failed to load config file '{}'.", configFile.toAbsolutePath());
         }
 
+        checkBaseLanguage();
+
         // TODO 1.19.3+
         //CreativeExtraItems.setCreativeExtraItems(Lists.CREATIVE_EXTRA_ITEMS.getStrings());
 
@@ -672,5 +686,35 @@ public class Configs implements IConfigHandler
     public void save()
     {
         saveToFile();
+    }
+    // Attempts to load the same language file as MaLiLib; where available -- on occasion
+
+    public static void checkBaseLanguage()
+    {
+        if (Generic.TRANSLATION_TRY_BASE_LANGUAGE.getBooleanValue())
+        {
+            LANG.ifPresent(
+                    i18nManager ->
+                    {
+                        String baseKey = Registry.TRANSLATION_OVERRIDE_MANAGER.getBaseLanguageCode();
+
+                        // Try setting language if it doesn't match
+                        if (!i18nManager.getLang().getLangCode().equals(baseKey))
+                        {
+                            List<i18nOption> list = i18nManager.getLanguageOptions();
+
+                            for (i18nOption entry : list)
+                            {
+                                if (entry.getKey().equals(baseKey))
+                                {
+                                    i18nConfig newConfig = ((i18nConfig) Generic.TRANSLATION_LANGUAGE.getOptionListValue()).fromString(baseKey);
+                                    Generic.TRANSLATION_LANGUAGE.setOptionListValue(newConfig);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+            );
+        }
     }
 }
