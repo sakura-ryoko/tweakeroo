@@ -69,8 +69,6 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 public class FakeWorld extends Level
 {
     private static final ResourceKey<Level> REGISTRY_KEY = ResourceKey.create(Registries.DIMENSION, Identifier.fromNamespaceAndPath(Reference.MOD_ID, "selective_world"));
-    private static final ClientLevel.ClientLevelData LEVEL_INFO = new ClientLevel.ClientLevelData(Difficulty.PEACEFUL, false, true);
-    private static final Holder<DimensionType> DIMENSION_TYPE = RenderTweaks.getDynamicRegistryManager().getOrThrow(BuiltinDimensionTypes.OVERWORLD);
 
     private final Minecraft mc;
     private final FakeChunkManager chunkManager;
@@ -95,7 +93,22 @@ public class FakeWorld extends Level
 
     public FakeWorld(RegistryAccess registryManager, int loadDistance)
     {
-        this(registryManager, LEVEL_INFO, DIMENSION_TYPE, Profiler::get, loadDistance);
+        this(registryManager,
+             new ClientLevel.ClientLevelData(Difficulty.PEACEFUL, false, true),
+             dimensionWrapper(registryManager),
+             Profiler::get, loadDistance);
+    }
+
+    private static Holder<DimensionType> dimensionWrapper(RegistryAccess registry)
+    {
+        Level world = Minecraft.getInstance().level;
+
+        if (world != null)
+        {
+            return world.dimensionTypeRegistration();
+        }
+
+        return registry.getOrThrow(BuiltinDimensionTypes.OVERWORLD);
     }
 
     public ProfilerFiller getProfiler()
