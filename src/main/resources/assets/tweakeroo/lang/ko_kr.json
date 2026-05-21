@@ -205,7 +205,7 @@
     "tweakeroo.config.feature_toggle.comment.tweakMatchingSkyFog": "활성화된 경우, 오버월드의 안개가 하늘의 색상과 일치되어\n훨씬 멋진 연속된 하늘을 표현합니다. 특히 렌더 거리\n안개가 비활성화된 경우 효과적입니다.\n§6NOTE: This setting might conflict if you have other Fog mods enabled",
     "tweakeroo.config.feature_toggle.comment.tweakMovementKeysLast": "활성화된 경우, 반대편 이동 키가 서로 취소되지 않고\n대신 마지막으로 누른 키가 활성 입력이 됩니다.",
     "tweakeroo.config.feature_toggle.comment.tweakPeriodicAttack": "반복 공격(왼쪽 클릭)을 활성화합니다.\n일반 -> 반복 공격 간격에서 간격을 설정합니다.",
-    "tweakeroo.config.feature_toggle.comment.tweakPeriodicHoldAttack": "설정한 시간 만큼 공격 누르기 반복을 활성화합니다.\n일반 -> 반복 공격 누르기 간격에서 간격을 설정하고,\n간격 반복 공격 누르기 시간에서 시간을 설정합니다.\n§6참고: 공격 누르기 또는 반복 공격과 동시에 사용해서는 안 됩니다.",
+    "tweakeroo.config.feature_toggle.comment.tweakPeriodicHoldAttack": "설정한 시간 만큼 공격 누르기 반복을 활성화합니다.\n일반 -> 반복 공격 누르기 간격에서 간격을 설정하고,\n반복 공격 누르기 시간에서 시간을 설정합니다.\n§6참고: 공격 누르기 또는 반복 공격과 동시에 사용해서는 안 됩니다.",
     "tweakeroo.config.feature_toggle.comment.tweakPeriodicHoldUse": "설정한 시간 만큼 사용 누르기 반복을 활성화합니다.\n일반 -> 반복 사용 누르기 간격에서 간격을 설정하고,\n간격 반복 사용 누르기 시간에서 시간을 설정합니다.\n§6참고: 사용 누르기 또는 반복 사용과 동시에 사용해서는 안 됩니다.",
     "tweakeroo.config.feature_toggle.comment.tweakPeriodicUse": "반복 사용(오른쪽 클릭)을 활성화합니다.\n일반 -> 반복 사용 간격에서 간격을 설정합니다.",
     "tweakeroo.config.feature_toggle.comment.tweakPermanentSneak": "활성화된 경우, 플레이어는 항상 웅크리기 상태가 됩니다.",
