@@ -820,6 +820,14 @@ public class PlacementTweaks
             Vec3d hitVecIn,
             Hand hand)
     {
+        // 修复mod拓展手的数量问题
+        // Fix for mods that extend the Hand enum (e.g. Accessorify/Accessories)
+        // causing ArrayIndexOutOfBoundsException because stackBeforeUse is hardcoded to size 2.
+        if (hand.ordinal() >= stackBeforeUse.length)
+        {
+            return ActionResult.PASS;
+        }
+        
         //System.out.printf("processRightClickBlockWrapper() start @ %s, side: %s, hand: %s\n", posIn, sideIn, hand);
         if (FeatureToggle.TWEAK_PLACEMENT_LIMIT.getBooleanValue() &&
             placementCount >= Configs.Generic.PLACEMENT_LIMIT.getIntegerValue())
