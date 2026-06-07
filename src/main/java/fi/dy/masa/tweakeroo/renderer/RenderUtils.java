@@ -35,7 +35,7 @@ public class RenderUtils
     {
         Player player = ctx.mc().player;
 
-        if (player != null && ctx.mc().screen == null)
+        if (player != null && ctx.mc().gui.screen() == null)
         {
             final int scaledWidth = GuiUtils.getScaledWindowWidth();
             final int scaledHeight = GuiUtils.getScaledWindowHeight();
@@ -70,7 +70,7 @@ public class RenderUtils
             Font textRenderer = ctx.fontRenderer();
             Matrix4f modelViewMatrix = new Matrix4f();
 
-            modelViewMatrix.set(RenderSystem.getModelViewMatrix());
+            modelViewMatrix.set(RenderSystem.getModelViewMatrixCopy());
             fi.dy.masa.malilib.render.RenderUtils.drawTexturedRect(ctx, AbstractContainerScreen.INVENTORY_LOCATION, x - 1, y - 1, 7, 83, 9 * 18, 3 * 18);
 
 	        ctx.drawString(textRenderer, "1", x - 10, y +  4, 0xFFFFFF);
@@ -95,7 +95,7 @@ public class RenderUtils
                 x = startX;
             }
 
-            RenderSystem.getModelViewMatrix().set(modelViewMatrix);
+            RenderSystem.getModelViewMatrixCopy().set(modelViewMatrix);
         }
     }
 

@@ -23,11 +23,11 @@ public abstract class MixinSlimeBlock extends HalfTransparentBlock
     }
 
     @Inject(method = "stepOn", at = @At("HEAD"), cancellable = true)
-    private void onEntityWalkOnSlime(Level worldIn, BlockPos pos, BlockState state, Entity entityIn, CallbackInfo ci)
+    private void onEntityWalkOnSlime(Level level, BlockPos pos, BlockState onState, Entity entity, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.getBooleanValue() && entityIn instanceof Player)
+        if (Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.getBooleanValue() && entity instanceof Player)
         {
-            super.stepOn(worldIn, pos, state, entityIn);
+            super.stepOn(level, pos, onState, entity);
             ci.cancel();
         }
     }

@@ -32,9 +32,9 @@ public abstract class MixinLevel
     }
 
     @Inject(method = "guardEntityTick(Ljava/util/function/Consumer;Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
-    private <T extends Entity> void preventEntityTicking(Consumer<T> consumer, T entityIn, CallbackInfo ci)
+    private <T extends Entity> void preventEntityTicking(Consumer<T> tick, T entity, CallbackInfo ci)
     {
-        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && (entityIn instanceof Player) == false)
+        if (Configs.Disable.DISABLE_ENTITY_TICKING.getBooleanValue() && (entity instanceof Player) == false)
         {
             ci.cancel();
         }
@@ -44,7 +44,7 @@ public abstract class MixinLevel
      * Copied From Tweak Fork by Andrew54757
      */
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("HEAD"), cancellable = true)
-    private void setBlockStateInject(BlockPos pos, BlockState state, int flags, int maxUpdateDepth, CallbackInfoReturnable<Boolean> ci)
+    private void setBlockStateInject(BlockPos pos, BlockState blockState, int updateFlags, int updateLimit, CallbackInfoReturnable<Boolean> ci)
     {
         if (!this.isClientSide)
         {
@@ -53,13 +53,13 @@ public abstract class MixinLevel
 
         if (!RenderTweaks.isPositionValidForRendering(pos))
         {
-            if ((flags & RenderTweaks.PASSTHROUGH) != 0)
+            if ((updateFlags & RenderTweaks.PASSTHROUGH) != 0)
             {
                 return;
             }
 
             Minecraft mc = Minecraft.getInstance();
-            RenderTweaks.setFakeBlockState(mc.level, pos, state, null);
+            RenderTweaks.setFakeBlockState(mc.level, pos, blockState, null);
             ci.setReturnValue(false);
         }
     }

@@ -17,7 +17,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 public class MixinBundleItem
 {
     @Inject(method = "getTooltipImage", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_getTooltipData(ItemStack stack, CallbackInfoReturnable<Optional<TooltipComponent>> cir)
+    private void tweakeroo_getTooltipData(ItemStack bundle, CallbackInfoReturnable<Optional<TooltipComponent>> cir)
     {
         if (FeatureToggle.TWEAK_BUNDLE_DISPLAY.getBooleanValue() &&
             Configs.Generic.BUNDLE_DISPLAY_REQUIRE_SHIFT.getBooleanValue() &&

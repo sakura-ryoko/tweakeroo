@@ -13,7 +13,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 @Mixin(ScreenEffectRenderer.class)
 public abstract class MixinScreenEffectRenderer
 {
-    @WrapOperation(method = "renderScreenEffect",
+    @WrapOperation(method = "submit",
                    at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/player/LocalPlayer;isOnFire()Z"))
     private boolean tweakeroo_disableFireOverlay(LocalPlayer instance, Operation<Boolean> original)

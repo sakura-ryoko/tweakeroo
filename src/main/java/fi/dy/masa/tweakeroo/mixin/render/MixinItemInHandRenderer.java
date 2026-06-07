@@ -27,14 +27,15 @@ public abstract class MixinItemInHandRenderer
         return Configs.Disable.DISABLE_ITEM_SWITCH_COOLDOWN.getBooleanValue() ? 1.0F : original.call(instance, v);
     }
 
-    @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "submitArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
+            at = @At("HEAD"), cancellable = true)
     private void tweakeroo_preventOffhandRendering(AbstractClientPlayer player,
-                                                   float tickProgress, float pitch,
-												   InteractionHand hand,
-												   float swingProgress, ItemStack item,
-												   float equipProgress, PoseStack matrices,
-												   SubmitNodeCollector orderedRenderCommandQueue,
-												   int light, CallbackInfo ci)
+                                                   float frameInterp, float xRot,
+                                                   InteractionHand hand,
+                                                   float attack, ItemStack itemStack,
+                                                   float inverseArmHeight, PoseStack poseStack,
+                                                   SubmitNodeCollector submitNodeCollector,
+                                                   int lightCoords, CallbackInfo ci)
     {
         if (hand == InteractionHand.OFF_HAND && Configs.Disable.DISABLE_OFFHAND_RENDERING.getBooleanValue())
         {

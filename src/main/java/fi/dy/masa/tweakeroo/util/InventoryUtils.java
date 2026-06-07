@@ -20,10 +20,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +44,7 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinBlockBehaviour;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
 
 public class InventoryUtils
@@ -1242,7 +1239,7 @@ public class InventoryUtils
         if (player == null || GuiUtils.getCurrentScreen() != null) { return; }
         AbstractContainerMenu container = player.containerMenu;
         @SuppressWarnings("deprecation")
-        Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityType.PLAYER.builtInRegistryHolder()) && s.getDamageValue() < s.getMaxDamage() - 10;
+        Predicate<ItemStack> filter = (s) -> s.getItem().equals(Items.ELYTRA) && s.get(DataComponents.EQUIPPABLE).canBeEquippedBy(EntityTypes.PLAYER.builtInRegistryHolder()) && s.getDamageValue() < s.getMaxDamage() - 10;
 
         int targetSlot = findSlotWithBestItemMatch(container, (testedStack, previousBestMatch) ->
         {
@@ -1400,7 +1397,7 @@ public class InventoryUtils
 
         stack.forEachModifier(slot, (entry, modifier, consumer) ->
         {
-            if (entry.unwrapKey().orElseThrow() == Attributes.ARMOR || entry.unwrapKey().orElseThrow() == Attributes.ARMOR_TOUGHNESS)
+            if (entry == Attributes.ARMOR || entry == Attributes.ARMOR_TOUGHNESS)
             {
                 switch (modifier.operation())
                 {
@@ -1758,7 +1755,7 @@ public class InventoryUtils
         {
             BlockPos pos = ((BlockHitResult) trace).getBlockPos();
             BlockState stateTargeted = world.getBlockState(pos);
-            ItemStack stack = ((IMixinAbstractBlock) stateTargeted.getBlock()).tweakeroo_getPickStack(world, pos, stateTargeted, false);
+            ItemStack stack = ((IMixinBlockBehaviour) stateTargeted.getBlock()).tweakeroo_getPickStack(world, pos, stateTargeted, false);
 
             if (stack.isEmpty() == false && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, player.getMainHandItem()) == false)
             {

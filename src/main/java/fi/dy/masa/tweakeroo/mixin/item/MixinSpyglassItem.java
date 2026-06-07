@@ -18,7 +18,7 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 public class MixinSpyglassItem
 {
 	@Inject(method = "use", at = @At("RETURN"))
-	private void tweakeroo_onSpyglassActivate(Level level, Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir)
+	private void tweakeroo_onSpyglassActivate(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
 	{
 		if (cir.getReturnValue() == InteractionResult.CONSUME)
 		{
@@ -29,7 +29,7 @@ public class MixinSpyglassItem
 	}
 
 	@Inject(method = "stopUsing", at = @At("TAIL"))
-	private void tweakeroo_onSpyglassDeactivate(LivingEntity livingEntity, CallbackInfo ci)
+	private void tweakeroo_onSpyglassDeactivate(LivingEntity entity, CallbackInfo ci)
 	{
 		// Don't check if the Tweak is active; just mark as not in use
 		// in case someone decides to toggle it while already using.

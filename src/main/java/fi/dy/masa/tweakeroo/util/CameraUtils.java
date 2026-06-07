@@ -2,14 +2,16 @@ package fi.dy.masa.tweakeroo.util;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -106,7 +108,7 @@ public class CameraUtils
                 {
                     if (isClientChunkLoaded(mc.level, cx, cz))
                     {
-                        markChunkForReRender(mc.levelRenderer, cx, cz);
+                        markChunkForReRender(mc.levelExtractor, cx, cz);
                     }
                 }
             }
@@ -123,7 +125,7 @@ public class CameraUtils
                 {
                     if (isClientChunkLoaded(mc.level, cx, cz))
                     {
-                        markChunkForReRender(mc.levelRenderer, cx, cz);
+                        markChunkForReRender(mc.levelExtractor, cx, cz);
                     }
                 }
             }
@@ -161,17 +163,17 @@ public class CameraUtils
                 if ((cx < minCameraCX || cx > maxCameraCX || cz < minCameraCZ || cz > maxCameraCZ) &&
                     isClientChunkLoaded(mc.level, cx, cz))
                 {
-                    markChunkForReRender(mc.levelRenderer, cx, cz);
+                    markChunkForReRender(mc.levelExtractor, cx, cz);
                 }
             }
         }
     }
 
-    public static void markChunkForReRender(LevelRenderer renderer, int chunkX, int chunkZ)
+    public static void markChunkForReRender(LevelExtractor extractor, int chunkX, int chunkZ)
     {
         for (int cy = 0; cy < 16; ++cy)
         {
-            renderer.setSectionDirty(chunkX, cy, chunkZ);
+	        extractor.setSectionDirty(chunkX, cy, chunkZ);
         }
     }
 

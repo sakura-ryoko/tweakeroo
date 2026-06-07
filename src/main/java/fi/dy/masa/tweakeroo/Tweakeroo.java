@@ -24,12 +24,13 @@ public class Tweakeroo implements ModInitializer
     {
         if (Configs.Generic.DEBUG_LOGGING.getBooleanValue())
         {
-            Tweakeroo.LOGGER.info(msg, args);
+            String message = "[DEBUG] "+msg;
+            LOGGER.info(message, args);
 
             // Is this for the "Test" module??
             if (Boolean.getBoolean("tweakeroo.debug.stdout"))
             {
-                ANSI_LOGGER.info("[TweakerooDebug] {} | args={}", msg, args);
+                ANSI_LOGGER.debug(msg, args);
             }
         }
     }

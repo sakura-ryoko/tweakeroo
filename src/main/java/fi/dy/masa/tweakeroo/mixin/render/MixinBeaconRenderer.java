@@ -15,9 +15,9 @@ public abstract class MixinBeaconRenderer
 {
     @Inject(method = "submitBeaconBeam(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/resources/Identifier;FFIIIFF)V",
             at = @At("HEAD"), cancellable = true)
-    private static void tweakeroo_disableBeamRendering(PoseStack matrices, SubmitNodeCollector queue, Identifier textureId,
-													   float beamHeight, float beamRotationDegrees, int minHeight, int maxHeight,
-													   int color, float innerScale, float outerScale, CallbackInfo ci)
+    private static void tweakeroo_disableBeamRendering(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Identifier beamLocation,
+                                                       float scale, float animationTime, int beamStart, int height,
+                                                       int color, float solidBeamRadius, float beamGlowRadius, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_BEACON_BEAM_RENDERING.getBooleanValue())
         {

@@ -17,12 +17,12 @@ public class MixinDebugQueryHandler
             method = "handleResponse",
             at = @At("HEAD")
     )
-    private void tweakeroo_queryResponse(int transactionId, CompoundTag nbt, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_queryResponse(int transactionId, CompoundTag tag, CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() ||
 	        Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
         {
-            EntityDataManager.getInstance().handleVanillaQueryNbt(transactionId, nbt);
+            EntityDataManager.getInstance().handleVanillaQueryNbt(transactionId, tag);
         }
     }
 }

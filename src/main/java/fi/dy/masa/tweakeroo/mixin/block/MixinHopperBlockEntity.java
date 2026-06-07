@@ -52,11 +52,11 @@ public class MixinHopperBlockEntity
             at = @At("HEAD"),
             cancellable = true
     )
-    private static void cancelItemMerging(ItemStack first, ItemStack second, CallbackInfoReturnable<Boolean> cir)
+    private static void cancelItemMerging(ItemStack a, ItemStack b, CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Fixes.STACKABLE_SHULKERS_IN_HOPPER_FIX.getBooleanValue())
         {
-            if (MiscUtils.isShulkerBox(first) || MiscUtils.isShulkerBox(second)) cir.setReturnValue(false);
+            if (MiscUtils.isShulkerBox(a) || MiscUtils.isShulkerBox(b)) cir.setReturnValue(false);
         }
     }
 }

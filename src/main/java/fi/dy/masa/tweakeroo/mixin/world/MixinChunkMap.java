@@ -22,7 +22,7 @@ public abstract class MixinChunkMap
                      target = "Lnet/minecraft/server/level/ChunkMap;visibleChunkMap:Lit/unimi/dsi/fastutil/longs/Long2ObjectLinkedOpenHashMap;",
                      opcode = Opcodes.GETFIELD)
     )
-    private void tweakeroo_disableSaving20ChunksEveryTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci)
+    private void tweakeroo_disableSaving20ChunksEveryTick(BooleanSupplier haveTime, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CONSTANT_CHUNK_SAVING.getBooleanValue())
         {

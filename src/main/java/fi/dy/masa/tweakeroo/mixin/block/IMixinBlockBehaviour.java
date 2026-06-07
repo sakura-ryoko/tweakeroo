@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(BlockBehaviour.class)
-public interface IMixinAbstractBlock
+public interface IMixinBlockBehaviour
 {
     @Mutable
     @Accessor("friction")

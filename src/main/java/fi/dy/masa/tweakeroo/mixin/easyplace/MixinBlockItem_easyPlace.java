@@ -24,22 +24,22 @@ public abstract class MixinBlockItem_easyPlace extends Item
         super(builder);
     }
 
-    @Shadow protected abstract boolean canPlace(BlockPlaceContext context, BlockState state);
+    @Shadow protected abstract boolean canPlace(BlockPlaceContext context, BlockState stateForPlacement);
     @Shadow public abstract Block getBlock();
 
     @Inject(method = "getPlacementState", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_modifyPlacementState(BlockPlaceContext ctx, CallbackInfoReturnable<BlockState> cir)
+    private void tweakeroo_modifyPlacementState(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir)
     {
         if (Configs.Generic.CLIENT_PLACEMENT_ROTATION.getBooleanValue())
         {
-            BlockState stateOrig = this.getBlock().getStateForPlacement(ctx);
+            BlockState stateOrig = this.getBlock().getStateForPlacement(context);
 
 			if (stateOrig != null)
 			{
-				if (!Configs.Generic.CLIENT_PLACEMENT_VALIDATION.getBooleanValue() || this.canPlace(ctx, stateOrig))
+				if (!Configs.Generic.CLIENT_PLACEMENT_VALIDATION.getBooleanValue() || this.canPlace(context, stateOrig))
 				{
-					UseContext context = UseContext.from(ctx, ctx.getHand());
-					cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, context));
+					UseContext ctx = UseContext.from(context, context.getHand());
+					cir.setReturnValue(PlacementHandler.applyPlacementProtocolToPlacementState(stateOrig, ctx));
 				}
 			}
         }

@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -417,7 +418,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         BlockEntityType<?> beType = data != null ? DataBlockUtils.getBlockEntityType(data) : null;
         //Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beType != null ? beType.toString() : "<null>", inv != null ? inv.getContainerSize() : "<null>");
 
-        if ((beType != null && beType.equals(BlockEntityType.ENDER_CHEST)) ||
+        if ((beType != null && beType.equals(BlockEntityTypes.ENDER_CHEST)) ||
             be instanceof EnderChestBlockEntity)
         {
             if (Minecraft.getInstance().player != null)

@@ -30,7 +30,7 @@ public class MixinDarknessFogEnvironment
             // The actual strength value returned by Vanilla here
             // tends to be somewhat random and unpredictable and varies.
             // Someone could remove the fog by changing the 'adj' value higher, but
-            // that would be no fun; now would it? :)
+            // that would be no fun; now, would it? :)
             final float adj = fog.skyEnd * 3.0F;
 
             fog.environmentalStart = adj * 0.75F;

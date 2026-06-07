@@ -27,6 +27,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 
 @Mixin(MultiPlayerGameMode.class)
 public abstract class MixinMultiPlayerGameMode
@@ -34,7 +35,7 @@ public abstract class MixinMultiPlayerGameMode
     @Shadow @Final private Minecraft minecraft;
     @Shadow private int destroyDelay;
 
-    @Shadow public abstract InteractionResult useItemOn(LocalPlayer player, InteractionHand hand, BlockHitResult hitResult);
+    @Shadow public abstract InteractionResult useItemOn(LocalPlayer player, InteractionHand hand, BlockHitResult blockHit);
 
     @Inject(method = "useItem", at = @At(
             value = "INVOKE",
@@ -59,18 +60,6 @@ public abstract class MixinMultiPlayerGameMode
             PlacementTweaks.onProcessRightClickPost(player, hand);
         }
     }
-
-//    @Inject(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
-//            at = @At("HEAD"),
-//            cancellable = true)
-//    private void tweakeroo_onRightClickMouseOnEntityPre1(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
-//    {
-//        if (CameraUtils.shouldPreventPlayerInputs() ||
-//            PlacementTweaks.onProcessRightClickPre(player, hand))
-//        {
-//            cir.setReturnValue(InteractionResult.PASS);
-//        }
-//    }
 
     @Inject(method = "interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;",
             at = @At("HEAD"),
@@ -138,13 +127,16 @@ public abstract class MixinMultiPlayerGameMode
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
                      target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startPrediction(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V"
             ))
-    private void tweakeroo_handleBreakReplaceInAttack(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_handleBreakReplaceInAttack(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue() &&
 			this.minecraft.level != null && this.minecraft.player != null)
         {
-            if (this.minecraft.level.getBlockState(targetPos).isAir()) {
-                BlockHitResult blockHitResult = new BlockHitResult(targetPos.getCenter(), side, targetPos, false);
+            if (this.minecraft.level.getBlockState(pos).isAir())
+            {
+                Vec3 center = Vec3.atCenterOf(pos);
+                BlockHitResult blockHitResult = new BlockHitResult(center, direction, pos, false);
+
                 for (InteractionHand hand : InteractionHand.values())
                 {
                     ItemStack stack = this.minecraft.player.getItemInHand(hand);
@@ -168,13 +160,16 @@ public abstract class MixinMultiPlayerGameMode
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
                      target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startPrediction(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V"
             ))
-    private void tweakeroo_handleBreakReplaceInUpdate(BlockPos targetPos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_handleBreakReplaceInUpdate(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_BREAK_REPLACE.getBooleanValue() &&
 			this.minecraft.level != null && this.minecraft.player != null)
         {
-            if (this.minecraft.level.getBlockState(targetPos).isAir()) {
-                BlockHitResult blockHitResult = new BlockHitResult(targetPos.getCenter(), side, targetPos, false);
+            if (this.minecraft.level.getBlockState(pos).isAir())
+            {
+                Vec3 center = Vec3.atCenterOf(pos);
+                BlockHitResult blockHitResult = new BlockHitResult(center, direction, pos, false);
+
                 for (InteractionHand hand : InteractionHand.values())
                 {
                     ItemStack stack = this.minecraft.player.getItemInHand(hand);
@@ -189,7 +184,7 @@ public abstract class MixinMultiPlayerGameMode
     }
 
     @Inject(method = "continueDestroyBlock", at = @At("HEAD"), cancellable = true) // MCP: onPlayerDamageBlock
-    private void tweakeroo_handleBreakingRestriction2(BlockPos pos, Direction side, CallbackInfoReturnable<Boolean> cir)
+    private void tweakeroo_handleBreakingRestriction2(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir)
     {
         if (Configs.Disable.DISABLE_BLOCK_BREAK_COOLDOWN.getBooleanValue())
             //&& this.client.player.isCreative() == false)
@@ -198,7 +193,7 @@ public abstract class MixinMultiPlayerGameMode
         }
 
         if (FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue() || CameraUtils.shouldPreventPlayerInputs() ||
-                PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, side) == false)
+                PlacementTweaks.isPositionAllowedByBreakingRestriction(pos, direction) == false)
         {
             cir.setReturnValue(true);
         }

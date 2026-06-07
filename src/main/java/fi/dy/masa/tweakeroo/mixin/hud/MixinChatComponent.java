@@ -18,17 +18,17 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 public abstract class MixinChatComponent
 {
     @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V",
-                    at = @At("HEAD"), argsOnly = true)
-    private Component tweakeroo_addMessageTimestamp(Component value)
+                    at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private Component tweakeroo_addMessageTimestamp(Component contents)
     {
         if (FeatureToggle.TWEAK_CHAT_TIMESTAMP.getBooleanValue())
         {
             MutableComponent newComponent = Component.literal(MiscUtils.getChatTimestamp() + " ");
-            newComponent.append(value);
+            newComponent.append(contents);
             return newComponent;
         }
 
-        return value;
+        return contents;
     }
 
     // INVOKESTATIC Bytecode Mixin (L2)

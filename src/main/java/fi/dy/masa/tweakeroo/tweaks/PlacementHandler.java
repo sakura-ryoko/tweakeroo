@@ -322,7 +322,6 @@ public class PlacementHandler
             {
                 @SuppressWarnings("unchecked")
                 Property<T> prop = (Property<T>) p;
-//                BlockState def = state.getBlock().defaultBlockState();
                 state = state.setValue(prop, (T) BLACKLISTED_PROPERTIES.get(p));
                 //System.out.printf("[PHv3] blacklisted state [%s] found, setting value\n", prop.getName());
             }

@@ -18,13 +18,13 @@ public class MixinServerGamePacketListenerImpl_easyPlace
     @WrapOperation(method = "handleUseItemOn",
                    at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/world/phys/Vec3;subtract(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
-    private Vec3 tweakeroo_removeHitPosCheck(Vec3 instance, Vec3 vec3, Operation<Vec3> original)
+    private Vec3 tweakeroo_removeHitPosCheck(Vec3 instance, Vec3 vec, Operation<Vec3> original)
     {
         if (Configs.Generic.ITEM_USE_PACKET_CHECK_BYPASS.getBooleanValue())
         {
             return Vec3.ZERO;
         }
 
-        return original.call(instance, vec3);
+        return original.call(instance, vec);
     }
 }

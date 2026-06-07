@@ -21,7 +21,7 @@ public abstract class MixinWindow
     private void tweakeroo_customGuiScaleGetScale(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
-            Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>)
+            Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?>)
         {
             int scale = Configs.Generic.CUSTOM_INVENTORY_GUI_SCALE.getIntegerValue();
 
@@ -36,7 +36,7 @@ public abstract class MixinWindow
     private void tweakeroo_customGuiScaleGetWidth(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
-            Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>)
+            Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?>)
         {
             int scale = Configs.Generic.CUSTOM_INVENTORY_GUI_SCALE.getIntegerValue();
 
@@ -51,7 +51,7 @@ public abstract class MixinWindow
     private void tweakeroo_customGuiScaleGetHeight(CallbackInfoReturnable<Integer> cir)
     {
         if (FeatureToggle.TWEAK_CUSTOM_INVENTORY_GUI_SCALE.getBooleanValue() &&
-            Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>)
+            Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?>)
         {
             int scale = Configs.Generic.CUSTOM_INVENTORY_GUI_SCALE.getIntegerValue();
 

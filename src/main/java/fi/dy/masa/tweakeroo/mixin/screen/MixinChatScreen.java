@@ -43,8 +43,9 @@ public abstract class MixinChatScreen
     @Inject(method = "keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z",
             slice = @Slice(
                     from = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/ChatScreen;handleChatInput(Ljava/lang/String;Z)V")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", shift = Shift.AFTER))
-    private void tweakeroo_onSendMessage(KeyEvent input, CallbackInfoReturnable<Boolean> cir)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V",
+                     shift = Shift.AFTER))
+    private void tweakeroo_onSendMessage(KeyEvent event, CallbackInfoReturnable<Boolean> cir)
     {
         MiscUtils.setLastChatText("");
     }

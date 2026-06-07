@@ -43,7 +43,7 @@ import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractNautilus;
 import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
-import fi.dy.masa.malilib.mixin.network.IMixinDataQueryHandler;
+import fi.dy.masa.malilib.mixin.network.IMixinDebugQueryHandler;
 import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -872,7 +872,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         {
             this.sentBackupPackets = true;
             handler.getDebugQueryHandler().queryBlockEntityTag(pos, nbtCompound -> handleBlockEntityData(pos, nbtCompound, null));
-            this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDebugQueryHandler()).malilib_currentTransactionId(), Either.left(pos));
+            this.transactionToBlockPosOrEntityId.put(((IMixinDebugQueryHandler) handler.getDebugQueryHandler()).malilib_currentTransactionId(), Either.left(pos));
         }
     }
 
@@ -889,7 +889,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         {
             this.sentBackupPackets = true;
             handler.getDebugQueryHandler().queryEntityTag(entityId, nbtCompound -> handleEntityData(entityId, nbtCompound));
-            this.transactionToBlockPosOrEntityId.put(((IMixinDataQueryHandler) handler.getDebugQueryHandler()).malilib_currentTransactionId(), Either.right(entityId));
+            this.transactionToBlockPosOrEntityId.put(((IMixinDebugQueryHandler) handler.getDebugQueryHandler()).malilib_currentTransactionId(), Either.right(entityId));
         }
     }
 

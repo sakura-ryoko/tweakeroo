@@ -22,7 +22,7 @@ public abstract class MixinObserverBlock extends DirectionalBlock
     }
 
     @Inject(method = "startSignal", at = @At("HEAD"), cancellable = true)
-    private void preventTrigger(LevelReader world, ScheduledTickAccess tickView, BlockPos pos, CallbackInfo ci)
+    private void preventTrigger(LevelReader level, ScheduledTickAccess ticks, BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_OBSERVER.getBooleanValue())
         {

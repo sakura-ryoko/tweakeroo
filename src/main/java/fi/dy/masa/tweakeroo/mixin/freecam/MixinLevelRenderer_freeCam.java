@@ -1,19 +1,24 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
-import org.objectweb.asm.Opcodes;
+import com.llamalad7.mixinextras.sugar.Local;
+import org.joml.Matrix4fc;
+import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 
-import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.ViewArea;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -22,17 +27,16 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
 @Mixin(value = LevelRenderer.class, priority = 1005)
 public abstract class MixinLevelRenderer_freeCam
 {
-    @Shadow private int lastCameraSectionX;
-    @Shadow private int lastCameraSectionZ;
-
+    @Shadow
+    private @Nullable ViewArea viewArea;
     @Unique private int lastUpdatePosX;
     @Unique private int lastUpdatePosZ;
 
-    @Inject(method = "update",
+    @Inject(method = "render",
             at = @At(value = "INVOKE_STRING",
                      target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-                     args = "ldc=cullTerrain"))
-    private void tweakeroo_preSetupTerrain(Camera camera, CallbackInfo ci)
+                     args = "ldc=repositionCamera"))
+    private void tweakeroo_preSetupTerrain(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
@@ -40,52 +44,41 @@ public abstract class MixinLevelRenderer_freeCam
         }
     }
 
-    @Inject(method = "update",
+    @Inject(method = "render",
             at = @At(value = "INVOKE_STRING",
-                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
+                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
                      args = "ldc=compileSections"))
-    private void tweakeroo_postSetupTerrain(Camera camera, CallbackInfo ci)
+    private void tweakeroo_postSetupTerrain(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci)
     {
         CameraUtils.setFreeCameraSpectator(false);
     }
 
-    // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
-    @Redirect(method = "extractVisibleEntities", require = 0, at = @At(value = "INVOKE",
-                                                                    target = "Lnet/minecraft/client/Camera;entity()Lnet/minecraft/world/entity/Entity;", ordinal = 3))
-    private Entity tweakeroo_allowRenderingClientPlayerInFreeCameraMode(Camera camera)
-    {
-        if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
-        {
-            return Minecraft.getInstance().player;
-        }
-
-        return camera.entity();
-    }
-
-	// cullTerrain -> method_74752
     // These injections will fail when Sodium is present, but the Free Camera
     // rendering seems to work fine with Sodium without these anyway
-    @Inject(method = "cullTerrain", require = 0,
-            at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,
-                     target = "Lnet/minecraft/client/renderer/LevelRenderer;prevCamX:D"))
-    private void tweakeroo_rebuildChunksAroundCamera1(
-            Camera camera, Frustum frustum, boolean bl, CallbackInfo ci)
+    @Inject(method = "repositionCamera", at = @At(value = "HEAD"))
+    private void tweakeroo_rebuildChunksAroundCamera1(CameraRenderState camera, CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
             // Hold on to the previous update position before it gets updated
-            this.lastUpdatePosX = this.lastCameraSectionX;
-            this.lastUpdatePosZ = this.lastCameraSectionZ;
+            if (this.viewArea != null)
+            {
+                SectionPos lastCameraPos = this.viewArea.getCameraSectionPos();
+                this.lastUpdatePosX = lastCameraPos.x();
+                this.lastUpdatePosZ = lastCameraPos.z();
+            }
         }
     }
 
 	// cullTerrain -> method_74752
     // These injections will fail when Sodium is present, but the Free Camera
     // rendering seems to work fine with Sodium without these anyway
-    @Inject(method = "cullTerrain", require = 0,
+    @Inject(method = "repositionCamera",
             at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-                     target = "Lnet/minecraft/client/renderer/ViewArea;repositionCamera(Lnet/minecraft/core/SectionPos;)V"))
-    private void tweakeroo_rebuildChunksAroundCamera2(Camera camera, Frustum frustum, boolean bl, CallbackInfo ci)
+                     target = "Lnet/minecraft/client/renderer/ViewArea;repositionCamera(Lnet/minecraft/core/SectionPos;)Z"
+            ))
+    private void tweakeroo_rebuildChunksAroundCamera2(CameraRenderState camera, CallbackInfo ci,
+                                                      @Local(name = "cameraPos") Vec3 cameraPos)
     {
         // Mark the chunks at the edge of the free camera's render range for rebuilding
         // when the camera moves around.
@@ -94,8 +87,8 @@ public abstract class MixinLevelRenderer_freeCam
         // to disappear because of no dirty marking calls from chunk loading.
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
-            int x = Mth.floor(camera.position().x) >> 4;
-            int z = Mth.floor(camera.position().z) >> 4;
+            int x = Mth.floor(cameraPos.x) >> 4;
+            int z = Mth.floor(cameraPos.z) >> 4;
             CameraUtils.markChunksForRebuild(x, z, this.lastUpdatePosX, this.lastUpdatePosZ);
             // Could send this to Servux in the future
         }

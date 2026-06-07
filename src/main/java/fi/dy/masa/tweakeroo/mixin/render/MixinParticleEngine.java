@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinParticleEngine
 {
     @Inject(method = "add(Lnet/minecraft/client/particle/Particle;)V", at = @At("HEAD"), cancellable = true)
-    private void disableAllParticles(Particle effect, CallbackInfo ci)
+    private void disableAllParticles(Particle p, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_PARTICLES.getBooleanValue())
         {
@@ -30,8 +30,8 @@ public abstract class MixinParticleEngine
      */
     @Inject(method = "createParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)Lnet/minecraft/client/particle/Particle;",
             at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_spawnParticleInject(ParticleOptions parameters, double x, double y, double z,
-                                               double velocityX, double velocityY, double velocityZ,
+    private void tweakeroo_spawnParticleInject(ParticleOptions options, double x, double y, double z,
+                                               double xa, double ya, double za,
                                                CallbackInfoReturnable<Particle> cir)
     {
         if (Configs.Generic.SELECTIVE_BLOCKS_HIDE_PARTICLES.getBooleanValue())

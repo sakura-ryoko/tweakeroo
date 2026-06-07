@@ -237,7 +237,7 @@ public class MiscUtils
             }
 
             // Refresh the rendered chunks when exiting zoom mode
-            Minecraft.getInstance().levelRenderer.needsUpdate();
+            Minecraft.getInstance().levelExtractor.allChanged();
 
             zoomActive = false;
         }
@@ -286,7 +286,7 @@ public class MiscUtils
             }
 
             // Refresh the rendered chunks when exiting zoom mode
-            Minecraft.getInstance().levelRenderer.needsUpdate();
+            Minecraft.getInstance().levelExtractor.allChanged();
 
             spyglassZoomActive = false;
         }
@@ -469,17 +469,13 @@ public class MiscUtils
 		if (mc.player == null) return;
         BlockPos pos = PositionUtils.getEntityBlockPos(mc.player);
         String dim = mc.player.level().dimension().identifier().toString();
+        String coords = pos.getX() + " " + pos.getY() + " " + pos.getZ();
         String str = StringUtils.translate("tweakeroo.message.death_coordinates",
                                            pos.getX(), pos.getY(), pos.getZ(), dim);
         MutableComponent message = Component.literal(str);
-        Style style = message.getStyle();
-        String coords = pos.getX() + " " + pos.getY() + " " + pos.getZ();
-        //style = style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, coords));
-        //style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(coords)));
-        style = style.withClickEvent(new ClickEvent.SuggestCommand(coords));
-        style = style.withHoverEvent(new HoverEvent.ShowText(Component.literal(coords)));
+        Style style = message.getStyle().withClickEvent(new ClickEvent.SuggestCommand(coords)).withHoverEvent(new HoverEvent.ShowText(Component.literal(coords)));
         message.setStyle(style);
-        mc.gui.getChat().addClientSystemMessage(message);
+        mc.gui.hud.getChat().addClientSystemMessage(message);
         Tweakeroo.LOGGER.info(str);
     }
 

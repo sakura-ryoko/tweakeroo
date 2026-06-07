@@ -68,9 +68,11 @@ public abstract class MixinClientPacketListener extends ClientCommonPacketListen
         }
     }
 
-    @Inject(method = "handlePlayerCombatKill", at = @At(value = "INVOKE", // onCombatEvent
-                                                target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
-    private void tweakeroo_onPlayerDeath(ClientboundPlayerCombatKillPacket packetIn, CallbackInfo ci)
+    @Inject(method = "handlePlayerCombatKill",
+            at = @At(value = "INVOKE", // onCombatEvent
+                     target = "Lnet/minecraft/client/gui/Gui;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"
+            ))
+    private void tweakeroo_onPlayerDeath(ClientboundPlayerCombatKillPacket packet, CallbackInfo ci)
     {
         Minecraft mc = Minecraft.getInstance();
 

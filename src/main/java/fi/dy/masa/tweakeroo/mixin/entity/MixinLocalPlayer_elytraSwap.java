@@ -88,11 +88,11 @@ public abstract class MixinLocalPlayer_elytraSwap extends AbstractClientPlayer
 	}
 
 	@Inject(method = "onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V", at = @At("RETURN"))
-	private void tweakeroo_onStopFlying(EntityDataAccessor<?> data, CallbackInfo ci)
+	private void tweakeroo_onStopFlying(EntityDataAccessor<?> accessor, CallbackInfo ci)
 	{
 		if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() || FeatureToggle.TWEAK_AUTO_SWITCH_ROCKETS.getBooleanValue())
 		{
-			if (DATA_SHARED_FLAGS_ID.equals(data) && this.wasFallFlying && !this.isFallFlying())
+			if (DATA_SHARED_FLAGS_ID.equals(accessor) && this.wasFallFlying && !this.isFallFlying())
 			{
 				if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue())
 				{

@@ -34,7 +34,7 @@ public class MixinFogRenderer
             Minecraft mc = Minecraft.getInstance();
 
             final int viewDistance = mc.options.getEffectiveRenderDistance();
-            final float blocksDistance = MathUtils.max(512.0F, mc.gameRenderer.getGameRenderState().optionsRenderState.renderDistance);
+            final float blocksDistance = MathUtils.max(512.0F, mc.gameRenderer.gameRenderState().optionsRenderState.renderDistance);
 
             // 42 is the answer :)
             return (int) (blocksDistance / viewDistance);

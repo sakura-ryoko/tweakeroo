@@ -9,7 +9,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -40,7 +39,8 @@ import fi.dy.masa.malilib.util.restrictions.ItemRestriction;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinAbstractBlock;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinBlockBehaviour;
 import fi.dy.masa.tweakeroo.util.*;
 
 public class PlacementTweaks
@@ -358,7 +358,7 @@ public class PlacementTweaks
         if (FeatureToggle.TWEAK_PLACEMENT_REST_FIRST.getBooleanValue() && stateClickedOn == null)
         {
             BlockState state = world.getBlockState(posIn);
-            stackClickedOn = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, posIn, state, false);
+            stackClickedOn = ((IMixinBlockBehaviour) state.getBlock()).tweakeroo_getPickStack(world, posIn, state, false);
             stateClickedOn = state;
         }
 
@@ -648,7 +648,8 @@ public class PlacementTweaks
                     protocolValue |= facing.get3DDataValue() << shiftBy;
                     shiftBy += 3;
 
-                    if (stack.is(ItemTags.TRAPDOORS) || stack.is(ItemTags.STAIRS))
+//                    if (stack.is(ItemTags.TRAPDOORS) || stack.is(ItemTags.STAIRS))
+                    if (CachedTagManager.isTrapdoor(stack) || CachedTagManager.isStairs(stack))
                     {
                         // add BLOCK_HALF handling --> (BOTTOM)
                         int requiredBits = Mth.log2(Mth.smallestEncompassingPowerOfTwo(2));
@@ -721,7 +722,7 @@ public class PlacementTweaks
 
             if (stackClickedOn.isEmpty() == false)
             {
-                ItemStack stack = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
+                ItemStack stack = ((IMixinBlockBehaviour) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
 
                 if (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClickedOn, stack) == false)
                 {
@@ -740,7 +741,7 @@ public class PlacementTweaks
         if (FeatureToggle.TWEAK_PLACEMENT_REST_HAND.getBooleanValue())
         {
             BlockState state = world.getBlockState(pos);
-            ItemStack stackClicked = ((IMixinAbstractBlock) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
+            ItemStack stackClicked = ((IMixinBlockBehaviour) state.getBlock()).tweakeroo_getPickStack(world, pos, state, false);
             ItemStack stackHand = player.getItemInHand(hand);
 
             return fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stackClicked, stackHand);
@@ -892,7 +893,8 @@ public class PlacementTweaks
             protocolValue |= facing.get3DDataValue() << shiftBy;
             shiftBy += 3;
 
-            if (stackOriginal.is(ItemTags.TRAPDOORS) || stackOriginal.is(ItemTags.STAIRS))
+//            if (stackOriginal.is(ItemTags.TRAPDOORS) || stackOriginal.is(ItemTags.STAIRS))
+            if (CachedTagManager.isTrapdoor(stackOriginal) || CachedTagManager.isStairs(stackOriginal))
             {
                 // add BLOCK_HALF handling --> (BOTTOM)
                 int requiredBits = Mth.log2(Mth.smallestEncompassingPowerOfTwo(2));

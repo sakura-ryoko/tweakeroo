@@ -26,8 +26,8 @@ dependencies {
 	implementation "com.google.code.findbugs:jsr305:3.0.2"
 //	implementation "org.jspecify:jspecify:1.0.0"
 
-	implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_out}:${project.malilib_version}"
-//	implementation "com.github.sakura-ryoko:malilib:${project.malilib_version}"
+//	implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_out}:${project.malilib_version}"
+	implementation "com.github.sakura-ryoko:malilib:${project.malilib_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 //	compileOnly fabricApi.module("fabric-api-base", project.fabric_api_version)
@@ -36,7 +36,7 @@ dependencies {
 	include(implementation("me.fallenbreath:conditional-mixin-fabric:${project.conditionalmixin_version}"))
 
 	compileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
-//	runtimeOnly 'me.fallenbreath:mixin-auditor:0.2.0-u'
+	runtimeOnly 'me.fallenbreath:mixin-auditor:0.2.0-u'
 
 	// Test dependencies
 //	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
@@ -62,16 +62,16 @@ base {
 loom {
     accessWidenerPath = file("src/main/resources/tweakeroo.accesswidener")
 
-//    def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
-//	// [FEATURE] MIXIN_AUDITOR
-//	runs {
-//		def auditVmArgs = [*commonVmArgs, '-DmixinAuditor.audit=true']
-//		clientMixinAudit {
-//			client()
-//			vmArgs auditVmArgs
-//			ideConfigGenerated false
-//		}
-//	}
+    def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
+	// [FEATURE] MIXIN_AUDITOR
+	runs {
+		def auditVmArgs = [*commonVmArgs, '-DmixinAuditor.audit=true']
+		clientMixinAudit {
+			client()
+			vmArgs auditVmArgs
+			ideConfigGenerated false
+		}
+	}
 }
 
 //test {

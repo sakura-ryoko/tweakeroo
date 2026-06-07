@@ -24,13 +24,13 @@ import net.minecraft.world.entity.player.Player;
 public abstract class MixinEntityRenderDispatcher
 {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private void onShouldRender(Entity entityIn, Frustum frustum, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
+    private void onShouldRender(Entity entity, Frustum culler, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
     {
-        boolean isPlayer = (entityIn instanceof Player);
+        boolean isPlayer = (entity instanceof Player);
 
-        if (entityIn instanceof HangingEntity)
+        if (entity instanceof HangingEntity)
         {
-            if (!RenderTweaks.isPositionValidForRendering(((IDecorationEntity) entityIn).tweakeroo$getAttached()))
+            if (!RenderTweaks.isPositionValidForRendering(((IDecorationEntity) entity).tweakeroo$getAttached()))
             {
                 cir.setReturnValue(false);
             }
@@ -38,26 +38,26 @@ public abstract class MixinEntityRenderDispatcher
 
         if (!isPlayer && Configs.Generic.SELECTIVE_BLOCKS_HIDE_ENTITIES.getBooleanValue())
         {
-            if (!RenderTweaks.isPositionValidForRendering(entityIn.blockPosition()))
+            if (!RenderTweaks.isPositionValidForRendering(entity.blockPosition()))
             {
                 cir.setReturnValue(false);
             }
         }
 
-        if (Configs.Disable.DISABLE_ENTITY_RENDERING.getBooleanValue() && (entityIn instanceof Player) == false)
+        if (Configs.Disable.DISABLE_ENTITY_RENDERING.getBooleanValue() && (entity instanceof Player) == false)
         {
             cir.setReturnValue(false);
         }
 
-        if (entityIn instanceof FallingBlockEntity && Configs.Disable.DISABLE_FALLING_BLOCK_RENDER.getBooleanValue())
+        if (entity instanceof FallingBlockEntity && Configs.Disable.DISABLE_FALLING_BLOCK_RENDER.getBooleanValue())
         {
             cir.setReturnValue(false);
         }
-        else if (entityIn instanceof ArmorStand && Configs.Disable.DISABLE_ARMOR_STAND_RENDERING.getBooleanValue())
+        else if (entity instanceof ArmorStand && Configs.Disable.DISABLE_ARMOR_STAND_RENDERING.getBooleanValue())
         {
             cir.setReturnValue(false);
         }
-        else if (entityIn instanceof ExperienceOrb)
+        else if (entity instanceof ExperienceOrb)
         {
             if (FeatureToggle.TWEAK_RENDER_LIMIT_ENTITIES.getBooleanValue())
             {
@@ -69,7 +69,7 @@ public abstract class MixinEntityRenderDispatcher
                 }
             }
         }
-        else if (entityIn instanceof ItemEntity)
+        else if (entity instanceof ItemEntity)
         {
             if (FeatureToggle.TWEAK_RENDER_LIMIT_ENTITIES.getBooleanValue())
             {
@@ -82,7 +82,7 @@ public abstract class MixinEntityRenderDispatcher
             }
         }
         else if (Configs.Disable.DISABLE_DEAD_MOB_RENDERING.getBooleanValue() &&
-                entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getHealth() <= 0f)
+                entity instanceof LivingEntity && ((LivingEntity) entity).getHealth() <= 0f)
         {
             cir.setReturnValue(false);
         }

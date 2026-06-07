@@ -33,16 +33,16 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
     }
 
     @Inject(method = "loadAdditional", at = @At("RETURN"))
-    private void tweakeroo_restoreCopiedText(ValueInput view, CallbackInfo ci)
+    private void tweakeroo_restoreCopiedText(ValueInput input, CallbackInfo ci)
     {
         // Restore the copied/pasted text after the TileEntity sync overrides it with empty lines
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue() && this.getLevel() != null && this.getLevel().isClientSide())
         {
             Minecraft mc = Minecraft.getInstance();
 
-            if (mc.screen instanceof SignEditScreen || mc.screen instanceof HangingSignEditScreen)
+            if (mc.gui.screen() instanceof SignEditScreen || mc.gui.screen() instanceof HangingSignEditScreen)
             {
-                if (((IGuiEditSign) mc.screen).tweakeroo$getTile() == (Object) this)
+                if (((IGuiEditSign) mc.gui.screen()).tweakeroo$getTile() == (Object) this)
                 {
                     MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isFacingFrontText(mc.player));
                 }

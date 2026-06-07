@@ -19,7 +19,7 @@ public abstract class MixinBatEntity
             at = @At("HEAD"),
             cancellable = true)
     private static void tweakeroo_disableBatSpawning(EntityType<Bat> type,
-                                                     LevelAccessor world,
+                                                     LevelAccessor level,
                                                      EntitySpawnReason spawnReason,
                                                      BlockPos pos,
                                                      RandomSource random,

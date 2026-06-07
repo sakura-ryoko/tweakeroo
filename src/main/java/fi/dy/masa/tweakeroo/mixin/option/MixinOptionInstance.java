@@ -24,19 +24,16 @@ import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
  * -
  * @param <T>
  */
-@Mixin(value = OptionInstance.class, priority = 990)
+@Mixin(value = OptionInstance.class, priority = 900)
 public abstract class MixinOptionInstance<T>
 {
-//	@Mutable @Shadow @Final private OptionInstance.ValueSet<T> values;
-//	@Mutable @Shadow @Final private Codec<T> codec;
 	@Shadow private T value;
 
 	@Unique private boolean isGamma;
 	@Unique private T preValue;
 
-//	@SuppressWarnings("unchecked")
 	@ModifyArgs(method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;"+
-						        "Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V",
+						 "Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Lnet/minecraft/client/OptionInstance$ValueUpdateListener;)V",
 	            at = @At(value = "INVOKE",
 	                     target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;"
 	            )
@@ -46,14 +43,11 @@ public abstract class MixinOptionInstance<T>
 		if (args.get(0).equals("options.gamma"))
 		{
 			this.isGamma = true;
-//			this.values = (OptionInstance.ValueSet<T>) MiscTweaks.GammaOverrideValue.INSTANCE;
-//			this.codec = (Codec<T>) MiscTweaks.GammaOverrideValue.INSTANCE.codec();
-			// Allows values of up to 32.0
 		}
 	}
 
 	@Inject(method = "set", at = @At("HEAD"))
-	private void tweakeroo_onValueSetPre(T object, CallbackInfo ci)
+	private void tweakeroo_onValueSetPre(T value, CallbackInfo ci)
 	{
 		if (this.isGamma)
 		{
@@ -62,7 +56,7 @@ public abstract class MixinOptionInstance<T>
 	}
 
 	@Inject(method = "set", at = @At("RETURN"))
-	private void tweakeroo_onValueSetPost(T object, CallbackInfo ci)
+	private void tweakeroo_onValueSetPost(T value, CallbackInfo ci)
 	{
 		if (this.isGamma)
 		{

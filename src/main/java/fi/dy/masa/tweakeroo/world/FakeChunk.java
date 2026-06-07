@@ -1,6 +1,8 @@
 package fi.dy.masa.tweakeroo.world;
 
 import javax.annotation.Nonnull;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
@@ -12,6 +14,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 /**
  * Copied From Tweak Fork by Andrew54757
  */
+@ApiStatus.NonExtendable
 public class FakeChunk extends LevelChunk
 {
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();

@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
+import org.jspecify.annotations.Nullable;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,12 +16,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 @Mixin(BlockEntityRenderDispatcher.class)
 public abstract class MixinBlockEntityRenderDispatcher
 {
-    @Inject(method = "tryExtractRenderState(Lnet/minecraft/world/level/block/entity/BlockEntity;FLnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)Lnet/minecraft/client/renderer/blockentity/state/BlockEntityRenderState;",
+    @Inject(method = "tryExtractRenderState(Lnet/minecraft/world/level/block/entity/BlockEntity;FLnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;Z)Lnet/minecraft/client/renderer/blockentity/state/BlockEntityRenderState;",
 			at = @At("HEAD"), cancellable = true)
     private <E extends BlockEntity, S extends BlockEntityRenderState> void tweakeroo_preventTileEntityRendering(
-			E blockEntity, float f,
-			ModelFeatureRenderer.CrumblingOverlay crumblingOverlay,
-			CallbackInfoReturnable<S> cir)
+		    E blockEntity, float partialTicks,
+		    ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress,
+		    boolean isGloballyRendered, CallbackInfoReturnable<S> cir)
     {
         if (Configs.Disable.DISABLE_TILE_ENTITY_RENDERING.getBooleanValue())
         {

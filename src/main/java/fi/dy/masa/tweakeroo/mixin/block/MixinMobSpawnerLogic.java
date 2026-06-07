@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 public abstract class MixinMobSpawnerLogic
 {
     @Inject(method = "clientTick", at = @At("HEAD"), cancellable = true)
-    private void cancelParticleRendering(Level world, BlockPos pos, CallbackInfo ci)
+    private void cancelParticleRendering(Level level, BlockPos pos, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_MOB_SPAWNER_MOB_RENDER.getBooleanValue())
         {

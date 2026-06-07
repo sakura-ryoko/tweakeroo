@@ -39,29 +39,8 @@ public abstract class MixinClientLevel extends Level
         }
     }
 
-    /* TODO 1.17 is this still needed?
-    @Inject(method = "addEntitiesToChunk", at = @At("HEAD"), cancellable = true)
-    private void fixChunkEntityLeak(WorldChunk chunk, CallbackInfo ci)
-    {
-        if (Configs.Fixes.CLIENT_CHUNK_ENTITY_DUPE.getBooleanValue())
-        {
-            for (int y = 0; y < 16; ++y)
-            {
-                // The chunk already has entities, which means it's a re-used existing chunk,
-                // in such a case we don't want to add the from the world entities again, otherwise
-                // they are basically duped within the Chunk.
-                if (chunk.getEntitySectionArray()[y].size() > 0)
-                {
-                    ci.cancel();
-                    return;
-                }
-            }
-        }
-    }
-    */
-
     @Inject(method = "setBlocksDirty", at = @At("HEAD"), cancellable = true)
-    private void disableChunkReRenders(BlockPos pos, BlockState old, BlockState updated, CallbackInfo ci)
+    private void disableChunkReRenders(BlockPos pos, BlockState oldState, BlockState newState, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {
@@ -70,7 +49,7 @@ public abstract class MixinClientLevel extends Level
     }
 
     @Inject(method = "setSectionDirtyWithNeighbors", at = @At("HEAD"), cancellable = true)
-    private void disableChunkReRenders(int x, int y, int z, CallbackInfo ci)
+    private void disableChunkReRenders(int chunkX, int chunkY, int chunkZ, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {
@@ -79,7 +58,7 @@ public abstract class MixinClientLevel extends Level
     }
 
     @Inject(method = "sendBlockUpdated", at = @At("HEAD"), cancellable = true)
-    private void disableChunkReRenders(BlockPos pos, BlockState oldState, BlockState newState, int flags, CallbackInfo ci)
+    private void disableChunkReRenders(BlockPos pos, BlockState old, BlockState current, int updateFlags, CallbackInfo ci)
     {
         if (Configs.Disable.DISABLE_CHUNK_RENDERING.getBooleanValue())
         {
@@ -89,7 +68,7 @@ public abstract class MixinClientLevel extends Level
 
 	@Inject(method = "addDestroyBlockEffect(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V",
 			at = @At("HEAD"), cancellable = true)
-	private void tweakeroo_onAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci)
+	private void tweakeroo_onAddBlockBreakParticles(BlockPos pos, BlockState blockState, CallbackInfo ci)
 	{
 		if (Configs.Disable.DISABLE_BLOCK_BREAK_PARTICLES.getBooleanValue())
 		{

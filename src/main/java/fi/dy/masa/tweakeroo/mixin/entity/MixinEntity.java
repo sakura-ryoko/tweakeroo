@@ -2,6 +2,8 @@ package fi.dy.masa.tweakeroo.mixin.entity;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,7 +33,7 @@ public abstract class MixinEntity
     @Unique private double cameraYaw;
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
-    private void overrideIsInvisibleToPlayer(net.minecraft.world.entity.player.Player player, CallbackInfoReturnable<Boolean> cir)
+    private void overrideIsInvisibleToPlayer(Player player, CallbackInfoReturnable<Boolean> cir)
     {
         if (FeatureToggle.TWEAK_RENDER_INVISIBLE_ENTITIES.getBooleanValue())
         {
@@ -40,32 +42,32 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)
-    private void moreAccurateMoveRelative(float speedIn, net.minecraft.world.phys.Vec3 motion, CallbackInfo ci)
+    private void moreAccurateMoveRelative(float speed, Vec3 input, CallbackInfo ci)
     {
         if ((Object) this instanceof LocalPlayer &&
             (FeatureToggle.TWEAK_SNAP_AIM.getBooleanValue() ||
              FeatureToggle.TWEAK_AIM_LOCK.getBooleanValue()))
         {
-            SnapAimUtils.onUpdateVelocity((Entity) (Object) this, this.yRot, speedIn, motion, ci);
+            SnapAimUtils.onUpdateVelocity((Entity) (Object) this, this.yRot, speed, input, ci);
         }
     }
 
     @Inject(method = "turn", at = @At("HEAD"), cancellable = true)
-    private void overrideYaw(double yawChange, double pitchChange, CallbackInfo ci)
+    private void overrideYaw(double xo, double yo, CallbackInfo ci)
     {
         if ((Object) this instanceof LocalPlayer)
         {
             if (CameraUtils.shouldPreventPlayerMovement())
             {
-                CameraUtils.updateCameraRotations((float) yawChange, (float) pitchChange);
+                CameraUtils.updateCameraRotations((float) xo, (float) yo);
             }
 
             if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
             {
                 int pitchLimit = Configs.Generic.SNAP_AIM_PITCH_OVERSHOOT.getBooleanValue() ? 180 : 90;
 
-                this.cameraYaw += yawChange * 0.15D;
-                this.cameraPitch = net.minecraft.util.Mth.clamp(this.cameraPitch + pitchChange * 0.15D, -pitchLimit, pitchLimit);
+                this.cameraYaw += xo * 0.15D;
+                this.cameraPitch = net.minecraft.util.Mth.clamp(this.cameraPitch + yo * 0.15D, -pitchLimit, pitchLimit);
 
                 CameraUtils.setCameraYaw((float) this.cameraYaw);
                 CameraUtils.setCameraPitch((float) this.cameraPitch);
@@ -103,12 +105,12 @@ public abstract class MixinEntity
                 SnapAimMode mode = (SnapAimMode) Configs.Generic.SNAP_AIM_MODE.getOptionListValue();
                 boolean snapAimLock = FeatureToggle.TWEAK_SNAP_AIM_LOCK.getBooleanValue();
 
-                // Not locked, or not snapping the yaw (ie. not in Yaw or Both modes)
+                // Not locked, or not snapping the yaw (i.e. not in Yaw or Both modes)
                 boolean updateYaw = snapAimLock == false || mode == SnapAimMode.PITCH;
-                // Not locked, or not snapping the pitch (ie. not in Pitch or Both modes)
+                // Not locked, or not snapping the pitch (i.e. not in Pitch or Both modes)
                 boolean updatePitch = snapAimLock == false || mode == SnapAimMode.YAW;
 
-                this.updateCustomPlayerRotations(yawChange, pitchChange, updateYaw, updatePitch, pitchLimit);
+                this.updateCustomPlayerRotations(xo, yo, updateYaw, updatePitch, pitchLimit);
 
                 this.yRot = SnapAimUtils.getSnappedYaw(this.lastFreeYaw);
                 this.xRot = SnapAimUtils.getSnappedPitch(this.lastFreePitch);
