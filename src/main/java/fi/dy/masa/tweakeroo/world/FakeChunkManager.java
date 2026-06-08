@@ -4,6 +4,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.BooleanSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -13,6 +15,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 /**
  * Copied From Tweak Fork by Andrew54757
  */
+@ApiStatus.NonExtendable
 public class FakeChunkManager extends ChunkSource
 {
     private final FakeWorld world;

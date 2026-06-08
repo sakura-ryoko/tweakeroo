@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -62,6 +64,7 @@ import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
 /**
  * Copied From Tweak Fork by Andrew54757
  */
+@ApiStatus.NonExtendable
 public class FakeWorld extends Level
 {
     private static final ResourceKey<Level> REGISTRY_KEY = ResourceKey.create(Registries.DIMENSION, Identifier.fromNamespaceAndPath(Reference.MOD_ID, "selective_world"));
