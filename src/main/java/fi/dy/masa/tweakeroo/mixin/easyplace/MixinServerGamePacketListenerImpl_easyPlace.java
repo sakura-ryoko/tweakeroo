@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(value = ServerGamePacketListenerImpl.class, priority = 990)
+@Mixin(value = ServerGamePacketListenerImpl.class, priority = 1001)
 //@Restriction(conflict = @Condition(value = "litematica"))
 public class MixinServerGamePacketListenerImpl_easyPlace
 {

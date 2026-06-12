@@ -15,7 +15,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.tweaks.PlacementHandler;
 import fi.dy.masa.tweakeroo.tweaks.PlacementHandler.UseContext;
 
-@Mixin(value = BlockItem.class, priority = 990)
+@Mixin(value = BlockItem.class, priority = 1001)
 //@Restriction(conflict = @Condition(value = "litematica"))
 public abstract class MixinBlockItem_easyPlace extends Item
 {
