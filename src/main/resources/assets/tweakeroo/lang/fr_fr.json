@@ -1,5 +1,5 @@
 {
-    "modmenu.descriptionTranslation.tweakeroo": "Ajoute un ensemble de modifications configurables côté client",
+    "modmenu.descriptionTranslation.tweakeroo": "Adds a bunch of configurable client-side tweaks",
     "tweakeroo.config.disable.comment.disableAllTerrainFog": "Disables all environmental terrain fog\n§cThis setting will be disabled if you have Sodium installed",
     "tweakeroo.config.disable.comment.disableArmorStandRendering": "Désactive le rendu de toutes les entités Présentoir d'armure",
     "tweakeroo.config.disable.comment.disableAtmosphericFog": "Désactive tout le brouillard atmosphérique présent\nentre le joueur et le brouillard de distance de rendu.",
