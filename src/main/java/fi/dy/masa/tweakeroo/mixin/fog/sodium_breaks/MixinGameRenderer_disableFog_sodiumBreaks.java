@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.fog;
+package fi.dy.masa.tweakeroo.mixin.fog.sodium_breaks;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -23,10 +23,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import fi.dy.masa.malilib.compat.ModIds;
 import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.mixin.fog.IMixinFogRenderer;
 
 @Mixin(value = GameRenderer.class, priority = 900)
 @Restriction(conflict = @Condition(value = ModIds.sodium))
-public abstract class MixinGameRenderer_disableFog
+public abstract class MixinGameRenderer_disableFog_sodiumBreaks
 {
     @Shadow @Final private FogRenderer fogRenderer;
     @Shadow @Final private Minecraft minecraft;

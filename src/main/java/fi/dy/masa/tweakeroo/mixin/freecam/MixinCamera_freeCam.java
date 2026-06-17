@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = Camera.class, priority = 1005)
+@Mixin(value = Camera.class, priority = 850)
 public class MixinCamera_freeCam
 {
     @Inject(method = "getFluidInCamera", at = @At("HEAD"), cancellable = true)

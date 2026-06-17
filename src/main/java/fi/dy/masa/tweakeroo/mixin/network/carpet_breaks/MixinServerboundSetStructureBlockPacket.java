@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.network;
+package fi.dy.masa.tweakeroo.mixin.network.carpet_breaks;
 
 import me.fallenbreath.conditionalmixin.api.annotation.Condition;
 import me.fallenbreath.conditionalmixin.api.annotation.Restriction;

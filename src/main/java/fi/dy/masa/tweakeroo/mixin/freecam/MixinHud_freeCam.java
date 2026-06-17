@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = Hud.class, priority = 1005)
+@Mixin(value = Hud.class, priority = 850)
 public abstract class MixinHud_freeCam
 {
 	@Shadow @Final private Minecraft minecraft;

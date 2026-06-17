@@ -20,7 +20,7 @@ import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 
-@Mixin(value = LocalPlayer.class, priority = 1005)
+@Mixin(value = LocalPlayer.class, priority = 850)
 public abstract class MixinLocalPlayer_freeCam extends AbstractClientPlayer
 {
     @Shadow public ClientInput input;

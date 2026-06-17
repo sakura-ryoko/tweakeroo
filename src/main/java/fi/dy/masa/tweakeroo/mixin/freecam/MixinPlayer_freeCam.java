@@ -13,7 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-@Mixin(value = Player.class, priority = 1005)
+@Mixin(value = Player.class, priority = 850)
 public abstract class MixinPlayer_freeCam extends LivingEntity
 {
     protected MixinPlayer_freeCam(EntityType<? extends LivingEntity> entityType_1, Level world_1)

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = LevelExtractor.class, priority = 1005)
+@Mixin(value = LevelExtractor.class, priority = 850)
 public abstract class MixinLevelExtractor_freeCam
 {
 	// Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode

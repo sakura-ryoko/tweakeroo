@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = Minecraft.class, priority = 1005)
+@Mixin(value = Minecraft.class, priority = 850)
 public class MixinMinecraft_freeCam
 {
 	@Shadow @Nullable public LocalPlayer player;

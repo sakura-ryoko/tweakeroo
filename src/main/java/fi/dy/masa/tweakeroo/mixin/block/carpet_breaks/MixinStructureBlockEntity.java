@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.block;
+package fi.dy.masa.tweakeroo.mixin.block.carpet_breaks;
 
 import java.util.ArrayList;
 import java.util.Collection;

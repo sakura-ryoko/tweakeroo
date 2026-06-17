@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = GameRenderer.class, priority = 1005)
+@Mixin(value = GameRenderer.class, priority = 850)
 public abstract class MixinGameRenderer_freeCam
 {
     @Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true)
