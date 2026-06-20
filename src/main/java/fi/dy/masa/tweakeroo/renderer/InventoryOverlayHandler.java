@@ -247,9 +247,9 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     return null;
                 }
 
-                Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, data != null);
+//                Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, data != null);
                 InventoryOverlayContext ctx = this.getTargetInventoryFromBlock(world, pos, be, data);
-                dumpContext(ctx);
+//                dumpContext(ctx);
 
                 if (this.lastBlockEntityContext != null && !this.lastBlockEntityContext.getLeft().equals(pos))
                 {
@@ -415,7 +415,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         }
 
         BlockEntityType<?> beType = data != null ? DataBlockUtils.getBlockEntityType(data) : null;
-        Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beType != null ? beType.builtInRegistryHolder().key().identifier().toString() : "<null>", inv != null ? inv.getContainerSize() : "<null>");
+//        Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beType != null ? beType.builtInRegistryHolder().key().identifier().toString() : "<null>", inv != null ? inv.getContainerSize() : "<null>");
 
         if ((beType != null && beType.equals(BlockEntityType.ENDER_CHEST)) ||
             be instanceof EnderChestBlockEntity)
@@ -458,7 +458,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
         }
 
-        Tweakeroo.LOGGER.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, data != null ? data.getString("id") : new CompoundData());
+//        Tweakeroo.LOGGER.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, data != null ? data.getString("id") : new CompoundData());
 
         if (inv == null || data == null)
         {
