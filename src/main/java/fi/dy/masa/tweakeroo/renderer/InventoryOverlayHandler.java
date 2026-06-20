@@ -236,16 +236,16 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     }
                 }
 
-                if (be == null)
-                {
-                    if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
-                    {
-                        this.context = this.lastBlockEntityContext.getRight();
-                        return this.context;
-                    }
-
-                    return null;
-                }
+//                if (be == null)
+//                {
+//                    if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
+//                    {
+//                        this.context = this.lastBlockEntityContext.getRight();
+//                        return this.context;
+//                    }
+//
+//                    return null;
+//                }
 
 //                Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, data != null);
                 InventoryOverlayContext ctx = this.getTargetInventoryFromBlock(world, pos, be, data);
