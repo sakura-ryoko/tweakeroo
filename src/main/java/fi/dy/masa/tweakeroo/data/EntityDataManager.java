@@ -212,7 +212,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             this.lastTickTime = now - (this.getCacheTimeout() + 5000L);
             this.cache.tickCache(now);
             this.lastTickTime = now;
-            this.clientWorld = mc.level;
+            this.clientWorld = this.mc.level;
             this.checkOpStatus = true;
             this.lastOpCheck = now;
         }
@@ -461,7 +461,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         if (handler != null)
         {
             this.sentBackupPackets = true;
-            handler.getDebugQueryHandler().queryBlockEntityTag(pos, nbtCompound -> handleBlockEntityData(pos, nbtCompound));
+            handler.getDebugQueryHandler().queryBlockEntityTag(pos, nbtCompound -> this.handleBlockEntityData(pos, nbtCompound));
             this.transactionToBlockPosOrEntityId.put(((IMixinDebugQueryHandler) handler.getDebugQueryHandler()).malilib_currentTransactionId(), Either.left(pos));
         }
     }
@@ -478,7 +478,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         if (handler != null)
         {
             this.sentBackupPackets = true;
-            handler.getDebugQueryHandler().queryEntityTag(entityId, nbtCompound -> handleEntityData(entityId, nbtCompound));
+            handler.getDebugQueryHandler().queryEntityTag(entityId, nbtCompound -> this.handleEntityData(entityId, nbtCompound));
             this.transactionToBlockPosOrEntityId.put(((IMixinDebugQueryHandler) handler.getDebugQueryHandler()).malilib_currentTransactionId(), Either.right(entityId));
         }
     }
