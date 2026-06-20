@@ -49,6 +49,7 @@ import fi.dy.masa.malilib.util.nbt.NbtInventory;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
 import fi.dy.masa.malilib.util.position.BlockPos;
 import fi.dy.masa.tweakeroo.Reference;
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
 
@@ -204,47 +205,47 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 //                    list = inventory.sorted().toDataList(world.registryAccess());
 //                }
 //
-//                if (world instanceof ServerLevel)
-//                {
-//                    be = world.getChunkAt(pos).getBlockEntity(pos);
-//
-//                    if (be != null)
-//                    {
-//	                    data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
-//
-//                        if (list != null && !list.isEmpty())
-//                        {
-//                            data.remove(NbtKeys.ITEMS);
-//                            data.put(NbtKeys.ITEMS, list);
-//                        }
-//                    }
-//                }
-//                else
-//                {
-//	                Pair<BlockEntity, CompoundData> pair = this.getDataSyncer().requestBlockEntity(world, pos);
-//
-//                    if (pair != null)
-//                    {
-//                        data = pair.getRight();
-//
-//                        if (list != null && !list.isEmpty())
-//                        {
-//                            data.remove(NbtKeys.ITEMS);
-//                            data.put(NbtKeys.ITEMS, list);
-//                        }
-//                    }
-//                }
+                if (world instanceof ServerLevel)
+                {
+                    be = world.getChunkAt(pos).getBlockEntity(pos);
 
-//                if (be == null)
-//                {
-//                    if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
-//                    {
-//                        this.context = this.lastBlockEntityContext.getRight();
-//                        return this.context;
-//                    }
-//
-//                    return null;
-//                }
+                    if (be != null)
+                    {
+	                    data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
+
+//                        if (list != null && !list.isEmpty())
+//                        {
+//                            data.remove(NbtKeys.ITEMS);
+//                            data.put(NbtKeys.ITEMS, list);
+//                        }
+                    }
+                }
+                else
+                {
+	                Pair<BlockEntity, CompoundData> pair = this.getDataSyncer().requestBlockEntity(world, pos);
+
+                    if (pair != null)
+                    {
+                        data = pair.getRight();
+
+//                        if (list != null && !list.isEmpty())
+//                        {
+//                            data.remove(NbtKeys.ITEMS);
+//                            data.put(NbtKeys.ITEMS, list);
+//                        }
+                    }
+                }
+
+                if (be == null)
+                {
+                    if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
+                    {
+                        this.context = this.lastBlockEntityContext.getRight();
+                        return this.context;
+                    }
+
+                    return null;
+                }
 
 //                Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, data != null);
                 InventoryOverlayContext ctx = this.getTargetInventoryFromBlock(world, pos, be, data);
