@@ -237,7 +237,7 @@ public class MiscUtils
             }
 
             // Refresh the rendered chunks when exiting zoom mode
-            Minecraft.getInstance().levelExtractor.allChanged();
+//            Minecraft.getInstance().levelExtractor.allChanged();
 
             zoomActive = false;
         }
@@ -286,7 +286,7 @@ public class MiscUtils
             }
 
             // Refresh the rendered chunks when exiting zoom mode
-            Minecraft.getInstance().levelExtractor.allChanged();
+//            Minecraft.getInstance().levelExtractor.allChanged();
 
             spyglassZoomActive = false;
         }
