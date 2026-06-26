@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -47,7 +48,6 @@ import fi.dy.masa.malilib.util.data.tag.converter.DataConverterNbt;
 import fi.dy.masa.malilib.util.game.RayTraceUtils;
 import fi.dy.masa.malilib.util.nbt.NbtInventory;
 import fi.dy.masa.malilib.util.nbt.NbtKeys;
-import fi.dy.masa.malilib.util.position.BlockPos;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
@@ -187,7 +187,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
         if (trace.getType() == HitResult.Type.BLOCK)
         {
-            BlockPos pos = BlockPos.of(((BlockHitResult) trace).getBlockPos());
+            BlockPos pos = ((BlockHitResult) trace).getBlockPos();
             BlockState state = world.getBlockState(pos);
             Block blockTmp = state.getBlock();
             BlockEntity be = null;
@@ -621,7 +621,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             // Refresh data
             if (data.be() != null)
             {
-                BlockPos pos = BlockPos.of(data.be().getBlockPos());
+                BlockPos pos = data.be().getBlockPos();
                 InventoryOverlayHandler.getInstance().requestBlockEntityAt(world, pos);
                 data = InventoryOverlayHandler.getInstance().getTargetInventoryFromBlock(data.be().getLevel(), pos, data.be(), data.data());
             }
