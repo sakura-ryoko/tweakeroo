@@ -657,7 +657,7 @@
     "tweakeroo.config.generic.name.selectiveBlocksHideParticles": "隐藏粒子设置",
     "tweakeroo.config.generic.name.selectiveBlocksNoHit": "禁用隐藏方块选中",
     "tweakeroo.config.generic.name.selectiveBlocksTrackPistons": "追踪活塞运动",
-    "tweakeroo.config.generic.name.serverDataSyncCacheRefresh": "服务器数据同步 - 缓存刷新间隔",
+    "tweakeroo.config.generic.name.serverDataSyncCacheRefresh": "服务器数据同步 - 缓存刷新",
     "tweakeroo.config.generic.name.serverDataSyncCacheTimeout": "服务器数据同步 - 缓存超时",
     "tweakeroo.config.generic.name.serverNbtRequestRate": "服务器NBT请求频率",
     "tweakeroo.config.generic.name.shulkerDisplayBgColor": "潜影盒 - 背景颜色",

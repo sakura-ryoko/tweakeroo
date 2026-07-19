@@ -24,6 +24,7 @@ import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.data.tag.CompoundData;
 import fi.dy.masa.malilib.util.data.tag.converter.DataConverterNbt;
 import fi.dy.masa.malilib.util.data_syncer.EntityDataCache;
@@ -102,7 +103,9 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                 if (!DataManager.getInstance().hasIntegratedServer() && this.hasServuxServer())
                 {
                     this.servuxServer = false;
+                    HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
                     HANDLER.unregisterPlayReceiver();
+                    HANDLER.reset(this.getNetworkChannel());
                 }
 
                 if (!Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
@@ -111,7 +114,8 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                     return;
                 }
             }
-            else if (!DataManager.getInstance().hasIntegratedServer() &&
+            else if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() &&
+                    !DataManager.getInstance().hasIntegratedServer() &&
                     !this.hasServuxServer() &&
                     !this.hasInValidServux &&
                     this.getBestWorld() != null)
@@ -384,50 +388,75 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         if (!DataManager.getInstance().hasIntegratedServer() &&
             Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
         {
-            CompoundTag nbt = new CompoundTag();
-            nbt.putString("version", Reference.MOD_STRING);
-
+            CompoundData nbt = new CompoundData();
+            nbt.putInt("version", ServuxTweaksPacket.PROTOCOL_VERSION);
             HANDLER.encodeClientData(ServuxTweaksPacket.MetadataRequest(nbt));
         }
     }
 
-    public boolean receiveServuxMetadata(CompoundTag nbt)
+    @Deprecated(forRemoval = true)
+    public boolean receiveServuxMetadata(CompoundTag data)
+    {
+        return this.receiveServuxMetadata(DataConverterNbt.fromVanillaCompound(data));
+    }
+
+    public boolean receiveServuxMetadata(CompoundData data)
     {
         if (!DataManager.getInstance().hasIntegratedServer())
         {
             Tweakeroo.debugLog("tweaksDataChannel: received METADATA from Servux");
-            this.checkTweaksConfigs(nbt);
+            this.checkTweaksConfigs(data);
 
             if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
             {
-                if (nbt.getIntOr("version", -1) != ServuxTweaksPacket.PROTOCOL_VERSION)
+                final int version = data.getIntOrDefault("version", -1);
+                final String servux = data.getStringOrDefault("servux", "?");
+
+                if (version != ServuxTweaksPacket.PROTOCOL_VERSION || !servux.startsWith("servux-"+Reference.MOD_TYPE+"-"+Reference.MC_VERSION))
                 {
-                    Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version!");
+                    Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version! (Expected: {} but got {} running on: {})", ServuxTweaksPacket.PROTOCOL_VERSION, version, servux);
+
+                    if (version >= ServuxTweaksPacket.PROTOCOL_VERSION)
+                    {
+                        HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
+                    }
+
+                    HANDLER.unregisterPlayReceiver();
+                    HANDLER.reset(this.getNetworkChannel());
+                    Configs.Generic.ENTITY_DATA_SYNC.setBooleanValue(false);
+                    return false;
                 }
 
+                Tweakeroo.debugLog("tweaksDataChannel: Connected to: {}", servux);
                 DataManager.getInstance().setHasServuxServer(true);
-                this.setServuxVersion(nbt.getStringOr("servux", ""));
+                this.setServuxVersion(servux);
                 this.setIsServuxServer();
-                
+
                 return true;
             }
         }
 
         return false;
     }
-    
-    // This is only meant to keep some Tweaks in sync with the Server, such as Stackable Shulkers.
+
+    @Deprecated(forRemoval = true)
     private void checkTweaksConfigs(CompoundTag nbt)
     {
-        if (nbt.contains("stackingShulkers"))
+        this.checkTweaksConfigs(DataConverterNbt.fromVanillaCompound(nbt));
+    }
+
+    // This is only meant to keep some Tweaks in sync with the Server, such as Stackable Shulkers.
+    private void checkTweaksConfigs(CompoundData nbt)
+    {
+        if (nbt.contains("stackingShulkers", Constants.NBT.TAG_BYTE))
         {
-            boolean newValue =nbt.getBooleanOr("stackingShulkers", FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue());
+            boolean newValue = nbt.getBooleanOrDefault("stackingShulkers", FeatureToggle.TWEAK_SHULKERBOX_STACKING.getBooleanValue());
             Tweakeroo.debugLog("checkTweaksConfigs: stackingShulkers: [{}]", newValue);
             FeatureToggle.TWEAK_SHULKERBOX_STACKING.setBooleanValue(newValue);
         }
-        if (nbt.contains("stackingShulkersMax"))
+        if (nbt.contains("stackingShulkersMax", Constants.NBT.TAG_INT))
         {
-            int newValue = Math.clamp(nbt.getIntOr("stackingShulkersMax", 64), 1, 99);
+            int newValue = Math.clamp(nbt.getIntOrDefault("stackingShulkersMax", 64), 1, 99);
             Tweakeroo.debugLog("checkTweaksConfigs: stackingShulkersMax: [{}]", newValue);
             Configs.Internal.SHULKER_MAX_STACK_SIZE.setIntegerValue(newValue);
         }
@@ -435,6 +464,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
 
     public void onPacketFailure()
     {
+        Configs.Generic.ENTITY_DATA_SYNC.setBooleanValue(false);
         DataManager.getInstance().setHasServuxServer(false);
         this.servuxServer = false;
         this.hasInValidServux = true;
@@ -498,18 +528,6 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         {
             HANDLER.encodeClientData(ServuxTweaksPacket.EntityRequest(entityId));
         }
-    }
-
-    @Override
-    public void handleBulkEntityData(int transactionId, CompoundData data)
-    {
-        this.handleBulkEntityData(transactionId, DataConverterNbt.toVanillaCompound(data));
-    }
-
-    @Override
-    public void handleBulkEntityData(int transactionId, CompoundTag nbt)
-    {
-        // todo
     }
 
     @Override
