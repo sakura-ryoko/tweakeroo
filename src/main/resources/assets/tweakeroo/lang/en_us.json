@@ -229,7 +229,7 @@
     "tweakeroo.config.feature_toggle.comment.tweakRenderEdgeChunks": "Allows the edge-most client-loaded chunks to render.\nVanilla doesn't allow rendering chunks that don't have\nall the adjacent chunks loaded, meaning that the edge-most chunk\nof the client's loaded won't render in vanilla.\n§lThis is also very helpful in the Free Camera mode!§r",
     "tweakeroo.config.feature_toggle.comment.tweakRenderInvisibleEntities": "When enabled, invisible entities are rendered like\nthey would be in spectator mode.",
     "tweakeroo.config.feature_toggle.comment.tweakRenderLimitEntities": "Enables limiting the number of certain types of entities\nto render per frame. Currently XP Orbs and Item entities\nare supported, see Generic configs for the limits.",
-    "tweakeroo.config.feature_toggle.comment.tweakRepairMode": "If enabled, then fully repaired items held in hand will\nbe swapped to damaged items that have Mending on them.",
+    "tweakeroo.config.feature_toggle.comment.tweakRepairMode": "If enabled, then fully repaired items in the slots configured in Lists -> repairModeSlots\nwill be swapped to damaged items that have Mending on them.",
     "tweakeroo.config.feature_toggle.comment.tweakScaffoldPlace": "Enables placing blocks as if they were scaffolding.\nSet the max distance in Generic -> scaffoldPlaceDistance\nWritten by Andrew54757 under TweakFork",
     "tweakeroo.config.feature_toggle.comment.tweakSculkPulseLength": "Allows modifying the Sculk Sensor pulse length. Set the pulse length in Generic -> sculkSensorPulseLength",
     "tweakeroo.config.feature_toggle.comment.tweakSelectiveBlocksRenderOutline": "Renders an outline over listed blocks\nWritten by Andrew54757 under TweakFork",
