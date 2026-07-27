@@ -34,6 +34,9 @@ public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
     @Shadow public float oPortalEffectIntensity;
     @Shadow public float portalEffectIntensity;
 
+    @Shadow
+    public abstract boolean isUnderWater();
+
     @Unique private float realNauseaIntensity;
 
     private MixinLocalPlayer_common(ClientLevel world, GameProfile profile)
@@ -70,12 +73,23 @@ public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
     private void tweakeroo_overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
-            ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardImpulse() &&
-            (this.getFoodData().getFoodLevel() > 6.0F || this.getAbilities().mayfly) &&
-            ! this.hasEffect(MobEffects.BLINDNESS) && ! this.isInWater())
+            canPermaSprintSwim() && ! this.isInWater())
         {
             this.setSprinting(true);
         }
+        if (FeatureToggle.TWEAK_PERMANENT_SWIM.getBooleanValue() &&
+            canPermaSprintSwim() && this.isUnderWater() && ! this.isSwimming())
+        {
+            this.setSwimming(true);
+            if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue()) this.setSprinting(true);
+        }
+    }
+
+    @Unique
+    private boolean canPermaSprintSwim() {
+        return ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardImpulse() &&
+                (this.getFoodData().getFoodLevel() > 6.0F || this.getAbilities().mayfly) &&
+                ! this.hasEffect(MobEffects.BLINDNESS);
     }
 
     @WrapOperation(method = "shouldStopRunSprinting", at = @At(value = "FIELD",
