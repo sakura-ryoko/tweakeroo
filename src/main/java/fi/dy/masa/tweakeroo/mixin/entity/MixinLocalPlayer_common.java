@@ -36,6 +36,8 @@ public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
 
     @Shadow
     public abstract boolean isUnderWater();
+    @Shadow
+    protected abstract boolean isSprintingPossible(final boolean allowedInShallowWater);
 
     @Unique private float realNauseaIntensity;
 
@@ -73,7 +75,7 @@ public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
     private void tweakeroo_overrideSprint(CallbackInfo ci)
     {
         if (FeatureToggle.TWEAK_PERMANENT_SPRINT.getBooleanValue() &&
-            canPermaSprintSwim() && ! this.isInWater())
+            canPermaSprintSwim() && ! this.isInWater() && ! this.shouldStopRunSprinting())
         {
             this.setSprinting(true);
         }
@@ -90,6 +92,11 @@ public abstract class MixinLocalPlayer_common extends AbstractClientPlayer
         return ! this.isSprinting() && ! this.isUsingItem() && this.input.hasForwardImpulse() &&
                 (this.getFoodData().getFoodLevel() > 6.0F || this.getAbilities().mayfly) &&
                 ! this.hasEffect(MobEffects.BLINDNESS);
+    }
+
+    @Unique
+    private boolean shouldStopRunSprinting() {
+        return (! this.isSprintingPossible(this.getAbilities().flying) || this.horizontalCollision && ! this.minorHorizontalCollision) && ! Configs.Disable.DISABLE_WALL_UNSPRINT.getBooleanValue();
     }
 
     @WrapOperation(method = "shouldStopRunSprinting", at = @At(value = "FIELD",
