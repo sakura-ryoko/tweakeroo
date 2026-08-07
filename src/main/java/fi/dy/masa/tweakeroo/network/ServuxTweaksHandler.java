@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import fi.dy.masa.malilib.network.IClientPayloadData;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
-import fi.dy.masa.malilib.util.data.tag.CompoundData;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
 
@@ -83,9 +82,19 @@ public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> impleme
 					}
 				}
 				case PACKET_S2C_BLOCK_NBT_RESPONSE_SIMPLE ->
+				{
+					if (this.servuxRegistered)
+					{
 						EntityDataManager.getInstance().handleBlockEntityData(packet.getPos(), packet.getCompound());
+					}
+				}
 				case PACKET_S2C_ENTITY_NBT_RESPONSE_SIMPLE ->
+				{
+					if (this.servuxRegistered)
+					{
 						EntityDataManager.getInstance().handleEntityData(packet.getEntityId(), packet.getCompound());
+					}
+				}
 				default ->
 						Tweakeroo.LOGGER.warn("ServuxTweaksHandler#decodeClientData(): received unhandled packetType {} of size {} bytes.", packet.getPacketType(), packet.getTotalSize());
 			}
@@ -156,7 +165,6 @@ public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> impleme
 		{
 			Tweakeroo.debugLog("ServuxTweaksHandler#tickFailures(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", this.maxFailures());
 			this.servuxRegistered = false;
-			this.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
 			ServuxTweaksHandler.INSTANCE.unregisterPlayReceiver();
 			EntityDataManager.getInstance().onPacketFailure();
 		}

@@ -104,6 +104,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                     this.servuxServer = false;
                     HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
                     HANDLER.unregisterPlayReceiver();
+                    HANDLER.reset(this.getNetworkChannel());
                 }
 
                 if (!Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
@@ -413,8 +414,14 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                 if (version != ServuxTweaksPacket.PROTOCOL_VERSION || !servux.startsWith("servux-"+Reference.MOD_TYPE+"-"+Reference.MC_VERSION))
                 {
                     Tweakeroo.LOGGER.warn("tweaksDataChannel: Mis-matched protocol version! (Expected: {} but got {} running on: {})", ServuxTweaksPacket.PROTOCOL_VERSION, version, servux);
-                    HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
+
+                    if (version >= ServuxTweaksPacket.PROTOCOL_VERSION)
+                    {
+                        HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
+                    }
+
                     HANDLER.unregisterPlayReceiver();
+                    HANDLER.reset(this.getNetworkChannel());
                     Configs.Generic.ENTITY_DATA_SYNC.setBooleanValue(false);
                     return false;
                 }
