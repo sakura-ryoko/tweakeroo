@@ -965,6 +965,7 @@
     "tweakeroo.hotkeys.category.generic_hotkeys": "通用功能快捷鍵",
     "tweakeroo.hotkeys.category.tweak_toggle_hotkeys": "開啟快捷鍵切換",
     "tweakeroo.label.config_comment.single_player_only": "§6注意：此功能要麼完全無法執行§r\n§6或者至少只能在單人遊戲中執行§r",
+    "tweakeroo.label.config_comment.single_player_or_servux": "§6Note: This feature works either at all or§r\n§6at least fully only in single player; or while\n§6connected to Servux with 'entityDataSync' enabled§r",
     "tweakeroo.label.config_comment.without_mod_only": "§cNote: This feature only works while '%s' is not installed.§r",
     "tweakeroo.label.placement_restriction_mode.column": "列",
     "tweakeroo.label.placement_restriction_mode.diagonal": "對角線",

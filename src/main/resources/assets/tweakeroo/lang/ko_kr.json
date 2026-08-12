@@ -965,6 +965,7 @@
     "tweakeroo.hotkeys.category.generic_hotkeys": "일반 단축키",
     "tweakeroo.hotkeys.category.tweak_toggle_hotkeys": "토글 단축키 트윅",
     "tweakeroo.label.config_comment.single_player_only": "참고: 이 기능은 싱글 플레이어에서만 완전히 작동합니다.",
+    "tweakeroo.label.config_comment.single_player_or_servux": "§6Note: This feature works either at all or§r\n§6at least fully only in single player; or while\n§6connected to Servux with 'entityDataSync' enabled§r",
     "tweakeroo.label.config_comment.without_mod_only": "§c참고: 이 기능은 '%s'이(가) 설치되어 있지 않을 때만 작동합니다.§r",
     "tweakeroo.label.placement_restriction_mode.column": "열",
     "tweakeroo.label.placement_restriction_mode.diagonal": "대각",
