@@ -74,6 +74,7 @@
         "hud.MixinEffectsInInventory",
         "hud.MixinHud",
         "hud.MixinLerpingBossEvent",
+        "hud.MixinPlayerMenuItem",
         "hud.MixinTeleportToPlayerMenuCategory",
         "input.MixinClientSuggestionProvider",
         "input.MixinKeyboardInput",
