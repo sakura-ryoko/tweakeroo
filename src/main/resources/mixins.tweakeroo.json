@@ -73,6 +73,7 @@
         "hud.MixinClientBossBar",
         "hud.MixinInGameHud",
         "hud.MixinStatusEffectsDisplay",
+        "hud.MixinPlayerMenuItem",
         "hud.MixinTeleportSpectatorMenu",
         "input.MixinClientCommandSource",
         "input.MixinKeyboardInput",

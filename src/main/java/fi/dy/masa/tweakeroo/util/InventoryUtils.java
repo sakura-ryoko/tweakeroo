@@ -1188,6 +1188,7 @@ public class InventoryUtils
         if (slotNum == -1) { return; }
         ItemStack stack = player.getItemBySlot(type);
 
+        // Fully repaired items in slot should be swapped with damaged items with mending
         if (stack.isEmpty() == false && (stack.isDamageableItem() == false || stack.isDamaged() == false || EquipmentUtils.getEnchantmentLevel(stack, Enchantments.MENDING) <= 0))
         {
             Slot slot = player.containerMenu.getSlot(slotNum);
@@ -1210,7 +1211,7 @@ public class InventoryUtils
 
         for (Slot slot : containerPlayer.slots)
         {
-            if (slot.hasItem() && isConfiguredRepairSlot(slot.index, player) == false)
+            if (slot.hasItem() && isConfiguredRepairSlot(slot.index, player) == false && slot.mayPlace(targetSlot.getItem()))
             {
                 ItemStack stack = slot.getItem();
 
@@ -1496,9 +1497,14 @@ public class InventoryUtils
     {
         Minecraft mc = Minecraft.getInstance();
         AbstractContainerMenu container = player.containerMenu;
-        mc.gameMode.handleInventoryMouseClick(container.containerId, slotNum, 0, ClickType.SWAP, player);
-        mc.gameMode.handleInventoryMouseClick(container.containerId, otherSlot, 0, ClickType.SWAP, player);
-        mc.gameMode.handleInventoryMouseClick(container.containerId, slotNum, 0, ClickType.SWAP, player);
+
+        int hotbarSlot = 0;
+        while (36 + hotbarSlot == slotNum || 36 + hotbarSlot == otherSlot) {
+            ++hotbarSlot;
+        }
+        mc.gameMode.handleInventoryMouseClick(container.containerId, slotNum, hotbarSlot, ClickType.SWAP, player);
+        mc.gameMode.handleInventoryMouseClick(container.containerId, otherSlot, hotbarSlot, ClickType.SWAP, player);
+        mc.gameMode.handleInventoryMouseClick(container.containerId, slotNum, hotbarSlot, ClickType.SWAP, player);
     }
 
     private static void swapToolToHand(int slotNumber, Minecraft mc)
