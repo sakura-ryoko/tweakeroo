@@ -148,6 +148,7 @@ public abstract class MixinMultiPlayerGameMode
                 for (InteractionHand hand : InteractionHand.values())
                 {
                     ItemStack stack = this.minecraft.player.getItemInHand(hand);
+                    ItemStack originalStack = stack.copy();
                     if (stack != null && stack.getItem() instanceof BlockItem
                         && this.useItemOn(this.minecraft.player, hand, blockHitResult).consumesAction()
                     )
@@ -156,6 +157,10 @@ public abstract class MixinMultiPlayerGameMode
                         if (!this.minecraft.player.getAbilities().instabuild)
                         {
                             this.destroyDelay = 1;
+                        }
+                        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue())
+                        {
+                            PlacementTweaks.tryRestockHand(this.minecraft.player, hand, originalStack);
                         }
                         return;
                     }
@@ -178,9 +183,14 @@ public abstract class MixinMultiPlayerGameMode
                 for (InteractionHand hand : InteractionHand.values())
                 {
                     ItemStack stack = this.minecraft.player.getItemInHand(hand);
+                    ItemStack originalStack = stack.copy();
                     if (stack != null && stack.getItem() instanceof BlockItem
                         && this.useItemOn(this.minecraft.player, hand, blockHitResult).consumesAction())
                     {
+                        if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue())
+                        {
+                            PlacementTweaks.tryRestockHand(this.minecraft.player, hand, originalStack);
+                        }
                         return;
                     }
                 }

@@ -83,6 +83,7 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     TWEAK_PERIODIC_HOLD_USE         ("tweakPeriodicHoldUse",                false, ""),
     TWEAK_PERMANENT_SNEAK           ("tweakPermanentSneak",                 false, ""),
     TWEAK_PERMANENT_SPRINT          ("tweakPermanentSprint",                false, ""),
+    TWEAK_PERMANENT_SWIM            ("tweakPermanentSwim",                  false, ""),
     TWEAK_PLACEMENT_GRID            ("tweakPlacementGrid",                  false, "",    KeybindSettings.INGAME_BOTH),
     TWEAK_PLACEMENT_LIMIT           ("tweakPlacementLimit",                 false, "",    KeybindSettings.INGAME_BOTH),
     TWEAK_PLACEMENT_RESTRICTION     ("tweakPlacementRestriction",           false, ""),

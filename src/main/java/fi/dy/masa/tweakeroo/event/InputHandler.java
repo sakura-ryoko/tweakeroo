@@ -6,6 +6,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.*;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -254,7 +255,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                         Configs.Generic.ZOOM_FOV_DIFFERENCE.getDoubleValue();
                 
                 double newValue = Configs.Generic.ZOOM_FOV.getDoubleValue() + (dWheel < 0 ? diff : -diff);
-                Configs.Generic.ZOOM_FOV.setDoubleValue(newValue);
+                Configs.Generic.ZOOM_FOV.setDoubleValue(MathUtils.clamp(newValue, Configs.Generic.ZOOM_MINIMUM_FOV.getDoubleValue(), Configs.Generic.ZOOM_MAXIMUM_FOV.getDoubleValue()));
 
                 // Only prevent the next trigger when adjusting the value with the actual toggle key held
                 if (FeatureToggle.TWEAK_ZOOM.getKeybind().isKeybindHeld())

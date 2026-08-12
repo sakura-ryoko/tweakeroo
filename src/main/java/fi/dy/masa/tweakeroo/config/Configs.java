@@ -174,10 +174,12 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    	UTILITY_HAND_SLOT                   = new ConfigOptionList  ("utilityHandSlot", HandSlot.MAIN_HAND).apply(GENERIC_KEY);
         public static final ConfigBooleanHotkeyed	WEAPON_SWAP_BETTER_ENCHANTS			= new ConfigBooleanHotkeyed ("weaponSwapBetterEnchants", true, "").apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_ADJUST_MOUSE_SENSITIVITY       = new ConfigBoolean     ("zoomAdjustMouseSensitivity", true).apply(GENERIC_KEY);
-        public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 359.99).apply(GENERIC_KEY);
+        public static final ConfigDouble			ZOOM_FOV                            = new ConfigDouble      ("zoomFov", 30, 0.01, 358.7).apply(GENERIC_KEY);
         public static final ConfigDouble			ZOOM_FOV_DIFFERENCE                 = new ConfigDouble      ("zoomFovDifference", 1, 0.01, 359.99).apply(GENERIC_KEY);
         public static final ConfigDouble            ZOOM_FOV_DIFFERENCE_CTRL            = new ConfigDouble      ("zoomFovDifferenceCtrl", 5, 0, 359.99).apply(GENERIC_KEY);
         public static final ConfigBoolean			ZOOM_RESET_FOV_ON_ACTIVATE          = new ConfigBoolean     ("zoomResetFovOnActivate", true).apply(GENERIC_KEY);
+        public static final ConfigDouble			ZOOM_MINIMUM_FOV                    = new ConfigDouble      ("zoomMinimumFov", 0, 0, 360).apply(GENERIC_KEY);
+        public static final ConfigDouble            ZOOM_MAXIMUM_FOV                    = new ConfigDouble      ("zoomMaximumFov", 360, 0, 360).apply(GENERIC_KEY);
 
         public static final ImmutableList<@NotNull IConfigBase> OPTIONS = ImmutableList.of(
                 ACCURATE_PLACEMENT_PROTOCOL_MODE,
@@ -309,7 +311,9 @@ public class Configs implements IConfigHandler
                 ZOOM_FOV,
                 ZOOM_FOV_DIFFERENCE,
                 ZOOM_FOV_DIFFERENCE_CTRL,
-                ZOOM_RESET_FOV_ON_ACTIVATE
+                ZOOM_RESET_FOV_ON_ACTIVATE,
+                ZOOM_MINIMUM_FOV,
+                ZOOM_MAXIMUM_FOV
         );
 
         public static final ImmutableList<@NotNull IHotkey> HOTKEYS = ImmutableList.of(
