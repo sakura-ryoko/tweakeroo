@@ -105,6 +105,16 @@ public abstract class MixinEntity
                 SnapAimMode mode = (SnapAimMode) Configs.Generic.SNAP_AIM_MODE.getOptionListValue();
                 boolean snapAimLock = FeatureToggle.TWEAK_SNAP_AIM_LOCK.getBooleanValue();
 
+                // Keep the unsnapped axis in sync with rotations made outside of turn(), such as by flight mods.
+                if (mode == SnapAimMode.YAW)
+                {
+                    this.lastFreePitch = this.xRot;
+                }
+                else if (mode == SnapAimMode.PITCH)
+                {
+                    this.lastFreeYaw = this.yRot;
+                }
+
                 // Not locked, or not snapping the yaw (i.e. not in Yaw or Both modes)
                 boolean updateYaw = snapAimLock == false || mode == SnapAimMode.PITCH;
                 // Not locked, or not snapping the pitch (i.e. not in Pitch or Both modes)
