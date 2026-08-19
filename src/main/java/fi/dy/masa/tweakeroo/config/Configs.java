@@ -70,7 +70,7 @@ public class Configs implements IConfigHandler
 	    public static final ConfigBooleanHotkeyed   ENTITY_DATA_SYNC                    = new ConfigBooleanHotkeyed ("entityDataSync", false, "").apply(GENERIC_KEY);
 	    public static final ConfigBooleanHotkeyed   ENTITY_DATA_SYNC_BACKUP             = new ConfigBooleanHotkeyed ("entityDataSyncBackup", false, "").apply(GENERIC_KEY);
 	    public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_REFRESH      = new ConfigFloat       ("entityDataSyncCacheRefresh", 0.25f, 0.05f, 1.0f).apply(GENERIC_KEY);
-	    public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("entityDataSyncCacheTimeout", 2.75f, 1.0f, 25.0f).apply(GENERIC_KEY);
+	    public static final ConfigFloat             ENTITY_DATA_SYNC_CACHE_TIMEOUT      = new ConfigFloat       ("entityDataSyncCacheTimeout", 2.75f, 1.0f, 30.0f).apply(GENERIC_KEY);
         public static final ConfigDouble        	ENTITY_REACH_DISTANCE               = new ConfigDouble      ("entityReachDistance", 3.0, 1, 64).apply(GENERIC_KEY);
         public static final ConfigOptionList    	ENTITY_TYPE_ATTACK_RESTRICTION_WARN = new ConfigOptionList  ("entityTypeAttackRestrictionWarn", MessageOutputType.MESSAGE).apply(GENERIC_KEY);
         public static final ConfigInteger       	FAST_BLOCK_PLACEMENT_COUNT          = new ConfigInteger     ("fastBlockPlacementCount", 2, 1, 16).apply(GENERIC_KEY);

@@ -196,15 +196,6 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
             if (blockTmp instanceof EntityBlock)
             {
-//                Optional<NbtInventory> combinedInv = this.getCombinedInventory(world, pos);
-//                ListData list = null;
-//
-//                if (combinedInv.isPresent())
-//                {
-//                    NbtInventory inventory = combinedInv.get();
-//                    list = inventory.sorted().toDataList(world.registryAccess());
-//                }
-//
                 if (world instanceof ServerLevel)
                 {
                     be = world.getChunkAt(pos).getBlockEntity(pos);
@@ -212,12 +203,6 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     if (be != null)
                     {
 	                    data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
-
-//                        if (list != null && !list.isEmpty())
-//                        {
-//                            data.remove(NbtKeys.ITEMS);
-//                            data.put(NbtKeys.ITEMS, list);
-//                        }
                     }
                 }
                 else
@@ -227,25 +212,8 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     if (pair != null)
                     {
                         data = pair.getRight();
-
-//                        if (list != null && !list.isEmpty())
-//                        {
-//                            data.remove(NbtKeys.ITEMS);
-//                            data.put(NbtKeys.ITEMS, list);
-//                        }
                     }
                 }
-
-//                if (be == null)
-//                {
-//                    if (this.lastBlockEntityContext != null && this.lastBlockEntityContext.getLeft().equals(pos))
-//                    {
-//                        this.context = this.lastBlockEntityContext.getRight();
-//                        return this.context;
-//                    }
-//
-//                    return null;
-//                }
 
 //                Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, data != null);
                 InventoryOverlayContext ctx = this.getTargetInventoryFromBlock(world, pos, be, data);
@@ -325,7 +293,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             }
 
             //Tweakeroo.LOGGER.error("getTarget(): Entity [{}] raw NBT [{}]", entity.getId(), data.toString());
-            InventoryOverlayContext ctx = getTargetInventoryFromEntity(entity, data);
+            InventoryOverlayContext ctx = this.getTargetInventoryFromEntity(entity, data);
 //            dumpContext(ctx);
 
             if (this.lastEntityContext != null && this.lastEntityContext.getLeft() != entity.getId())
@@ -408,10 +376,11 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 if (pair != null)
                 {
 	                data = pair.getRight();
+                    be = pair.getLeft();
                 }
             }
 
-            inv = this.getDataSyncer().getBlockInventory(world, pos, false);
+            inv = this.getDataSyncer().getBlockInventory(world, pos, true);
         }
 
         BlockEntityType<?> beType = data != null ? DataBlockUtils.getBlockEntityType(data) : null;
@@ -460,12 +429,31 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
 //        Tweakeroo.LOGGER.warn("getTarget():3: pos [{}], inv [{}], be [{}], nbt [{}]", pos.toShortString(), inv != null, be != null, data != null ? data.getString("id") : new CompoundData());
 
+        if (be == null)
+        {
+            be = world.getBlockEntity(pos);
+
+            if (inv == null || inv.isEmpty())
+            {
+                if (be instanceof Container cc)
+                {
+                    inv = cc;
+                }
+                else
+                {
+                    inv = new SimpleContainer(1);
+                }
+            }
+        }
+
         if (inv == null || data == null)
         {
             return null;
         }
 
-        this.context = new InventoryOverlayContext(InventoryOverlay.getBestInventoryType(inv, data), inv, be != null ? be : world.getBlockEntity(pos), null, data, this.getRefreshHandler());
+        this.context = new InventoryOverlayContext(InventoryOverlay.getBestInventoryType(inv, data), inv,
+                                                   be != null ? be : world.getBlockEntity(pos), null,
+                                                   data, this.getRefreshHandler());
 
         return this.context;
     }
@@ -587,8 +575,10 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             return null;
         }
 
-        this.context = new InventoryOverlayContext(inv != null ? InventoryOverlay.getBestInventoryType(inv, data) : InventoryOverlay.getInventoryType(data),
-                                                    inv, null, entityLivingBase, data, this.getRefreshHandler());
+        this.context = new InventoryOverlayContext(inv != null
+                                                   ? InventoryOverlay.getBestInventoryType(inv, data)
+                                                   : InventoryOverlay.getInventoryType(data),
+                                                   inv, null, entityLivingBase, data, this.getRefreshHandler());
 
         return this.context;
     }
