@@ -354,9 +354,8 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 //    @SuppressWarnings("deprecation")
     public @Nullable InventoryOverlayContext getTargetInventoryFromBlock(Level world, BlockPos pos, @Nullable BlockEntity be, CompoundData data)
     {
+        if (world == null) { return null; }
         Container inv;
-
-        if (world == null) return null;
 
         if (be != null)
         {
@@ -439,16 +438,16 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 {
                     inv = cc;
                 }
-                else
-                {
-                    inv = new SimpleContainer(1);
-                }
             }
         }
 
-        if (inv == null || data == null)
+        if (data == null)
         {
-            return null;
+            data = new CompoundData();
+        }
+        if (inv == null)
+        {
+            inv = new SimpleContainer(1);
         }
 
         this.context = new InventoryOverlayContext(InventoryOverlay.getBestInventoryType(inv, data), inv,
