@@ -179,7 +179,7 @@
     "tweakeroo.config.feature_toggle.comment.tweakEntityReachOverride": "일반 -> 엔티티 도달 거리에 설정된 값으로\n엔티티 도달 거리를 오버라이드합니다.",
     "tweakeroo.config.feature_toggle.comment.tweakEntityTypeAttackRestriction": "(직접) 공격할 수 있는 엔티티를 제한합니다.\n목록 카테고리에서 해당 '엔티티 공격 제한*' 설정을 참조하세요.",
     "tweakeroo.config.feature_toggle.comment.tweakExplosionReducedParticles": "활성화된 경우, 모든 폭발 입자는 EXPLOSION_LARGE\n또는 EXPLOSION_HUGE 입자 대신 EXPLOSION_NORMAL\n입자를 사용합니다.",
-    "tweakeroo.config.feature_toggle.comment.tweakF3Cursor": "F3 화면 커서를 항상 렌더링하도록 설정합니다.\n이는 다른 스크린을 열지 않았을 때만 유효합니다;\n예를 들어 보관함이나 설정 스크린을 열면 안 보입니다.",
+    "tweakeroo.config.feature_toggle.comment.tweakF3Cursor": "F3 화면 커서를 항상 렌더링하도록 설정합니다.\n이는 다른 화면을 열지 않았을 때만 유효합니다;\n예를 들어 보관함이나 설정 화면을 열면 안 보입니다.",
     "tweakeroo.config.feature_toggle.comment.tweakFakeSneakPlacement": "이 트윅은 클릭 위치를 실제로 클릭한 블록에서\n인접한 공기 블록으로 오프셋합니다.\n기본적으로 이를 통해 웅크리지 않고도 보관함 GUI를 여는\n것과 같은 클릭 동작이 있는 블록에 블록을 설치할 수 있습니다.\n참고로 이것은 실제로 가상 웅크리기를 하는 것이 아니고\n그저 겉보기에 비슷한 효과일 뿐입니다.",
     "tweakeroo.config.feature_toggle.comment.tweakFakeSneaking": "\"가상 웅크리기\"를 활성화합니다. 이동 속도를 늦추지\n않고 가장자리에서 떨어지는 것을 방지합니다.",
     "tweakeroo.config.feature_toggle.comment.tweakFastBlockPlacement": "새로운 블록 위로 커서를 이동할 때 빠르고 편리한 블록 설치를 활성화합니다.",
