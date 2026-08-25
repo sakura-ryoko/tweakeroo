@@ -37,6 +37,7 @@ import fi.dy.masa.malilib.interfaces.IInventoryOverlayHandler;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractHorseEntity;
 import fi.dy.masa.malilib.mixin.entity.IMixinAbstractNautilus;
 import fi.dy.masa.malilib.mixin.entity.IMixinPiglinEntity;
+import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.render.*;
 import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -401,7 +402,8 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 {
                     // Fetch your own EnderItems from Server ...
                     Pair<Entity, CompoundData> enderPair = this.getDataSyncer().requestEntity(world, player.getId());
-                    PlayerEnderChestContainer enderItems = null;
+                    PlayerEnderChestContainer enderItems;
+                    NbtInventory enderCache = Registry.ENTITY_DATA_REGISTRY.chestTracker().getEnderCache();
 
                     if (enderPair != null && enderPair.getRight() != null && enderPair.getRight().contains(NbtKeys.ENDER_ITEMS, Constants.NBT.TAG_LIST))
                     {
@@ -410,6 +412,12 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     else
                     {
                         enderItems = player.getEnderChestInventory();
+                    }
+
+                    if (enderCache != null && !enderCache.isEmpty())
+                    {
+                        inv = enderCache.toInventory(-1);
+                        enderItems = null;
                     }
 
                     if (enderItems != null)
