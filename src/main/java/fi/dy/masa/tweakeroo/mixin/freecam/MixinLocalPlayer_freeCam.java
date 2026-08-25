@@ -48,7 +48,11 @@ public abstract class MixinLocalPlayer_freeCam extends AbstractClientPlayer
     {
         if (this.realInput != null)
         {
-            this.input = this.realInput;
+            if (this.input == this.dummyMovementInput)
+            {
+                this.input = this.realInput;
+            }
+
             this.realInput = null;
         }
     }
