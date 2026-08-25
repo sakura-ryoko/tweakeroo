@@ -192,7 +192,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
             Block blockTmp = state.getBlock();
             BlockEntity be = null;
 
-            //Tweakeroo.LOGGER.warn("getTarget():1: pos [{}], state [{}]", pos.toShortString(), state.toString());
+//            Tweakeroo.LOGGER.warn("getTarget():1: pos [{}], state [{}]", pos.toShortString(), state.toString());
 
             if (blockTmp instanceof EntityBlock)
             {
@@ -212,6 +212,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                     if (pair != null)
                     {
                         data = pair.getRight();
+                        be = pair.getLeft();
                     }
                 }
 
@@ -357,33 +358,37 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         if (world == null) { return null; }
         Container inv;
 
-        if (be != null)
-        {
-            if (data.isEmpty())
-            {
-	            data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
-            }
+        // Kind of redundant ...
+//        if (be != null)
+//        {
+//            if (data.isEmpty())
+//            {
+//	            data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
+//            }
+//
+//            inv = InventoryUtils.getInventory(world, pos);
+//        }
+//        else
+//        {
+//            if (data.isEmpty())
+//            {
+//                Pair<BlockEntity, CompoundData> pair = this.requestBlockEntityAt(world, pos);
+//
+//                if (pair != null)
+//                {
+//	                data = pair.getRight();
+//                    be = pair.getLeft();
+//                }
+//            }
 
-            inv = InventoryUtils.getInventory(world, pos);
-        }
-        else
-        {
-            if (data.isEmpty())
-            {
-                Pair<BlockEntity, CompoundData> pair = this.requestBlockEntityAt(world, pos);
-
-                if (pair != null)
-                {
-	                data = pair.getRight();
-                    be = pair.getLeft();
-                }
-            }
-
-            inv = this.getDataSyncer().getBlockInventory(world, pos, true);
-        }
+        inv = this.getDataSyncer().getBlockInventory(world, pos, true);
+//        }
 
         BlockEntityType<?> beType = data != null ? DataBlockUtils.getBlockEntityType(data) : null;
-//        Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beType != null ? beType.builtInRegistryHolder().key().identifier().toString() : "<null>", inv != null ? inv.getContainerSize() : "<null>");
+//        Identifier beId = beType != null
+//                          ? BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(beType)
+//                          : null;
+//        Tweakeroo.LOGGER.warn("getTargetInventoryFromBlock() beType: [{}], inv [{}]", beId != null ? beId.toString() : "<null>", inv != null ? inv.getContainerSize() : "<null>");
 
         if ((beType != null && beType.equals(BlockEntityTypes.ENDER_CHEST)) ||
             be instanceof EnderChestBlockEntity)
