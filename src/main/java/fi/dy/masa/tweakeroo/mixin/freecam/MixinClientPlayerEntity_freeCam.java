@@ -49,7 +49,11 @@ public abstract class MixinClientPlayerEntity_freeCam extends AbstractClientPlay
     {
         if (this.realInput != null)
         {
-            this.input = this.realInput;
+            if (this.input == this.dummyMovementInput)
+            {
+                this.input = this.realInput;
+            }
+
             this.realInput = null;
         }
     }
