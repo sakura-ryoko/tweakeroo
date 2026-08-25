@@ -795,7 +795,7 @@ public class PlacementTweaks
             int threshold = Configs.Generic.HAND_RESTOCK_PRE_THRESHOLD.getIntegerValue();
 
             if (stackOriginal.isEmpty() == false && player.getInventory().getSelectedSlot() == hotbarSlot &&
-                (stackCurrent.isEmpty() || ItemStack.isSameItem(stackCurrent, stackOriginal) == false) || (Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() && stackCurrent.isEmpty() == false && stackCurrent.getCount() <= threshold && stackCurrent.getMaxStackSize() > threshold))
+                ((stackCurrent.isEmpty() || ItemStack.isSameItem(stackCurrent, stackOriginal) == false) || (Configs.Generic.HAND_RESTOCK_PRE.getBooleanValue() && stackCurrent.isEmpty() == false && stackCurrent.getCount() <= threshold && stackCurrent.getMaxStackSize() > threshold)))
             {
                 // Don't allow taking stacks from elsewhere in the hotbar, if the cycle tweak is on
                 boolean allowHotbar = FeatureToggle.TWEAK_HOTBAR_SLOT_CYCLE.getBooleanValue() == false &&
