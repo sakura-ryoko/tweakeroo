@@ -1,21 +1,13 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.objectweb.asm.Opcodes;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.CameraUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -23,6 +15,15 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.util.CameraUtils;
 
 @Mixin(value = LevelRenderer.class, priority = 1005)
 public abstract class MixinWorldRenderer_freeCam
@@ -55,16 +56,16 @@ public abstract class MixinWorldRenderer_freeCam
     }
 
     // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
-    @Redirect(method = "extractVisibleEntities", require = 0, at = @At(value = "INVOKE",
-                                                                    target = "Lnet/minecraft/client/Camera;entity()Lnet/minecraft/world/entity/Entity;", ordinal = 3))
-    private Entity tweakeroo_allowRenderingClientPlayerInFreeCameraMode(Camera camera)
+    @WrapOperation(method = "extractVisibleEntities", require = 0, at = @At(value = "INVOKE",
+                                                                            target = "Lnet/minecraft/client/Camera;entity()Lnet/minecraft/world/entity/Entity;", ordinal = 3))
+    private Entity tweakeroo_allowRenderingClientPlayerInFreeCameraMode(Camera instance, Operation<Entity> original)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
             return Minecraft.getInstance().player;
         }
 
-        return camera.entity();
+        return original.call(instance);
     }
 
 	// cullTerrain -> method_74752

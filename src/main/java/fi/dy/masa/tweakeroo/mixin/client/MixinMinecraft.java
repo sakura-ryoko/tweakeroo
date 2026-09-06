@@ -1,21 +1,10 @@
 package fi.dy.masa.tweakeroo.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.jetbrains.annotations.Nullable;
 
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.blaze3d.platform.InputConstants;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
-import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
-import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
-import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -26,6 +15,19 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
+import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
+import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
+import fi.dy.masa.tweakeroo.util.IMinecraftClientInvoker;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft implements IMinecraftClientInvoker
@@ -114,16 +116,13 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
         PlacementTweaks.onLeftClickMousePost();
     }
 
-    @Redirect(method = "startUseItem()V", at = @At(
+    @WrapOperation(method = "startUseItem()V", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult onProcessRightClickBlock(
-            MultiPlayerGameMode controller,
-            LocalPlayer player,
-            InteractionHand hand,
-            BlockHitResult hitResult)
+            MultiPlayerGameMode instance, LocalPlayer localPlayer, InteractionHand interactionHand, BlockHitResult blockHitResult, Operation<InteractionResult> original)
     {
-        return PlacementTweaks.onProcessRightClickBlock(controller, player, this.level, hand, hitResult);
+        return PlacementTweaks.onProcessRightClickBlock(instance, player, this.level, interactionHand, blockHitResult);
     }
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))

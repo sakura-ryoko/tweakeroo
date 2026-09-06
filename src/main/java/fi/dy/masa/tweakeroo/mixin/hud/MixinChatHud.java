@@ -1,18 +1,20 @@
 package fi.dy.masa.tweakeroo.mixin.hud;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.MiscUtils;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.ARGB;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 @Mixin(value = ChatComponent.class, priority = 1100)
 public abstract class MixinChatHud
@@ -37,18 +39,17 @@ public abstract class MixinChatHud
 	// method_75802(IILnet/minecraft/client/gui/hud/ChatHud$Backend;IFLnet/minecraft/client/gui/hud/ChatHudLine$Visible;IF)V
 	//
     // INVOKEVIRTUAL Bytecode Mixin
-    @Redirect(method = "method_75802(IILnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IFLnet/minecraft/client/GuiMessage$Line;IF)V",
-              at = @At(value = "INVOKE",
+    @WrapOperation(method = "method_75802(IILnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IFLnet/minecraft/client/GuiMessage$Line;IF)V",
+                   at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/util/ARGB;black(F)I",
                        ordinal = 0))
-    private static int tweakeroo_overrideChatBackgroundColor(float alpha)
+    private static int tweakeroo_overrideChatBackgroundColor(float alpha, Operation<Integer> original)
     {
         if (FeatureToggle.TWEAK_CHAT_BACKGROUND_COLOR.getBooleanValue())
         {
             return MiscUtils.getChatBackgroundColor(ARGB.black(alpha));
         }
 
-//        return ColorHelper.withAlpha(alpha, rgb);
-	    return ARGB.black(alpha);
+        return original.call(alpha);
     }
 }
