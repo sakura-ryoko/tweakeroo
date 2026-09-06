@@ -1,5 +1,7 @@
 package fi.dy.masa.tweakeroo.mixin.freecam;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.objectweb.asm.Opcodes;
 
 import net.minecraft.client.Camera;
@@ -13,7 +15,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -50,16 +51,16 @@ public abstract class MixinLevelRenderer_freeCam
     }
 
     // Allow rendering the client player entity by spoofing one of the entity rendering conditions while in Free Camera mode
-    @Redirect(method = "extractVisibleEntities", require = 0, at = @At(value = "INVOKE",
-                                                                    target = "Lnet/minecraft/client/Camera;entity()Lnet/minecraft/world/entity/Entity;", ordinal = 3))
-    private Entity tweakeroo_allowRenderingClientPlayerInFreeCameraMode(Camera camera)
+    @WrapOperation(method = "extractVisibleEntities", require = 0, at = @At(value = "INVOKE",
+                                                                            target = "Lnet/minecraft/client/Camera;entity()Lnet/minecraft/world/entity/Entity;", ordinal = 3))
+    private Entity tweakeroo_allowRenderingClientPlayerInFreeCameraMode(Camera instance, Operation<Entity> original)
     {
         if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
         {
             return Minecraft.getInstance().player;
         }
 
-        return camera.entity();
+        return original.call(instance);
     }
 
 	// cullTerrain -> method_74752
