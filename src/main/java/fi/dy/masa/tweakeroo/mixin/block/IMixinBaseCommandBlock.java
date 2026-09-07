@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(BaseCommandBlock.class)
-public interface IMixinCommandBlockExecutor
+public interface IMixinBaseCommandBlock
 {
     @Accessor("updateLastExecution")
     boolean getUpdateLastExecution();

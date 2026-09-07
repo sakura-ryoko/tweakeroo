@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.MaLiLibIcons;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.GuiContext;
-import fi.dy.masa.malilib.util.KeyCodes;
+import fi.dy.masa.malilib.util.input.ScanCodes;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.gui.GuiCameraPresetEditor;
 import fi.dy.masa.tweakeroo.util.CameraPreset;
@@ -63,7 +65,7 @@ public class WidgetCameraPresetList extends WidgetListBase<CameraPreset, WidgetC
 	@Override
 	public boolean onKeyTyped(KeyEvent input)
 	{
-		if (input.key() == KeyCodes.KEY_ESCAPE)
+		if (input.key() == ScanCodes.SCAN_ESCAPE)
 		{
 			this.parent.onClose();
 		}

@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(value = Hud.class, priority = 1005)
+@Mixin(value = Hud.class, priority = 900)
 public abstract class MixinHud
 {
 	@Shadow @Final private PlayerTabOverlay tabList;

@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.fog.sodium_breaks;
+package fi.dy.masa.tweakeroo.mixin.fog;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -6,7 +6,7 @@ import me.fallenbreath.conditionalmixin.api.annotation.Condition;
 import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import org.joml.Vector4f;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -23,9 +23,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import fi.dy.masa.malilib.compat.ModIds;
 import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.mixin.fog.IMixinFogRenderer;
 
-@Mixin(value = GameRenderer.class, priority = 900)
+@Mixin(value = GameRenderer.class)
 @Restriction(conflict = @Condition(value = ModIds.sodium))
 public abstract class MixinGameRenderer_disableFog_sodiumBreaks
 {
@@ -72,14 +71,13 @@ public abstract class MixinGameRenderer_disableFog_sodiumBreaks
 
     @WrapOperation(method = "renderLevel",
                    at = @At(value = "INVOKE",
-                            target = "Lnet/minecraft/client/renderer/fog/FogRenderer;getBuffer(Lnet/minecraft/client/renderer/fog/FogRenderer$FogMode;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;",
+                            target = "Lnet/minecraft/client/renderer/fog/FogRenderer;getBuffer(Lnet/minecraft/client/renderer/fog/FogRenderer$FogMode;)Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;",
                             ordinal = 0))
-    private GpuBufferSlice tweakeroo_yeetWorldFog2(FogRenderer instance, FogRenderer.FogMode mode,
-                                                  Operation<GpuBufferSlice> original)
+    private GpuBufferSlice tweakeroo_yeetWorldFog2(FogRenderer instance, FogRenderer.FogMode mode, Operation<GpuBufferSlice> original)
     {
         if (Configs.Disable.DISABLE_ALL_TERRAIN_FOG.getBooleanValue())
         {
-            return instance.getBuffer(FogRenderer.FogMode.NONE);
+            return original.call(instance, FogRenderer.FogMode.NONE);
         }
 
         return original.call(instance, mode);

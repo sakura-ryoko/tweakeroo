@@ -25,6 +25,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
@@ -38,6 +39,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -46,6 +48,7 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
@@ -70,11 +73,10 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinCommandBlockExecutor;
-import fi.dy.masa.tweakeroo.mixin.item.IMixinAxeItem;
-import fi.dy.masa.tweakeroo.mixin.item.IMixinShovelItem;
+import fi.dy.masa.tweakeroo.data.CachedTagManager;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinBaseCommandBlock;
 import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
-import fi.dy.masa.tweakeroo.mixin.screen.IMixinCustomizeFlatLevelScreen;
+import fi.dy.masa.tweakeroo.mixin.screen.IMixinCreateFlatWorldScreen;
 import fi.dy.masa.tweakeroo.mixin.world.IMixinClientLevel;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 
@@ -445,23 +447,23 @@ public class MiscUtils
     public static boolean isStrippableLog(Level world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
-        return IMixinAxeItem.tweakeroo_getStrippedBlocks().containsKey(state.getBlock());
+        return CachedTagManager.isAxeStrippable(state);
     }
 
     public static boolean isShovelPathConvertableBlock(Level world, BlockPos pos)
     {
         BlockState state = world.getBlockState(pos);
-        return IMixinShovelItem.tweakeroo_getPathStates().containsKey(state.getBlock());
+        return state.is(BlockTags.TURNS_INTO_DIRT_PATH);
     }
 
     public static boolean getUpdateExec(CommandBlockEntity te)
     {
-        return ((IMixinCommandBlockExecutor) te.getCommandBlock()).getUpdateLastExecution();
+        return ((IMixinBaseCommandBlock) te.getCommandBlock()).getUpdateLastExecution();
     }
 
     public static void setUpdateExec(CommandBlockEntity te, boolean value)
     {
-        ((IMixinCommandBlockExecutor) te.getCommandBlock()).setUpdateLastExecution(value);
+        ((IMixinBaseCommandBlock) te.getCommandBlock()).setUpdateLastExecution(value);
     }
 
     public static void printDeathCoordinates(Minecraft mc)
@@ -502,16 +504,16 @@ public class MiscUtils
         return (newColor & 0x00FFFFFF) | ((int) (((newColor >>> 24) / 255.0) * ((colorOrig >>> 24) / 255.0) / 0.5 * 255) << 24);
     }
 
-    public static void copyTextFromSign(SignBlockEntity te, boolean front)
+    public static void copyTextFromSign(SignBlockEntity te, SignTextSlot slot)
     {
-        previousSignText = ((ISignTextAccess) te).tweakeroo$getText(front);
+        previousSignText = ((ISignTextAccess) te).tweakeroo$getText(slot);
     }
 
-    public static void applyPreviousTextToSign(SignBlockEntity te, @Nullable AbstractSignEditScreen guiLines, boolean front)
+    public static void applyPreviousTextToSign(SignBlockEntity te, @Nullable AbstractSignEditScreen guiLines, SignTextSlot slot)
     {
         if (previousSignText != null)
         {
-            te.setText(previousSignText, front);
+            te.setText(previousSignText, slot);
 
             if (guiLines != null)
             {
@@ -582,9 +584,9 @@ public class MiscUtils
 
         if (actionResult instanceof InteractionResult.Success success)
         {
-            if (success.swingSource() == InteractionResult.SwingSource.CLIENT)
+            if (success.shouldSwing())
             {
-                player.swing(hand);
+                player.swing(hand, SwingAnimation.DEFAULT, true);
             }
         }
     }
@@ -749,7 +751,7 @@ public class MiscUtils
         if (matcher.matches())
         {
             // TODO --> I added some code here, and added the IMixinCustomizeFlatLevelScreen
-            WorldCreationContext generatorOptionsHolder = ((IMixinCustomizeFlatLevelScreen) screen).tweakeroo_getCreateWorldParent().getUiState().getSettings();
+            WorldCreationContext generatorOptionsHolder = ((IMixinCreateFlatWorldScreen) screen).tweakeroo_getCreateWorldParent().getUiState().getSettings();
             RegistryAccess.Frozen registryManager = generatorOptionsHolder.worldgenLoadContext();
             FeatureFlagSet featureSet = generatorOptionsHolder.dataConfiguration().enabledFeatures();
             HolderGetter<Biome> biomeLookup = registryManager.lookupOrThrow(Registries.BIOME);

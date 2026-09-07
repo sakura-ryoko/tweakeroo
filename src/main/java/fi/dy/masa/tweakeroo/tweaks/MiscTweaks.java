@@ -1,9 +1,13 @@
 package fi.dy.masa.tweakeroo.tweaks;
 
+import java.util.*;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
@@ -14,14 +18,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
-import java.util.*;
-import java.util.function.Consumer;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
-
-import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.serialization.Codec;
 
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.IConfigInteger;
@@ -377,39 +373,6 @@ public class MiscTweaks
         {
             FeatureToggle.TWEAK_GAMMA_OVERRIDE.setBooleanValue(false);
             MiscUtils.toggleGammaOverrideWithMessage();
-        }
-    }
-
-    /**
-     * I don't like this.  Let's just keep using the ugly Vanilla value change warnings instead.
-     */
-    @ApiStatus.Experimental
-    public enum GammaOverrideValue implements OptionInstance.SliderableValueSet<Double>
-    {
-        INSTANCE;
-
-        @Override
-        public double toSliderValue(Double value)
-        {
-            return value;
-        }
-
-        @Override
-        public Double fromSliderValue(double value)
-        {
-            return value;
-        }
-
-        @Override
-        public @NonNull Optional<Double> validateValue(Double value)
-        {
-            return value >= 0.0 && value <= 32.0 ? Optional.of(value) : Optional.empty();
-        }
-
-        @Override
-        public @NonNull Codec<Double> codec()
-        {
-            return Codec.withAlternative(Codec.doubleRange(0.0, 32.0), Codec.BOOL, boolean_ -> boolean_ ? 32.0 : 0.0);
         }
     }
 }

@@ -9,16 +9,15 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -332,14 +331,16 @@ public class PlacementTweaks
         BlockPos posIn = hitResult.getBlockPos();
 
         if (Configs.Disable.DISABLE_AXE_STRIPPING.getBooleanValue() &&
-            stackPre.getItem() instanceof AxeItem &&
+//            stackPre.getItem() instanceof AxeItem &&
+            EquipmentUtils.isAxe(stackPre) &&
             MiscUtils.isStrippableLog(world, posIn))
         {
             return InteractionResult.PASS;
         }
 
         if (Configs.Disable.DISABLE_SHOVEL_PATHING.getBooleanValue() &&
-            stackPre.getItem() instanceof ShovelItem &&
+//            stackPre.getItem() instanceof ShovelItem &&
+            EquipmentUtils.isShovel(stackPre) &&
             MiscUtils.isShovelPathConvertableBlock(world, posIn))
         {
             return InteractionResult.PASS;

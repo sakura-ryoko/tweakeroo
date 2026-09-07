@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(BossHealthOverlay.class)
+@Mixin(value = BossHealthOverlay.class, priority = 900)
 public abstract class MixinBossHealthOverlay
 {
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)

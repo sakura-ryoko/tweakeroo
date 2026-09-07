@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 
 @Mixin(Abilities.class)
-public abstract class MixinPlayerAbilities
+public abstract class MixinAbilities
 {
     @Inject(method = "getFlyingSpeed", at = @At("HEAD"), cancellable = true)
     private void tweakeroo_overrideFlySpeed(CallbackInfoReturnable<Float> cir)

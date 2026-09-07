@@ -29,22 +29,12 @@ import fi.dy.masa.tweakeroo.util.MiscUtils;
 public abstract class MixinLivingEntity extends Entity
 {
     @Shadow public abstract InteractionHand getUsedItemHand();
-	@Unique private boolean wasGammaOverriden = false;
+	@Unique private boolean wasGammaOverridden = false;
 
     private MixinLivingEntity(EntityType<?> type, Level worldIn)
     {
         super(type, worldIn);
     }
-
-    // TODO 1.21.2+ - it seems that Mojang fixed this.
-    /*
-    @Redirect(method = "method_61417", at = @At(value = "FIELD", ordinal = 1,
-            target = "Lnet/minecraft/world/World;isClient:Z"))
-    private boolean fixElytraLanding()
-    {
-        return this.getWorld().isClient && (Configs.Fixes.ELYTRA_FIX.getBooleanValue() == false || ((Object) this instanceof ClientPlayerEntity) == false);
-    }
-     */
 
     @Inject(method = "tickEffects", at = @At(value = "INVOKE", ordinal = 0,
             target = "Lnet/minecraft/network/syncher/SynchedEntityData;get(Lnet/minecraft/network/syncher/EntityDataAccessor;)Ljava/lang/Object;"),
@@ -101,14 +91,14 @@ public abstract class MixinLivingEntity extends Entity
 			}
 
 //			MiscUtils.toggleGammaOverrideWithMessage();
-			this.wasGammaOverriden = true;
+			this.wasGammaOverridden = true;
 		}
 	}
 
 	@Inject(method = "onEffectsRemoved", at = @At("TAIL"))
 	private void tweakeroo$onStatusEffectRemoved(Collection<MobEffectInstance> effects, CallbackInfo ci)
 	{
-		if (this.wasGammaOverriden || FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
+		if (this.wasGammaOverridden || FeatureToggle.TWEAK_GAMMA_OVERRIDE.getBooleanValue())
 		{
 			for (MobEffectInstance entry : effects)
 			{
@@ -120,7 +110,7 @@ public abstract class MixinLivingEntity extends Entity
 					}
 
 					MiscUtils.toggleGammaOverrideWithMessage(true);
-					this.wasGammaOverriden = false;
+					this.wasGammaOverridden = false;
 					break;
 				}
 			}

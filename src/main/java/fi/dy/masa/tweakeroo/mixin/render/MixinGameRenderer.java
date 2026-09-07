@@ -1,14 +1,16 @@
 package fi.dy.masa.tweakeroo.mixin.render;
 
-import com.llamalad7.mixinextras.sugar.Local;
-
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DebugCrosshairRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.state.GameRenderState;
+import net.minecraft.client.renderer.state.OptionsRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,12 +33,13 @@ public abstract class MixinGameRenderer
     @Shadow @Final private Camera mainCamera;
     @Shadow @Final private GameRenderState gameRenderState;
     @Shadow @Final private DebugCrosshairRenderer debugCrosshairRenderer;
-
+    @Shadow @Final private RenderTarget hud3DTarget;
+    @Shadow @Final private RenderTarget mainRenderTarget;
     @Unique private float realYaw;
     @Unique private float realPitch;
 
     @Inject(method = "renderLevel", at = @At("HEAD"), cancellable = true)
-    private void tweakeroo_onRenderWorld(DeltaTracker deltaTracker, CallbackInfo ci)
+    private void tweakeroo_onRenderWorld(CallbackInfo ci)
     {
         if (Callbacks.skipWorldRendering)
         {
@@ -62,14 +65,8 @@ public abstract class MixinGameRenderer
     }
 
     @Inject(method = "renderLevel", at = @At("TAIL"))
-    private void tweakeroo_onRenderLevelPost(DeltaTracker deltaTracker, CallbackInfo ci,
-                                             @Local(name = "cameraState") CameraRenderState cameraState)
+    private void tweakeroo_onRenderLevelPost(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue())
-        {
-            this.debugCrosshairRenderer.render(cameraState, this.gameRenderState.windowRenderState.guiScale);
-        }
-
         if (FeatureToggle.TWEAK_ELYTRA_CAMERA.getBooleanValue() && Hotkeys.ELYTRA_CAMERA.getKeybind().isKeybindHeld())
         {
             Entity entity = this.minecraft.getCameraEntity();
@@ -77,7 +74,28 @@ public abstract class MixinGameRenderer
             if (entity != null)
             {
                 MiscUtils.setEntityRotations(entity, this.realYaw, this.realPitch);
-                this.mainCamera.update(deltaTracker);
+                this.mainCamera.update(this.minecraft.getDeltaTracker());
+            }
+        }
+    }
+
+    @Inject(method = "render3dHud",
+            at = @At(value = "INVOKE",
+                     target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFog(Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;)V",
+                     shift = At.Shift.AFTER
+            )
+    )
+    private void tweakeroo_render3dCursorAlways(CameraRenderState cameraState, PlayerRenderState playerState,
+                                                OptionsRenderState optionsState, boolean consistentDepthRequired, CallbackInfo ci)
+    {
+        if (FeatureToggle.TWEAK_F3_CURSOR.getBooleanValue() &&
+                (!this.gameRenderState.levelRenderState.render3dCrosshair || !optionsState.cameraType.isFirstPerson() || this.gameRenderState.guiRenderState.isHudHidden))
+        {
+            GpuTextureView depthTextureView = consistentDepthRequired ? this.hud3DTarget.getDepthTextureView() : this.mainRenderTarget.getDepthTextureView();
+
+            if (this.mainRenderTarget.getColorTextureView() != null && depthTextureView != null)
+            {
+                this.debugCrosshairRenderer.render(cameraState, this.gameRenderState.windowRenderState.guiScale, this.mainRenderTarget.getColorTextureView(), depthTextureView);
             }
         }
     }

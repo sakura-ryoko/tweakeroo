@@ -37,10 +37,10 @@
 	"accessWidener": "tweakeroo.accesswidener",
 
 	"depends": {
-		"minecraft": "~26.2-",
-		"malilib": ">=0.29.5- <0.30.0-"
+		"minecraft": "26.3-pre.2",
+		"malilib": ">=0.29.99- <0.30.0-"
 	},
 	"breaks": {
-		"malilib": "<0.29.5-"
+		"malilib": "<0.29.99-"
 	}
 }

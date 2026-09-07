@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player;
 public abstract class MixinEntityRenderDispatcher
 {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
-    private void onShouldRender(Entity entity, Frustum culler, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir)
+    private <E extends Entity> void onShouldRender(E entity, Frustum culler, double camX, double camY, double camZ, float partialTicks, CallbackInfoReturnable<Boolean> cir)
     {
         boolean isPlayer = (entity instanceof Player);
 

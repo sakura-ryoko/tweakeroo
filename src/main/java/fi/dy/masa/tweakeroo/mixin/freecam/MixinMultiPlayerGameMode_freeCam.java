@@ -9,7 +9,7 @@ import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 
-@Mixin(value = MultiPlayerGameMode.class, priority = 850)
+@Mixin(value = MultiPlayerGameMode.class)
 public class MixinMultiPlayerGameMode_freeCam
 {
 	@Inject(method = "hasExperience", at = @At("RETURN"), cancellable = true)

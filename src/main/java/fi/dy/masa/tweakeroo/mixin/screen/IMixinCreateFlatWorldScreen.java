@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(CreateFlatWorldScreen.class)
-public interface IMixinCustomizeFlatLevelScreen
+public interface IMixinCreateFlatWorldScreen
 {
     @Accessor("parent")
     CreateWorldScreen tweakeroo_getCreateWorldParent();

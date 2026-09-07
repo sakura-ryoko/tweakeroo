@@ -537,14 +537,14 @@ public class Callbacks
 				HitResult trace = this.mc.hitResult;
 
 				if (trace != null && trace.getType() == HitResult.Type.BLOCK &&
-						this.mc.level != null)
+					this.mc.level != null)
 				{
 					BlockPos pos = ((BlockHitResult) trace).getBlockPos();
 					BlockEntity te = this.mc.level.getBlockEntity(pos);
 
 					if (te instanceof SignBlockEntity && this.mc.player != null)
 					{
-						MiscUtils.copyTextFromSign((SignBlockEntity) te, ((SignBlockEntity) te).isFacingFrontText(this.mc.player));
+						MiscUtils.copyTextFromSign((SignBlockEntity) te, ((SignBlockEntity) te).getSlotPlayerIsFacing(this.mc.player));
 						InfoUtils.printActionbarMessage("tweakeroo.message.sign_text_copied");
 					}
 				}
@@ -760,6 +760,11 @@ public class Callbacks
 						Hotkeys.INVENTORY_PREVIEW.getKeybind().isKeybindHeld())
 				{
 					InventoryOverlayHandler.getInstance().refreshInventoryOverlay(mc, Configs.Generic.SHULKER_DISPLAY_BACKGROUND_COLOR.getBooleanValue());
+					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 

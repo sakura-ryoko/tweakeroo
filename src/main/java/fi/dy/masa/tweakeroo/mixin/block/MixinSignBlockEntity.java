@@ -14,10 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
 import net.minecraft.client.gui.screens.inventory.SignEditScreen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 
@@ -44,15 +41,15 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements ISignT
             {
                 if (((IGuiEditSign) mc.gui.screen()).tweakeroo$getTile() == (Object) this)
                 {
-                    MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).isFacingFrontText(mc.player));
+                    MiscUtils.applyPreviousTextToSign((SignBlockEntity) (Object) this, null, ((SignBlockEntity) (Object) this).getSlotPlayerIsFacing(mc.player));
                 }
             }
         }
     }
 
     @Override
-    public SignText tweakeroo$getText(boolean front)
+    public SignText tweakeroo$getText(SignTextSlot slot)
     {
-        return front ? this.frontText : this.backText;
+        return slot == SignTextSlot.FRONT ? this.frontText : this.backText;
     }
 }

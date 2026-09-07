@@ -18,7 +18,7 @@ import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.world.entity.player.Input;
 
-@Mixin(KeyboardInput.class)
+@Mixin(value = KeyboardInput.class, priority = 999)
 public abstract class MixinKeyboardInput extends ClientInput
 {
     @Shadow @Final private Options options;

@@ -195,25 +195,13 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
 
             if (blockTmp instanceof EntityBlock)
             {
-//                if (world instanceof ServerLevel)
-//                {
-//                    be = world.getChunkAt(pos).getBlockEntity(pos);
-//
-//                    if (be != null)
-//                    {
-//	                    data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
-//                    }
-//                }
-//                else
-//                {
-	                Pair<BlockEntity, CompoundData> pair = this.getDataSyncer().requestBlockEntity(world, pos);
+                Pair<BlockEntity, CompoundData> pair = this.getDataSyncer().requestBlockEntity(world, pos);
 
-                    if (pair != null)
-                    {
-                        data = pair.getRight();
-                        be = pair.getLeft();
-                    }
-//                }
+                if (pair != null)
+                {
+                    data = pair.getRight();
+                    be = pair.getLeft();
+                }
 
 //                Tweakeroo.LOGGER.warn("getTarget():2: pos [{}], be [{}], nbt [{}]", pos.toShortString(), be != null, data != null);
                 InventoryOverlayContext ctx = this.getTargetInventoryFromBlock(world, pos, be, data);
@@ -248,29 +236,13 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
                 return null;
             }
 
-//            if (world instanceof ServerLevel)
-//            {
-//                entity = world.getEntity(entity.getId());
-//
-//                if (entity != null)
-//                {
-//                    data = DataEntityUtils.invokeEntityDataTagNoPassengers(entity, entity.getId());
-//                }
-//                else
-//                {
-//                    return null;
-//                }
-//            }
-//            else
-//            {
-                Pair<Entity, CompoundData> pair = this.getDataSyncer().requestEntity(world, entity.getId());
+            Pair<Entity, CompoundData> pair = this.getDataSyncer().requestEntity(world, entity.getId());
 
-                if (pair != null)
-                {
-                    data = pair.getRight();
-                    entity = pair.getLeft() != null ? pair.getLeft() : entity;
-                }
-//            }
+            if (pair != null)
+            {
+                data = pair.getRight();
+                entity = pair.getLeft() != null ? pair.getLeft() : entity;
+            }
 
             if (entity != null)
             {
@@ -357,31 +329,7 @@ public class InventoryOverlayHandler implements IInventoryOverlayHandler
         if (world == null) { return null; }
         Container inv;
 
-        // Kind of redundant ...
-//        if (be != null)
-//        {
-//            if (data.isEmpty())
-//            {
-//	            data = DataConverterNbt.fromVanillaCompound(be.saveWithFullMetadata(world.registryAccess()));
-//            }
-//
-//            inv = InventoryUtils.getInventory(world, pos);
-//        }
-//        else
-//        {
-//            if (data.isEmpty())
-//            {
-//                Pair<BlockEntity, CompoundData> pair = this.requestBlockEntityAt(world, pos);
-//
-//                if (pair != null)
-//                {
-//	                data = pair.getRight();
-//                    be = pair.getLeft();
-//                }
-//            }
-
         inv = this.getDataSyncer().getBlockInventory(world, pos, true);
-//        }
 
         BlockEntityType<?> beType = data != null ? DataBlockUtils.getBlockEntityType(data) : null;
 //        Identifier beId = beType != null

@@ -1,18 +1,8 @@
 package fi.dy.masa.tweakeroo.mixin.screen;
 
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import java.util.List;
+
 import com.mojang.blaze3d.platform.InputConstants;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.tweakeroo.config.Configs;
-import fi.dy.masa.tweakeroo.config.FeatureToggle;
-import fi.dy.masa.tweakeroo.util.IGuiEditSign;
-import fi.dy.masa.tweakeroo.util.MiscUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,6 +10,21 @@ import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.entity.SignTextSlot;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.tweakeroo.config.Configs;
+import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.util.IGuiEditSign;
+import fi.dy.masa.tweakeroo.util.MiscUtils;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class MixinAbstractSignEditScreen extends Screen implements IGuiEditSign
@@ -30,9 +35,9 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     }
 
     @Shadow @Final protected SignBlockEntity sign;
-    @Shadow private SignText text;
-    @Shadow @Final private boolean isFrontText;
-    @Shadow @Final private String[] messages;
+    @Mutable @Final @Shadow private SignText.Mutable text;
+    @Mutable @Shadow @Final private String[] messages;
+    @Shadow @Final private SignTextSlot slot;
 
     @Override
     public SignBlockEntity tweakeroo$getTile()
@@ -45,7 +50,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     {
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue())
         {
-            MiscUtils.copyTextFromSign(this.sign, this.isFrontText);
+            MiscUtils.copyTextFromSign(this.sign, this.slot);
         }
     }
 
@@ -54,7 +59,7 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     {
         if (FeatureToggle.TWEAK_SIGN_COPY.getBooleanValue())
         {
-            MiscUtils.applyPreviousTextToSign(this.sign, ((AbstractSignEditScreen) (Object) this), this.isFrontText);
+            MiscUtils.applyPreviousTextToSign(this.sign, ((AbstractSignEditScreen) (Object) this), this.slot);
         }
 
         if (Configs.Disable.DISABLE_SIGN_GUI.getBooleanValue())
@@ -76,11 +81,17 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
     @Override
     public void tweakeroo$applyText(SignText text)
     {
-        this.text = text;
+        List<Component> list = text.getMessages(false);
+        SignText.Mutable mutable = text.asMutable();
 
-        for (int i = 0; i < this.messages.length; i++)
+        for (int i = 0; i < 4; i++)
         {
-            this.messages[i] = text.getMessage(i, false).getString();
+            String entry = i < list.size() ? list.get(i).getString() : "";
+            this.messages[i] = list.get(i).getString();
+            mutable.setLine(i, Component.literal(entry));
         }
+
+        this.text = mutable;
+        this.sign.setText(this.text.asImmutable(), this.slot);
     }
 }

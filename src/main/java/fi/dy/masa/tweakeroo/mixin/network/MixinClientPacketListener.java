@@ -167,8 +167,8 @@ public abstract class MixinClientPacketListener extends ClientCommonPacketListen
     @Inject(method = "handleLevelChunkWithLight", at = @At("RETURN"))
     private void tweakeroo_onChunkDataInject(ClientboundLevelChunkWithLightPacket packet, CallbackInfo ci)
     {
-        int cx = packet.getX();
-        int cz = packet.getZ();
+        int cx = packet.x();
+        int cz = packet.z();
         RenderTweaks.loadFakeChunk(cx, cz);
 
         if (!FeatureToggle.TWEAK_SELECTIVE_BLOCKS_RENDERING.getBooleanValue())

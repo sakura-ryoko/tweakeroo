@@ -7,7 +7,7 @@ import net.minecraft.world.BossEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(LerpingBossEvent.class)
+@Mixin(value = LerpingBossEvent.class, priority = 900)
 public abstract class MixinLerpingBossEvent extends BossEvent
 {
     public MixinLerpingBossEvent(UUID uniqueIdIn, Component nameIn, BossEvent.BossBarColor colorIn, BossEvent.BossBarOverlay styleIn)

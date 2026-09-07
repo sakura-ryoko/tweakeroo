@@ -1,13 +1,8 @@
 package fi.dy.masa.tweakeroo.data;
 
-import fi.dy.masa.malilib.data.CachedBlockTags;
-import fi.dy.masa.malilib.data.CachedItemTags;
-import fi.dy.masa.malilib.data.CachedTagKey;
-import fi.dy.masa.tweakeroo.Reference;
-import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.config.Configs;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
@@ -16,6 +11,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+
+import fi.dy.masa.malilib.data.CachedBlockTags;
+import fi.dy.masa.malilib.data.CachedItemTags;
+import fi.dy.masa.malilib.data.CachedTagKey;
+import fi.dy.masa.tweakeroo.Reference;
+import fi.dy.masa.tweakeroo.Tweakeroo;
+import fi.dy.masa.tweakeroo.config.Configs;
 
 /**
  * Caches Block/Item Tags as if they are real Vanilla Block/Item tags.
@@ -27,7 +29,7 @@ public class CachedTagManager
 	public static final CachedTagKey NEEDS_PICKAXE_KEY          = new CachedTagKey(Reference.MOD_ID, "needs_pickaxe");
 	public static final CachedTagKey NEEDS_SHEARS_KEY           = new CachedTagKey(Reference.MOD_ID, "needs_shears");
 	public static final CachedTagKey NEEDS_SILK_TOUCH_KEY       = new CachedTagKey(Reference.MOD_ID, "needs_silk_touch");
-	public static final CachedTagKey ORE_BLOCKS_KEY             = new CachedTagKey(Reference.MOD_ID, "ore_blocks");
+	public static final CachedTagKey AXE_STRIPPABLE_KEY         = new CachedTagKey(Reference.MOD_ID, "axe_strippable");
 	public static final CachedTagKey TRAPDOORS_KEY              = new CachedTagKey(Reference.MOD_ID, "trapdoors");
 	public static final CachedTagKey STAIRS_KEY                 = new CachedTagKey(Reference.MOD_ID, "stairs");
 
@@ -38,7 +40,7 @@ public class CachedTagManager
 	    CachedBlockTags.getInstance().build(NEEDS_PICKAXE_KEY, buildNeedsPickaxeCache());
 		CachedBlockTags.getInstance().build(NEEDS_SHEARS_KEY, buildNeedsShearsCache());
 		CachedBlockTags.getInstance().build(NEEDS_SILK_TOUCH_KEY, buildNeedsSilkTouchCache());
-		CachedBlockTags.getInstance().build(ORE_BLOCKS_KEY, buildOreBlocksCache());
+	    CachedBlockTags.getInstance().build(AXE_STRIPPABLE_KEY, buildAxeStrippableCache());
 	    CachedItemTags.getInstance().build(TRAPDOORS_KEY, buildTrapdoorItemsCache());
 	    CachedItemTags.getInstance().build(STAIRS_KEY, buildStairItemsCache());
 	}
@@ -78,6 +80,8 @@ public class CachedTagManager
 
 		list.add("#"+BlockTags.LEAVES.location().toString());
 		list.add("#"+BlockTags.WOOL.location().toString());
+		list.add("#"+BlockTags.WOOL_SLABS.location().toString());
+		list.add("#"+BlockTags.WOOL_STAIRS.location().toString());
 		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CAVE_VINES).toString());
 		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CAVE_VINES_PLANT).toString());
 		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.COBWEB).toString());
@@ -154,24 +158,35 @@ public class CachedTagManager
 		return list;
 	}
 
-	private static List<String> buildOreBlocksCache()
+	private static List<String> buildAxeStrippableCache()
 	{
 		List<String> list = new ArrayList<>();
 
-		list.add("#" + BlockTags.COPPER_ORES.location().toString());
-		list.add("#" + BlockTags.GOLD_ORES.location().toString());
-		list.add("#" + BlockTags.IRON_ORES.location().toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.COAL_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_COAL_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_DIAMOND_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_EMERALD_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_LAPIS_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_REDSTONE_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DIAMOND_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.EMERALD_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.LAPIS_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.REDSTONE_ORE).toString());
-		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.NETHER_QUARTZ_ORE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.OAK_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.OAK_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DARK_OAK_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.DARK_OAK_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.PALE_OAK_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.PALE_OAK_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.POPLAR_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.POPLAR_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.ACACIA_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.ACACIA_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CHERRY_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CHERRY_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BIRCH_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BIRCH_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.JUNGLE_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.JUNGLE_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.SPRUCE_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.SPRUCE_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.WARPED_STEM).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.WARPED_HYPHAE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CRIMSON_STEM).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.CRIMSON_HYPHAE).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.MANGROVE_WOOD).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.MANGROVE_LOG).toString());
+		list.add(BuiltInRegistries.BLOCK.getKey(Blocks.BAMBOO_BLOCK).toString());
 
 		return list;
 	}
@@ -316,7 +331,7 @@ public class CachedTagManager
 	    CachedBlockTags.getInstance().clearEntry(PICKAXE_OVERRIDE_KEY);
 		CachedBlockTags.getInstance().clearEntry(NEEDS_SHEARS_KEY);
 		CachedBlockTags.getInstance().clearEntry(NEEDS_SILK_TOUCH_KEY);
-		CachedBlockTags.getInstance().clearEntry(ORE_BLOCKS_KEY);
+	    CachedBlockTags.getInstance().clearEntry(AXE_STRIPPABLE_KEY);
 	    CachedItemTags.getInstance().clearEntry(TRAPDOORS_KEY);
 	    CachedItemTags.getInstance().clearEntry(STAIRS_KEY);
     }
@@ -336,11 +351,6 @@ public class CachedTagManager
 		return CachedBlockTags.getInstance().match(NEEDS_SILK_TOUCH_KEY, state);
 	}
 
-	public static boolean isOreBlock(BlockState state)
-	{
-		return CachedBlockTags.getInstance().match(ORE_BLOCKS_KEY, state);
-	}
-
 	public static boolean isSilkTouchOverride(BlockState state)
 	{
 		return CachedBlockTags.getInstance().match(SILK_TOUCH_OVERRIDE_KEY, state);
@@ -349,6 +359,11 @@ public class CachedTagManager
 	public static boolean isPickaxeOverride(BlockState state)
 	{
 		return CachedBlockTags.getInstance().match(PICKAXE_OVERRIDE_KEY, state);
+	}
+
+	public static boolean isAxeStrippable(BlockState state)
+	{
+		return CachedBlockTags.getInstance().match(AXE_STRIPPABLE_KEY, state);
 	}
 
 	public static boolean isTrapdoor(ItemStack stack)

@@ -4,7 +4,7 @@ import net.minecraft.client.OptionInstance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(value = OptionInstance.class, priority = 1010)
+@Mixin(value = OptionInstance.class, priority = 900)
 public interface IMixinSimpleOption<T>
 {
     @Accessor("value")

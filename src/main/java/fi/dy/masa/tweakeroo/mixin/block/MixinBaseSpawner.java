@@ -10,7 +10,7 @@ import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
 
 @Mixin(BaseSpawner.class)
-public abstract class MixinMobSpawnerLogic
+public abstract class MixinBaseSpawner
 {
     @Inject(method = "clientTick", at = @At("HEAD"), cancellable = true)
     private void cancelParticleRendering(Level level, BlockPos pos, CallbackInfo ci)

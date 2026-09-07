@@ -561,7 +561,7 @@ public class InventoryUtils
                 !CachedTagManager.isNeedsSilkTouch(state) &&
                 !CachedTagManager.isNeedsPickaxe(state) &&
                 !CachedTagManager.isNeedsShears(state) &&
-                !CachedTagManager.isOreBlock(state))
+                !state.is(BlockTags.ORES))
             {
                 return false;
             }
@@ -708,7 +708,7 @@ public class InventoryUtils
         Supplier<Boolean> silkTouchOresRule = () ->
         {
             // Silk touch if we need it
-            if (CachedTagManager.isOreBlock(state))
+            if (state.is(BlockTags.ORES))
             {
                 if (EquipmentUtils.hasSilkTouch(testedStack) && !EquipmentUtils.hasSilkTouch(previousTool))
                 {

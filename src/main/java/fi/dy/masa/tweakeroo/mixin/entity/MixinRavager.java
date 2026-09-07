@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import fi.dy.masa.tweakeroo.config.Configs;
 
 @Mixin(Ravager.class)
-public abstract class MixinRavagerEntity
+public abstract class MixinRavager
 {
     @WrapOperation(method = "aiStep", at = @At(
             value = "FIELD",

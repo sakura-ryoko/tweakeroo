@@ -37,7 +37,7 @@ import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.config.Hotkeys;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinPistonBlock;
+import fi.dy.masa.tweakeroo.mixin.block.IMixinPistonBaseBlock;
 import fi.dy.masa.tweakeroo.world.FakeChunk;
 import fi.dy.masa.tweakeroo.world.FakeWorld;
 
@@ -147,7 +147,8 @@ public class RenderTweaks
             {
                 if (posLookingAt != null)
                 {
-                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, false);
+//                    RenderUtils.renderBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, false);
+                    RenderUtils.scheduleBlockOutline(posLookingAt, expand, lineWidthBlockBox, colorLooking, false);
                 }
 
                 renderSelection(profiler, mc, AREA_SELECTION);
@@ -166,11 +167,13 @@ public class RenderTweaks
         profiler.push("lists");
         for (ListMapEntry entry : SELECTIVE_BLACKLIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist, false);
+//            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist, false);
+            RenderUtils.scheduleBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorBlacklist, false);
         }
         for (ListMapEntry entry : SELECTIVE_WHITELIST.values())
         {
-            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist, false);
+//            RenderUtils.renderBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist, false);
+            RenderUtils.scheduleBlockOutline(entry.currentPosition, expand, lineWidthBlockBox, colorWhitelist, false);
         }
         profiler.pop();
     }
@@ -325,27 +328,33 @@ public class RenderTweaks
         {
             if (pos1.equals(pos2) == false)
             {
-                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
-                RenderUtils.renderAreaSides(pos1, pos2, sideColor, false);
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
+//                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ);
+//                RenderUtils.renderAreaSides(pos1, pos2, sideColor, false);
+//                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
+//                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
+                RenderUtils.scheduleSelectionBox(pos1, pos2, expand, lineWidthArea, lineWidthBlockBox,
+                                                 sideColor, colorPos1, colorPos2, colorX, colorY, colorZ);
             }
             else
             {
-                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
-                                                          colorOverlapping, false);
+//                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
+//                                                          colorOverlapping, false);
+                RenderUtils.scheduleBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, colorPos1, colorPos2,
+                                                            colorOverlapping, false);
             }
         }
         else
         {
             if (pos1 != null)
             {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
+//                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
+                RenderUtils.scheduleBlockOutline(pos1, expand, lineWidthBlockBox, colorPos1, false);
             }
 
             if (pos2 != null)
             {
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
+//                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
+                RenderUtils.scheduleBlockOutline(pos2, expand, lineWidthBlockBox, colorPos2, false);
             }
         }
 
@@ -375,7 +384,7 @@ public class RenderTweaks
         BlockEntity entity = null;
         BlockEntity entity2 = null;
 
-        if (type != 0 && !((IMixinPistonBlock) state.getBlock()).getSticky())
+        if (type != 0 && !((IMixinPistonBaseBlock) state.getBlock()).getSticky())
         {
             return; // non sticky pistons do nothing
         }

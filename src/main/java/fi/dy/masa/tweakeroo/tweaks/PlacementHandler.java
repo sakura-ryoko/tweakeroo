@@ -417,13 +417,6 @@ public class PlacementHandler
             this.itemPlacementContext = itemPlacementContext;
         }
 
-        /*
-        public static UseContext of(World world, BlockPos pos, Direction side, Vec3d hitVec, LivingEntity entity, Hand hand)
-        {
-            return new UseContext(world, pos, side, hitVec, entity, hand, null);
-        }
-        */
-
         public static UseContext from(BlockPlaceContext ctx, InteractionHand hand)
         {
             Vec3 pos = ctx.getClickLocation();

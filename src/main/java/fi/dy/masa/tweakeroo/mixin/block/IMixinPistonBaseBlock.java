@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * Copied From Tweak Fork by Andrew54757
  */
 @Mixin(PistonBaseBlock.class)
-public interface IMixinPistonBlock
+public interface IMixinPistonBaseBlock
 {
     @Accessor("isSticky")
     boolean getSticky();

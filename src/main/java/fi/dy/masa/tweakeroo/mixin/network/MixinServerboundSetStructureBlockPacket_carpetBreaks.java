@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.network.carpet_breaks;
+package fi.dy.masa.tweakeroo.mixin.network;
 
 import me.fallenbreath.conditionalmixin.api.annotation.Condition;
 import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
@@ -18,7 +18,7 @@ import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
 @Mixin(value = ServerboundSetStructureBlockPacket.class, priority = 999)
 @Restriction(conflict = @Condition(value = ModIds.carpet))
-public abstract class MixinServerboundSetStructureBlockPacket
+public abstract class MixinServerboundSetStructureBlockPacket_carpetBreaks
 {
     @ModifyConstant(method = "<init>(Lnet/minecraft/network/FriendlyByteBuf;)V",
                     slice = @Slice(from = @At(value = "FIELD", opcode = Opcodes.PUTFIELD,

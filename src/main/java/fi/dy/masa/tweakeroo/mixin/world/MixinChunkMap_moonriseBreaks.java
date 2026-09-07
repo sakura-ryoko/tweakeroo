@@ -1,6 +1,8 @@
 package fi.dy.masa.tweakeroo.mixin.world;
 
 import java.util.function.BooleanSupplier;
+import me.fallenbreath.conditionalmixin.api.annotation.Condition;
+import me.fallenbreath.conditionalmixin.api.annotation.Restriction;
 import org.objectweb.asm.Opcodes;
 
 import net.minecraft.server.level.ChunkMap;
@@ -8,13 +10,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import fi.dy.masa.tweakeroo.compat.ModIds;
 import fi.dy.masa.tweakeroo.config.Configs;
 
 /**
  * The "Moonrise" mod breaks this mixin.
  */
 @Mixin(value = ChunkMap.class, priority = 990)
-public abstract class MixinChunkMap
+@Restriction(conflict = @Condition(value = ModIds.moonrise))
+public abstract class MixinChunkMap_moonriseBreaks
 {
     @Inject(method = "saveChunksEagerly",
             cancellable = true,

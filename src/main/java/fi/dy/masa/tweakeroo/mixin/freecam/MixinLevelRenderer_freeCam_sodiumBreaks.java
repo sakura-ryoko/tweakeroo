@@ -1,4 +1,4 @@
-package fi.dy.masa.tweakeroo.mixin.freecam.sodium_breaks;
+package fi.dy.masa.tweakeroo.mixin.freecam;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import me.fallenbreath.conditionalmixin.api.annotation.Condition;
@@ -26,7 +26,7 @@ import fi.dy.masa.tweakeroo.util.CameraUtils;
  * Sodium 26.2+ hard breaks this injection.
  * --> Separate Mixin to be disabled conditionally.
  */
-@Mixin(value = LevelRenderer.class, priority = 850)
+@Mixin(value = LevelRenderer.class)
 @Restriction(conflict = @Condition(value = ModIds.sodium))
 public abstract class MixinLevelRenderer_freeCam_sodiumBreaks
 {

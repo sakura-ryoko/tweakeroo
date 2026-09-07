@@ -24,7 +24,7 @@ import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
  * -
  * @param <T>
  */
-@Mixin(value = OptionInstance.class, priority = 900)
+@Mixin(value = OptionInstance.class, priority = 500)
 public abstract class MixinOptionInstance<T>
 {
 	@Shadow private T value;

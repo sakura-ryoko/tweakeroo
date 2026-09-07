@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.tweakeroo.config.Configs;
 
-@Mixin(value = EffectsInInventory.class, priority = 1001)
+@Mixin(value = EffectsInInventory.class, priority = 900)
 public abstract class MixinEffectsInInventory
 {
     @Inject(method = "extractEffects", at = @At("HEAD"), cancellable = true)

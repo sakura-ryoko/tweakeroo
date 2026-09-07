@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(PlayerMenuItem.class)
+@Mixin(value = PlayerMenuItem.class, priority = 1001)
 public class MixinPlayerMenuItem
 {
 	@Inject(method = "isEnabled()Z", at = @At("HEAD"), cancellable = true)

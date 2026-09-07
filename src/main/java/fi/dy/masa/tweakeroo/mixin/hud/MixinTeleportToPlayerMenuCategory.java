@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 
-@Mixin(TeleportToPlayerMenuCategory.class)
+@Mixin(value = TeleportToPlayerMenuCategory.class, priority = 1001)
 public abstract class MixinTeleportToPlayerMenuCategory
 {
     @Shadow @Final private static Comparator<PlayerInfo> PROFILE_ORDER;
