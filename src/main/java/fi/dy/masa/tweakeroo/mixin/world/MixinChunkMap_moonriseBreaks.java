@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import fi.dy.masa.tweakeroo.compat.ModIds;
+import fi.dy.masa.malilib.compat.ModIds;
 import fi.dy.masa.tweakeroo.config.Configs;
 
 /**

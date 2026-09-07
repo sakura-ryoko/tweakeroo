@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.client.Minecraft;
 
+import fi.dy.masa.malilib.compat.ModIds;
 import fi.dy.masa.malilib.config.*;
 import fi.dy.masa.malilib.config.options.*;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
@@ -27,7 +28,6 @@ import fi.dy.masa.malilib.util.i18n.i18nOption;
 import fi.dy.masa.malilib.util.restrictions.UsageRestriction.ListType;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.Tweakeroo;
-import fi.dy.masa.tweakeroo.compat.ModIds;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
