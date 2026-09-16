@@ -134,8 +134,12 @@ public class CameraEntity extends LocalPlayer
     {
         this.setYRot(yaw);
         this.setXRot(pitch);
-
         this.yHeadRot = yaw;
+
+        // update the old rotation angles as well so that tick interpolation doesn't yank the camera back
+        this.yRotO = yaw;
+        this.xRotO = pitch;
+        this.yHeadRotO = yaw;
 
         //this.lastRotationYaw = this.rotationYaw;
         //this.lastRotationPitch = this.rotationPitch;
