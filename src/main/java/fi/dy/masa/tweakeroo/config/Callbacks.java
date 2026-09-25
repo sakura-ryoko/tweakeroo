@@ -33,7 +33,6 @@ import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
 import fi.dy.masa.tweakeroo.gui.GuiCameraPresetEditor;
 import fi.dy.masa.tweakeroo.gui.GuiConfigs;
-import fi.dy.masa.tweakeroo.mixin.block.IMixinBlockBehaviour;
 import fi.dy.masa.tweakeroo.mixin.option.IMixinSimpleOption;
 import fi.dy.masa.tweakeroo.renderer.InventoryOverlayHandler;
 import fi.dy.masa.tweakeroo.tweaks.RenderTweaks;
@@ -48,7 +47,6 @@ public class Callbacks
 //		FeatureToggle.TWEAK_F3_CURSOR.setValueChangeCallback(new FeatureCallbackF3Toggle(FeatureToggle.TWEAK_F3_CURSOR, mc));
         FeatureToggle.TWEAK_GAMMA_OVERRIDE.setValueChangeCallback(new FeatureCallbackGamma(FeatureToggle.TWEAK_GAMMA_OVERRIDE, mc));
         FeatureToggle.TWEAK_DARKNESS_VISIBILITY.setValueChangeCallback(new FeatureCallbackDarkness(FeatureToggle.TWEAK_DARKNESS_VISIBILITY, mc));
-        Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.setValueChangeCallback(new FeatureCallbackSlime(Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN));
 
         FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.getKeybind().setCallback(new KeyCallbackToggleFastMode(FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT));
         FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.setValueChangeCallback((cfg) ->
@@ -316,33 +314,6 @@ public class Callbacks
             if (opt != null)
             {
                 opt.tweakeroo_setValueWithoutCheck(darkness);
-            }
-        }
-    }
-
-    public static class FeatureCallbackSlime implements IValueChangeCallback<ConfigBoolean>
-    {
-        public FeatureCallbackSlime(ConfigBoolean feature)
-        {
-            Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.setDoubleValue(Blocks.SLIME_BLOCK.getFriction());
-
-            // If the feature is enabled on game launch, apply the overridden value here
-            if (feature.getBooleanValue())
-            {
-                ((IMixinBlockBehaviour) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getFriction());
-            }
-        }
-
-        @Override
-        public void onValueChanged(ConfigBoolean config)
-        {
-            if (config.getBooleanValue())
-            {
-                ((IMixinBlockBehaviour) Blocks.SLIME_BLOCK).setFriction(Blocks.STONE.getFriction());
-            }
-            else
-            {
-                ((IMixinBlockBehaviour) Blocks.SLIME_BLOCK).setFriction((float) Configs.Internal.SLIME_BLOCK_SLIPPERINESS_ORIGINAL.getDoubleValue());
             }
         }
     }
