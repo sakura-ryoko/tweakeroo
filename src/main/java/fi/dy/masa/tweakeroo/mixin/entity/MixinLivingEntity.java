@@ -11,6 +11,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,6 +50,19 @@ public abstract class MixinLivingEntity extends Entity
             mc.options.getCameraType() == CameraType.FIRST_PERSON)
         {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "getBlockSpeedFactor", at = @At("HEAD"), cancellable = true)
+    private void tweakeroo_removeSlimeSpeedFactor(CallbackInfoReturnable<Float> cir)
+    {
+        // Only run for players when the tweak is enabled
+        if (Configs.Disable.DISABLE_SLIME_BLOCK_SLOWDOWN.getBooleanValue() && ((Object) this instanceof Player))
+        {
+            if (this.getBlockStateOn().is(Blocks.SLIME_BLOCK))
+            {
+                cir.setReturnValue(1.0F); // Standard block speed factor (no slowdown)
+            }
         }
     }
 
