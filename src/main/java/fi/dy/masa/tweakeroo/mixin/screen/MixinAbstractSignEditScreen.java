@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.util.input.InputUtils;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.util.IGuiEditSign;
@@ -67,11 +68,14 @@ public abstract class MixinAbstractSignEditScreen extends Screen implements IGui
             // Update the keybind state, because opening a GUI resets them all.
             // Also, KeyBinding.updateKeyBindState() only works for keyboard keys
             KeyMapping keybind = Minecraft.getInstance().options.keyUse;
-            InputConstants.Key input = InputConstants.getKey(keybind.saveString());
+//            InputConstants.Key input = InputConstants.getKey(keybind.saveString());
+            InputConstants.Key input = InputUtils.getBoundKey(keybind);
 
             if (input != null)
             {
-                KeyMapping.set(input, KeybindMulti.isKeyDown(KeybindMulti.getKeyCode(keybind)));
+                final int scanCode = KeybindMulti.getKeyCode(keybind);
+                final boolean isDown = KeybindMulti.isKeyDown(scanCode);
+                KeyMapping.set(input, isDown);
             }
 
             GuiBase.openGui(null);

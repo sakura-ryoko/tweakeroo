@@ -25,6 +25,7 @@ import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.MessageOutputType;
+import fi.dy.masa.malilib.util.input.InputUtils;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
@@ -96,7 +97,8 @@ public class MiscTweaks
         {
             this.state = state;
 
-            InputConstants.Key key = InputConstants.getKey(this.keybind.saveString());
+            InputConstants.Key key = InputUtils.getBoundKey(this.keybind);
+//            InputConstants.Key key = InputConstants.getKey(this.keybind.saveString());
             KeyMapping.set(key, state);
 
             if (state)

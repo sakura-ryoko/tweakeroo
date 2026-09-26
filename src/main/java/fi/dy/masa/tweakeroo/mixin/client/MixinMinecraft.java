@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import fi.dy.masa.malilib.util.input.InputUtils;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
 import fi.dy.masa.tweakeroo.tweaks.MiscTweaks;
 import fi.dy.masa.tweakeroo.tweaks.PlacementTweaks;
@@ -139,12 +140,16 @@ public abstract class MixinMinecraft implements IMinecraftClientInvoker
                     this.missTime = 0;
                 }
 
-                KeyMapping.set(InputConstants.getKey(this.options.keyAttack.saveString()), true);
+                KeyMapping atk = this.options.keyAttack;
+                InputConstants.Key atkKey = InputUtils.getBoundKey(atk);
+                KeyMapping.set(atkKey, true);
             }
 
             if (FeatureToggle.TWEAK_HOLD_USE.getBooleanValue())
             {
-                KeyMapping.set(InputConstants.getKey(this.options.keyUse.saveString()), true);
+                KeyMapping use = this.options.keyUse;
+                InputConstants.Key useKey = InputUtils.getBoundKey(use);
+                KeyMapping.set(useKey, true);
             }
         }
     }

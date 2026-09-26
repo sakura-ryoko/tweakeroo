@@ -11,7 +11,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
@@ -27,6 +26,7 @@ import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.render.InventoryOverlayScreen;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.input.InputUtils;
 import fi.dy.masa.tweakeroo.Reference;
 import fi.dy.masa.tweakeroo.data.CachedTagManager;
 import fi.dy.masa.tweakeroo.data.CameraPresetManager;
@@ -197,14 +197,16 @@ public class Callbacks
         @Override
         public void onValueChanged(IConfigBoolean config)
         {
+	        InputConstants.Key key = InputUtils.getBoundKey(this.keyBind);
+
             if (config.getBooleanValue())
             {
-                KeyMapping.set(InputConstants.getKey(this.keyBind.saveString()), true);
-                KeyMapping.click(InputConstants.getKey(this.keyBind.saveString()));
+                KeyMapping.set(key, true);
+                KeyMapping.click(key);
             }
             else
             {
-                KeyMapping.set(InputConstants.getKey(this.keyBind.saveString()), false);
+                KeyMapping.set(key, false);
             }
         }
     }
