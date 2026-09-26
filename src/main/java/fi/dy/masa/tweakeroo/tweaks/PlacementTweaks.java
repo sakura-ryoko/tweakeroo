@@ -2,6 +2,8 @@ package fi.dy.masa.tweakeroo.tweaks;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
+
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -9,7 +11,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
 import fi.dy.masa.malilib.gui.Message;
 import fi.dy.masa.malilib.util.EquipmentUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -72,17 +74,19 @@ public class PlacementTweaks
 
     public static void onTick(Minecraft mc)
     {
-        boolean attack = mc.options.keyAttack.isDown();
-        boolean use = mc.options.keyUse.isDown();
+	    KeyMapping atk = mc.options.keyAttack;
+        KeyMapping use = mc.options.keyUse;
+//        InputConstants.Key boundAtk = InputUtils.getBoundKey(atk);
+//        InputConstants.Key boundUse = InputUtils.getBoundKey(use);
 
         if (GuiUtils.getCurrentScreen() == null && !FeatureToggle.TWEAK_AREA_SELECTOR.getBooleanValue())
         {
-            if (use)
+            if (use.isDown())
             {
                 onUsingTick();
             }
 
-            if (attack)
+            if (atk.isDown())
             {
                 onAttackTick(mc);
             }
@@ -93,20 +97,20 @@ public class PlacementTweaks
             stackBeforeUse[1] = ItemStack.EMPTY;
         }
 
-        if (use == false)
+        if (use.isDown() == false)
         {
             clearClickedBlockInfoUse();
 
             // Clear the cached stack when releasing both keys, so that the restock doesn't happen when
             // using another item or an empty hand.
-            if (attack == false)
+            if (atk.isDown() == false)
             {
                 stackBeforeUse[0] = ItemStack.EMPTY;
                 stackBeforeUse[1] = ItemStack.EMPTY;
             }
         }
 
-        if (attack == false)
+        if (atk.isDown() == false)
         {
             clearClickedBlockInfoAttack();
         }
@@ -119,8 +123,8 @@ public class PlacementTweaks
         ItemStack stackOriginal = player.getItemInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-                stackOriginal.isEmpty() == false &&
-                canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
+            stackOriginal.isEmpty() == false &&
+            canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             if (isEmulatedClick == false)
             {
@@ -170,8 +174,8 @@ public class PlacementTweaks
         ItemStack stackOriginal = player.getItemInHand(hand);
 
         if (FeatureToggle.TWEAK_HAND_RESTOCK.getBooleanValue() &&
-                stackOriginal.isEmpty() == false &&
-                canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
+            stackOriginal.isEmpty() == false &&
+            canUseItemWithRestriction(HAND_RESTOCK_RESTRICTION, stackOriginal))
         {
             stackBeforeUse[hand.ordinal()] = stackOriginal.copy();
             hotbarSlot = player.getInventory().getSelectedSlot();
@@ -183,7 +187,7 @@ public class PlacementTweaks
         if (FeatureToggle.TWEAK_FAST_LEFT_CLICK.getBooleanValue())
         {
             if (mc.player.getAbilities().instabuild ||
-                    (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (EquipmentUtils.isAnyTool(mc.player.getMainHandItem())) == false))
+                (Configs.Generic.FAST_LEFT_CLICK_ALLOW_TOOLS.getBooleanValue() || (EquipmentUtils.isAnyTool(mc.player.getMainHandItem())) == false))
             {
                 final int count = Configs.Generic.FAST_LEFT_CLICK_COUNT.getIntegerValue();
 
@@ -213,7 +217,7 @@ public class PlacementTweaks
         }
 
         if (posFirst != null && FeatureToggle.TWEAK_FAST_BLOCK_PLACEMENT.getBooleanValue() &&
-                canUseItemWithRestriction(FAST_PLACEMENT_ITEM_RESTRICTION, mc.player))
+            canUseItemWithRestriction(FAST_PLACEMENT_ITEM_RESTRICTION, mc.player))
         {
             LocalPlayer player = mc.player;
             Level world = player.level();
@@ -278,7 +282,7 @@ public class PlacementTweaks
                     InteractionResult result = tryPlaceBlock(mc.gameMode, player, mc.level,
                                                         posNew, sideFirst, sideRotatedFirst, playerYawFirst, hitVec, hand, hitPartFirst, false, false);
 
-                    if (result == InteractionResult.SUCCESS)
+                    if (result instanceof InteractionResult.Success)
                     {
                         posLast = posNew;
                         mc.hitResult = player.pick(reach, mc.getDeltaTracker().getGameTimeDeltaPartialTick(false), false);
@@ -397,7 +401,7 @@ public class PlacementTweaks
         InteractionResult result = tryPlaceBlock(controller, player, world, posIn, sideIn, sideRotated, yaw, hitVec, hand, hitPart, true, hitResult.isInside());
 
         // Store the initial click data for the fast placement mode
-        if (posFirst == null && result == InteractionResult.SUCCESS && restricted)
+        if (posFirst == null && result instanceof InteractionResult.Success && restricted)
         {
             boolean accurate = FeatureToggle.TWEAK_ACCURATE_BLOCK_PLACEMENT.getBooleanValue();
             boolean accurateIn = Hotkeys.ACCURATE_BLOCK_PLACEMENT_IN.getKeybind().isKeybindHeld();
@@ -982,7 +986,7 @@ public class PlacementTweaks
             result = controller.useItemOn(player, hand, context);
         }
 
-        if (result == InteractionResult.SUCCESS)
+        if (result instanceof InteractionResult.Success)
         {
             placementCount++;
         }
@@ -1005,7 +1009,7 @@ public class PlacementTweaks
             }
         }
 
-        if (result == InteractionResult.SUCCESS)
+        if (result instanceof InteractionResult.Success)
         {
             Inventory inv = player.getInventory();
 
