@@ -135,7 +135,7 @@ public class CameraEntity extends LocalPlayer
     {
         this.setYRot(yaw);
         this.setXRot(pitch);
-        this.setYHeadRot(yaw);
+        this.yHeadRot = yaw;
 
         // update the old rotation angles as well so that tick interpolation doesn't yank the camera back
         this.yRotO = yaw;
@@ -153,6 +153,9 @@ public class CameraEntity extends LocalPlayer
     {
         float yaw = this.getYRot() + yawChange * 0.15F;
         float pitch = Mth.clamp(this.getXRot() + pitchChange * 0.15F, -90F, 90F);
+
+        this.setYRot(yaw);
+        this.setXRot(pitch);
 
         this.setCameraRotations(yaw, pitch);
     }
@@ -187,7 +190,8 @@ public class CameraEntity extends LocalPlayer
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
 
         camera.setPosRaw(entityPos.x(), entityPos.y() + 0.125f, entityPos.z());
-        camera.setCameraRotations(yaw, pitch);
+        camera.setYRot(yaw);
+        camera.setXRot(pitch);
         camera.setDeltaMovement(Vec3.ZERO);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
@@ -202,7 +206,8 @@ public class CameraEntity extends LocalPlayer
 		{
 //			Tweakeroo.LOGGER.error("CameraEntity#updatePositionAtPreset(): oldPos [{}], newPos [{}] // yaw [{}], pitch [{}]", camera.getEyePos().toString(), preset.pos().toString(), preset.yaw(), preset.pitch());
 			camera.setPosRaw(preset.getPos().x(), preset.getPos().y(), preset.getPos().z());
-			camera.setCameraRotations(preset.getYaw(), preset.getPitch());
+			camera.setYRot(preset.getYaw());
+			camera.setXRot(preset.getPitch());
 			camera.setDeltaMovement(Vec3.ZERO);
 		}
 	}
@@ -229,7 +234,8 @@ public class CameraEntity extends LocalPlayer
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [PLAYER] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", eyePos.toString(), entityPos.toString(), blockPos.toShortString(), player.getVelocity().toString());
 
 		camera.setPosRaw(preset.getPos().x(), preset.getPos().y(), preset.getPos().z());
-		camera.setCameraRotations(preset.getYaw(), preset.getPitch());
+		camera.setYRot(preset.getYaw());
+		camera.setXRot(preset.getPitch());
 		camera.setDeltaMovement(Vec3.ZERO);
 
 //        Tweakeroo.LOGGER.error("CameraEntity::new() [CAM] eyePos [{}], pos [{}], blockPos [{}] // Velocity [{}]", camera.getEyePos().toString(), camera.getPos().toString(), camera.getBlockPos().toShortString(), camera.getVelocity().toString());
