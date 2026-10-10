@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.chat.ChatAbilities;
@@ -67,15 +66,15 @@ public class CameraEntity extends LocalPlayer
 
         if (camera != null && Configs.Generic.FREE_CAMERA_PLAYER_MOVEMENT.getBooleanValue() == false)
         {
-            Options options = Minecraft.getInstance().options;
+            var presses = Minecraft.getInstance().player.input.keyPresses;
 
             camera.updateLastTickPosition();
 
-            if (options.keySprint.isDown())
+            if (presses.sprint())
             {
                 sprinting = true;
             }
-            else if (options.keyUp.isDown() == false && options.keyDown.isDown() == false)
+            else if (presses.forward() == false && presses.backward() == false)
             {
                 sprinting = false;
             }
