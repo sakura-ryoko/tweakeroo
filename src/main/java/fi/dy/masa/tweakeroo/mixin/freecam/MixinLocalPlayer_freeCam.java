@@ -37,6 +37,7 @@ public abstract class MixinLocalPlayer_freeCam extends AbstractClientPlayer
         if (CameraUtils.shouldPreventPlayerMovement())
         {
             this.realInput = this.input;
+            this.realInput.tick();
             this.input = this.dummyMovementInput;
         }
     }

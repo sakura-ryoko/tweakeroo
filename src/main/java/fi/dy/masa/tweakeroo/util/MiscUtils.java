@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.CreateFlatWorldScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
@@ -134,32 +133,32 @@ public class MiscUtils
                                                               double rampAmount,
                                                               double decelerationFactor)
     {
-        Options options = Minecraft.getInstance().options;
+        var presses = Minecraft.getInstance().player.input.keyPresses;
         int forward = 0;
         int vertical = 0;
         int strafe = 0;
 
-        if (options.keyUp.isDown())
+        if (presses.forward())
         {
             forward += 1;
         }
-        if (options.keyDown.isDown())
+        if (presses.backward())
         {
             forward -= 1;
         }
-        if (options.keyLeft.isDown())
+        if (presses.left())
         {
             strafe += 1;
         }
-        if (options.keyRight.isDown())
+        if (presses.right())
         {
             strafe -= 1;
         }
-        if (options.keyJump.isDown())
+        if (presses.jump())
         {
             vertical += 1;
         }
-        if (options.keyShift.isDown())
+        if (presses.shift())
         {
             vertical -= 1;
         }
