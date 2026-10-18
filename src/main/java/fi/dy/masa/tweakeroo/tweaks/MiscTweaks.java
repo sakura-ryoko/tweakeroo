@@ -140,6 +140,20 @@ public class MiscTweaks
 
     private static void doPeriodicClicks(Minecraft mc)
     {
+        // These are normally created in WorldLoadListener#onWorldLoadPost(),
+        // but that world load callback can be missed (for example on some
+        // join/transfer paths), which used to leave them null and then crash
+        // here with a NPE as soon as any GUI was open.
+        if (KEY_STATE_ATTACK == null || KEY_STATE_USE == null)
+        {
+            ensureKeybindStates(mc);
+        }
+
+        if (KEY_STATE_ATTACK == null || KEY_STATE_USE == null)
+        {
+            return;
+        }
+
         if (GuiUtils.getCurrentScreen() == null)
         {
             handlePeriodicClicks(
@@ -363,6 +377,30 @@ public class MiscTweaks
     {
         Options opts = Minecraft.getInstance().options;
 
+        if (opts != null)
+        {
+            createKeybindStates(opts);
+        }
+    }
+
+    /**
+     * Fallback initialization, in case the world load callbacks were skipped
+     * and {@link #setKeybindStates()} never got called before the first tick.
+     */
+    private static void ensureKeybindStates(Minecraft mc)
+    {
+        Options opts = mc != null ? mc.options : null;
+
+        if (opts != null)
+        {
+            createKeybindStates(opts);
+            Tweakeroo.LOGGER.warn("MiscTweaks: the periodic click keybind states were not initialized by the world load event," +
+                                  " created them lazily on the first tick instead");
+        }
+    }
+
+    private static void createKeybindStates(Options opts)
+    {
 	    KEY_STATE_ATTACK = new KeybindState(opts.keyAttack, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoAttack());
 	    KEY_STATE_USE = new KeybindState(opts.keyUse, (mc) -> ((IMinecraftClientInvoker) mc).tweakeroo_invokeDoItemUse());
     }
