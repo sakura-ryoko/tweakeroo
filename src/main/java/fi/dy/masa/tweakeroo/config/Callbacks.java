@@ -56,7 +56,15 @@ public class Callbacks
                                                                                 FeatureToggle.TWEAK_PLACEMENT_RESTRICTION.setBooleanValue(cfg.getBooleanValue());
                                                                             }
                                                                         });
-        FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> CameraEntity.setCameraState(cfg.getBooleanValue(), null));
+        FeatureToggle.TWEAK_FREE_CAMERA.setValueChangeCallback((cfg) -> {
+			CameraPreset preset = null;
+			if (cfg.getBooleanValue() && Configs.Generic.FREE_CAMERA_ACTIVATE_LAST_PRESET.getBooleanValue() && mc.level != null) {
+                CameraPresetManager manager = CameraPresetManager.getInstance();
+                int id = manager.getLastPreset(mc.level.dimension());
+                preset = manager.get(id);
+			}
+	        CameraEntity.setCameraState(cfg.getBooleanValue(), preset);
+        });
         FeatureToggle.TWEAK_HOLD_ATTACK.setValueChangeCallback(new FeatureCallbackHold(mc.options.keyAttack));
         FeatureToggle.TWEAK_HOLD_USE.setValueChangeCallback(new FeatureCallbackHold(mc.options.keyUse));
         Configs.Generic.ENTITY_DATA_SYNC.setValueChangeCallback((config) -> EntityDataManager.getInstance().onEntityDataSyncToggled(config));
