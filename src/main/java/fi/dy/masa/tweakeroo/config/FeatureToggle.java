@@ -117,6 +117,7 @@ public enum FeatureToggle implements IEnumBooleanHotkey
     TWEAK_WEAPON_SWITCH             ("tweakWeaponSwitch",                   false, ""),
     TWEAK_Y_MIRROR                  ("tweakYMirror",                        false, ""),
     TWEAK_ZOOM                      ("tweakZoom",                           false, "",    KeybindSettings.INGAME_BOTH),
+    TWEAK_ZOOM_EXPONENTIAL          ("tweakZoomExponential",                true,  ""),
     ;
 
     public static final ImmutableList<@NotNull FeatureToggle> VALUES = ImmutableList.copyOf(values());
