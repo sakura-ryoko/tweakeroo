@@ -37,12 +37,14 @@ public class CameraPresetManager
 	private final List<CameraPreset> presets;
 	private CameraPreset selectedPreset;
 	private int lastPreset;
+	private int activePreset;
 	private final Map<Identifier, Integer> lastDimPreset;
 
 	private CameraPresetManager()
 	{
 		this.presets = new ArrayList<>();
 		this.lastPreset = -1;
+		this.activePreset = -1;
 		this.selectedPreset = null;
 		this.lastDimPreset = new HashMap<>();
 	}
@@ -371,6 +373,26 @@ public class CameraPresetManager
 	public int getLastPreset(@Nonnull ResourceKey<Level> worldKey)
 	{
 		return this.lastDimPreset.getOrDefault(worldKey.identifier(), -1);
+	}
+
+	/**
+	 * Return the ID of the Preset the Free Camera was last activated with. (-1 means there isn't an active preset)
+	 *
+	 * @return (id)
+	 */
+	public int getActivePreset()
+	{
+		return this.activePreset;
+	}
+
+	/**
+	 * Set the ID of the Preset the Free Camera was last activated with. (-1 to clear).
+	 *
+	 * @param id ()
+	 */
+	public void setActivePreset(final int id)
+	{
+		this.activePreset = id;
 	}
 
 	/**
