@@ -2,7 +2,9 @@ package fi.dy.masa.tweakeroo.data;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,12 +37,14 @@ public class CameraPresetManager
 	private final List<CameraPreset> presets;
 	private CameraPreset selectedPreset;
 	private int lastPreset;
+	private final Map<Identifier, Integer> lastDimPreset;
 
 	private CameraPresetManager()
 	{
 		this.presets = new ArrayList<>();
 		this.lastPreset = -1;
 		this.selectedPreset = null;
+		this.lastDimPreset = new HashMap<>();
 	}
 
 	public @Nullable CameraPreset getSelectedPreset()
@@ -359,6 +363,17 @@ public class CameraPresetManager
 	}
 
 	/**
+	 * Return the last obtained Preset ID for a particular dimension. (-1 means none were obtained)
+	 *
+	 * @param worldKey (dim)
+	 * @return (id)
+	 */
+	public int getLastPreset(@Nonnull ResourceKey<Level> worldKey)
+	{
+		return this.lastDimPreset.getOrDefault(worldKey.identifier(), -1);
+	}
+
+	/**
 	 * Set the lastPreset Value manually.
 	 *
 	 * @param id ()
@@ -366,6 +381,29 @@ public class CameraPresetManager
 	public void setLastPreset(final int id)
 	{
 		this.lastPreset = id;
+	}
+
+	/**
+	 * Set the lastPreset Value manually, for a particular dimension.
+	 *
+	 * @param dim ()
+	 * @param id ()
+	 */
+	public void setLastPreset(final int id, Identifier dim)
+	{
+		this.setLastPreset(id);
+		this.lastDimPreset.put(dim, id);
+	}
+
+	/**
+	 * Set the lastPreset Value manually, for a particular dimension.
+	 *
+	 * @param worldKey (dim)
+	 * @param id ()
+	 */
+	public void setLastPreset(final int id, @Nonnull ResourceKey<Level> worldKey)
+	{
+		this.setLastPreset(id, worldKey.identifier());
 	}
 
 	/**
@@ -397,12 +435,12 @@ public class CameraPresetManager
 								return null;
 							}
 
-							this.lastPreset = first.getId();
+							this.setLastPreset(first.getId(), dim);
 							return first;
 						}
 					}
 
-					this.lastPreset = entry.getId();
+					this.setLastPreset(entry.getId(), dim);
 					return entry;
 				}
 				else if (entry.getId() == this.lastPreset)
@@ -421,10 +459,11 @@ public class CameraPresetManager
 				if (last.getId() == this.lastPreset)
 				{
 					this.lastPreset = -1;
+					this.lastDimPreset.remove(worldKey.identifier());
 					return this.getFirst(worldKey);
 				}
 
-				this.lastPreset = last.getId();
+				this.setLastPreset(last.getId(), last.getDim());
 				return last;
 			}
 		}
@@ -446,7 +485,7 @@ public class CameraPresetManager
 		{
 			if (entry != null && entry.getDim().equals(dim))
 			{
-				this.lastPreset = entry.getId();
+				this.setLastPreset(entry.getId(), dim);
 				return entry;
 			}
 		}
@@ -475,7 +514,7 @@ public class CameraPresetManager
 
 		if (last != null)
 		{
-			this.lastPreset = last.getId();
+			this.setLastPreset(last.getId(), dim);
 		}
 
 		return last;
@@ -514,6 +553,7 @@ public class CameraPresetManager
 				}
 			}
 		}
+		lastDimPreset.remove(dim);
 	}
 
 	/**
@@ -532,6 +572,7 @@ public class CameraPresetManager
 	public void clear(boolean message)
 	{
 		this.presets.clear();
+		this.lastDimPreset.clear();
 
 		if (message)
 		{

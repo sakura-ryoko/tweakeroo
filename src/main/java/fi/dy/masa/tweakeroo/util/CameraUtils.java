@@ -267,7 +267,7 @@ public class CameraUtils
 		{
 			if (mc.level.dimension().identifier().equals(preset.getDim()))
 			{
-				CameraPresetManager.getInstance().setLastPreset(preset.getId());
+				CameraPresetManager.getInstance().setLastPreset(preset.getId(), mc.level.dimension());
 
 				if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
 				{
