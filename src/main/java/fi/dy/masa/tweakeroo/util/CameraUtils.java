@@ -272,6 +272,7 @@ public class CameraUtils
 				if (FeatureToggle.TWEAK_FREE_CAMERA.getBooleanValue())
 				{
 					CameraEntity.updatePositionAtPreset(preset);
+					CameraPresetManager.getInstance().setActivePreset(preset.getId());
 				}
 				else
 				{

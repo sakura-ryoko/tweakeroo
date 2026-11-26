@@ -22,6 +22,7 @@ import org.jetbrains.annotations.ApiStatus;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.config.Configs;
 import fi.dy.masa.tweakeroo.config.FeatureToggle;
+import fi.dy.masa.tweakeroo.data.CameraPresetManager;
 
 public class CameraEntity extends LocalPlayer
 {
@@ -111,6 +112,35 @@ public class CameraEntity extends LocalPlayer
 
         this.setDeltaMovement(new Vec3(x, y, z));
         this.move(MoverType.SELF, this.getDeltaMovement());
+        this.updateActiveFreeCamPreset();
+    }
+
+    private void updateActiveFreeCamPreset()
+    {
+        if (!Configs.Generic.FREE_CAMERA_LIVE_UPDATE_PRESET.getBooleanValue())
+        {
+            return;
+        }
+
+        CameraPresetManager manager = CameraPresetManager.getInstance();
+        CameraPreset activePreset = manager.get(manager.getActivePreset());
+
+        if (activePreset == null)
+        {
+            return;
+        }
+
+        Vec3 pos = this.getEyePosition();
+        float yaw = this.getYRot();
+        float pitch = this.getXRot();
+
+        if (activePreset.getPos().equals(pos) && activePreset.getYaw() == yaw && activePreset.getPitch() == pitch)
+        {
+            return;
+        }
+
+        CameraPreset newPreset = new CameraPreset(activePreset.getId(), activePreset.getName(), activePreset.getDim(), pos, yaw, pitch);
+        CameraUtils.updatePreset(newPreset);
     }
 
     private void updateLastTickPosition()
@@ -256,6 +286,7 @@ public class CameraEntity extends LocalPlayer
         if (mc.level != null && mc.player != null)
         {
 	        ResourceKey<Level> dim = mc.level.dimension();
+            CameraPresetManager manager = CameraPresetManager.getInstance();
 
             if (enabled && preset != null &&
 	            preset.getId() > -1)
@@ -263,6 +294,7 @@ public class CameraEntity extends LocalPlayer
 				if (preset.getDim().equals(dim.identifier()))
 				{
 					createAndSetCameraAtPreset(mc, preset);
+					manager.setActivePreset(preset.getId());
 				}
 				else
 				{
@@ -272,10 +304,12 @@ public class CameraEntity extends LocalPlayer
 	        else if (enabled)
 	        {
 		        createAndSetCamera(mc);
+		        manager.setActivePreset(-1);
 	        }
             else
             {
                 removeCamera(mc);
+                manager.setActivePreset(-1);
             }
 
 //            mc.gameRenderer.setRenderHand(! enabled);
