@@ -87,7 +87,8 @@ public class MiscUtils
     private static SignText previousSignText;
     private static String previousChatText = "";
     private static final Date DATE = new Date();
-    private static double mouseSensitivity = -1.0F;
+    private static double mouseSensitivity;
+    private static boolean mouseSensitivityAdjusted = false;
     private static boolean zoomActive;
     private static boolean spyglassZoomActive;
 
@@ -215,6 +216,9 @@ public class MiscUtils
         if (Configs.Generic.ZOOM_ADJUST_MOUSE_SENSITIVITY.getBooleanValue())
         {
             setMouseSensitivityForZoom();
+        }
+	if (Configs.Generic.ZOOM_RESET_FOV_ON_ACTIVATE.getBooleanValue())
+        {
             lastZoomValue = new PostKeyAction(Configs.Generic.ZOOM_FOV.getDoubleValue());
         }
 
@@ -242,6 +246,12 @@ public class MiscUtils
 
             zoomActive = false;
         }
+    }
+
+    public static void onZoomChanged()
+    {
+        if (zoomActive && Configs.Generic.ZOOM_ADJUST_MOUSE_SENSITIVITY.getBooleanValue())
+            setMouseSensitivityForZoom();
     }
 
     public static boolean isSpyglassZoomActive()
@@ -297,29 +307,36 @@ public class MiscUtils
     {
         Minecraft mc = Minecraft.getInstance();
 
-        double fov = Configs.Generic.ZOOM_FOV.getDoubleValue();
-        double origFov = mc.options.fov().get();
-
-        if (fov < origFov)
+        // Only store once
+        if (!mouseSensitivityAdjusted)
         {
-            // Only store it once
-            if (mouseSensitivity <= 0.0 || mouseSensitivity > 1.0)
-            {
-                mouseSensitivity = mc.options.sensitivity().get();
-            }
-
-            double min = 0.04;
-            double sens = min + (0.5 - min) * (1.0 - (origFov - fov) / origFov);
-            mc.options.sensitivity().set(Math.min(mouseSensitivity, sens));
+            mouseSensitivity = mc.options.sensitivity().get();
+            mouseSensitivityAdjusted = true;
         }
+
+        double fov = Configs.Generic.ZOOM_FOV.getDoubleValue();
+	double origFov = mc.options.fov().get();
+
+	double trueDPS = Math.pow(mouseSensitivity*0.6+0.2, 3) * 8.0;
+
+        double sens = trueDPS * Math.tan(Math.toRadians(fov/2)) / Math.tan(Math.toRadians(origFov/2));
+
+        sens = Mth.lerp(Math.cbrt(sens), -0.2/0.6, 1);
+
+        // Math.min to ensure we never set a sens _higher_ than the player has configured
+        //mc.options.sensitivity().set(Math.min(sens, mouseSensitivity));
+        @SuppressWarnings("unchecked")
+        IMixinSimpleOption<Double> opt = (IMixinSimpleOption<Double>) (Object) mc.options.sensitivity();
+
+        opt.tweakeroo_setValueWithoutCheck(Math.min(sens, mouseSensitivity));
     }
 
     public static void resetMouseSensitivityForZoom()
     {
-        if (mouseSensitivity > 0.0)
+        if (mouseSensitivityAdjusted)
         {
             Minecraft.getInstance().options.sensitivity().set(mouseSensitivity);
-            mouseSensitivity = -1.0;
+            mouseSensitivityAdjusted = false;
         }
     }
 

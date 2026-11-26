@@ -278,6 +278,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
 
                 Configs.Generic.ZOOM_FOV.setDoubleValue(MathUtils.clamp(newValue, Configs.Generic.ZOOM_MINIMUM_FOV.getDoubleValue(), Configs.Generic.ZOOM_MAXIMUM_FOV.getDoubleValue()));
+		MiscUtils.onZoomChanged();
 
                 // Only prevent the next trigger when adjusting the value with the actual toggle key held
                 if (FeatureToggle.TWEAK_ZOOM.getKeybind().isKeybindHeld())
