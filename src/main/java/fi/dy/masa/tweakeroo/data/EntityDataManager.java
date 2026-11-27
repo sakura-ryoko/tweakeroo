@@ -20,6 +20,7 @@ import fi.dy.masa.malilib.interfaces.IDataSyncer;
 import fi.dy.masa.malilib.mixin.network.IMixinDebugQueryHandler;
 import fi.dy.masa.malilib.network.ClientPlayHandler;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
+import fi.dy.masa.malilib.network.status.NetworkState;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.MathUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -47,7 +48,6 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
     private final Minecraft mc;
     private ClientLevel clientWorld;
     private boolean servuxServer = false;
-    private boolean hasInValidServux = false;
     private String servuxVersion;
     private boolean checkOpStatus = true;
     private boolean hasOpStatus = false;
@@ -59,6 +59,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
     private final EntityDataRequestTracker requestTracker;
     private final Map<Integer, Either<BlockPos, Integer>> transactionToBlockPosOrEntityId = new HashMap<>();
     private long lastTickTime;
+    private long lastMetaRequestTime;
 
     @Override
     @Nullable
@@ -84,6 +85,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         this.cache = new EntityDataCache(Reference.MOD_ID, this.getCacheTimeout());
         this.requestTracker = new EntityDataRequestTracker();
         this.lastTickTime = System.currentTimeMillis();
+        this.lastMetaRequestTime = 0L;
         this.lastOpCheck = 0L;
         Registry.ENTITY_DATA_REGISTRY.registerEntityDataCache(this.cache);
     }
@@ -107,12 +109,21 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             if (!Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue())
             {
                 this.lastTickTime = now;
-                if (!DataManager.getInstance().hasIntegratedServer() && this.hasServuxServer())
+
+                if (!DataManager.getInstance().hasIntegratedServer())
                 {
-                    this.servuxServer = false;
-                    HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
-                    HANDLER.unregisterPlayReceiver();
-                    HANDLER.reset(this.getNetworkChannel());
+                    if (this.hasServuxServer())
+                    {
+                        this.servuxServer = false;
+                        HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
+                        HANDLER.unregisterPlayReceiver();
+                        HANDLER.tracker().displayGenericDisconnectedMessage();
+                    }
+
+                    if (!HANDLER.tracker().isLocked())
+                    {
+                        HANDLER.tracker().lock();
+                    }
                 }
 
                 if (!Configs.Generic.ENTITY_DATA_SYNC_BACKUP.getBooleanValue())
@@ -125,12 +136,22 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             else if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() &&
                     !DataManager.getInstance().hasIntegratedServer() &&
                     !this.hasServuxServer() &&
-                    !this.hasInValidServux &&
+                    !HANDLER.tracker().isLocked() &&
                     this.getBestWorld() != null)
             {
-                // Make sure we're Play Registered, and request Metadata
-                HANDLER.registerPlayReceiver(ServuxTweaksPacket.Payload.ID, HANDLER::receivePlayPayload);
-                this.requestMetadata();
+                if (this.lastMetaRequestTime > 0L && (now - this.lastMetaRequestTime) > 4000L)
+                {
+                    // Give up after 10 seconds, and don't continuously request metadata.
+                    HANDLER.tracker().tickState(NetworkState.GENERAL_ERROR);
+                    HANDLER.tracker().lock();
+                    HANDLER.tracker().displayTopStatusMessage();
+                }
+                else
+                {
+                    // Make sure we're Play Registered, and request Metadata
+                    HANDLER.registerPlayReceiver(ServuxTweaksPacket.Payload.ID, HANDLER::receivePlayPayload);
+                    this.requestMetadata();
+                }
             }
 
             if (this.cache.getTimeout() != this.getCacheTimeout())
@@ -209,14 +230,13 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
         {
             Tweakeroo.debugLog("ServerDataSyncer#reset() - log-out");
             HANDLER.reset(this.getNetworkChannel());
-            HANDLER.resetFailures(this.getNetworkChannel());
             this.servuxServer = false;
-            this.hasInValidServux = false;
             this.sentBackupPackets = false;
             this.receivedBackupPackets = false;
             this.checkOpStatus = false;
             this.hasOpStatus = false;
             this.lastOpCheck = 0L;
+            this.lastMetaRequestTime = 0L;
         }
         else
         {
@@ -228,6 +248,9 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             this.clientWorld = this.mc.level;
             this.checkOpStatus = true;
             this.lastOpCheck = now;
+
+            // Re-Register connection [OPTIONAL]
+//            this.reRegisterServux();
         }
 
         // Clear data
@@ -316,7 +339,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
     public void setIsServuxServer()
     {
         this.servuxServer = true;
-        this.hasInValidServux = false;
+        HANDLER.tracker().reset();
     }
 
     public boolean hasServuxServer()
@@ -412,6 +435,13 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             CompoundData nbt = new CompoundData();
             nbt.putInt("version", ServuxTweaksPacket.PROTOCOL_VERSION);
             HANDLER.encodeClientData(ServuxTweaksPacket.MetadataRequest(nbt));
+
+            System.out.print("REQUEST\n");
+
+            if (this.lastMetaRequestTime < 50L)
+            {
+                this.lastMetaRequestTime = System.currentTimeMillis();
+            }
         }
     }
 
@@ -442,8 +472,10 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                         HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
                     }
 
+                    HANDLER.tracker().tickState(NetworkState.VERSION_MISMATCH);
+                    HANDLER.tracker().lock();
                     HANDLER.unregisterPlayReceiver();
-                    HANDLER.reset(this.getNetworkChannel());
+//                    HANDLER.reset(this.getNetworkChannel());
 //                    Configs.Generic.ENTITY_DATA_SYNC.setBooleanValue(false);
                     this.onPacketFailure();
                     return false;
@@ -453,12 +485,30 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
                 DataManager.getInstance().setHasServuxServer(true);
                 this.setServuxVersion(servux);
                 this.setIsServuxServer();
+                HANDLER.tracker().displayGenericConnectedMessage();
 
                 return true;
             }
         }
 
         return false;
+    }
+
+    // [OPTIONAL]
+    private void reRegisterServux()
+    {
+        if (Configs.Generic.ENTITY_DATA_SYNC.getBooleanValue() &&
+            !DataManager.getInstance().hasIntegratedServer() &&
+            this.hasServuxServer())
+        {
+            HANDLER.encodeClientData(ServuxTweaksPacket.UnregisterReply(new CompoundData()));
+            HANDLER.tracker().displayGenericDisconnectedMessage();
+            this.servuxServer = false;
+            this.lastMetaRequestTime = 0L;
+
+            // Request
+            this.requestMetadata();
+        }
     }
 
     @Deprecated(forRemoval = true)
@@ -489,17 +539,15 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
 //        Configs.Generic.ENTITY_DATA_SYNC.setBooleanValue(false);
         DataManager.getInstance().setHasServuxServer(false);
         this.servuxServer = false;
-        this.hasInValidServux = true;
+        HANDLER.tracker().displayStatusAllMessages();
     }
 
     public void onEntityDataSyncToggled(ConfigBoolean config)
     {
-        if (this.hasInValidServux)
+        if (config.getBooleanValue())
         {
             this.reset(true);
         }
-
-        // Do something?
     }
 
     private void requestQueryBlockEntity(BlockPos pos)

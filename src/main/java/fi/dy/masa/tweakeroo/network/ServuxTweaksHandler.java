@@ -12,6 +12,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import fi.dy.masa.malilib.network.IClientPayloadData;
 import fi.dy.masa.malilib.network.IPluginClientPlayHandler;
+import fi.dy.masa.malilib.network.status.NetworkState;
+import fi.dy.masa.malilib.network.status.NetworkStateTracker;
 import fi.dy.masa.tweakeroo.Tweakeroo;
 import fi.dy.masa.tweakeroo.data.EntityDataManager;
 
@@ -30,10 +32,10 @@ public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> impleme
 	public static ServuxTweaksHandler<ServuxTweaksPacket.Payload> getInstance() {return INSTANCE;}
 
 	public static final Identifier CHANNEL_ID = Identifier.fromNamespaceAndPath("servux", "tweaks");
+	private final NetworkStateTracker tracker = new NetworkStateTracker("tweaks_data");
 
 	private boolean servuxRegistered;
 	private boolean payloadRegistered = false;
-	private int failures = 0;
 
 	@Override
 	public Identifier getPayloadChannel() {return CHANNEL_ID;}
@@ -104,18 +106,10 @@ public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> impleme
 	@Override
 	public void reset(Identifier channel)
 	{
-		if (channel.equals(CHANNEL_ID) && this.servuxRegistered)
+		if (channel.equals(CHANNEL_ID))
 		{
 			this.servuxRegistered = false;
-			this.failures = 0;
-		}
-	}
-
-	public void resetFailures(Identifier channel)
-	{
-		if (channel.equals(CHANNEL_ID) && this.failures > 0)
-		{
-			this.failures = 0;
+			this.tracker().reset();
 		}
 	}
 
@@ -155,22 +149,31 @@ public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> impleme
 	@Override
 	public boolean checkFailures()
 	{
-		return !(this.failures > this.maxFailures());
+		return !(this.tracker().failureCount() > this.maxFailures());
+	}
+
+	@Override
+	public NetworkStateTracker tracker()
+	{
+		return this.tracker;
 	}
 
 	@Override
 	public void tickFailures()
 	{
-		if (this.failures > this.maxFailures())
+		int count = this.tracker().failureCount();
+
+		if (count > this.maxFailures())
 		{
 			Tweakeroo.debugLog("ServuxTweaksHandler#tickFailures(): encountered [{}] sendPayload failures, cancelling any Servux join attempt(s)", this.maxFailures());
 			this.servuxRegistered = false;
+			this.tracker().lock();
 			ServuxTweaksHandler.INSTANCE.unregisterPlayReceiver();
 			EntityDataManager.getInstance().onPacketFailure();
 		}
 		else
 		{
-			this.failures++;
+			this.tracker().tickState(NetworkState.GENERAL_ERROR);
 		}
 	}
 }
