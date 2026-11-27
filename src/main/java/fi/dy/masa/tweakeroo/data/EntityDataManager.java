@@ -436,8 +436,6 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
             nbt.putInt("version", ServuxTweaksPacket.PROTOCOL_VERSION);
             HANDLER.encodeClientData(ServuxTweaksPacket.MetadataRequest(nbt));
 
-            System.out.print("REQUEST\n");
-
             if (this.lastMetaRequestTime < 50L)
             {
                 this.lastMetaRequestTime = System.currentTimeMillis();
