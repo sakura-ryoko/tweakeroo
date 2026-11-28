@@ -256,9 +256,29 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 double diff = GuiBase.isCtrlDown() ?
                         Configs.Generic.ZOOM_FOV_DIFFERENCE_CTRL.getDoubleValue() :
                         Configs.Generic.ZOOM_FOV_DIFFERENCE.getDoubleValue();
-                
-                double newValue = Configs.Generic.ZOOM_FOV.getDoubleValue() + (dWheel < 0 ? diff : -diff);
+
+                double newValue = Configs.Generic.ZOOM_FOV.getDoubleValue();
+
+                if (FeatureToggle.TWEAK_ZOOM_EXPONENTIAL.getBooleanValue())
+                {
+                    // 1.1 here is sort of a magic number, and it kinda just feels right.
+                    double k = Math.pow(1.1, diff);
+                    if (dWheel < 0)
+                        newValue *= k;
+                    else
+                        newValue /= k;
+		}
+                else
+                {
+
+                    if (dWheel < 0)
+                        newValue += diff;
+                    else
+                        newValue -= diff;
+                }
+
                 Configs.Generic.ZOOM_FOV.setDoubleValue(MathUtils.clamp(newValue, Configs.Generic.ZOOM_MINIMUM_FOV.getDoubleValue(), Configs.Generic.ZOOM_MAXIMUM_FOV.getDoubleValue()));
+		MiscUtils.onZoomChanged();
 
                 // Only prevent the next trigger when adjusting the value with the actual toggle key held
                 if (FeatureToggle.TWEAK_ZOOM.getKeybind().isKeybindHeld())

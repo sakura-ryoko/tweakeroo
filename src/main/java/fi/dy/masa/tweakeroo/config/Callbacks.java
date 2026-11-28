@@ -145,6 +145,7 @@ public class Callbacks
         FeatureToggle.TWEAK_PLACEMENT_LIMIT.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PLACEMENT_LIMIT));
         FeatureToggle.TWEAK_SNAP_AIM.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_SNAP_AIM));
         FeatureToggle.TWEAK_ZOOM.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_ZOOM));
+	FeatureToggle.TWEAK_ZOOM_EXPONENTIAL.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_ZOOM_EXPONENTIAL));
 
 //        FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_ATTACK));
 //        FeatureToggle.TWEAK_PERIODIC_USE.getKeybind().setCallback(KeyCallbackAdjustableFeature.createCallback(FeatureToggle.TWEAK_PERIODIC_USE));
@@ -960,6 +961,10 @@ public class Callbacks
 					//InfoUtils.printActionbarMessage("tweakeroo.message.toggled_zoom_off", strStatus, strValue);
 					InfoUtils.printActionbarMessage("tweakeroo.message.toggled", prettyName, strStatus);
 				}
+			}
+			else if (key == FeatureToggle.TWEAK_ZOOM_EXPONENTIAL.getKeybind())
+			{
+				InfoUtils.printActionbarMessage("tweakeroo.message.toggled", prettyName, strStatus);
 			}
 	//            else if (key == FeatureToggle.TWEAK_PERIODIC_ATTACK.getKeybind())
 	//            {
