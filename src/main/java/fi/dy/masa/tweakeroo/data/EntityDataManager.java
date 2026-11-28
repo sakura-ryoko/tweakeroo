@@ -210,9 +210,9 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
 
     private ClientPacketListener getVanillaHandler()
     {
-        if (mc.player != null)
+        if (this.mc.player != null)
         {
-            return mc.player.connection;
+            return this.mc.player.connection;
         }
 
         return null;
@@ -476,6 +476,7 @@ public class EntityDataManager implements IClientTickHandler, IDataSyncer
 //                    HANDLER.reset(this.getNetworkChannel());
 //                    Configs.Generic.ENTITY_DATA_SYNC.setBooleanValue(false);
                     this.onPacketFailure();
+
                     return false;
                 }
 

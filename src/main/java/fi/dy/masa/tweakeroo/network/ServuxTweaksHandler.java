@@ -45,7 +45,7 @@ public abstract class ServuxTweaksHandler<T extends CustomPacketPayload> impleme
 	{
 		if (channel.equals(CHANNEL_ID))
 		{
-			return payloadRegistered;
+			return this.payloadRegistered;
 		}
 
 		return false;
